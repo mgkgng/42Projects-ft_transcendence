@@ -1,0 +1,51 @@
+version: "3.8"
+
+#NETWORK
+networks:
+  net:
+    driver: bridge
+#VOLUMES
+volumes:
+  postgre:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./bd/
+      o: bind
+  projet:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./back/src
+      o: bind
+#IMAGES
+services:
+  back:
+    container_name: back 
+    build: 
+      context: ./back/
+      target: development
+    command: npm run start:debug
+    env_file:
+      - .env
+    volumes:
+      - ./back/src:/usr/src/app
+      - /usr/src/app/node_modules
+    networks:
+      - net
+    ports:
+      - "6969:3000"
+    restart: always
+  bd:
+    image: postgres
+    environment:
+      - .env
+    networks:
+      - net
+    volumes:
+      - postgre:/var/lib/postgresql/data 
+    ports:
+      - "5432:5432"
+    depends_on:
+      - back
+ 
