@@ -23,15 +23,12 @@ services:
       - back
   back:
     container_name: back 
-    build:
-      context: ./back
-      target: development
+    build: ./back
     volumes:
       - ./back:/usr/src/app
       - /usr/src/app/node_modules
     ports:
       - 3000:3000
-    command: npm run start:dev
     env_file:
       - .env
     networks:
