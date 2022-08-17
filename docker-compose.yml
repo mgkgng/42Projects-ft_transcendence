@@ -7,6 +7,20 @@ networks:
 
 #IMAGES
 services:
+  front:
+    container_name: front
+    build: ./front
+    ports:
+      - "3001:3000"
+    networks:
+      - net
+    env_file:
+      - .env
+    volumes:
+      - ./front:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - back
   back:
     container_name: back 
     build:
@@ -25,6 +39,7 @@ services:
     depends_on:
       - bd 
   bd:
+    container_name: "bd"
     image: postgres
     environment:
       - .env

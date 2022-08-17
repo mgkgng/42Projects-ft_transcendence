@@ -4,7 +4,7 @@ WORKDIR /usr/src/app
 
 COPY package*.json ./
 
-RUN ls &&  npm install
+RUN npm install
 
 COPY . .
 
