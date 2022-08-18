@@ -38,11 +38,11 @@ services:
   bd:
     container_name: "bd"
     image: postgres
-    environment:
+    env_file:
       - .env
     networks:
       - net
     volumes:
-      - /home/abittel/data/postgres:/var/lib/postgresql/data 
+      - ./bd:/var/lib/postgresql/data 
     ports:
       - "5432:5432"
