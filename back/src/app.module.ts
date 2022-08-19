@@ -7,6 +7,7 @@ import { AuthService } from './auth/auth.service';
 import { AuthModule } from './auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm'; 
 import { UserEntity } from './user/user.entity';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
@@ -19,7 +20,7 @@ import { UserEntity } from './user/user.entity';
       database: 'macron',
       entities: [UserEntity],
       synchronize: true,
-    }), ChatModule, UserModule, AuthModule],
+    }), ChatModule, UserModule, AuthModule, HttpModule],
   controllers: [AppController],
   providers: [AppService, AuthService],
 })

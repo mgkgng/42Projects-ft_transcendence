@@ -17,7 +17,7 @@ services:
     env_file:
       - .env
     volumes:
-      - ./front:/usr/src/app
+      - ./front/src:/usr/src/app/src
       - /usr/src/app/node_modules
     depends_on:
       - back

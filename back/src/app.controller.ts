@@ -6,15 +6,21 @@ import { AppService } from './app.service';
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Get("/")
-  getHello(): string {
-    return ("Je te baise");
-  }
+  //@Get("/")
+  //getHello(): string {
+    //return ("Je te baise");
+  //}
   
   @UseGuards(AuthGuard('local'))
   @Post('/auth')
   login(): string
   {
       return ("LOGGED");
+  }
+  @UseGuards(AuthGuard('oauth'))
+  @Post("/auth42")
+  login42(): string
+  {
+      return ("LOGGED42");
   }
 }
