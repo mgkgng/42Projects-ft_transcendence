@@ -11,7 +11,7 @@ services:
     container_name: front
     build: ./front
     ports:
-      - "3001:3000"
+      - "3001:3001"
     networks:
       - net
     env_file:

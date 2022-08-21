@@ -6,8 +6,15 @@ import { UserModule } from './user/user.module';
 import { AuthService } from './auth/auth.service';
 import { AuthModule } from './auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm'; 
-import { UserEntity } from './user/user.entity';
+import { UserEntity } from './entity/User.entity';
 import { HttpModule } from '@nestjs/axios';
+import { JwtModule } from '@nestjs/jwt';
+import { UserChatRoomEntity } from './entity/UserChatRoom.entity';
+import { ChatRoomEntity } from './entity/ChatRoom.entity';
+import { GameEntity } from './entity/Game.entity';
+import { MessageChatRoomEntity } from './entity/MessageChatRoom.entity';
+import { MessageDirectEntity } from './entity/MessageDirect.entity';
+import { UserBlockEntity } from './entity/UserBlock.entity';
 
 @Module({
   imports: [
@@ -15,12 +22,13 @@ import { HttpModule } from '@nestjs/axios';
       type: 'postgres',
       host: "bd",
       port: 5432,
-      username: "macron",
-      password: "macron42",
-      database: 'macron',
-      entities: [UserEntity],
+      username: process.env.POSTGRES_USER,
+      password: process.env.POSTGRES_PASSWORD,
+      database: process.env.POSTGRES_USER,
       synchronize: true,
-    }), ChatModule, UserModule, AuthModule, HttpModule],
+      entities: [UserEntity, UserChatRoomEntity, ChatRoomEntity, GameEntity, MessageChatRoomEntity, MessageDirectEntity, UserBlockEntity],
+    }), 
+    ChatModule, UserModule, AuthModule, HttpModule, JwtModule],
   controllers: [AppController],
   providers: [AppService, AuthService],
 })

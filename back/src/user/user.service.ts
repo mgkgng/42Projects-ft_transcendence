@@ -1,7 +1,8 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { UserChatRoomEntity } from 'src/entity/UserChatRoom.entity';
 import { Repository, DataSource } from 'typeorm';
-import { UserEntity } from './user.entity';
+import { UserEntity } from '../entity/User.entity';
 
 @Injectable()
 export class UserService {
@@ -26,4 +27,14 @@ export class UserService {
 		])
 		.execute());
 	  }
+	 async create(user: any)
+	 {
+		console.log("TRY TO CREATE USER");
+		const res =  await (this.dataSource.createQueryBuilder().insert().into(UserEntity).values([
+			{username: user.username, password: user.password, email: user.email, is_42_user: user.is_42_user, img: user.img},
+		]).execute());
+		console.log("USER INSERTED");
+		console.log(res);
+		return (res);
+	 }
 }
