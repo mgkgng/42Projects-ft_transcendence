@@ -20,12 +20,12 @@ export class UserChatRoomEntity {
 	@Column()
 	is_banned: boolean;
 
-	@Column()
+	@Column({nullable: true})
 	ban_end?: Date;
 
 	@Column()
 	is_muted: boolean;
 
-	@Column()
+	@Column({nullable: true})
 	mute_end?: Date;
 }

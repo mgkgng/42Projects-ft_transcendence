@@ -13,6 +13,9 @@ export class ChatRoomEntity {
 	@OneToMany(() => MessageChatRoomEntity, (user: MessageChatRoomEntity) => user.id_chat_room)
 	id2: MessageChatRoomEntity[];
 
+	@Column({unique: true})
+	name: string;
+
 	@Column()
 	date_creation: Date;
 

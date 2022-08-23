@@ -2,6 +2,7 @@ import logo from './logo.svg';
 import './App.css';
 import React from 'react';
 import axios from 'axios';
+import Socket from "socker.io-client";
 
 class PageLoggin extends React.Component
 {
@@ -26,7 +27,10 @@ class PageLoggin extends React.Component
     const  data = "username=" + this.state.name + "&password=" + this.state.password;
     console.log("username=" + this.state.name + "&password=" + this.state.password);
     try {
-     const response = await axios.post("http://localhost:3000/auth", data, {headers: {'Access-Control-Allow-Origin': '*',}}).catch((err) => {return (false)});
+      const response = await axios.post("http://localhost:3000/auth", data, {headers: {'Access-Control-Allow-Origin': '*',}}).catch((err) => {return (false)});
+      console.log(response.data);
+      const token = response.data.access_token;
+      this.props.setToken(token);
       return (true);
     } catch (error) {
       return (false);
@@ -98,7 +102,8 @@ class App extends React.Component {
   constructor(props)
   {
     super( props );
-    this.state = {page: "Loggin", is_log: false, jwt: "", error_longin42: false};
+    this.state = {page: "Loggin", is_log: false, error_longin42: false, socket : null};
+    this.jwt = React.createRef();
   }
   componentDidMount() {
     const queryParams = new URLSearchParams(window.location.search);
@@ -110,7 +115,7 @@ class App extends React.Component {
         axios.post("http://localhost:3000/auth42","username=oui&password=" + code)
         .then(res => {
           console.log(res.data);
-          this.setState({is_log: true, page: "Game"});
+          this.setState({is_log: true, page: "Game", jwt: res.data.access_token});
         }).catch((err) => {this.setState({error_longin42: true})});
       }catch (error) {
         this.setState({error_longin42: true});
@@ -121,14 +126,15 @@ class App extends React.Component {
   {
     this.setState(() => ({page: page}));
   }
-  change_to_loggin()
+  setToken(tok)
   {
-    this.setState({is_log: true, page: "Game"}); 
+    this.setState({is_log: true, page: "Game", jwt: tok}); 
+
   }
   render(){
     let page_content;
     if (this.state.page === "Loggin")
-      page_content = <PageLoggin error42={this.error_longin42}/>;
+      page_content = <PageLoggin error42={this.error_longin42} setToken={(tok) => this.setToken(tok)}/>;
     else if (this.state.page === "Profile")
       page_content = <PageProfile/>;
     else if (this.state.page === "Game")
