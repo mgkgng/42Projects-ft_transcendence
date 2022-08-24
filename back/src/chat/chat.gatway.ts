@@ -48,7 +48,6 @@ export class ChatService {
 			client.join(name);
 			console.log("Join => ", n.room.name);
 		}
-		this.server.to('test').emit('test', 'test');
 		return ("connect");
 	}
 

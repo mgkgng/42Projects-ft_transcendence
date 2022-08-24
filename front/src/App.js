@@ -2,7 +2,7 @@ import logo from './logo.svg';
 import './App.css';
 import React from 'react';
 import axios from 'axios';
-import Socket from "socker.io-client";
+const { io } = require("socket.io-client");
 
 class PageLoggin extends React.Component
 {
@@ -103,7 +103,7 @@ class App extends React.Component {
   {
     super( props );
     this.state = {page: "Loggin", is_log: false, error_longin42: false, socket : null};
-    this.jwt = React.createRef();
+    this.socket = null;
   }
   componentDidMount() {
     const queryParams = new URLSearchParams(window.location.search);
@@ -129,7 +129,21 @@ class App extends React.Component {
   setToken(tok)
   {
     this.setState({is_log: true, page: "Game", jwt: tok}); 
-
+    this.socket = io("http://localhost:3000", {
+      extraHeaders: {
+        Authorization: "Bearer " + tok,
+      }
+    });
+                  
+    this.socket.on("connect", (data) => {
+        console.log("connect: " + this.state.jwt);
+    });
+  }
+  get_all_room()
+  {
+    this.socket.emit("get_all_room").then((data) => {
+      return (data);
+    });
   }
   render(){
     let page_content;
