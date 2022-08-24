@@ -147,6 +147,11 @@ export class ChatService {
 		await querry.connect();
 		await querry.startTransaction();
 		try{
+			const res = await this.dataSource.getRepository(UserChatRoomEntity).createQueryBuilder("userChat")
+			.where("userChat.id_user = :u", {u : id_user})
+			.andWhere("userChat.room = :r", {r: id_room}).getMany();
+			if (!res.length)
+				throw new WsException("Not in the room");
 			const res_insert_message = await querry.manager.insert(MessageChatRoomEntity,
 				{ id_user: id_user, id_chat_room: id_room, content_message: message, date_message: date_creation}
 			);
@@ -159,6 +164,19 @@ export class ChatService {
 			console.log("Can't create message");
 			throw new WsException("Can't send message");
 		}
+	}
+	@SubscribeMessage('get_my_rooms')
+	async getMyRoom(@MessageBody() data: any, @ConnectedSocket() client: Socket)
+	{
+		const res : any = await this.getNamesRoomsForUser(client);
+		console.log(res);
+		let name : string[];
+		for (let n in res)
+		{
+			const inter : string = (n);
+			name.push(inter);
+		}
+		client.emit("get_my_rooms", name);
 	}
 
 	@SubscribeMessage('pute')

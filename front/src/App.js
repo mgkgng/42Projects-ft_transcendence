@@ -4,6 +4,9 @@ import React from 'react';
 import axios from 'axios';
 const { io } = require("socket.io-client");
 
+ 
+var socket;
+
 class PageLoggin extends React.Component
 {
   constructor(props) 
@@ -89,11 +92,38 @@ class PageChat extends React.Component
   constructor(props) 
   {
     super(props);
+    this.text_info = "";
+    this.rooms = [];
+    socket.emit("get_my_rooms");
+    socket.on("get_my_rooms", (data) => {
+        console.log(data);
+        for (let n in data)
+          if (!(n in this.rooms))
+            this.rooms.push(n);
+    });
+  }
+  addRoom()
+  {
+	  //NAME, IS_PASSWORD_PROTECTED, PASSWORD
+    const name = document.getElementById("newRoom").value;
+    const is_password_protected = false;
+    const password = "";
+    try
+    {
+      socket.emit("new_room", { name: name, is_password_protected: is_password_protected, password: password});
+      socket.emit("get_my_rooms");
+    }
+    catch(e) {  this.text_info = "Room already exist.";}
   }
   render()
   {
     return (
+      <div className='page'>
        <h1>PageChat</h1>
+       <p>{this.text_info}</p>
+       <input type="textarea" id="newRoom"></input>
+       <button onClick={this.addRoom.bind(this)}>+</button>
+      </div>
     );
   }
 };
@@ -103,7 +133,6 @@ class App extends React.Component {
   {
     super( props );
     this.state = {page: "Loggin", is_log: false, error_longin42: false, socket : null};
-    this.socket = null;
   }
   componentDidMount() {
     const queryParams = new URLSearchParams(window.location.search);
@@ -129,19 +158,19 @@ class App extends React.Component {
   setToken(tok)
   {
     this.setState({is_log: true, page: "Game", jwt: tok}); 
-    this.socket = io("http://localhost:3000", {
+		socket = io("http://localhost:3000",{
       extraHeaders: {
         Authorization: "Bearer " + tok,
       }
     });
                   
-    this.socket.on("connect", (data) => {
+    socket.current.on("connect", (data) => {
         console.log("connect: " + this.state.jwt);
     });
   }
   get_all_room()
   {
-    this.socket.emit("get_all_room").then((data) => {
+    socket.emit("get_all_room").then((data) => {
       return (data);
     });
   }
@@ -154,7 +183,7 @@ class App extends React.Component {
     else if (this.state.page === "Game")
       page_content = <PageGame/>;
     else if (this.state.page === "Chat")
-      page_content = <PageChat/>;
+      page_content = <PageChat socket={this.state.socket}/>;
     else
       page_content = <h1>Page not found</h1>;
     if (this.state.is_log == true){
