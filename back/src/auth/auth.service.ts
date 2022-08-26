@@ -21,9 +21,8 @@ export class AuthService {
 	}
 	async validateUser42(code: string): Promise<any> 
 	{
-		const iud = process.env.UID;
+		const iud = process.env.IUD;
 		const secret = process.env.SECRET_APP;
-		
 		try {
 			const rep = await lastValueFrom(this.httpService.post("https://api.intra.42.fr/oauth/token", "grant_type=authorization_code&code=" + code + "&client_id=" + iud + "&client_secret=" + secret + "&redirect_uri=http://localhost:3001"));
 			const res = await lastValueFrom(this.httpService.get("https://api.intra.42.fr/v2/me", {headers: {Authorization: "Bearer " + rep.data.access_token}}));

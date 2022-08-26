@@ -29,12 +29,18 @@ export class UserService {
 	  }
 	 async create(user: any)
 	 {
-		console.log("TRY TO CREATE USER");
-		const res =  await (this.dataSource.createQueryBuilder().insert().into(UserEntity).values([
-			{username: user.username, password: user.password, email: user.email, is_42_user: user.is_42_user, img: user.img},
-		]).execute());
-		console.log("USER INSERTED");
-		console.log(res);
-		return (res);
-	 }
+		const  querry = this.dataSource.createQueryRunner(); 
+		await querry.connect();
+		await querry.startTransaction();
+		try{
+			const res =  await querry.manager.insert(UserEntity,
+				{username: user.username, password: user.password, email: user.email, is_42_user: user.is_42_user, img: user.img},
+			);
+			await querry.commitTransaction();
+		} catch (e) {
+			await querry.rollbackTransaction();
+			console.log("Create User failed");
+			return (null);
+		}
+	}
 }

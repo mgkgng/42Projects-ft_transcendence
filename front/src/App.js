@@ -2,10 +2,13 @@ import logo from './logo.svg';
 import './App.css';
 import React from 'react';
 import axios from 'axios';
+import jwt_decode from 'jwt-decode';
+
 const { io } = require("socket.io-client");
 
  
 var socket;
+var username = "John";
 
 class PageLoggin extends React.Component
 {
@@ -47,7 +50,7 @@ class PageLoggin extends React.Component
     else if (this.state.etat == "error_loggin")
       content = <p>Error loggin: username or password not correct.</p>;
     return (
-      <div className="Lggin">
+      <div className="PageLoggin">
        <h1>PageLoggin</h1>
        {content}
        <input type="textarea" onChange={this.change_username.bind(this)}/>
@@ -92,14 +95,27 @@ class PageChat extends React.Component
   constructor(props) 
   {
     super(props);
+    this.state = {room: [], messages: []};
     this.text_info = "";
     this.rooms = [];
+    this.messages = [];
+    this.id = 0;
     socket.emit("get_my_rooms");
     socket.on("get_my_rooms", (data) => {
         console.log(data);
-        for (let n in data)
+        this.rooms = [];
+        for (let n of data)
+        {
           if (!(n in this.rooms))
+          {
             this.rooms.push(n);
+          }
+        }
+        this.setState({room: this.rooms});
+    });
+    socket.on("get_message_room", (data) => {
+      this.messages = data;
+      this.setState({messages: data});
     });
   }
   addRoom()
@@ -110,19 +126,34 @@ class PageChat extends React.Component
     const password = "";
     try
     {
-      socket.emit("new_room", { name: name, is_password_protected: is_password_protected, password: password});
-      socket.emit("get_my_rooms");
+        socket.emit("new_room", { room_name: name, is_password_protected: is_password_protected, password: password}, () => {
+        socket.emit("get_my_rooms");
+      });
     }
     catch(e) {  this.text_info = "Room already exist.";}
   }
+  getAllMessages(room)
+  {
+    socket.emit("get_message_room", {room_name: room});
+  }
   render()
   {
+    console.log(username);
+    console.log(this.messages);
     return (
-      <div className='page'>
-       <h1>PageChat</h1>
-       <p>{this.text_info}</p>
-       <input type="textarea" id="newRoom"></input>
-       <button onClick={this.addRoom.bind(this)}>+</button>
+      <div className='pageRoom'>
+        <h1>PageChat</h1>
+        <p>{this.text_info}</p>
+        <input type="textarea" id="newRoom"></input>
+        <button onClick={this.addRoom.bind(this)}>+</button>
+        <div className='MessageRoom'>
+          <ul class="ul_room">
+            {this.rooms.map((room) => { return (<button className='BtnRoom' onClick={this.getAllMessages.bind(this, room) }>{room}</button>)})}
+          </ul>
+          <ul className='ul_messages'>
+            {this.messages.map((room) => { return (<p className={room.id_user.username == username ? 'ul_message_me' : 'ul_message_other'}>{room.content_message}</p>)})}
+          </ul>
+        </div>
       </div>
     );
   }
@@ -144,7 +175,8 @@ class App extends React.Component {
         axios.post("http://localhost:3000/auth42","username=oui&password=" + code)
         .then(res => {
           console.log(res.data);
-          this.setState({is_log: true, page: "Game", jwt: res.data.access_token});
+          this.setToken(res.data.access_token);
+          console.log("conv : ", jwt_decode(res.data.access_token + "jwt token"));
         }).catch((err) => {this.setState({error_longin42: true})});
       }catch (error) {
         this.setState({error_longin42: true});

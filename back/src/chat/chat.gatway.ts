@@ -41,13 +41,15 @@ export class ChatService {
 	{
 		const client : Socket = req;
 		console.log('Connect');
-		const names = await this.getNamesRoomsForUser(req);
-		for (let n of names)
-		{
-			const name : string = n.room.name;
-			client.join(name);
-			console.log("Join => ", n.room.name);
-		}
+		try {
+			const names = await this.getNamesRoomsForUser(req);
+			for (let n of names)
+			{
+				const name : string = n.room.name;
+				client.join(name);
+				console.log("Join => ", n.room.name);
+			}
+		} catch (e) { return (e); }
 		return ("connect");
 	}
 
@@ -75,10 +77,11 @@ export class ChatService {
 		const names_rooms : any = await this.dataSource.getRepository(UserChatRoomEntity)
 		.createQueryBuilder("userRooms").innerJoinAndSelect("userRooms.room", "chatRoom")
 		.where("userRooms.id_user = :u", { u: id_user })
+		.andWhere("(userRooms.ban_end < :d OR userRooms.ban_end is null)", { d: new Date() })
 		.select(["userRooms.id", "chatRoom.name"]).getMany();
 		return (names_rooms);
 	}
-
+	//OK
 	@SubscribeMessage('new_room')
 	async creat_room(@MessageBody() data: any, @Request() req)
 	{
@@ -110,7 +113,7 @@ export class ChatService {
 			throw new WsException("Room already exist");
 		}
 	}
-
+	//OK
 	@SubscribeMessage('get_message_room')
 	async getMessageRoom(@MessageBody() data: number, @ConnectedSocket() client: Socket, @Request() req) 
 	{
@@ -124,6 +127,7 @@ export class ChatService {
 				.select(["messageChatRoomEntity.content_message", "messageChatRoomEntity.date_message", "user.username", "chatRoom.name"])
 				.where("chatRoom.id_g = :id", {id: id_room}).orderBy("messageChatRoomEntity.date_message", "DESC").getMany();
 				console.log(res);
+				client.emit('get_message_room', res);
 			} catch (e) {
 				console.log("getMessage Error");
 				console.log(e);
@@ -134,7 +138,7 @@ export class ChatService {
 			throw new WsException("Bad data");
 		}
 	}
-
+	//OK	
 	@SubscribeMessage('new_message_room')
 	async newMessageRoom(@MessageBody() data: any, @ConnectedSocket() client: Socket, @Request() req)
 	{
@@ -165,20 +169,83 @@ export class ChatService {
 			throw new WsException("Can't send message");
 		}
 	}
+	//OK
 	@SubscribeMessage('get_my_rooms')
-	async getMyRoom(@MessageBody() data: any, @ConnectedSocket() client: Socket)
+	async getMyRoom(@MessageBody() data, @ConnectedSocket() client: Socket)
 	{
 		const res : any = await this.getNamesRoomsForUser(client);
 		console.log(res);
-		let name : string[];
-		for (let n in res)
+		let name : string[] = [];
+		for (let n of res)
 		{
-			const inter : string = (n);
+			const inter : string = (n.room.name);
 			name.push(inter);
 		}
 		client.emit("get_my_rooms", name);
 	}
+	@SubscribeMessage('ban_user')
+	async setBanUser(@MessageBody() data, @ConnectedSocket() client: Socket)
+	{
+			const user : any = await this.dataSource.getRepository(UserEntity).find({where: {username: data.username}});
+			const user_ban : any = await this.dataSource.getRepository(UserEntity).find({where: {username: data.username_ban}});
+			const room : any = await this.dataSource.getRepository(ChatRoomEntity).find({where: {name: data.room_name}});
 
+			const is_admin = await this.dataSource.getRepository(UserChatRoomEntity).createQueryBuilder("userRoom")
+			.where("userRoom.id_user = :u AND userRoom.room = :r", {u: user[0].id_g, r: room[0].id_g})
+			.select("userChat.is_admin").getMany();
+			if (!is_admin[0].is_admin)
+				throw new WsException("You are not admin");
+			else
+			{
+				const res = await this.dataSource.getRepository(UserChatRoomEntity).createQueryBuilder("userRoom")
+				.where("userRoom.id_user = :u AND userRoom.room = :r", {u: user_ban[0].id_g, r: room[0].id_g})
+				.update({is_banned: true, ban_end: data.ban_end}).execute();
+				console.log(res);
+				client.emit("ban_user", data);
+			}
+	}
+	@SubscribeMessage('mute_user')
+	async setMuteUser(@MessageBody() data, @ConnectedSocket() client: Socket)
+	{
+			const user : any = await this.dataSource.getRepository(UserEntity).find({where: {username: data.username}});
+			const user_ban : any = await this.dataSource.getRepository(UserEntity).find({where: {username: data.username_ban}});
+			const room : any = await this.dataSource.getRepository(ChatRoomEntity).find({where: {name: data.room_name}});
+
+			const is_admin = await this.dataSource.getRepository(UserChatRoomEntity).createQueryBuilder("userRoom")
+			.where("userRoom.id_user = :u AND userRoom.room = :r", {u: user[0].id_g, r: room[0].id_g})
+			.select("userChat.is_admin").getMany();
+			if (!is_admin[0].is_admin)
+				throw new WsException("You are not admin");
+			else
+			{
+				const res = await this.dataSource.getRepository(UserChatRoomEntity).createQueryBuilder("userRoom")
+				.where("userRoom.id_user = :u AND userRoom.room = :r", {u: user_ban[0].id_g, r: room[0].id_g})
+				.update({is_muted: true, mute_end: data.ban_end}).execute();
+				console.log(res);
+				client.emit("mute_user", data);
+			}
+	}
+	@SubscribeMessage('set_admin')
+	async setAdminUser(@MessageBody() data, @ConnectedSocket() client: Socket)
+	{
+			const user : any = await this.dataSource.getRepository(UserEntity).find({where: {username: data.username}});
+			const user_ban : any = await this.dataSource.getRepository(UserEntity).find({where: {username: data.username_ban}});
+			const room : any = await this.dataSource.getRepository(ChatRoomEntity).find({where: {name: data.room_name}});
+
+			const is_admin = await this.dataSource.getRepository(UserChatRoomEntity).createQueryBuilder("userRoom")
+			.where("userRoom.id_user = :u AND userRoom.room = :r", {u: user[0].id_g, r: room[0].id_g})
+			.select("userChat.is_admin").getMany();
+			if (!is_admin[0].is_admin)
+				throw new WsException("You are not admin");
+			else
+			{
+				const res = await this.dataSource.getRepository(UserChatRoomEntity).createQueryBuilder("userRoom")
+				.where("userRoom.id_user = :u AND userRoom.room = :r", {u: user_ban[0].id_g, r: room[0].id_g})
+				.update({is_admin: true}).execute();
+				console.log(res);
+				client.emit("set_admin", data);
+			}
+	}
 	@SubscribeMessage('pute')
 	handleEvent(@MessageBody('data') data: string, @ConnectedSocket() client: Socket): string {
 		return (data);
