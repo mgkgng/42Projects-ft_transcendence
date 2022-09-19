@@ -1,0 +1,51 @@
+@import "reset.scss";
+@import "var.scss";
+
+/* Style */
+html {
+	font-family: 'avenger';
+	background: white;
+	color: $text;
+}
+main {
+	padding: $padding;
+}
+
+a {
+	color: $blue;
+}
+
+h5 { font-size: $h5 }
+h4 { font-size: $h4 }
+h3 { font-size: $h3 }
+h2 { font-size: $h2; font-weight: bold; }
+h1 { font-size: $h1; font-weight: bold; }
+
+.vflex, .flex {
+	display: flex;
+	gap: 1em;
+}
+.vflex { flex-direction: column }
+.flex-justify-center { justify-content: center }
+.flex-align-center { align-items: center }
+.space-between { justify-content: space-between }
+.nogap { gap: 0 }
+.grow { flex: 1 }
+
+.text-center {
+	text-align: center;
+}
+
+.tag {
+	background: $blue;
+	color: $background;
+	border-radius: $border-radius;
+	padding: .2em .5em;
+	position: relative;
+}
+
+
+@font-face {
+	font-family: 'avenger';
+	src: URL('fonts/AVENGER.ttf') format('truetype');
+}
