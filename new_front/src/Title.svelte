@@ -1,4 +1,10 @@
 <style lang="scss">
+	.container {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		
+	}
 	.main-circle {
 		position: absolute;
 		top: var(--startX); // should make it responsive later
@@ -13,7 +19,6 @@
 		align-items: center;
 
 		box-shadow: 0px 0px 240px 30px #0ff;
-
 	}
 
 	@keyframes rotate {
@@ -90,7 +95,7 @@
 
 </script>
 
-<div>
+<div class="container">
 	<div class="main-circle" style="--startX: {topMargin}px; --startY: {leftMargin}px; --width: {circleRadius * 2}px">
 		<h1 class="title">ft_transcendence</h1>
 	</div>

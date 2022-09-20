@@ -2,8 +2,9 @@
 	main {
 		display: grid;
 		height: 100vh;
-		grid-template-rows: 80vh 10vh;
+		grid-template-rows: 90vh 10vh;
 		gap: 0;
+		padding: 0;
 	}
 
 </style>
@@ -15,7 +16,7 @@
 
 <main>
 	<div>
-		<Title topMargin={150} leftMargin={250} />
+		<Title topMargin={150} leftMargin={450} />
 	</div>
 	<Navbar />
 </main>
