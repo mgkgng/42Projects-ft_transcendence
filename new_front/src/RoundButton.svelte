@@ -35,8 +35,8 @@
 	}
 
 	.circle-button:hover {
-		transition: .2s;
-		background-color: orange;
+		transition: .4s;
+		background-color: rgba(0, 255, 255, 0.2);
 		animation-play-state: paused;
 	}
 
