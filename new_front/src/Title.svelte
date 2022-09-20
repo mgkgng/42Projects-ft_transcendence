@@ -15,13 +15,13 @@
 	}
 
 	@keyframes rotateR {
-		from { transform: rotate(var(--angle)) translateX(var(--startX)) rotate(var(--angle));}
-		to { transform: rotate(var(--contreangle)) translateX(var(--startX)) rotate(var(--contreangle)); }
+		from { transform: rotate(var(--angle)) translateX(var(--dist)) rotate(var(--angle))}
+		to { transform: rotate(var(--angle2)) translateX(var(--dist)) rotate(var(--angle2))}
 	}
 
 	@keyframes rotateL {
-		from { transform: rotate(360deg) translateX(var(--startX)) rotate(360deg);}
-		to { transform: rotate(0deg) translateX(var(--startX)) rotate(0deg); }
+		from { transform: rotate(var(--angle)) translateX(var(--dist)) rotate(360deg);}
+		to { transform: rotate(360deg) translateX(var(--dist)) rotate(var(--angle)); }
 	}
 
 	.circle-around {
@@ -33,13 +33,12 @@
 		border-radius: 50%;
 		background-color: #000;
 
-		transform: rotate(90deg) translateX(var(--startX));
+		// transform: rotate(var(--angle)) translateX(var(--dist));
 
 		animation-name: rotateR;
-		animation-duration: var(--speed);
+		animation-duration: var(--duration);
 		animation-iteration-count: infinite;
 		animation-timing-function: linear;
-
 	}
 
 	.title {
@@ -74,29 +73,15 @@
 
 	function createCircles() {
 		let res = [];
-		let circleNb = Math.floor(Math.random() * 10 + 32);
+		let circleNb = Math.floor(Math.random() * 10 + 20);
 
 		for (let i = 0; i < circleNb; i++) {
 			let circle = {};
 
-			let angle = Math.floor(Math.random() * 360);
-
-			let distCenterX = circleRadius * Math.sin(Math.PI * 2 * angle / 360);
-			let distCenterY = circleRadius * Math.cos(Math.PI * 2 * angle / 360);
-
-			let size = Math.floor(Math.random() * 20 + 8);
-
-			circle["x"] = circleRadius + 45;
-			circle["y"] = circleRadius;
-			// circle["x"] = topMargin + circleRadius + distCenterX;
-			// circle["y"] = leftMargin + circleRadius + distCenterY;
-			// circle["x"] += !(angle > 0 && angle < 180) ? (size + 5) * -1: 5;
-			// circle["y"] += (angle > 90 && angle < 270) ? (size + 5) * -1: 5;
-			circle["size"] = size;
-			circle["duration"] = Math.floor(Math.random() * 25 + 8).toString();
-			circle["angle"] = angle.toString();
-			
-			// circle["rotateDir"] = Math.floor(Math.random() * 2).toString();
+			circle["size"] = Math.floor(Math.random() * 20 + 8).toString();
+			circle["duration"] = Math.floor(Math.random() * 1000 + 2000).toString();
+			circle["angle"] = Math.floor(Math.random() * 360).toString();
+			circle["rotateDir"] = (Math.floor(Math.random() * 2)) ? "rotateR" : "rotateL";
 			res.push(circle);
 		}
 		return (res)
@@ -113,6 +98,6 @@
 		<h1 class="title">ft_transcendence</h1>
 	</div>
 	{#each circlesAround as circleInfo}
-	<div class="circle-around" style="--radius: {circleRadius}px; --centerX: {centerX}px; --centerY: {centerY}px; --startX: {circleInfo.x}px; --startY: {circleInfo.y}px; --size: {circleInfo.size}px; --speed: {circleInfo.duration}s; --angle: {circleInfo.angle}deg; --contreangle: {360 - circleInfo.angle}deg"></div>
+	<div class="circle-around" style="--dist: {circleRadius + 45}px; --centerX: {centerX}px; --centerY: {centerY}px;  --startY: {circleInfo.y}px; --size: {circleInfo.size}px; --duration: {circleInfo.duration}s; --angle: {circleInfo.angle}deg; --angle2: {circleInfo.angle + 360}deg"></div>
 	{/each}
 </div>	
