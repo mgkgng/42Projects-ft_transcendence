@@ -7,6 +7,6 @@
 </script>
 
 <main>
-	<Title topMargin={100} leftMargin={100} />
+	<Title topMargin={100} leftMargin={250} />
 </main>
 

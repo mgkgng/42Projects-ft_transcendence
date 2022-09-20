@@ -49,3 +49,13 @@ h1 { font-size: $h1; font-weight: bold; }
 	font-family: 'avenger';
 	src: URL('fonts/AVENGER.ttf') format('truetype');
 }
+
+@font-face {
+	font-family: 'led-display';
+	src: URL('fonts/Led_Display.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'modernism-narrow';
+	src: URL('fonts/Modernism-Narrow.ttf') format('truetype');
+}
