@@ -43,6 +43,7 @@
 		font-size: 75px;
 		text-align: center;
 		color: white;
+		user-select: none;
 	}
 </style>
 

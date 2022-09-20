@@ -10,7 +10,7 @@
 		top: var(--startX);
 		left: var(--startY);
 
-		background-color: #000;
+		background-color: rgba(0, 0, 0, 0.9);
 		width: 100px;
 		aspect-ratio: 1 / 1;
 		border-radius: 50%;
@@ -31,6 +31,7 @@
 			background-color: rgba(0, 0, 0, 0);
 			font-family: 'modernism-narrow';
 			color: white;
+			user-select: none;
 		}
 	}
 
@@ -45,7 +46,9 @@
 
 <script>
 	import { onMount } from "svelte";
-	// export let type;
+	// import { goto } from '$app/navigation';
+
+
 	export let topMargin;
 	export let leftMargin;
 	export let circleRadius;
@@ -53,17 +56,29 @@
 	let centerX = topMargin + circleRadius;
 	let centerY = leftMargin + circleRadius;
 
-	let startAngle;
+	let angleLogin, anglePlay;
 
 	onMount(() => {
-		startAngle = Math.floor(Math.random() * 360);
+		angleLogin = Math.floor(Math.random() * 180 + 180);
+		anglePlay = Math.floor(Math.random() * 180);
 	});
 
 </script>
 
 <div>
-	<div class="circle-button" style="--startX: {centerX - 45}px; --startY: {centerY}px; --angle: {startAngle}deg; --angle2: {startAngle + 360}deg">
+	<div class="circle-button" style="--startX: {centerX - 45}px; --startY: {centerY}px; --angle: {angleLogin}deg; --angle2: {angleLogin + 360}deg"
+		on:click={()=>{
+			console.log("Login");
+		}}
+	>
 		<h2>Login</h2>
+	</div>
+	<div class="circle-button" style="--startX: {centerX - 45}px; --startY: {centerY}px; --angle: {anglePlay}deg; --angle2: {anglePlay + 360}deg"
+		on:click={()=>{
+			console.log("Play");
+		}}
+	>
+		<h2>Play</h2>
 	</div>
 </div>
 

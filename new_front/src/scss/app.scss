@@ -59,3 +59,8 @@ h1 { font-size: $h1; font-weight: bold; }
 	font-family: 'modernism-narrow';
 	src: URL('fonts/Modernism-Narrow.ttf') format('truetype');
 }
+
+@font-face {
+	font-family: 'modernism';
+	src: URL('fonts/Modernism.ttf') format('truetype');
+}
