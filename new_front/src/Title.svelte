@@ -18,7 +18,10 @@
 		justify-content: center;
 		align-items: center;
 
-		box-shadow: 0px 0px 240px 30px $main;
+		// box-shadow: 0px 0px 240px 30px $main;
+		// box-shadow: 0px 0px 550px 50px $main;
+		box-shadow: 0px 0px 750px 100px $main;
+
 	}
 
 	@keyframes rotate {
@@ -42,6 +45,8 @@
 	}
 
 	.title {
+		position: absolute;
+		top: 22vh;
 		background-color: rgba(0, 0, 0, 0);
 		margin: 2em;
 		padding: .3em 0 .1em;
@@ -97,10 +102,10 @@
 
 <div class="container">
 	<div class="main-circle" style="--startX: {topMargin}px; --startY: {leftMargin}px; --width: {circleRadius * 2}px">
-		<h1 class="title">transcendence</h1>
 	</div>
-	<RoundButton topMargin={topMargin} leftMargin={leftMargin} circleRadius={circleRadius}/>
 	{#each circlesAround as circleInfo}
 	<div class="circle-around" style="--dist: {circleRadius + 45}px; --centerX: {centerX}px; --centerY: {centerY}px;  --startY: {circleInfo.y}px; --size: {circleInfo.size}px; --duration: {circleInfo.duration}s; --angle: {circleInfo.angle}deg; --angle2: {circleInfo.angle + 360}deg"></div>
 	{/each}
+	<h1 class="title">transcendence</h1>
+	<RoundButton topMargin={topMargin} leftMargin={leftMargin} circleRadius={circleRadius}/>
 </div>	

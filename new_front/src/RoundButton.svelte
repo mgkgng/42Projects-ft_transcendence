@@ -10,7 +10,7 @@
 		top: var(--startX);
 		left: var(--startY);
 
-		background-color: rgba(0, 0, 0, 0.8);
+		background-color: transparentize(#000000, 0.2);
 		width: 100px;
 		aspect-ratio: 1 / 1;
 		border-radius: 50%;
@@ -30,8 +30,13 @@
 		h2 {
 			background-color: rgba(0, 0, 0, 0);
 			font-family: 'modernism-narrow';
-			color: rgba(255, 255, 255, 0.9);
+			color: rgba(255, 255, 255, 0.75);
 			user-select: none;
+		}
+
+		.h2:hover {
+			transition: .2s;
+			color: rgba(255, 255, 255, 0.9);
 		}
 	}
 

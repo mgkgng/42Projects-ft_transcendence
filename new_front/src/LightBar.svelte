@@ -5,7 +5,7 @@
 		width: 150px;
 		height: 10px;
 		border-radius: 5rem;
-		background-color: rgba(0, 255, 255, 0.2);
+		background-color: rgba(255, 255, 255, 0.5);
 		box-shadow: 0px -40px 80px 40px transparentize($main, 0.4);
 		translate: .5s;
 	}
