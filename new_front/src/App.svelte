@@ -16,7 +16,7 @@
 
 <main>
 	<div>
-		<Title topMargin={150} leftMargin={450} />
+		<Title topMargin={180} leftMargin={700} />
 	</div>
 	<Navbar />
 </main>

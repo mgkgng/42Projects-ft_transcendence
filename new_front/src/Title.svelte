@@ -18,7 +18,7 @@
 		justify-content: center;
 		align-items: center;
 
-		box-shadow: 0px 0px 240px 30px #0ff;
+		box-shadow: 0px 0px 240px 30px $main;
 	}
 
 	@keyframes rotate {

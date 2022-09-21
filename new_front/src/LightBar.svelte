@@ -5,15 +5,10 @@
 		width: 150px;
 		height: 10px;
 		border-radius: 5rem;
-		background-color: rgba(255, 255, 255, 0.8);
-		box-shadow: 0px -40px 80px 40px rgba(139, 226, 226, 0.8);
+		background-color: rgba(0, 255, 255, 0.2);
+		box-shadow: 0px -40px 80px 40px transparentize($main, 0.4);
 		translate: .5s;
 	}
-
-	// .content::after {
-	// 	content: '';
-		
-	// }
 </style>
 
 <script>
@@ -23,6 +18,8 @@
 <div class="light-bar" style="--posX: {posX}px"></div>
 
 <svelte:window on:mousemove={ (e)=> {
+	if (e.screenY < 800)
+		return ;
 	posX = e.screenX - 100;
 	if (posX < 550)
 		posX = 550;
