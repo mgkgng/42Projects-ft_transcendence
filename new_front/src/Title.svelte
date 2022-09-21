@@ -84,7 +84,6 @@
 			circle["size"] = Math.floor(Math.random() * 20 + 8).toString();
 			circle["duration"] = Math.floor(Math.random() * 50 + 15).toString();
 			circle["angle"] = Math.floor(Math.random() * 360);
-			circle["rotateDir"] = (Math.floor(Math.random() * 2)) ? "rotateR" : "rotateL";
 			res.push(circle);
 		}
 		return (res)
