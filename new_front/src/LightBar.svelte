@@ -17,14 +17,15 @@
 </style>
 
 <script>
-	let posX = 150;
+	let posX = 800;
 </script>
 
 <div class="light-bar" style="--posX: {posX}px"></div>
 
-<svelte:window on:keypress={ (e)=> {
-	if (e.code == "KeyD" && posX < 600)
-		posX += 10;
-	else if (e.code == "KeyA" && posX > 0)
-		posX -= 10;
+<svelte:window on:mousemove={ (e)=> {
+	posX = e.screenX - 100;
+	if (posX < 550)
+		posX = 550;
+	if (posX > 1150)
+		posX = 1150;
 }}/>

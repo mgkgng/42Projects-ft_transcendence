@@ -1,6 +1,7 @@
 import sveltePreprocess from 'svelte-preprocess'
+import adapter from '@sveltejs/adapter-node';
 
-export default {
+const config = {
   // Consult https://github.com/sveltejs/svelte-preprocess
   // for more information about preprocessors
   preprocess: sveltePreprocess({
@@ -8,5 +9,12 @@ export default {
       prependData: `@import "src/scss/var.scss";`,
       renderSync: true
     }
-  })
+  }),
+  kit: {
+    adapter: adapter({
+      out: 'build'
+    })
+  }
 }
+
+export default config;

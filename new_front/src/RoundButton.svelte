@@ -46,8 +46,6 @@
 
 <script>
 	import { onMount } from "svelte";
-	// import { goto } from '$app/navigation';
-
 
 	export let topMargin;
 	export let leftMargin;
