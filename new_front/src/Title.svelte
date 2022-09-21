@@ -81,8 +81,8 @@
 			let circle = {};
 
 			circle["size"] = Math.floor(Math.random() * 20 + 8).toString();
-			circle["duration"] = Math.floor(Math.random() * 100 + 6500).toString();
-			circle["angle"] = Math.floor(Math.random() * 360).toString();
+			circle["duration"] = Math.floor(Math.random() * 50 + 15).toString();
+			circle["angle"] = Math.floor(Math.random() * 360);
 			circle["rotateDir"] = (Math.floor(Math.random() * 2)) ? "rotateR" : "rotateL";
 			res.push(circle);
 		}
@@ -97,7 +97,7 @@
 
 <div class="container">
 	<div class="main-circle" style="--startX: {topMargin}px; --startY: {leftMargin}px; --width: {circleRadius * 2}px">
-		<h1 class="title">ft_transcendence</h1>
+		<h1 class="title">transcendence</h1>
 	</div>
 	<RoundButton topMargin={topMargin} leftMargin={leftMargin} circleRadius={circleRadius}/>
 	{#each circlesAround as circleInfo}

@@ -1,8 +1,8 @@
 <style lang="scss">
 
 	@keyframes rotate {	
-		from { transform: rotate(360deg) translateX(300px) rotate(-360deg); }
-		to { transform: rotate(0deg) translateX(300px) rotate(0deg); }
+		from { transform: rotate(360deg) translateX(350px) rotate(-360deg); }
+		to { transform: rotate(0deg) translateX(350px) rotate(0deg); }
 	}
 
 	.circle-button {
@@ -21,7 +21,7 @@
 		align-items: center;
 
 		animation-name: rotate;
-		animation-duration: 36s;
+		animation-duration: 25s;
 		animation-iteration-count: infinite;
 		animation-timing-function: linear;
 
@@ -66,14 +66,14 @@
 </script>
 
 <div>
-	<div class="circle-button" style="--startX: {centerX - 45}px; --startY: {centerY}px; --angle: {angleLogin}deg; --angle2: {angleLogin + 360}deg"
+	<div class="circle-button" style="--startX: {centerX - 50}px; --startY: {centerY - 50}px; --angle: {angleLogin}deg; --angle2: {angleLogin + 360}deg"
 		on:click={()=>{
 			console.log("Login");
 		}}
 	>
 		<h2>Login</h2>
 	</div>
-	<div class="circle-button" style="--startX: {centerX - 45}px; --startY: {centerY}px; --angle: {anglePlay}deg; --angle2: {anglePlay + 360}deg"
+	<div class="circle-button" style="--startX: {centerX - 50}px; --startY: {centerY - 50}px; --angle: {anglePlay}deg; --angle2: {anglePlay + 360}deg"
 		on:click={()=>{
 			console.log("Play");
 		}}

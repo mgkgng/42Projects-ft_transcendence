@@ -3,7 +3,7 @@
 
 /* Style */
 html {
-	font-family: 'avenger';
+	font-family: 'alpha-prota';
 	background: $background;
 	color: $text;
 }
@@ -51,8 +51,8 @@ h1 { font-size: $h1; font-weight: bold; }
 }
 
 @font-face {
-	font-family: 'led-display';
-	src: URL('fonts/Led_Display.ttf') format('truetype');
+	font-family: 'alpha-prota';
+	src: URL('fonts/AlphaProta.ttf') format('truetype');
 }
 
 @font-face {
