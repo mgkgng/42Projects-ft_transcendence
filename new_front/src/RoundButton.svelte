@@ -30,7 +30,7 @@
 		h2 {
 			background-color: rgba(0, 0, 0, 0);
 			font-family: 'modernism-narrow';
-			color: white;
+			color: rgba(255, 255, 255, 0.9);
 			user-select: none;
 		}
 	}

@@ -10,7 +10,6 @@
 		display: flex;
 		flex-direction: row;
 		height: 100%;
-		font-family: "Modernism";
 		//align-items: center;
 		justify-content: center;
 		gap: 2em;
@@ -18,7 +17,7 @@
 
 		.menu {
 			font-size: 28px;
-			letter-spacing: .2rem;
+			letter-spacing: .75px;
 			color: rgba(255, 255, 255, 0.9);
 			transition: .4s;
 			user-select: none;

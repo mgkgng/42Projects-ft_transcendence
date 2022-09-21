@@ -1,11 +1,11 @@
 <style lang="scss">
 	.light-bar {
-		// position: absolute;
-		// left: var(--posX);
+		position: relative;
+		left: var(--posX);
 		width: 150px;
 		height: 10px;
 		border-radius: 5rem;
-		background-color: rgba(255, 255, 255, 0.9);
+		background-color: rgba(255, 255, 255, 0.8);
 		box-shadow: 0px -40px 80px 40px rgba(139, 226, 226, 0.8);
 		translate: .5s;
 	}
@@ -24,7 +24,7 @@
 
 <svelte:window on:keypress={ (e)=> {
 	if (e.code == "KeyD" && posX < 600)
-		posX += 5;
+		posX += 10;
 	else if (e.code == "KeyA" && posX > 0)
-		posX -= 5;
+		posX -= 10;
 }}/>
