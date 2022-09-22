@@ -60,6 +60,7 @@
 <script lang="ts">
 	import { onMount } from "svelte";
 	import RoundButton from "./RoundButton.svelte";
+	import '$lib/scss/app.scss';
 
 
 	export let topMargin;
@@ -106,6 +107,6 @@
 	{#each circlesAround as circleInfo}
 	<div class="circle-around" style="--dist: {circleRadius + 45}px; --centerX: {centerX}px; --centerY: {centerY}px;  --startY: {circleInfo.y}px; --size: {circleInfo.size}px; --duration: {circleInfo.duration}s; --angle: {circleInfo.angle}deg; --angle2: {circleInfo.angle + 360}deg"></div>
 	{/each}
-	<h1 class="title">transcendence</h1>
 	<RoundButton topMargin={topMargin} leftMargin={leftMargin} circleRadius={circleRadius}/>
+	<h1 class="title">transcendence</h1>
 </div>	

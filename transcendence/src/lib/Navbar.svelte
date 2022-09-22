@@ -18,19 +18,21 @@
 		.menu {
 			font-size: 28px;
 			letter-spacing: .75px;
-			color: rgba(255, 255, 255, 0.9);
+			color: rgba(0, 0, 0, 0.1);
 			transition: .4s;
 			user-select: none;
 		}
 
 		.menu:hover {
 			transform: translateY(-15px);
+			color: rgba(0, 0, 0, 0.9);
 		}
 	}
 </style>
 
 <script>
-    import LightBar from "./LightBar.svelte";
+    import LightBar from "../../../new_front/src/LightBar.svelte";
+	import '$lib/scss/app.scss';
 
 </script>
 

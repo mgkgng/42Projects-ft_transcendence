@@ -10,7 +10,7 @@
 		top: var(--startX);
 		left: var(--startY);
 
-		background-color: transparentize(#000000, 0.2);
+		background-color: transparentize(#000000, 0.1);
 		width: 100px;
 		aspect-ratio: 1 / 1;
 		border-radius: 50%;
@@ -30,7 +30,7 @@
 		h2 {
 			background-color: rgba(0, 0, 0, 0);
 			font-family: 'modernism-narrow';
-			color: rgba(255, 255, 255, 0.75);
+			color: rgba(255, 255, 255, 0.85);
 			user-select: none;
 		}
 
@@ -50,6 +50,8 @@
 
 <script>
 	import { onMount } from "svelte";
+	import { goto } from "$app/navigation";
+	import '$lib/scss/app.scss';
 
 	export let topMargin;
 	export let leftMargin;
