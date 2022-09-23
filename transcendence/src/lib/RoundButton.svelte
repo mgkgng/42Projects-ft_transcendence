@@ -74,17 +74,13 @@
 <div>
 	<div class="circle-button" style="--startX: {centerX - 50}px; --startY: {centerY - 50}px;
 		--from1: {angleLogin[0]}deg; --to1: {angleLogin[1]}deg; --from2: {angleLogin[2]}deg; --to2: {angleLogin[3]}deg"
-		on:click={()=>{
-			console.log("Login");
-		}}
+		on:click={()=>{ goto(`/login`); }}
 	>
 		<h2>Login</h2>
 	</div>
 	<div class="circle-button" style="--startX: {centerX - 50}px; --startY: {centerY - 50}px;
 		--from1: {anglePlay[0]}deg; --to1: {anglePlay[1]}deg; --from2: {anglePlay[2]}deg; --to2: {anglePlay[3]}deg"
-		on:click={()=>{
-			console.log("Play");
-		}}
+		on:click={()=>{ goto(`/play`); }}
 	>
 		<h2>Play</h2>
 	</div>

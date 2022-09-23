@@ -24,7 +24,7 @@ const config = {
 	// for more information about preprocessors
 	preprocess: sveltePreprocess({
 		scss: {
-			prependdata: `@import "src/lib/scss/var.scss`,
+			prependData: `@import "./src/lib/scss/var.scss";`,
 			renderSync: true
 		}
 	}),

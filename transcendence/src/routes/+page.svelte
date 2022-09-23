@@ -15,9 +15,7 @@
 </script>
 
 <main>
-	<div>
-		<Title topMargin={180} leftMargin={700} />
-	</div>
+	<Title topMargin={180} leftMargin={700} />
 	<Navbar />
 </main>
 
