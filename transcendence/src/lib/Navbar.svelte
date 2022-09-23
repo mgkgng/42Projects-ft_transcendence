@@ -31,7 +31,7 @@
 </style>
 
 <script>
-    import LightBar from "../../../new_front/src/LightBar.svelte";
+    import LightBar from "./LightBar.svelte";
 	import '$lib/scss/app.scss';
 
 </script>
