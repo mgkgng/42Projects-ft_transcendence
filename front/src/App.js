@@ -5,7 +5,6 @@ import axios from 'axios';
 import jwt_decode from 'jwt-decode';
 
 const { io } = require("socket.io-client");
-
  
 var socket;
 var username = "John";

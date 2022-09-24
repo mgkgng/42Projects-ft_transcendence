@@ -22,6 +22,7 @@
 
 <script>
 	import Bar from "$lib/Bar.svelte";
+	import client
 </script>
 
 <div class="div-container">
