@@ -1,21 +1,50 @@
 <style lang="scss">
 	main {
+		padding: 0;
 		display: grid;
 		height: 100vh;
 		grid-template-rows: 90vh 10vh;
 		gap: 0;
 		padding: 0;
+		background-color: var(--col);
 	}
 
+	@keyframes size-change {
+		0% { transform: scale(1) }
+		50% { transform: scale(1.3) }
+		100% { transform: scale(1) }
+	}
+
+	.color-change-circle {
+		position: absolute;
+		bottom: -40px;
+		left: -40px;
+		width: 80px;
+		aspect-ratio: 1 / 1;
+		border-radius: 50%;
+		// box-shadow: 0px 0px 50px 10px #000;
+		cursor: pointer;
+
+		animation-name: size-change;
+		animation-duration: 3.5s;
+		animation-iteration-count: infinite;
+		animation-timing-function: linear;
+	}
 </style>
 
 <script lang="ts">
 	import Title from "$lib/Title.svelte";
 	import Navbar from "$lib/Navbar.svelte";
+
+	let darkMode = false;
 </script>
 
-<main>
+<main style="{(darkMode) ? "background-color: #000" : "background-color: #fff"}">
 	<Title topMargin={180} leftMargin={700} />
-	<Navbar />
+	<Navbar bind:darkMode={darkMode} />
+	<div class="color-change-circle" on:click={() => {
+		darkMode = !darkMode;
+	}}
+	style="{(darkMode) ? "background-color: rgba(255, 255, 255, .9)" : "background-color: rgba(0, 0, 0, .9)"}"></div>
 </main>
 

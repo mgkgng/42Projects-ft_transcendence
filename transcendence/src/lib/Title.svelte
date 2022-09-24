@@ -31,12 +31,6 @@
 		to { transform: rotate(var(--angle2)) translateX(var(--dist)) rotate(var(--angle2))}
 	}
 
-	@keyframes size-change {
-		0% { transform: scale(1) }
-		50% { transform: scale(1.3) }
-		100% { transform: scale(1) }
-	}
-
 	.circle-around {
 		position: absolute;
 		top: var(--centerX);
@@ -64,22 +58,7 @@
 		user-select: none;
 	}
 
-	.color-change-circle {
-		position: absolute;
-		bottom: -40px;
-		left: -40px;
-		width: 80px;
-		aspect-ratio: 1 / 1;
-		border-radius: 50%;
-		background-color: rgba(0, 0, 0, .95);
-		// box-shadow: 0px 0px 50px 10px #000;
-		cursor: pointer;
-
-		animation-name: size-change;
-		animation-duration: 3.5s;
-		animation-iteration-count: infinite;
-		animation-timing-function: linear;
-	}
+	
 
 </style>
 
@@ -90,16 +69,13 @@
 
 	export let topMargin;
 	export let leftMargin;
+	export let darkMode = false;
 
 	let circlesAround = [];
 	let circleRadius = 250;
 
-	let white = false;
-
 	let centerX = topMargin + circleRadius;
 	let centerY = leftMargin + circleRadius;
-
-	$: console.log(circlesAround);
 
 	function makeCssStyleVars(obj) {
 		return (Object.entries(obj)
@@ -137,5 +113,4 @@
 	<RoundButton topMargin={topMargin} leftMargin={leftMargin} circleRadius={circleRadius}/>
 	<h1 class="title">transcendence</h1>
 
-	<div class="color-change-circle"></div>
 </div>	

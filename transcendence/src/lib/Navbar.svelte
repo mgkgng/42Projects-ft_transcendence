@@ -18,14 +18,15 @@
 		.menu {
 			font-size: 28px;
 			letter-spacing: .75px;
-			color: rgba(0, 0, 0, 0.1);
+			color: var(--col);
+			opacity: .2;
 			transition: .4s;
 			user-select: none;
 		}
 
 		.menu:hover {
 			transform: translateY(-15px);
-			color: rgba(0, 0, 0, 0.9);
+			opacity: .9;
 		}
 	}
 </style>
@@ -34,11 +35,14 @@
     import LightBar from "./LightBar.svelte";
 	import '$lib/scss/app.scss';
 
+	export let darkMode;
+
+	$: col = (darkMode) ? "#fff" : "#222222"
 </script>
 
 
 <div class="nav-bar">
-	<div class="menus">
+	<div class="menus" style="--col: {col}">
 		<div class="menu">Menu1</div>
 		<div class="menu">Menu2</div>
 		<div class="menu">About</div>
