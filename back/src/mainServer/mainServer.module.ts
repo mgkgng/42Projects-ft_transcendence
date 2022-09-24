@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ChatService } from './chat.gatway';
+import { MainServerService } from './mainServer.gateway';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from 'src/entity/User.entity';
 import { UserChatRoomEntity } from 'src/entity/UserChatRoom.entity';
@@ -15,6 +15,6 @@ import { Repository } from 'typeorm';
 @Module({
 	imports :	[TypeOrmModule.forFeature([UserEntity, UserChatRoomEntity, ChatRoomEntity, GameEntity, MessageChatRoomEntity, MessageDirectEntity, UserBlockEntity]),
 	Repository],				
-    providers: [ChatService, JwtService],
+    providers: [MainServerService, JwtService],
 })
-export class ChatModule {}
+export class MainServerModule {}

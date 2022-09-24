@@ -22,7 +22,7 @@ import { Socket } from 'socket.io';
 	  origin: '*',
 	},
 })
-export class ChatService {
+export class MainServerService {
 	constructor(
 		@InjectRepository(UserEntity) 
 		private userRepository: Repository<UserEntity>,
