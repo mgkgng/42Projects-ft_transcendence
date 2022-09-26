@@ -1,4 +1,4 @@
-version: "3.7"
+version: "3.3"
 
 #NETWORK
 networks:
@@ -44,5 +44,5 @@ services:
       - net
     volumes:
       - ./bd:/var/lib/postgresql/data 
-    ports:
-      - "5432:5432"
+    #ports:
+      #- "5432:5432"

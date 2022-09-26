@@ -7,10 +7,10 @@ export class MessageDirectEntity {
 	@PrimaryGeneratedColumn()
 	id: number;
 
-	@ManyToOne(() => UserEntity, (user: UserEntity) => user.id3)
+	@ManyToOne(() => UserEntity, (user: UserEntity) => user.relation_messageDirect)
 	id_sender: UserEntity;
 
-	@ManyToOne(() => UserEntity, (user: UserEntity) => user.id4)
+	@ManyToOne(() => UserEntity, (user: UserEntity) => user.relation_messageDirect)
 	id_recipient: UserEntity;
 
 	@Column()

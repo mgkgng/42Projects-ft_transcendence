@@ -7,7 +7,6 @@ import jwt_decode from 'jwt-decode';
 const { io } = require("socket.io-client");
  
 var socket;
-var username = "John";
 
 class PageLoggin extends React.Component
 {
@@ -94,7 +93,9 @@ class PageChat extends React.Component
   constructor(props) 
   {
     super(props);
+    console.log(props);
     this.state = {room: [], messages: []};
+    this.username = props.username;
     this.text_info = "";
     this.rooms = [];
     this.messages = [];
@@ -116,6 +117,12 @@ class PageChat extends React.Component
       this.messages = data;
       this.setState({messages: data});
     });
+    socket.on("new_message_room", (data) => {
+      console.log("New message: ", data);
+      console.log("New message:" , data);
+      this.messages = this.messages + data;
+      this.setState({messages: this.messages});
+    });
   }
   addRoom()
   {
@@ -131,14 +138,33 @@ class PageChat extends React.Component
     }
     catch(e) {  this.text_info = "Room already exist.";}
   }
+  addMute()
+  {
+    socket.emit("mute_user", {room_name: "bite", username_ban: "John"}, (err, res) =>
+    {
+      console.log(err, res);
+    });
+  }
+  addMessage()
+  {
+    const content= document.getElementById("newMessage").value;
+    try
+    {
+        console.log(this.state.actual_room);
+        socket.emit("new_message_room", {room_name: this.state.actual_room, content_message: content}, () => {
+        });
+    }
+    catch(e) {  this.text_info = "Room already exist.";}
+    //socket.emit("append_user_to_room", { room_name: "bite"})
+  }
   getAllMessages(room)
   {
     socket.emit("get_message_room", {room_name: room});
+    console.log(this.username);
+    this.setState({actual_room : room});
   }
   render()
   {
-    console.log(username);
-    console.log(this.messages);
     return (
       <div className='pageRoom'>
         <h1>PageChat</h1>
@@ -146,13 +172,16 @@ class PageChat extends React.Component
         <input type="textarea" id="newRoom"></input>
         <button onClick={this.addRoom.bind(this)}>+</button>
         <div className='MessageRoom'>
-          <ul class="ul_room">
+          <ul className="ul_room">
             {this.rooms.map((room) => { return (<button className='BtnRoom' onClick={this.getAllMessages.bind(this, room) }>{room}</button>)})}
           </ul>
           <ul className='ul_messages'>
-            {this.messages.map((room) => { return (<p className={room.id_user.username == username ? 'ul_message_me' : 'ul_message_other'}>{room.content_message}</p>)})}
+            {this.messages.map((room) => { return (<p className={room.id_user.username == this.username ? 'ul_message_me' : 'ul_message_other'}>{room.content_message}</p>)})}
           </ul>
         </div>
+        <input type="textarea" id="newMessage"></input>
+        <button onClick={this.addMessage.bind(this)}>+</button>
+        <button onClick={this.addMute.bind(this)}>X</button>
       </div>
     );
   }
@@ -194,6 +223,7 @@ class App extends React.Component {
         Authorization: "Bearer " + tok,
       }
     });
+    socket.emit("get_user_info", (res) => { console.log("GET_USER:", res); this.setState({username: res.username}); });
                   
     socket.current.on("connect", (data) => {
         console.log("connect: " + this.state.jwt);
@@ -214,7 +244,7 @@ class App extends React.Component {
     else if (this.state.page === "Game")
       page_content = <PageGame/>;
     else if (this.state.page === "Chat")
-      page_content = <PageChat socket={this.state.socket}/>;
+      page_content = <PageChat socket={this.state.socket} username={this.state.username}/>;
     else
       page_content = <h1>Page not found</h1>;
     if (this.state.is_log == true){

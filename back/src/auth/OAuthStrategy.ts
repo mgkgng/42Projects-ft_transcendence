@@ -15,11 +15,10 @@ export class OAuthStrategy extends PassportStrategy(Strategy, "oauth") {
 
   async validate(@MessageBody() username: string, @MessageBody() code : string): Promise<any> {
 	const res = await this.authService.validateUser42(code);
-	console.log("Get token");
+	console.log("Get token : ", code);
 	if (res)
 	{
 		let data = res.data;
-		console.log(res);
 		if (await this.userService.findOne(res.data.login))
 		{
 			const find = ({username: data.login, email: data.email, is_42_user: true, img: data.image_url});

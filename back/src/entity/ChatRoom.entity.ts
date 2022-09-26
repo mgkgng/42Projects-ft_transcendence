@@ -8,10 +8,10 @@ export class ChatRoomEntity {
 	id_g: number;
 
 	@OneToMany(() => UserChatRoomEntity, (id: UserChatRoomEntity) => id.room)
-	id: UserChatRoomEntity[];
+	relation_userChatRoom: UserChatRoomEntity[];
 	
 	@OneToMany(() => MessageChatRoomEntity, (user: MessageChatRoomEntity) => user.id_chat_room)
-	id2: MessageChatRoomEntity[];
+	relation_messageChatRoom: MessageChatRoomEntity[];
 
 	@Column({unique: true})
 	name: string;

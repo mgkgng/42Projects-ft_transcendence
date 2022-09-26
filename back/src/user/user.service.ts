@@ -37,6 +37,7 @@ export class UserService {
 				{username: user.username, password: user.password, email: user.email, is_42_user: user.is_42_user, img: user.img},
 			);
 			await querry.commitTransaction();
+			return (res);
 		} catch (e) {
 			await querry.rollbackTransaction();
 			console.log("Create User failed");

@@ -12,21 +12,21 @@ export class UserEntity
 	id_g: number;
 	
 	@OneToMany(() => UserChatRoomEntity, (user: UserChatRoomEntity) => user.id_user)
-	id1: UserChatRoomEntity[];
+	relation_userChatRoom: UserChatRoomEntity[];
 	@OneToMany(() => MessageChatRoomEntity, (user: MessageChatRoomEntity) => user.id_user)
-	id2: MessageChatRoomEntity[];
+	relation_messageChatRoom: MessageChatRoomEntity[];
 	@OneToMany(() => MessageDirectEntity, (user: MessageDirectEntity) => user.id_sender)
-	id3: MessageChatRoomEntity[];
+	relation_chatRoom: MessageChatRoomEntity[];
 	@OneToMany(() => MessageDirectEntity, (user: MessageDirectEntity) => user.id_recipient)
-	id4: MessageDirectEntity[];
+	relation_messageDirect: MessageDirectEntity[];
 	@OneToMany(() => GameEntity, (user: GameEntity) => user.player1)
-	id5: GameEntity[];
+	relation_gamePlayerOne: GameEntity[];
 	@OneToMany(() => GameEntity, (user: GameEntity) => user.player2)
-	id6: GameEntity[];
+	relation_gamePlayerTwo: GameEntity[];
 	@OneToMany(() => UserBlockEntity, (user: UserBlockEntity) => user.id_user)
-	id7: UserBlockEntity[];
+	relation_userBlocker: UserBlockEntity[];
 	@OneToMany(() => UserBlockEntity, (user: UserBlockEntity) => user.id_user_blocked)
-	id8: UserBlockEntity[];
+	relation_userBlocked: UserBlockEntity[];
 
 	@Column()	
 	email: string;

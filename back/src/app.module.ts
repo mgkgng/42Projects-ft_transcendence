@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { ChatModule } from './chat/mainServer.module';
 import { UserModule } from './user/user.module';
 import { AuthService } from './auth/auth.service';
 import { AuthModule } from './auth/auth.module';
@@ -15,7 +14,8 @@ import { GameEntity } from './entity/Game.entity';
 import { MessageChatRoomEntity } from './entity/MessageChatRoom.entity';
 import { MessageDirectEntity } from './entity/MessageDirect.entity';
 import { UserBlockEntity } from './entity/UserBlock.entity';
-import { MainServerService } from './chat/mainServer.gateway';
+import { MainServerService } from './mainServer/mainServer.gateway';
+import { MainServerModule } from './mainServer/mainServer.module';
 
 @Module({
   imports: [
@@ -29,7 +29,7 @@ import { MainServerService } from './chat/mainServer.gateway';
       synchronize: true,
       entities: [UserEntity, UserChatRoomEntity, ChatRoomEntity, GameEntity, MessageChatRoomEntity, MessageDirectEntity, UserBlockEntity],
     }), 
-   MainServerService, UserModule, AuthModule, HttpModule, JwtModule],
+   MainServerModule, UserModule, AuthModule, HttpModule, JwtModule],
   controllers: [AppController],
   providers: [AppService, AuthService],
 })

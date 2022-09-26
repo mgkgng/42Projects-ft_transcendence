@@ -6,10 +6,10 @@ export class GameEntity {
 	@PrimaryGeneratedColumn()
 	id: number;
 
-	@ManyToOne(() => UserEntity, (user: UserEntity) => user.id5)
+	@ManyToOne(() => UserEntity, (user: UserEntity) => user.relation_gamePlayerOne)
 	player1: UserEntity;
 
-	@ManyToOne(() => UserEntity, (user: UserEntity) => user.id6)
+	@ManyToOne(() => UserEntity, (user: UserEntity) => user.relation_gamePlayerTwo)
 	player2: UserEntity;
 
 	@Column()
