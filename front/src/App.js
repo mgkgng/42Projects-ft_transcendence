@@ -118,7 +118,6 @@ class PageChat extends React.Component
       this.setState({messages: data});
     });
     socket.on("new_message_room", (data) => {
-      console.log("New message: ", data);
       console.log("New message:" , data);
       this.messages = this.messages + data;
       this.setState({messages: this.messages});
@@ -155,12 +154,12 @@ class PageChat extends React.Component
         });
     }
     catch(e) {  this.text_info = "Room already exist.";}
-    //socket.emit("append_user_to_room", { room_name: "bite"})
+    //socket.emit("set_admin", { room_name: "bite", username_new_admin: "John"});
   }
   getAllMessages(room)
   {
     socket.emit("get_message_room", {room_name: room});
-    console.log(this.username);
+    //socket.emit("get_message_room_page", {room_name: room, page_number: 2, size_page: 4});
     this.setState({actual_room : room});
   }
   render()
@@ -176,7 +175,7 @@ class PageChat extends React.Component
             {this.rooms.map((room) => { return (<button className='BtnRoom' onClick={this.getAllMessages.bind(this, room) }>{room}</button>)})}
           </ul>
           <ul className='ul_messages'>
-            {this.messages.map((room) => { return (<p className={room.id_user.username == this.username ? 'ul_message_me' : 'ul_message_other'}>{room.content_message}</p>)})}
+            {this.messages.reverse().map((room) => { return (<p className={room.id_user.username == this.username ? 'ul_message_me' : 'ul_message_other'}>{room.content_message}</p>)})}
           </ul>
         </div>
         <input type="textarea" id="newMessage"></input>

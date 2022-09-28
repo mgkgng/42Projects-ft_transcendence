@@ -26,7 +26,7 @@ export class MainServerService {
 	constructor(
 		private dataSource : DataSource,
 		private jwtServer: JwtService
-){}
+	){}
 	@WebSocketServer() server;
 
 	after_init(){
@@ -95,8 +95,8 @@ export class MainServerService {
 		}
 	}
 	//OK
-	@SubscribeMessage('new_room')
 	//{room_name: string, is_password_protected: bool, room_password: string}
+	@SubscribeMessage('new_room')
 	async creat_room(@MessageBody() data: any, @Request() req)
 	{
 		const id_user = await this.getIdUser(req);
@@ -171,6 +171,42 @@ export class MainServerService {
 				.innerJoin("messageChatRoomEntity.id_user", "user")
 				.select(["messageChatRoomEntity.content_message", "messageChatRoomEntity.date_message", "user.username", "chatRoom.name"])
 				.where("chatRoom.id_g = :id", {id: id_room}).orderBy("messageChatRoomEntity.date_message", "DESC").getMany();
+				console.log(res);
+				client.emit('get_message_room', res);
+			} catch (e) {
+				console.log("getMessage Error");
+				console.log(e);
+				throw new WsException("No message in this room");
+			}
+		}catch(e){
+			console.log("getMessage Error: bad data");
+			throw new WsException("Bad data");
+		}
+	}
+	//OK
+	//{room_name: string, page_number: number, size_page: number }
+	@SubscribeMessage('get_message_room_page')
+	async getMessageRoomPage(@MessageBody() data: any, @ConnectedSocket() client: Socket, @Request() req) 
+	{
+		try{
+			const id_user = await this.getIdUser(req);
+			const id_room = await this.getIdRoom(data);
+			try{
+				const res_is_in_room = await this.dataSource.getRepository(UserChatRoomEntity).createQueryBuilder("userChat")
+				.where("userChat.id_user = :u", {u : id_user})
+				.andWhere("userChat.room = :r", {r: id_room}).getMany();
+				if (!res_is_in_room.length)
+					throw new WsException("Not in the room");
+				if (res_is_in_room[0].is_banned && res_is_in_room[0].ban_end > new Date())
+					throw new WsException("Your are ban");
+				const res = await this.dataSource.getRepository(MessageChatRoomEntity).createQueryBuilder("messageChatRoomEntity")
+				.innerJoin("messageChatRoomEntity.id_chat_room", "chatRoom")
+				.innerJoin("messageChatRoomEntity.id_user", "user")
+				.select(["messageChatRoomEntity.content_message", "messageChatRoomEntity.date_message", "user.username", "chatRoom.name"])
+				.where("chatRoom.id_g = :id", {id: id_room}).orderBy("messageChatRoomEntity.date_message", "DESC")
+				.offset((parseInt(data.page_number) - 1) * parseInt(data.size_page))
+				.limit(parseInt(data.size_page))
+				.getMany();
 				console.log(res);
 				client.emit('get_message_room', res);
 			} catch (e) {
@@ -297,25 +333,26 @@ export class MainServerService {
 				client.emit("mute_user", data);
 			}
 	}
+	//OK
 	//{room_name:string, username_new_admin: string}
 	@SubscribeMessage('set_admin')
 	async setAdminUser(@MessageBody() data, @ConnectedSocket() client: Socket, @Request() req)
 	{
-			data.username = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
-			const user : any = await this.dataSource.getRepository(UserEntity).find({where: {username: data.username}});
-			const user_ban : any = await this.dataSource.getRepository(UserEntity).find({where: {username: data.username_ban}});
+			const client_username : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
+			const user : any = await this.dataSource.getRepository(UserEntity).find({where: {username: client_username.username}});
+			const user_ban : any = await this.dataSource.getRepository(UserEntity).find({where: {username: data.username_new_admin}});
 			const room : any = await this.dataSource.getRepository(ChatRoomEntity).find({where: {name: data.room_name}});
 
 			const is_admin = await this.dataSource.getRepository(UserChatRoomEntity).createQueryBuilder("userRoom")
 			.where("userRoom.id_user = :u AND userRoom.room = :r", {u: user[0].id_g, r: room[0].id_g})
-			.select("userChat.is_admin").getMany();
+			.select("userRoom.is_admin").getMany();
 			if (!is_admin[0].is_admin)
 				throw new WsException("You are not admin");
 			else
 			{
-				const res = await this.dataSource.getRepository(UserChatRoomEntity).createQueryBuilder("userRoom")
-				.where("userRoom.id_user = :u AND userRoom.room = :r", {u: user_ban[0].id_g, r: room[0].id_g})
-				.update({is_admin: true}).execute();
+				const res = await this.dataSource.createQueryBuilder().update(UserChatRoomEntity)
+				.where("id_user = :u AND room = :r", {u: user_ban[0].id_g, r: room[0].id_g})
+				.set({is_admin: true, is_banned: false, is_muted: false}).execute();
 				console.log(res);
 				client.emit("set_admin", data);
 			}
