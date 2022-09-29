@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, Index } from "typeorm";
 import { UserEntity } from "./User.entity";
 
 
@@ -7,9 +7,11 @@ export class MessageDirectEntity {
 	@PrimaryGeneratedColumn()
 	id: number;
 
+	@Index()
 	@ManyToOne(() => UserEntity, (user: UserEntity) => user.relation_messageDirect)
 	id_sender: UserEntity;
 
+	@Index()
 	@ManyToOne(() => UserEntity, (user: UserEntity) => user.relation_messageDirect)
 	id_recipient: UserEntity;
 

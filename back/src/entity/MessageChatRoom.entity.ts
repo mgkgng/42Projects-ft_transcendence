@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn, Index } from "typeorm";
 import { ChatRoomEntity } from "./ChatRoom.entity";
 import { UserEntity } from "./User.entity";
 
@@ -8,9 +8,11 @@ export class MessageChatRoomEntity {
 	@PrimaryGeneratedColumn()
 	id: number;
 
+	@Index()
 	@ManyToOne(() => UserEntity, (user: UserEntity) => user.relation_messageChatRoom)
 	id_user: UserEntity;
 
+	@Index()
 	@ManyToOne(() => ChatRoomEntity, (user: ChatRoomEntity) => user.relation_messageChatRoom)
 	id_chat_room: ChatRoomEntity;
 
