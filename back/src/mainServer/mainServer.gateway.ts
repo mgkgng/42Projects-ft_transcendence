@@ -426,11 +426,15 @@ export class MainServerService {
 			console.log("create_game_while");
 			const id_one : any = await this.getIdUserByUsername(this.wait_list[0].username);
 			const id_two : any = await this.getIdUserByUsername(this.wait_list[1].username);
-			const res_user_chat_room = await this.dataSource.createQueryBuilder().insert().into(GameEntity).values
-			([ 
+
+			const  querry = this.dataSource.createQueryRunner(); 
+			await querry.connect();
+			await querry.startTransaction();
+			const res_game_entity : any = await querry.manager.insert(GameEntity,
 				{player1: id_one, player2: id_two, date_game: new Date(), is_finished: false, is_cancelled: false, is_abandoned: false, is_disconnected: false}
-			]).execute();
-			this.games.push(new game(this.wait_list[0], this.wait_list[1]));
+			);
+			await querry.commitTransaction();
+			this.games.push(new game(this.wait_list[0], this.wait_list[1], res_game_entity.id));
 			this.wait_list = this.wait_list.slice(1);
 		}
 	}
