@@ -14,8 +14,10 @@ import { GameEntity } from './entity/Game.entity';
 import { MessageChatRoomEntity } from './entity/MessageChatRoom.entity';
 import { MessageDirectEntity } from './entity/MessageDirect.entity';
 import { UserBlockEntity } from './entity/UserBlock.entity';
+import { MainServerService } from './mainServer/mainServer.gateway';
 import { MainServerModule } from './mainServer/mainServer.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { ChatDirectMessageModule } from './chatDirectMessage/chatDirectMessage.module';
 
 @Module({
   imports: [
@@ -28,9 +30,8 @@ import { ScheduleModule } from '@nestjs/schedule';
       database: process.env.POSTGRES_USER,
       synchronize: true,
       entities: [UserEntity, UserChatRoomEntity, ChatRoomEntity, GameEntity, MessageChatRoomEntity, MessageDirectEntity, UserBlockEntity],
-    }), 
-   MainServerModule, UserModule, AuthModule, HttpModule, JwtModule,
-   ScheduleModule.forRoot() ],
+    }),
+   MainServerModule, UserModule, AuthModule, HttpModule, JwtModule, ChatDirectMessageModule, ScheduleModule.forRoot() ],
   controllers: [AppController],
   providers: [AppService, AuthService],
 })
