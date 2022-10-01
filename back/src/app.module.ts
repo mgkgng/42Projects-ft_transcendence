@@ -14,8 +14,8 @@ import { GameEntity } from './entity/Game.entity';
 import { MessageChatRoomEntity } from './entity/MessageChatRoom.entity';
 import { MessageDirectEntity } from './entity/MessageDirect.entity';
 import { UserBlockEntity } from './entity/UserBlock.entity';
-import { MainServerService } from './mainServer/mainServer.gateway';
 import { MainServerModule } from './mainServer/mainServer.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -29,7 +29,8 @@ import { MainServerModule } from './mainServer/mainServer.module';
       synchronize: true,
       entities: [UserEntity, UserChatRoomEntity, ChatRoomEntity, GameEntity, MessageChatRoomEntity, MessageDirectEntity, UserBlockEntity],
     }), 
-   MainServerModule, UserModule, AuthModule, HttpModule, JwtModule],
+   MainServerModule, UserModule, AuthModule, HttpModule, JwtModule,
+   ScheduleModule.forRoot() ],
   controllers: [AppController],
   providers: [AppService, AuthService],
 })

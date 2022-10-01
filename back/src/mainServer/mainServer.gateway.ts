@@ -16,6 +16,59 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MessageChatRoomEntity } from 'src/entity/MessageChatRoom.entity';
 import { Socket } from 'socket.io';
+import { Interval } from '@nestjs/schedule';
+import { GameEntity } from 'src/entity/Game.entity';
+
+class Client
+{
+	username : string;
+	sock : Socket;
+	constructor(socket_client : Socket, username : string)
+	{
+
+		this.username = username;
+		this.sock = socket_client;
+	}
+};
+
+class game
+{
+	id_game : number = 0;
+	c1 : Client;
+	c2 : Client;
+
+	score_p1 : number = 0;
+	score_p2 : number = 0;
+	is_playing = false;
+
+	balle_x : number = 0;
+	balle_y : number = 0;
+	v_x : number = 10;
+	v_y : number = 5;
+
+	constructor(client_one : Client, client_two : Client, id_game: number)
+	{
+		this.c1 = client_one;
+		this.c2 = client_two;
+		this.id_game = id_game;
+	}
+	check_ball()
+	{
+		this.balle_x += this.v_x;
+		this.balle_y += this.v_y;
+		if (this.balle_x >= 889 || this.balle_x <= 0)
+		{
+			this.v_x *= -1;
+			return (true);
+		}
+		if (this.balle_y >= 500 || this.balle_y <= 0)
+		{
+			this.v_y *= -1;
+			return (true);
+		}
+		return (false);
+	}
+}
 
 @WebSocketGateway({
 	cors: {
@@ -25,13 +78,15 @@ import { Socket } from 'socket.io';
 export class MainServerService {
 	constructor(
 		private dataSource : DataSource,
-		private jwtServer: JwtService
-	){}
+		private jwtServer: JwtService, 
+	){
+	}
 	@WebSocketServer() server;
+	wait_list: Client[] = [];
+	games : game[] = [];
 
-	after_init(){
-		console.log('init');
-		return ({"create" : "bite"});
+	after_init()
+	{
 	}
 
   	@UseGuards(AuthGuard('jwt'))
@@ -62,7 +117,13 @@ export class MainServerService {
 		.createQueryBuilder().where("UserEntity.username = :u", { u: client_username }).getOneOrFail();
 		return (id_user.id_g);
 	}
-
+	async getIdUserByUsername(username : string)
+	{
+		const client_username : any = username;
+		const id_user = await this.dataSource.getRepository(UserEntity)
+		.createQueryBuilder().where("UserEntity.username = :u", { u: client_username }).getOneOrFail();
+		return (id_user.id_g);
+	}
 	async getIdRoom (@MessageBody() name){
 		const id_user : any = await this.dataSource.getRepository(ChatRoomEntity)
 		.createQueryBuilder().where("ChatRoomEntity.name = :u", { u: name.room_name}).getOneOrFail();
@@ -224,7 +285,6 @@ export class MainServerService {
 	@SubscribeMessage('new_message_room')
 	async newMessageRoom(@MessageBody() data: any, @ConnectedSocket() client: Socket, @Request() req)
 	{
-		console.log(data);
 		const id_user = await this.getIdUser(req);
 		const id_room = await this.getIdRoom(data);
 		const message : any = data.content_message;
@@ -356,6 +416,50 @@ export class MainServerService {
 				console.log(res);
 				client.emit("set_admin", data);
 			}
+	}
+	//TRY MAKE A LITTLE MATCH MAKING
+	async create_games()
+	{
+		console.log("create_game");
+		while (this.wait_list.length > 1)
+		{
+			console.log("create_game_while");
+			const id_one : any = await this.getIdUserByUsername(this.wait_list[0].username);
+			const id_two : any = await this.getIdUserByUsername(this.wait_list[1].username);
+			const res_user_chat_room = await this.dataSource.createQueryBuilder().insert().into(GameEntity).values
+			([ 
+				{player1: id_one, player2: id_two, date_game: new Date(), is_finished: false, is_cancelled: false, is_abandoned: false, is_disconnected: false}
+			]).execute();
+			this.games.push(new game(this.wait_list[0], this.wait_list[1]));
+			this.wait_list = this.wait_list.slice(1);
+		}
+	}
+	@SubscribeMessage('add_in_wait_list')
+	async enter_in_game(@MessageBody() data, @ConnectedSocket() client: Socket, @Request() req)
+	{
+		const jwt : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
+		for (let c of this.wait_list)
+		{
+			if (c.username == jwt.username)
+				throw new WsException("Already in queu");
+		}
+		console.log("add client");
+		this.wait_list.push(new Client(client, jwt.username));
+		this.create_games();
+		client.emit("add_in_wait_list");
+	}
+	@Interval(1000 / 30)
+	init_game()
+	{
+		if (this.games.length)
+		{
+			for (let g of this.games)
+			{
+				g.check_ball();
+				g.c1.sock.emit("set_data", {x: g.balle_x, y: g.balle_y});
+				g.c2.sock.emit("set_data", {x: g.balle_x, y: g.balle_y});
+			}
+		}
 	}
 	@SubscribeMessage('pute')
 	handleEvent(@MessageBody('data') data: string, @ConnectedSocket() client: Socket): string {

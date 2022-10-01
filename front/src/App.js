@@ -79,11 +79,32 @@ class PageGame extends React.Component
   constructor(props) 
   {
     super(props);
+      socket.emit("add_in_wait_list");
+      socket.on("set_data", (data) => {
+      console.log("New Data:", data);
+      this.draw(data.x, data.y);
+    });
+  }
+  draw(x, y) {
+    this.canvas = document.getElementById("myCanvas");
+    this.ctx = this.canvas.getContext("2d");
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.ctx.fillStyle = "white";
+    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    this.ctx.beginPath();
+    this.ctx.arc(x, y, 10, 0, Math.PI * 2);
+    this.ctx.fillStyle = "#0095DD";
+    this.ctx.fill();
+    this.ctx.closePath();
+
   }
   render()
   {
     return (
-       <h1>PageGame</h1>
+      <div>
+        <h1>PageGame</h1>
+        <canvas id="myCanvas" width="889" height="500"></canvas>
+      </div>
     );
   }
 };
@@ -224,7 +245,7 @@ class App extends React.Component {
     });
     socket.emit("get_user_info", (res) => { console.log("GET_USER:", res); this.setState({username: res.username}); });
                   
-    socket.current.on("connect", (data) => {
+    socket.on("connect", (data) => {
         console.log("connect: " + this.state.jwt);
     });
   }
