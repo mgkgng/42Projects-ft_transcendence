@@ -6,17 +6,17 @@ export class GameEntity {
 	@PrimaryGeneratedColumn()
 	id: number;
 
-	@ManyToOne(() => UserEntity, (user: UserEntity) => user.id5)
+	@ManyToOne(() => UserEntity, (user: UserEntity) => user.relation_gamePlayerOne)
 	player1: UserEntity;
 
-	@ManyToOne(() => UserEntity, (user: UserEntity) => user.id6)
+	@ManyToOne(() => UserEntity, (user: UserEntity) => user.relation_gamePlayerTwo)
 	player2: UserEntity;
 
-	@Column()
-	player1_score: number;
+	@Column({nullable: true})
+	player1_score?: number;
 
-	@Column()
-	player2_score: number;
+	@Column({nullable: true})
+	player2_score?: number;
 
 	@Column()
 	date_game: Date;
@@ -27,19 +27,19 @@ export class GameEntity {
 	@Column()
 	is_cancelled: boolean;
 
-	@Column()
-	cancelled_player: number;
+	@Column({nullable: true})
+	cancelled_player?: number;
 
 	@Column()
 	is_abandoned: boolean;
 
-	@Column()
-	abandoned_player: number;
+	@Column({nullable: true})
+	abandoned_player?: number;
 
 	@Column()
 	is_disconnected: boolean;
 
-	@Column()
-	disconnected_player: number;
+	@Column({nullable: true})
+	disconnected_player?: number;
 
 }

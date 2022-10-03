@@ -8,10 +8,10 @@ export class UserChatRoomEntity {
 	@PrimaryGeneratedColumn()
 	id: number;
 
-	@ManyToOne(() => UserEntity, (user: UserEntity) => user.id1)
+	@ManyToOne(() => UserEntity, (user: UserEntity) => user.relation_userChatRoom)
 	id_user: UserEntity;
 
-	@ManyToOne(() => ChatRoomEntity, (room: ChatRoomEntity) => room.id )
+	@ManyToOne(() => ChatRoomEntity, (room: ChatRoomEntity) => room.relation_userChatRoom)
 	room: ChatRoomEntity;
 
 	@Column()

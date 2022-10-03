@@ -12,11 +12,11 @@ export class UserService {
 		private dataSource : DataSource
 	  ) {}
 	
-	  findAll(): Promise<UserEntity[]> {
+	  async findAll(): Promise<UserEntity[]> {
 		return this.usersRepository.find();
 	  }
 	
-	  findOne(username: string): Promise<UserEntity> {
+	  async findOne(username: string): Promise<UserEntity> {
 		return this.usersRepository.findOneBy({ username });
 	  }
 
@@ -37,6 +37,7 @@ export class UserService {
 				{username: user.username, password: user.password, email: user.email, is_42_user: user.is_42_user, img: user.img},
 			);
 			await querry.commitTransaction();
+			return (res);
 		} catch (e) {
 			await querry.rollbackTransaction();
 			console.log("Create User failed");

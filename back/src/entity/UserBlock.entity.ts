@@ -6,9 +6,9 @@ export class UserBlockEntity {
 	@PrimaryGeneratedColumn()
 	id: number;
 
-	@ManyToOne(() => UserEntity, (user: UserEntity) => user.id7)
+	@ManyToOne(() => UserEntity, (user: UserEntity) => user.relation_userBlocker)
 	id_user: UserEntity;
 
-	@ManyToOne(() => UserEntity, (user: UserEntity) => user.id8)
+	@ManyToOne(() => UserEntity, (user: UserEntity) => user.relation_userBlocked)
 	id_user_blocked: UserEntity;
 }

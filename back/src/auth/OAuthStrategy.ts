@@ -15,12 +15,11 @@ export class OAuthStrategy extends PassportStrategy(Strategy, "oauth") {
 
   async validate(@MessageBody() username: string, @MessageBody() code : string): Promise<any> {
 	const res = await this.authService.validateUser42(code);
-	console.log("Get token");
+	console.log("Get token : ", code);
 	if (res)
 	{
 		let data = res.data;
-		console.log(res);
-		if (this.userService.findOne(res.data.login))
+		if (await this.userService.findOne(res.data.login))
 		{
 			const find = ({username: data.login, email: data.email, is_42_user: true, img: data.image_url});
 			console.log("Find :");
@@ -29,9 +28,9 @@ export class OAuthStrategy extends PassportStrategy(Strategy, "oauth") {
 		}
 		else
 		{
-			const create = this.userService.create({username: data.login, password: "42", email: data.email, is_42_user: true, img: data.image_url});
+			const create = await this.userService.create({username: data.login, password: "42", email: data.email, is_42_user: true, img: data.image_url});
 			if (create)
-				return ({username: data.login, password: "42", email: data.email, is_42_user: true, img: data.image_url});
+				return ({username: data.login, email: data.email, is_42_user: true, img: data.image_url});
 			else
 			{
 				console.log("Error create user");
