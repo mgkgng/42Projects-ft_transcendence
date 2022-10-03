@@ -40,7 +40,7 @@
 </script>
 
 <main style="{(darkMode) ? "background-color: #000" : "background-color: #fff"}">
-	<Title topMargin={180} leftMargin={700} />
+	<Title topMargin={160} leftMargin={700} />
 	<Navbar bind:darkMode={darkMode} />
 	<div class="color-change-circle" on:click={() => {
 		darkMode = !darkMode;

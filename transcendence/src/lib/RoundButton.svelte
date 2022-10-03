@@ -7,8 +7,8 @@
 
 	.circle-button {
 		position: absolute;
-		top: var(--startX);
-		left: var(--startY);
+		top: 40%;
+		left: 48%;
 
 		background-color: transparentize(#000000, 0.1);
 		width: 100px;

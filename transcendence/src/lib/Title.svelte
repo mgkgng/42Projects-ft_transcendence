@@ -4,13 +4,13 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		
-		
+		height: 100%;
 	}
 	.main-circle {
-		position: absolute;
-		top: var(--startX); // should make it responsive later
-		left: var(--startY);
+		position: relative;
+		//top: var(--startX); // should make it responsive later
+		top : 0px;
+		// left: var(--startY);
 		width: var(--width);
 		background-color: #000;
 		aspect-ratio: 1 / 1;
@@ -33,8 +33,9 @@
 
 	.circle-around {
 		position: absolute;
-		top: var(--centerX);
-		left: var(--centerY);
+		top: 44%;
+		left: 50%;
+		right: 0;
 		width: var(--size);
 		aspect-ratio: 1 / 1;
 		border-radius: 50%;
@@ -48,7 +49,7 @@
 
 	.title {
 		position: absolute;
-		top: 22vh;
+		top: 20vh;
 		background-color: rgba(0, 0, 0, 0);
 		margin: 2em;
 		padding: .3em 0 .1em;
@@ -112,5 +113,4 @@
 	{/each}
 	<RoundButton topMargin={topMargin} leftMargin={leftMargin} circleRadius={circleRadius}/>
 	<h1 class="title">transcendence</h1>
-
 </div>	
