@@ -1,26 +1,36 @@
 <style lang="scss">
-	.div-container {
+	main {
+		height: 100vh;
+	}
+
+	.container {
+		width: 100%;
+		height: 100%;
 		display: flex;
 		justify-content: center;
 		align-items: center;
 	}
+
 	.game-container {
-		width: 300px;
-		height: 80px;
-		border:  black;
-		
+		width: 720px;
+		height: 800px;
+		padding: 0;
+		border: solid transparentize(#000, .3);
+		border-radius: 1em;
+		display: grid;
+		grid-template-rows: 2% 3% 90% 3% 2%;
 	}
 
-	.bar-container {
-		position: absolute;
+	.bar-container-above {
+		position: relative;
+		display: flex;
+		align-items: center;
+	}
 
-		.above {
-			top: 20px;
-		}
-
-		.below {
-			bottom: 20px;
-		}
+	.bar-container-below {
+		position: relative;
+		display: flex;
+		align-items: center;
 	}
 
 	.central-line {
@@ -38,17 +48,20 @@
 
 </script>
 
-<div class="div-container">
-	<div class="game-container">
-		<div class="bar-container above">
-			<Bar />
+<main>
+	<div class="container">
+		<div class="game-container">
+			<div></div>
+			<div class="bar-container-above">
+				<Bar />
+			</div>
+			<div></div>
+			<div class="bar-container-below">
+				<Bar />
+			</div>
+			<div></div>
 		</div>
-		<div class="bar-container below">
-			<Bar />
-		</div>
+		<div class="central-line"></div>
 	</div>
-
-	<div class="central-line"></div>
-
-</div>
+</main>
 
