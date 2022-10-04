@@ -77,7 +77,6 @@
 		// animation-iterator-count: 1;
 		// animation-timinig-function: ease-out;
 	}
-	
 
 </style>
 

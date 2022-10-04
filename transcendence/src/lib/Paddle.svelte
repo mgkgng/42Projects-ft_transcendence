@@ -23,10 +23,16 @@
 
 	let pos = (gameWidth - paddleWidth) / 2;
 
-	$: moving;
-	$: pos + moving;
+	let callBack;
+
+	$: console.log(moving);
 	
 	$: console.log(pos);
+
+	function movePaddle() {
+		pos += moving;
+	}
+
 </script>
 
 <div class="paddle" style="--pos: {pos}px; --paddleWidth = {paddleWidth}px"></div>
@@ -43,14 +49,21 @@ on:mousemove={(event)=>{
 
 on:keydown={(event) => {
 	// console.log(event);
-	if (event.code == 'KeyA')
+	if (event.code == 'KeyA') {
 		moving = -1;
-	if (event.code == 'KeyD')
+		callBack = setInterval(movePaddle, 20);
+	}
+	if (event.code == 'KeyD') {
 		moving = 1;
+		callBack = setInterval(movePaddle, 20);
+	}
 }}
 
-on:keyup={()=>{
-	moving = 0;
+on:keyup={(event)=>{
+	if (event.code == 'KeyA' || event.code == 'KeyD') {
+		moving = 0;
+		clearInterval(callBack);
+	}
 }}
 
 />

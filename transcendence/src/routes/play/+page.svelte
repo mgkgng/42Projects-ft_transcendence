@@ -36,6 +36,20 @@
 		height: 0;
 		border: dashed 3px rgba(0, 0, 0, .7);
 	}
+
+	.beyond-above {
+		background-color: transparentize(blue, 0.7);
+		border-radius: 1em 0;
+	}
+
+	.beyond-below {
+		background-color: transparentize(blue, 0.7);
+		border-radius: 0 1em;
+	}
+
+	.map {
+
+	}
 </style>
 
 <script>
@@ -48,16 +62,15 @@
 
 <div class="container">
 	<div class="game-container" style="--gameWidth: {gameWidth}px; --gameHeight: {gameHeight}px;">
-		<div></div>
+		<div class="beyond-above"></div>
 		<div class="bar-container-above">
 			<Paddle gameWidth={gameWidth} gameHeight={gameHeight}/>
 		</div>
-		<div></div>
+		<div class="map"></div>
 		<div class="bar-container-below">
 			<Paddle gameWidth={gameWidth} gameHeight={gameHeight}/>
 		</div>
-		<div></div>
+		<div class="beyond-below"></div>
 	</div>
 	<div class="central-line"></div>
 </div>
-
