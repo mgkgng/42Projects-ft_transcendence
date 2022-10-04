@@ -64,9 +64,12 @@
 </style>
 
 <script lang="ts">
+	import { io } from 'socket.io-client';
 	import { onMount } from "svelte";
 	import RoundButton from "./RoundButton.svelte";
 	import '$lib/scss/app.scss';
+
+	const socket = io();
 
 	export let topMargin;
 	export let leftMargin;
@@ -101,6 +104,10 @@
 
 	onMount(() => {
 		circlesAround = createCircles();
+
+		socket.on('eventFromServer', (msg) => {
+			console.log(msg);
+		})
 	});
 
 </script>
