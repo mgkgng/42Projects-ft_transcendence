@@ -29,6 +29,8 @@
 		animation-duration: 3.5s;
 		animation-iteration-count: infinite;
 		animation-timing-function: linear;
+
+		overflow: hidden; // doesn't work yet
 	}
 </style>
 
@@ -40,11 +42,12 @@
 </script>
 
 <main style="{(darkMode) ? "background-color: #000" : "background-color: #fff"}">
-	<Title topMargin={160} leftMargin={700} />
-	<Navbar bind:darkMode={darkMode} />
 	<div class="color-change-circle" on:click={() => {
 		darkMode = !darkMode;
 	}}
 	style="{(darkMode) ? "background-color: rgba(255, 255, 255, .9)" : "background-color: rgba(0, 0, 0, .9)"}"></div>
+
+	<Title topMargin={160} leftMargin={700} />
+	<Navbar bind:darkMode={darkMode} />
 </main>
 

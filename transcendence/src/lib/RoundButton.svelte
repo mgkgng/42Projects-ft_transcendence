@@ -8,7 +8,7 @@
 	.circle-button {
 		position: absolute;
 		top: 40%;
-		left: 48%;
+		left: 43%;
 
 		background-color: transparentize(#000000, 0.1);
 		width: 100px;
@@ -53,34 +53,40 @@
 	import { goto } from "$app/navigation";
 	import '$lib/scss/app.scss';
 
-	export let topMargin;
-	export let leftMargin;
 	export let circleRadius;
 
-	let centerX = topMargin + circleRadius;
-	let centerY = leftMargin + circleRadius;
+	export let showMessage;
+	export let message;
 
 	let angleRand;
 	let angleLogin = [], anglePlay = [];
 
+	let login = false;
+
 	onMount(() => {
 		angleRand = Math.floor(Math.random() * 180 + 90);
 		angleLogin = [angleRand, -angleRand, angleRand - 360, -angleRand + 360];
-		anglePlay = [angleRand - 180, -angleRand + 180, angleRand - 540, -angleRand + 540];
+		anglePlay = [angleRand - 180,                                                                                              -angleRand + 180, angleRand - 540, -angleRand + 540];
 	});
 
 </script>
 
 <div>
-	<div class="circle-button" style="--startX: {centerX - 50}px; --startY: {centerY - 50}px;
-		--from1: {angleLogin[0]}deg; --to1: {angleLogin[1]}deg; --from2: {angleLogin[2]}deg; --to2: {angleLogin[3]}deg"
+	<div class="circle-button" style="--from1: {angleLogin[0]}deg; --to1: {angleLogin[1]}deg;
+	--from2: {angleLogin[2]}deg; --to2: {angleLogin[3]}deg"
 		on:click={()=>{ goto(`/login`); }}
 	>
 		<h2>Login</h2>
 	</div>
-	<div class="circle-button" style="--startX: {centerX - 50}px; --startY: {centerY - 50}px;
-		--from1: {anglePlay[0]}deg; --to1: {anglePlay[1]}deg; --from2: {anglePlay[2]}deg; --to2: {anglePlay[3]}deg"
-		on:click={()=>{ goto(`/play`); }}
+	<div class="circle-button" style="--from1: {anglePlay[0]}deg; --to1: {anglePlay[1]}deg;
+	--from2: {anglePlay[2]}deg; --to2: {anglePlay[3]}deg"
+		on:click={()=>{
+			if (!login) {
+				showMessage = true;
+				message = "Login required!";
+			}
+			goto(`/play`);
+		}}
 	>
 		<h2>Play</h2>
 	</div>

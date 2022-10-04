@@ -6,6 +6,7 @@
 html {
 	height: 100vh;
 }
+
 body {
 	font-family: 'alpha-prota';
 	background: #fff;
@@ -45,12 +46,6 @@ h1 { font-size: $h1; font-weight: bold; }
 	border-radius: $border-radius;
 	padding: .2em .5em;
 	position: relative;
-}
-
-
-@font-face {
-	font-family: 'avenger';
-	src: URL('fonts/AVENGER.ttf') format('truetype');
 }
 
 @font-face {

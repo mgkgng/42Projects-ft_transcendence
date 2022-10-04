@@ -8,9 +8,6 @@
 	}
 	.main-circle {
 		position: relative;
-		//top: var(--startX); // should make it responsive later
-		top : 0px;
-		// left: var(--startY);
 		width: var(--width);
 		background-color: #000;
 		aspect-ratio: 1 / 1;
@@ -59,6 +56,27 @@
 		user-select: none;
 	}
 
+	@keyframes show-msg {
+		0% { color: #000 }
+		50% { transform: #fff }
+		100% { transform: #000 }
+	}
+
+	.msg {
+		background-color:rgba(0, 0, 0, 0);
+
+		animation-play-state: paused;
+		animation-name: show-msg;
+		animation-duration: 3s;
+
+		// for play
+		// animation-iteration-count: infinite;
+		// animation-timing-function: linear;
+
+		// for login required
+		// animation-iterator-count: 1;
+		// animation-timinig-function: ease-out;
+	}
 	
 
 </style>
@@ -71,32 +89,29 @@
 
 	const socket = io();
 
-	export let topMargin;
-	export let leftMargin;
 	export let darkMode = false;
 
 	let circlesAround = [];
 	let circleRadius = 250;
 
-	let centerX = topMargin + circleRadius;
-	let centerY = leftMargin + circleRadius;
-
-	function makeCssStyleVars(obj) {
-		return (Object.entries(obj)
-		.map(([key, value]) => `${key}:${value}`)
-		.join(';'));
-	}
+	let showMessage = false;
+	let message = "";
 
 	function createCircles() {
 		let res = [];
 		let circleNb = Math.floor(Math.random() * 10 + 15);
-
+		type Circle = {
+				size: number;
+				duration: number;
+				angle: number;
+		};
+		
 		for (let i = 0; i < circleNb; i++) {
-			let circle = {};
-
-			circle["size"] = Math.floor(Math.random() * 20 + 8).toString();
-			circle["duration"] = Math.floor(Math.random() * 50 + 15).toString();
-			circle["angle"] = Math.floor(Math.random() * 360);
+			let circle: Circle = {
+				size : Math.floor(Math.random() * 20 + 8),
+				duration : Math.floor(Math.random() * 50 + 15),
+				angle : Math.floor(Math.random() * 360)
+			};
 			res.push(circle);
 		}
 		return (res)
@@ -113,11 +128,12 @@
 </script>
 
 <div class="container">
-	<div class="main-circle" style="--startX: {topMargin}px; --startY: {leftMargin}px; --width: {circleRadius * 2}px">
+	<div class="main-circle" style="--width: {circleRadius * 2}px">
 	</div>
 	{#each circlesAround as circleInfo}
-	<div class="circle-around" style="--dist: {circleRadius + 45}px; --centerX: {centerX}px; --centerY: {centerY}px;  --startY: {circleInfo.y}px; --size: {circleInfo.size}px; --duration: {circleInfo.duration}s; --angle: {circleInfo.angle}deg; --angle2: {circleInfo.angle + 360}deg"></div>
+	<div class="circle-around" style="--dist: {circleRadius + 45}px; --startY: {circleInfo.y}px; --size: {circleInfo.size}px; --duration: {circleInfo.duration}s; --angle: {circleInfo.angle}deg; --angle2: {circleInfo.angle + 360}deg"></div>
 	{/each}
-	<RoundButton topMargin={topMargin} leftMargin={leftMargin} circleRadius={circleRadius}/>
+	<RoundButton bind:showMessage={showMessage} bind:message={message} circleRadius={circleRadius}/>
 	<h1 class="title">transcendence</h1>
+	<div class="msg">{message}</div>
 </div>	
