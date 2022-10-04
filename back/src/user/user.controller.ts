@@ -1,4 +1,4 @@
-import { Controller, ForbiddenException, Post, UnauthorizedException} from "@nestjs/common";
+import { Controller, ForbiddenException, Get, Post, UnauthorizedException} from "@nestjs/common";
 import { UserService } from "./user.service";
 
 
@@ -8,7 +8,7 @@ export class UserController
     constructor(private userService : UserService)
     {
     }
-    @Post("/John")
+    @Get("/John")
     post_addJohn()
     {
         const user = this.userService.addJohn();

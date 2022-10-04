@@ -18,6 +18,8 @@ import { MainServerService } from './mainServer/mainServer.gateway';
 import { MainServerModule } from './mainServer/mainServer.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ChatDirectMessageModule } from './chatDirectMessage/chatDirectMessage.module';
+import { ChatRoomService } from './chatRoom/chatRoom.gatway';
+import { ChatRoomModule } from './chatRoom/chatRoom.module';
 
 @Module({
   imports: [
@@ -31,7 +33,7 @@ import { ChatDirectMessageModule } from './chatDirectMessage/chatDirectMessage.m
       synchronize: true,
       entities: [UserEntity, UserChatRoomEntity, ChatRoomEntity, GameEntity, MessageChatRoomEntity, MessageDirectEntity, UserBlockEntity],
     }),
-   MainServerModule, UserModule, AuthModule, HttpModule, JwtModule, ChatDirectMessageModule, ScheduleModule.forRoot() ],
+   MainServerModule, ChatRoomModule , UserModule, AuthModule, HttpModule, JwtModule, ChatDirectMessageModule, ScheduleModule.forRoot() ],
   controllers: [AppController],
   providers: [AppService, AuthService],
 })
