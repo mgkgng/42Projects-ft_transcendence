@@ -10,10 +10,9 @@
 </style>
 
 <script>
+	import { io } from "socket.io-client";
 	let grapped = false;
-	let moving = 0;
 
-	$: console.log(moving);
 </script>
 
 <div class="bar" on:mousedown={()=>{
@@ -28,17 +27,6 @@ on:mouseup={()=>{
 on:mousemove={(event)=>{
 	if (grapped)
 		console.log(event);
-}}
-
-on:keydown={(event) => {
-	if (event.code == 'KeyA')
-		moving = -1;
-	if (event.code == 'KeyD')
-		moving = 1;
-}}
-
-on:keyup={()=>{
-	moving = 0;
 }}
 
 />

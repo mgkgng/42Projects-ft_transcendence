@@ -1,8 +1,4 @@
 <style lang="scss">
-	main {
-		height: 100vh;
-	}
-
 	.container {
 		width: 100%;
 		height: 100%;
@@ -12,8 +8,8 @@
 	}
 
 	.game-container {
-		width: 720px;
-		height: 800px;
+		width: var(--gameWidth);
+		height: var(--gameHeight);
 		padding: 0;
 		border: solid transparentize(#000, .3);
 		border-radius: 1em;
@@ -44,24 +40,24 @@
 
 <script>
 	import { io } from "socket.io-client";
-	import Bar from "$lib/Bar.svelte";
+	import Paddle from "$lib/Paddle.svelte";
 
+	let gameWidth = 720;
+	let gameHeight = 800;
 </script>
 
-<main>
-	<div class="container">
-		<div class="game-container">
-			<div></div>
-			<div class="bar-container-above">
-				<Bar />
-			</div>
-			<div></div>
-			<div class="bar-container-below">
-				<Bar />
-			</div>
-			<div></div>
+<div class="container">
+	<div class="game-container" style="--gameWidth: {gameWidth}px; --gameHeight: {gameHeight}px;">
+		<div></div>
+		<div class="bar-container-above">
+			<Paddle gameWidth={gameWidth} gameHeight={gameHeight}/>
 		</div>
-		<div class="central-line"></div>
+		<div></div>
+		<div class="bar-container-below">
+			<Paddle gameWidth={gameWidth} gameHeight={gameHeight}/>
+		</div>
+		<div></div>
 	</div>
-</main>
+	<div class="central-line"></div>
+</div>
 
