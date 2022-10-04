@@ -1,4 +1,4 @@
-<style>
+<style lang="scss">
 	.div-container {
 		display: flex;
 		justify-content: center;
@@ -9,6 +9,18 @@
 		height: 80px;
 		border:  black;
 		
+	}
+
+	.bar-container {
+		position: absolute;
+
+		.above {
+			top: 20px;
+		}
+
+		.below {
+			bottom: 20px;
+		}
 	}
 
 	.central-line {
@@ -24,29 +36,19 @@
 	import { io } from "socket.io-client";
 	import Bar from "$lib/Bar.svelte";
 
-	let moving = 0;
-
-	$: console.log(moving);
-
 </script>
 
 <div class="div-container">
 	<div class="game-container">
-		
+		<div class="bar-container above">
+			<Bar />
+		</div>
+		<div class="bar-container below">
+			<Bar />
+		</div>
 	</div>
 
 	<div class="central-line"></div>
-	<Bar />
 
 </div>
 
-<svelte:window on:keydown={
-	(e) => {
-		if (e.code == 'KeyA')
-			moving = -1;
-		if (e.code == 'KeyD')
-			moving = 1;
-	}} on:keyup={()=>{
-		moving = 0;
-	}}
-/>

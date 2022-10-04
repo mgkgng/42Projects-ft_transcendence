@@ -1,5 +1,6 @@
 <style>
 	.bar {
+		position: relative;
 		width: 100px;
 		height: 10px;
 		background-color:rgba(0, 0, 0, 0.8);
@@ -10,15 +11,34 @@
 
 <script>
 	let grapped = false;
+	let moving = 0;
+
+	$: console.log(moving);
 </script>
 
 <div class="bar" on:mousedown={()=>{
 	grapped = true;
 }}></div>
 
-<svelte:window on:mouseup={()=>{
+<svelte:window
+on:mouseup={()=>{
 	grapped = false;
-}} on:mousemove={(e)=>{
+}}
+
+on:mousemove={(event)=>{
 	if (grapped)
-		console.log(e);
-}}/>
+		console.log(event);
+}}
+
+on:keydown={(event) => {
+	if (event.code == 'KeyA')
+		moving = -1;
+	if (event.code == 'KeyD')
+		moving = 1;
+}}
+
+on:keyup={()=>{
+	moving = 0;
+}}
+
+/>

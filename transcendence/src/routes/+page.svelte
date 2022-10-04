@@ -47,7 +47,7 @@
 	}}
 	style="{(darkMode) ? "background-color: rgba(255, 255, 255, .9)" : "background-color: rgba(0, 0, 0, .9)"}"></div>
 
-	<Title topMargin={160} leftMargin={700} />
+	<Title />
 	<Navbar bind:darkMode={darkMode} />
 </main>
 
