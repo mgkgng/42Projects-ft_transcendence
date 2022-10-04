@@ -17,8 +17,8 @@
 </style>
 
 <script>
-	export let circleRadius;
-	
+	export let circleRadius : number;
+
 </script>
 
 <div class="main-circle" style="--width: {circleRadius * 2}px">
