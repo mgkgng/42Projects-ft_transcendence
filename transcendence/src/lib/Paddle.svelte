@@ -2,7 +2,7 @@
 	.paddle {
 		width: 80px;
 		height: 12px;
-		background-color: transparentize(blue, 0.5);
+		background-color: transparentize($main, 0.5);
 		border-radius: 2em;
 
 		position: relative;

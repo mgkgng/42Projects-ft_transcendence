@@ -6,22 +6,6 @@
 		justify-content: center;
 		height: 100%;
 	}
-	.main-circle {
-		position: relative;
-		width: var(--width);
-		background-color: #000;
-		aspect-ratio: 1 / 1;
-		border-radius: 50%;
-
-		display: flex;
-		justify-content: center;
-		align-items: center;
-
-		// box-shadow: 0px 0px 240px 30px $main;
-		// box-shadow: 0px 0px 550px 50px $main;
-		box-shadow: 0px 0px 750px 100px $main;
-
-	}
 
 	@keyframes rotate {
 		from { transform: rotate(var(--angle)) translateX(var(--dist)) rotate(var(--angle))}
@@ -85,6 +69,7 @@
 	import { onMount } from "svelte";
 	import RoundButton from "./RoundButton.svelte";
 	import '$lib/scss/app.scss';
+    import MainCircle from './MainCircle.svelte';
 
 	const socket = io();
 
@@ -127,8 +112,8 @@
 </script>
 
 <div class="container">
-	<div class="main-circle" style="--width: {circleRadius * 2}px">
-	</div>
+	<MainCircle circleRadius={circleRadius}/>
+
 	{#each circlesAround as circleInfo}
 	<div class="circle-around" style="--dist: {circleRadius + 45}px; --startY: {circleInfo.y}px; --size: {circleInfo.size}px; --duration: {circleInfo.duration}s; --angle: {circleInfo.angle}deg; --angle2: {circleInfo.angle + 360}deg"></div>
 	{/each}

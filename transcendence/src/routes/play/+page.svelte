@@ -38,12 +38,12 @@
 	}
 
 	.beyond-above {
-		background-color: transparentize(blue, 0.7);
+		background-color: transparentize($main, 0.7);
 		border-radius: 1em 0;
 	}
 
 	.beyond-below {
-		background-color: transparentize(blue, 0.7);
+		background-color: transparentize($main, 0.7);
 		border-radius: 0 1em;
 	}
 
@@ -55,6 +55,7 @@
 <script>
 	import { io } from "socket.io-client";
 	import Paddle from "$lib/Paddle.svelte";
+	import MainCircle from "$lib/MainCircle.svelte";
 
 	let gameWidth = 720;
 	let gameHeight = 800;
@@ -73,4 +74,5 @@
 		<div class="beyond-below"></div>
 	</div>
 	<div class="central-line"></div>
+	<MainCircle circleRadius={250} />
 </div>
