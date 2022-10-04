@@ -10,9 +10,11 @@
 	}
 </style>
 
-<script>
+<script lang="ts">
 	import { io } from "socket.io-client";
 
+
+	export let myPaddle;
 	export let gameWidth;
 	export let gameHeight;
 
@@ -23,14 +25,16 @@
 
 	let pos = (gameWidth - paddleWidth) / 2;
 
-	let callBack;
+	let callBack : Function;
 
-	$: console.log(moving);
-	
-	$: console.log(pos);
+	// $: console.log(moving);
+	// $: console.log(pos);
 
 	function movePaddle() {
-		pos += moving;
+		if (moving == 1)
+			pos++;
+		if (moving == -1)
+			pos--;
 	}
 
 </script>
@@ -48,21 +52,23 @@ on:mousemove={(event)=>{
 }}
 
 on:keydown={(event) => {
-	// console.log(event);
-	if (event.code == 'KeyA') {
-		moving = -1;
-		callBack = setInterval(movePaddle, 20);
+	if (!callBack && event.code == 'KeyA') {
+		callBack = setInterval(() => {
+			pos -= 10;
+		}, 20);
 	}
-	if (event.code == 'KeyD') {
-		moving = 1;
-		callBack = setInterval(movePaddle, 20);
+	if (!callBack && event.code == 'KeyD') {
+		callBack = setInterval(() => {
+			pos += 10;
+		}, 20);
 	}
 }}
 
 on:keyup={(event)=>{
-	if (event.code == 'KeyA' || event.code == 'KeyD') {
-		moving = 0;
+	if (callBack) {
 		clearInterval(callBack);
+		setTimeout(callBack, 200);
+		callBack = undefined;
 	}
 }}
 

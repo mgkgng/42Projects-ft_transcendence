@@ -64,11 +64,11 @@
 	<div class="game-container" style="--gameWidth: {gameWidth}px; --gameHeight: {gameHeight}px;">
 		<div class="beyond-above"></div>
 		<div class="bar-container-above">
-			<Paddle gameWidth={gameWidth} gameHeight={gameHeight}/>
+			<Paddle myPaddle={false} gameWidth={gameWidth} gameHeight={gameHeight} />
 		</div>
 		<div class="map"></div>
 		<div class="bar-container-below">
-			<Paddle gameWidth={gameWidth} gameHeight={gameHeight}/>
+			<Paddle myPaddle={true} gameWidth={gameWidth} gameHeight={gameHeight} />
 		</div>
 		<div class="beyond-below"></div>
 	</div>
