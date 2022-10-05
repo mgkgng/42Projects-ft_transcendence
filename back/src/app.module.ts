@@ -31,7 +31,7 @@ import { ChatRoomModule } from './chatRoom/chatRoom.module';
       password: process.env.POSTGRES_PASSWORD,
       database: process.env.POSTGRES_USER,
       synchronize: true,
-      entities: [UserEntity, UserChatRoomEntity, ChatRoomEntity, GameEntity, MessageChatRoomEntity, MessageDirectEntity, UserBlockEntity],
+      autoLoadEntities: true,   
     }),
    MainServerModule, ChatRoomModule , UserModule, AuthModule, HttpModule, JwtModule, ChatDirectMessageModule, ScheduleModule.forRoot() ],
   controllers: [AppController],
