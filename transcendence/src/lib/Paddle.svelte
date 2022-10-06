@@ -2,8 +2,7 @@
 	.paddle {
 		width: 80px;
 		height: 12px;
-		background-color: #000;
-		box-shadow: 0px 0px 15px 10px $main;
+		box-shadow: 0px 0px 20px 8px $main;
 
 		border-radius: 2em;
 
@@ -14,6 +13,14 @@
 
 <script lang="ts">
 	import { io } from "socket.io-client";
+	import { darkMode } from "$lib/stores/store";
+
+	let dark : boolean;
+
+	darkMode.subscribe(value => {
+		dark = value;
+	});
+
 
 	export let gameWidth : number;
 	export let gameHeight : number;
@@ -23,5 +30,5 @@
 
 </script>
 
-<div class="paddle" style="--pos: {pos}px; --paddleWidth = {paddleWidth}px"></div>
+<div class="paddle" style="{(dark) ? "background-color: #000" : "background-color: #fff"}; --pos: {pos}px; --paddleWidth = {paddleWidth}px"></div>
 

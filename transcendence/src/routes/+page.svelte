@@ -1,5 +1,6 @@
 <style lang="scss">
 	.container {
+		max-height: 100%;
 		background-color: rgba(0, 0, 0, 0);
 		display: grid;
 		grid-template-rows: 90vh 10vh;
