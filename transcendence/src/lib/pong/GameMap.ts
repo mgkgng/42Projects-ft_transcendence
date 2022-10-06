@@ -12,7 +12,7 @@ export const PaddleSize = {
 	Large : 130
 }
 
-export class Map {
+export class GameMap {
 
 	walls : Array<Wall>;
 	width: number;

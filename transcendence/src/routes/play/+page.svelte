@@ -60,14 +60,14 @@
 <script>
 	import Paddle from "$lib/Paddle.svelte";
 	import { onMount } from 'svelte';
-	import { Map, PaddleSize } from "$lib/pong/Map";
+	import { GameMap, PaddleSize } from "$lib/pong/GameMap";
 
-	let map = new Map(720, 800, PaddleSize.Medium);
+	let gameMap = new GameMap(720, 800, PaddleSize.Medium);
 
 	let grapped = false;
 
-	let oppoPos = (map.width - map.paddleSize) / 2;
-	let myPos = (map.height - map.paddleSize) / 2;
+	let oppoPos = (gameMap.width - gameMap.paddleSize) / 2;
+	let myPos = (gameMap.height - gameMap.paddleSize) / 2;
 
 	onMount(()=> {
 		
@@ -80,16 +80,16 @@
 </script>
 
 <div class="container">
-	<div class="game-container" style="--gameWidth: {map.width}px; --gameHeight: {map.height}px;">
+	<div class="game-container" style="--gameWidth: {gameMap.width}px; --gameHeight: {gameMap.height}px;">
 		<div class="beyond-above"></div>
 		<div class="bar-container-above">
-			<Paddle pos={oppoPos} paddleWidth={map.paddleSize} gameWidth={map.width} gameHeight={map.height} />
+			<Paddle pos={oppoPos} paddleWidth={gameMap.paddleSize} gameWidth={gameMap.width} gameHeight={gameMap.height} />
 		</div>
 		<div class="map">
 			<div class="main-circle "></div>
 		</div>
 		<div class="bar-container-below">
-			<Paddle pos={myPos} paddleWidth={map.paddleSize} gameWidth={map.width} gameHeight={map.height} />
+			<Paddle pos={myPos} paddleWidth={gameMap.paddleSize} gameWidth={gameMap.width} gameHeight={gameMap.height} />
 		</div>
 		<div class="beyond-below"></div>
 	</div>
