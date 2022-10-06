@@ -1,5 +1,7 @@
 <style lang="scss">
 	.container {
+		display: grid;
+		grid-template-columns: 20% 70% ;
 		height: 100%;
 		display: flex;
 		justify-content: center;
@@ -7,9 +9,18 @@
 	}
 
 	.game-container {
-		width: var(--gameWidth);
-		height: var(--gameHeight);
-		padding: 0;
+		width: 800px;
+		height: 600px;
+		padding: 2em;
+		border: dashed 5px white;
+
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.game {
+		position: relative;
 		display: grid;
 		grid-template-rows: 4% 3% 80% 3% 4%;
 	}
@@ -28,7 +39,7 @@
 
 	.central-line {
 		position: absolute;
-		top: 400px;
+		top: 50%;
 		width: 500px;
 		height: 0;
 		border: dashed 3px transparentize($main, 0.7);
@@ -71,29 +82,38 @@
 	let oppoPos = (gameMap.width - gameMap.paddleSize) / 2;
 	let myPos = (gameMap.height - gameMap.paddleSize) / 2;
 
+	let myScore;
+	let opponentScore;
+
 	onMount(()=> {
+		myScore = 0;
+		opponentScore = 0;
 	/* here we distribute information about the room
 	: playersInfo, playMode, mapInfo */
 
 	/* and then here I visualize the map */
+
+	/* there should be a listener for score updating */
 	});
 
 </script>
 
 <DarkMode/>
 <div class="container">
-	<div class="game-container" style="--gameWidth: {gameMap.width}px; --gameHeight: {gameMap.height}px;">
-		<div class="beyond-above"></div>
-		<div class="bar-container-above">
-			<Paddle pos={oppoPos} paddleWidth={gameMap.paddleSize} gameWidth={gameMap.width} gameHeight={gameMap.height} />
+	<div class="game-container" >
+		<div class="game" style="width: {gameMap.width}px; height: {gameMap.height}px;">
+			<div class="beyond-above"></div>
+			<div class="bar-container-above">
+				<Paddle pos={oppoPos} paddleWidth={gameMap.paddleSize} gameWidth={gameMap.width} gameHeight={gameMap.height} />
+			</div>
+			<div class="map">
+				<div class="main-circle "></div>
+			</div>
+			<div class="bar-container-below">
+				<Paddle pos={myPos} paddleWidth={gameMap.paddleSize} gameWidth={gameMap.width} gameHeight={gameMap.height} />
+			</div>
+			<div class="beyond-below"></div>
 		</div>
-		<div class="map">
-			<div class="main-circle "></div>
-		</div>
-		<div class="bar-container-below">
-			<Paddle pos={myPos} paddleWidth={gameMap.paddleSize} gameWidth={gameMap.width} gameHeight={gameMap.height} />
-		</div>
-		<div class="beyond-below"></div>
 	</div>
 	<div class="central-line"></div>
 </div>

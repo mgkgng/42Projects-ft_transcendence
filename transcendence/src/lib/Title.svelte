@@ -112,11 +112,10 @@
 
 <div class="container">
 	<MainCircle circleRadius={circleRadius}/>
-
 	{#each circlesAround as circleInfo}
-	<div class="circle-around" style="--dist: {circleRadius + 45}px; --startY: {circleInfo.y}px; --size: {circleInfo.size}px; --duration: {circleInfo.duration}s; --angle: {circleInfo.angle}deg; --angle2: {circleInfo.angle + 360}deg"></div>
+	<div class="circle-around" style="--dist: {circleRadius + 45}px; --size: {circleInfo.size}px; --duration: {circleInfo.duration}s; --angle: {circleInfo.angle}deg; --angle2: {circleInfo.angle + 360}deg"></div>
 	{/each}
 	<RoundButton bind:showMessage={showMessage} bind:message={message} circleRadius={circleRadius}/>
 	<h1 class="title">transcendence</h1>
 	<div class="msg">{message}</div>
-</div>	
+</div>
