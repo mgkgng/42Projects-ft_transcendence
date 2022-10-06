@@ -32,10 +32,9 @@
 </style>
 
 <script>
+	import { darkMode } from "$lib/stores/store";
     import LightBar from "./LightBar.svelte";
 	import '$lib/scss/app.scss';
-
-	export let darkMode;
 
 	$: col = (darkMode) ? "#fff" : "#222222"
 </script>
@@ -49,5 +48,5 @@
 		<div class="menu">Menu3</div>
 		<div class="menu">Menu4</div>
 	</div>
-	<LightBar />
+	<!-- <LightBar /> -->
 </div>

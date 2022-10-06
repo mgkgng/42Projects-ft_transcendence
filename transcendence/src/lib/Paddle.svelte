@@ -2,7 +2,9 @@
 	.paddle {
 		width: 80px;
 		height: 12px;
-		background-color: transparentize($main, 0.5);
+		background-color: #000;
+		box-shadow: 0px 0px 15px 10px $main;
+
 		border-radius: 2em;
 
 		position: relative;
@@ -18,7 +20,6 @@
 	export let paddleWidth : number;
 
 	export let pos : number;
-
 
 </script>
 
