@@ -1,9 +1,4 @@
-interface Wall {
-	startX : number;
-	startY: number;
-	endX : number;
-	endY : number;
-}
+import { Block } from "./Block";
 
 export const PaddleSize = {
 	XSmall: 20,
@@ -12,22 +7,29 @@ export const PaddleSize = {
 	Large : 130
 }
 
+export const mapWidth = {
+	Small: 400,
+	Medium: 700,
+	Large: 1000
+}
+
+export const mapHeight = {
+	Small: 600,
+	Medium: 800,
+	Large: 1000
+}
+
 export class GameMap {
 
-	walls : Array<Wall>;
+	blocks : Array<Block>;
 	width: number;
 	height: number;
 	paddleSize: number;
 
-	constructor(mapWidth: number, mapHeight: number, paddleSize: number = PaddleSize.Medium, walls: Array<Wall> = []) {
+	constructor(mapWidth: number, mapHeight: number, paddleSize: number = PaddleSize.Medium, blocks: Array<Block> = []) {
 		this.width = mapWidth;
 		this.height = mapHeight;
 		this.paddleSize = paddleSize;
-		this.walls = [{startX: 0, startY: 0, endX: mapWidth, endY: 0},
-			{startX: 0, startY: 0, endX: 0, endY: mapHeight},
-			{startX: mapWidth, startY: 0, endX: mapWidth, endY: mapHeight},
-			{startX: 0, startY: mapHeight, endX: mapWidth, endY: mapHeight}
-		]
-		this.walls.concat(walls);
+		this.blocks = blocks;
 	}
 }

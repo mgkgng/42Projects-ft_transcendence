@@ -18,10 +18,10 @@
 	}
 </style>
 
-<script>
-	import { darkMode } from "$lib/stores/store";
+<script lang="ts">
+	import { darkMode } from "$lib/stores/var";
 
-	let dark;
+	let dark: boolean;
 
 	darkMode.subscribe(value => {
 		dark = value;

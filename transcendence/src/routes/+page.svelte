@@ -6,7 +6,6 @@
 		grid-template-rows: 90vh 10vh;
 		gap: 0;
 		padding: 0;
-
 	}
 
 	@keyframes size-change {
@@ -20,8 +19,6 @@
 	import Title from "$lib/Title.svelte";
 	import Navbar from "$lib/Navbar.svelte";
 	import DarkMode from "$lib/DarkMode.svelte";
-	
-
 </script>
 
 <div class="container">

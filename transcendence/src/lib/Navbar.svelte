@@ -31,12 +31,19 @@
 	}
 </style>
 
-<script>
-	import { darkMode } from "$lib/stores/store";
+<script lang="ts">
     import LightBar from "./LightBar.svelte";
+	import { darkMode } from "$lib/stores/var";
+
+	let dark : boolean;
+
+	darkMode.subscribe(value => {
+		dark = value;
+	});
+
 	import '$lib/scss/app.scss';
 
-	$: col = (darkMode) ? "#fff" : "#222222"
+	$: col = (dark) ? "#fff" : "#000"
 </script>
 
 

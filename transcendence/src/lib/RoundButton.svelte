@@ -1,5 +1,4 @@
 <style lang="scss">
-
 	@keyframes rotate {	
 		from { transform: rotate(var(--from1)) translateX(350px) rotate(var(--to1)); }
 		to { transform: rotate(var(--from2)) translateX(350px) rotate(var(--to2)); }
@@ -48,7 +47,7 @@
 
 </style>
 
-<script>
+<script lang="ts">
 	import { onMount } from "svelte";
 	import { goto } from "$app/navigation";
 	import '$lib/scss/app.scss';
@@ -59,14 +58,14 @@
 	export let message;
 
 	let angleRand;
-	let angleLogin = [], anglePlay = [];
+	let angleLogin: Array<number> = [], anglePlay: Array<number> = [];
 
 	let login = false;
 
 	onMount(() => {
 		angleRand = Math.floor(Math.random() * 180 + 90);
 		angleLogin = [angleRand, -angleRand, angleRand - 360, -angleRand + 360];
-		anglePlay = [angleRand - 180,                                                                                              -angleRand + 180, angleRand - 540, -angleRand + 540];
+		anglePlay = [angleRand - 180, -angleRand + 180, angleRand - 540, -angleRand + 540];
 	});
 
 </script>

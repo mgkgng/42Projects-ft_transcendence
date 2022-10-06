@@ -1,5 +1,4 @@
 <style lang="scss">
-
 	.container {
 		display: flex;
 		align-items: center;
@@ -70,11 +69,17 @@
 	import '$lib/scss/app.scss';
     import MainCircle from './MainCircle.svelte';
 
+	type Circle = {
+		size: number;
+		duration: number;
+		angle: number;
+	};
+
 	const socket = io();
 
 	export let darkMode = false;
 
-	let circlesAround = [];
+	let circlesAround: Array<Circle> = [];
 	let circleRadius = 250;
 
 	let showMessage = false;
@@ -83,11 +88,6 @@
 	function createCircles() {
 		let res = [];
 		let circleNb = Math.floor(Math.random() * 10 + 15);
-		type Circle = {
-				size: number;
-				duration: number;
-				angle: number;
-		};
 		
 		for (let i = 0; i < circleNb; i++) {
 			let circle: Circle = {

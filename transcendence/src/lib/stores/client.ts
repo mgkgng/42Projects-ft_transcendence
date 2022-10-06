@@ -2,11 +2,6 @@ import { writable } from "svelte/store";
 import { browser } from "$app/environment";
 import { WebSocket } from "vite";
 
-// interface Listeners {
-// 	name: string;
-// 	callback: Function;
-// };
-
 class Client {
 	listeners: Map<string, Function>;
 	socket: WebSocket;
@@ -26,7 +21,6 @@ class Client {
 		this.socket.onopen = () => {
 
 		};
-	
 	}
 
 	OnConnection(func: Function) {
@@ -54,3 +48,5 @@ class Client {
   		}
 	}
 }
+
+export const client = writable(new Client());

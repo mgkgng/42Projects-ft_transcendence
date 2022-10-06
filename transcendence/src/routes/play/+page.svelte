@@ -61,18 +61,10 @@
 <script>
 	import Paddle from "$lib/Paddle.svelte";
 	import { onMount } from 'svelte';
-	import { GameMap, PaddleSize } from "$lib/pong/GameMap";
+	import { GameMap, PaddleSize, mapWidth, mapHeight } from "$lib/pong/GameMap";
 	import DarkMode from "$lib/DarkMode.svelte";
-	import { darkMode } from "$lib/stores/store";
-	
-	let dark;
 
-	darkMode.subscribe(value => {
-		dark = value;
-	});
-
-
-	let gameMap = new GameMap(720, 800, PaddleSize.Medium);
+	let gameMap = new GameMap(mapWidth.Small, mapHeight.Small, PaddleSize.Medium);
 
 	let grapped = false;
 
@@ -80,32 +72,31 @@
 	let myPos = (gameMap.height - gameMap.paddleSize) / 2;
 
 	onMount(()=> {
-		
-		/* here we distribute information about the room
-		: playersInfo, playMode, mapInfo */
+	/* here we distribute information about the room
+	: playersInfo, playMode, mapInfo */
 
-		/* and then here I visualize the map */
+	/* and then here I visualize the map */
 	});
 
 </script>
 
-	<DarkMode/>
-	<div class="container">
-		<div class="game-container" style="--gameWidth: {gameMap.width}px; --gameHeight: {gameMap.height}px;">
-			<div class="beyond-above"></div>
-			<div class="bar-container-above">
-				<Paddle pos={oppoPos} paddleWidth={gameMap.paddleSize} gameWidth={gameMap.width} gameHeight={gameMap.height} />
-			</div>
-			<div class="map">
-				<div class="main-circle "></div>
-			</div>
-			<div class="bar-container-below">
-				<Paddle pos={myPos} paddleWidth={gameMap.paddleSize} gameWidth={gameMap.width} gameHeight={gameMap.height} />
-			</div>
-			<div class="beyond-below"></div>
+<DarkMode/>
+<div class="container">
+	<div class="game-container" style="--gameWidth: {gameMap.width}px; --gameHeight: {gameMap.height}px;">
+		<div class="beyond-above"></div>
+		<div class="bar-container-above">
+			<Paddle pos={oppoPos} paddleWidth={gameMap.paddleSize} gameWidth={gameMap.width} gameHeight={gameMap.height} />
 		</div>
-		<div class="central-line"></div>
+		<div class="map">
+			<div class="main-circle "></div>
+		</div>
+		<div class="bar-container-below">
+			<Paddle pos={myPos} paddleWidth={gameMap.paddleSize} gameWidth={gameMap.width} gameHeight={gameMap.height} />
+		</div>
+		<div class="beyond-below"></div>
 	</div>
+	<div class="central-line"></div>
+</div>
 
 <svelte:window
 on:mouseup={()=>{

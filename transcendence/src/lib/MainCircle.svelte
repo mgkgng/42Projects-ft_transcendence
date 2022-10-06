@@ -16,8 +16,8 @@
 	}
 </style>
 
-<script>
-	export let circleRadius;
+<script lang="ts">
+	export let circleRadius: number;
 
 </script>
 
