@@ -84,14 +84,28 @@ export class MainServerService {
 	@WebSocketServer() server;
 	wait_list: Client[] = []; //WAIT LIST FOR MATCHMAKING
 	games : game[] = [];	  //LIST OF GAMES WHICH IS RUNNING
+	userConnectedList : Client[] = []; // List of user connected with websocket.
+
+	@UseGuards(AuthGuard("jwt"))
+	handleConnection(@Request() req)
+	{
+		const user : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
+		const client_username = user.username;
+		this.userConnectedList.push(new Client(req, client_username));
+	}
+
+	handleDisconnect(@Request() req)
+	{
+		for (let i = 0; i < this.userConnectedList.length; i++)
+		{
+			if (this.userConnectedList[i].sock.id === req.id)
+				this.userConnectedList.splice(i, 1);
+			console.log(`User ${req.id} deleted`);
+		}
+	}
 
 	after_init()
 	{
-	}
-
-	handleDisconnect()
-	{
-		console.log('Disconnect');
 	}
 	async getIdUser(@Request() req) //GET THE UNIQ ID OF A USER
 	{
@@ -128,10 +142,8 @@ export class MainServerService {
 	//TRY MAKE A LITTLE MATCH MAKING
 	async create_games() // MAKE GAMES (MATCH MACKING)
 	{
-		console.log("create_game");
 		while (this.wait_list.length > 1)
 		{
-			console.log("create_game_while");
 			const id_one : any = await this.getIdUserByUsername(this.wait_list[0].username);
 			const id_two : any = await this.getIdUserByUsername(this.wait_list[1].username);
 
@@ -155,7 +167,6 @@ export class MainServerService {
 			if (c.username == jwt.username)
 				throw new WsException("Already in queu");
 		}
-		console.log("add client");
 		this.wait_list.push(new Client(client, jwt.username));
 		this.create_games();
 		client.emit("add_in_wait_list");
