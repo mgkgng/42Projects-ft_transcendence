@@ -30,7 +30,6 @@
 
 	.title {
 		position: absolute;
-		top: 20vh;
 		background-color: rgba(0, 0, 0, 0);
 		margin: 2em;
 		padding: .3em 0 .1em;

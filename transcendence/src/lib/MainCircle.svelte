@@ -17,7 +17,7 @@
 </style>
 
 <script>
-	export let circleRadius : number;
+	export let circleRadius;
 
 </script>
 
