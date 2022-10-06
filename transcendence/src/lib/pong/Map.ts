@@ -6,18 +6,23 @@ interface Wall {
 }
 
 export const PaddleSize = {
-	"S" : 15,
-	"M" : 30,
-	"L" : 45
+	XSmall: 20,
+	Small : 40,
+	Medium : 80,
+	Large : 130
 }
 
 export class Map {
+
 	walls : Array<Wall>;
 	width: number;
 	height: number;
-	constructor(mapWidth: number, mapHeight: number, paddleSize: number = "L", walls: Array<Wall> = []) {
+	paddleSize: number;
+
+	constructor(mapWidth: number, mapHeight: number, paddleSize: number = PaddleSize.Medium, walls: Array<Wall> = []) {
 		this.width = mapWidth;
 		this.height = mapHeight;
+		this.paddleSize = paddleSize;
 		this.walls = [{startX: 0, startY: 0, endX: mapWidth, endY: 0},
 			{startX: 0, startY: 0, endX: 0, endY: mapHeight},
 			{startX: mapWidth, startY: 0, endX: mapWidth, endY: mapHeight},
