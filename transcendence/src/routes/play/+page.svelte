@@ -59,19 +59,24 @@
 
 <script>
 	import Paddle from "$lib/Paddle.svelte";
+	import { onMount } from 'svelte';
+	import { Map } from "$lib/pong/Map";
 
-	let gameWidth = 720;
-	let gameHeight = 800;
+	let map = new Map(720, 800);
 
 	let grapped = false;
 
-	let callBack;
-
 	let paddleWidth = 80;
-	let oppoPos = (gameWidth - paddleWidth) / 2;
-	let myPos = (gameWidth - paddleWidth) / 2;
+	let oppoPos = (map.width - paddleWidth) / 2;
+	let myPos = (map.height - paddleWidth) / 2;
 
+	onMount(()=> {
+		
+		/* here we distribute information about the room
+		: playersInfo, playMode, mapInfo */
 
+		/* and then here I visualize the map */
+	});
 
 </script>
 
