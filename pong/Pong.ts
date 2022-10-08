@@ -7,11 +7,14 @@
 
 /* puck { vectorVelocity, } */
 
+import { Ball } from "./Ball";
+import { GameMap } from "./GameMap";
+
 export class Pong {
-	vectorVelocity: number;
+	gameMap: GameMap;
+	ball: Ball;
 
 	constructor() {
-		this.vectorVelocity = 0;
-		
+		this.ball = new Ball();
 	}
 }
