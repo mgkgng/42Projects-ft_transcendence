@@ -3,21 +3,21 @@ import { browser } from "$app/environment";
 import { WebSocket } from "vite";
 
 class Client {
-	listeners: Map<string, Function>;
 	socket: WebSocket;
 	callbacksOnConnection: Set<Function>;
 
+	//Websocket
+	// addEventListener
+	// removeEventListener
 	constructor() {
-		this.listeners = new Map();
 		this.callbacksOnConnection = new Set();
-		this.socket = undefined;
+		this.socket = new WebSocket(`ws://${location.hostname}:3000`);
 	}
 
 	connect() {
 		if (!browser)
 			return ;
 		
-		this.socket = new WebSocket(`ws://${location.hostname}:3000`);
 		this.socket.onopen = () => {
 
 		};
@@ -29,18 +29,18 @@ class Client {
 			func();
 	}
 	
-	addListener(type: string, callback: Function) {
+	addListener(type, callback) {
 		this.listeners[type] = callback;
 	}
 
-	removeListener(type: string) {
+	removeListener(type) {
 		this.listeners[type] = undefined;
 	}
 
 	send(data) {
 		if (this.socket?.readyState === WebSocket.OPEN) {
 			try {
-				this.socket.
+				this.socket.s
 			} catch(e) {
 				
 			}

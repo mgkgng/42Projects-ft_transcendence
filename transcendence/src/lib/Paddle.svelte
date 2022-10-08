@@ -21,7 +21,6 @@
 		dark = value;
 	});
 
-
 	export let gameWidth : number;
 	export let gameHeight : number;
 	export let paddleWidth : number;

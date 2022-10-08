@@ -19,6 +19,13 @@
 	import Title from "$lib/Title.svelte";
 	import Navbar from "$lib/Navbar.svelte";
 	import DarkMode from "$lib/DarkMode.svelte";
+
+	import { client } from "$lib/stores/client";
+    import { onMount } from "svelte/types/runtime/internal/lifecycle";
+
+	onMount(() => {
+
+	});
 </script>
 
 <div class="container">

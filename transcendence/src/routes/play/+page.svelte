@@ -75,6 +75,8 @@
 	import { GameMap, PaddleSize, mapWidth, mapHeight } from "$lib/pong/GameMap";
 	import DarkMode from "$lib/DarkMode.svelte";
 
+	import { client } from "$lib/stores/client";
+
 	let gameMap = new GameMap(mapWidth.Small, mapHeight.Small, PaddleSize.Medium);
 
 	let grapped = false;
@@ -94,6 +96,9 @@
 	/* and then here I visualize the map */
 
 	/* there should be a listener for score updating */
+		$client.socket.addEventListener("Match", () => {
+			
+		});
 	});
 
 </script>
