@@ -16,49 +16,10 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MessageChatRoomEntity } from 'src/entity/MessageChatRoom.entity';
 import { Socket } from 'socket.io';
-import { Interval } from '@nestjs/schedule';
+// import { Interval } from '@nestjs/schedule';
 import { GameEntity } from 'src/entity/Game.entity';
 import { Client } from "src/Client";
 import { Room } from 'src/Room';
-
-// class game
-// {
-// 	id_game : number = 0;
-// 	c1 : Client;
-// 	c2 : Client;
-
-// 	score_p1 : number = 0;
-// 	score_p2 : number = 0;
-// 	is_playing = false;
-
-// 	balle_x : number = 0;
-// 	balle_y : number = 0;
-// 	v_x : number = 10;
-// 	v_y : number = 5;
-
-// 	constructor(client_one : Client, client_two : Client, id_game: number)
-// 	{
-// 		this.c1 = client_one;
-// 		this.c2 = client_two;
-// 		this.id_game = id_game;
-// 	}
-// 	check_ball()
-// 	{
-// 		this.balle_x += this.v_x;
-// 		this.balle_y += this.v_y;
-// 		if (this.balle_x >= 889 || this.balle_x <= 0)
-// 		{
-// 			this.v_x *= -1;
-// 			return (true);
-// 		}
-// 		if (this.balle_y >= 500 || this.balle_y <= 0)
-// 		{
-// 			this.v_y *= -1;
-// 			return (true);
-// 		}
-// 		return (false);
-// 	}
-// }
 
 @WebSocketGateway({
 	cors: {
@@ -138,7 +99,10 @@ export class MainServerService {
 			let room = new Room([id_one, id_two]);
 			this.rooms[room.id] = room;
 
-			room.broadcast();
+			room.broadcast(JSON.stringify({
+				event: "MatchFound",
+				data: room.id
+			}));
 
 			this.wait_list = this.wait_list.slice(1);
 		}

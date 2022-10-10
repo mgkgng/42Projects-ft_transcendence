@@ -33,7 +33,7 @@ import { ChatRoomModule } from './chatRoom/chatRoom.module';
       synchronize: true,
       autoLoadEntities: true,   
     }),
-   MainServerModule, ChatRoomModule , UserModule, AuthModule, HttpModule, JwtModule, ChatDirectMessageModule, ScheduleModule.forRoot() ],
+   MainServerModule, ChatRoomModule , UserModule, AuthModule, HttpModule, JwtModule, ChatDirectMessageModule, ScheduleModule.forRoot()],
   controllers: [AppController],
   providers: [AppService, AuthService],
 })
