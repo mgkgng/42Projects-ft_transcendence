@@ -6,7 +6,7 @@ export class Ball {
 	gameWidth: number;
 	gameHeight: number;
 
-	constructor(vectorX : number, vectorY : number, gameWidth : number, gameHeight : number) {
+	constructor(gameWidth : number, gameHeight : number, vectorX : number = 1, vectorY : number = 1) {
 		this.vectorX = vectorX;
 		this.vectorY = vectorY;
 		this.gameWidth = gameWidth;

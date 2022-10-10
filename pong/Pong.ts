@@ -15,6 +15,7 @@ export class Pong {
 	ball: Ball;
 
 	constructor() {
-		this.ball = new Ball();
+		this.gameMap = new GameMap();
+		this.ball = new Ball(this.gameMap.width, this.gameMap.height);
 	}
 }

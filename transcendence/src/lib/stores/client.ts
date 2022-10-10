@@ -1,8 +1,10 @@
 import { writable } from "svelte/store";
 import { browser } from "$app/environment";
 import { WebSocket } from "vite";
+import { uid } from "/uid";
 
 class Client {
+	id: string;
 	socket: WebSocket;
 	callbacksOnConnection: Set<Function>;
 
@@ -10,6 +12,7 @@ class Client {
 	// addEventListener
 	// removeEventListener
 	constructor() {
+		this.id = uid();
 		this.callbacksOnConnection = new Set();
 		this.socket = new WebSocket(`ws://${location.hostname}:3000`);
 	}
@@ -19,7 +22,13 @@ class Client {
 			return ;
 		
 		this.socket.onopen = () => {
-
+			console.log('Connected');
+			this.socket.send(
+				JSON.stringify({
+					event: "Connexion",
+					data: this.id
+				})
+			)
 		};
 	}
 
@@ -49,4 +58,4 @@ class Client {
 	}
 }
 
-export const client = writable(new Client());
+export const client = writable(new Client());``

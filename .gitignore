@@ -2,3 +2,6 @@ back/node_modules
 bd/*
 front/node_modules
 **.vscode
+node_modules
+
+npx @nestjs/cli
