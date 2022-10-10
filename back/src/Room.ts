@@ -1,6 +1,8 @@
 import { ChatRoomService } from "./chatRoom/chatRoom.gatway";
 import { Client } from "./Client"
+import { MainServerService } from "./mainServer/mainServer.gateway";
 import { Pong } from "./pong/Pong";
+import { uid } from "./uid";
 
 interface GameMode {
 	// basic mode, serve mode ... difficult mode, easy mode...
@@ -11,18 +13,19 @@ interface MapChoice {
 }
 
 export class Room {
-	roomid: string;
+	id: string;
 	clients: Map<string, Client>;
 	players: Array<Client>;
 	scores: Array<number>;
 	maxpoint: number;
 	pong: Pong;
-	chat: ChatRoomService
+	//chat: ChatRoomService
 	isPlaying: boolean;
 	
-	constructor(clients, mapchoice: string, mode: string, maxpoint: number) {
-		this.roomid = "12345example";
-		this.chat = new ChatRoomService();
+	// constructor(clients, mapchoice: string, mode: string, maxpoint: number) {
+	constructor(clients, maxpoint: number = 20) {
+		this.id = uid();
+		//this.chat = new ChatRoomService();
 		this.addClients(clients);
 
 		this.pong = new Pong();
@@ -42,8 +45,8 @@ export class Room {
 	 * Use the static server method to broadcast,
 	 * pass the clients as parameters
 	 */
-	broadcast(msg) {
-	// 	SocketServer.broadcast(this.getClients(), msg)
+	broadcast(msg: any) {
+		MainServerService.broadcast(this.getClients(), msg);
 	}
 
 	addClients(clients) {
@@ -53,7 +56,7 @@ export class Room {
 
 	addClient(client) {
 		this.clients.set(client.username, client);
-		this.chat.append_user_to_room();
+		//this.chat.append_user_to_room();
 		//console.log('Room -> addClient', this.clients.size);
 		client.onDisconnect(() => this.removeClient(client));
 	}
@@ -75,13 +78,13 @@ export class Room {
 		});
 
 		// Store the game in db
-		this.storeGame();
+		//this.storeGame();
 
 		// Destroy room
-		this.onEnd?.();
+		//this.onEnd?.();
 	}
 
-	async storeGame() {
-		// Store the game result in db
-	}
+	// async storeGame() {
+	// 	// Store the game result in db
+	// }
 }

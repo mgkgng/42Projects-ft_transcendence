@@ -19,6 +19,7 @@ import { Socket } from 'socket.io';
 import { Interval } from '@nestjs/schedule';
 import { GameEntity } from 'src/entity/Game.entity';
 import { Client } from "src/Client";
+import { Room } from 'src/Room';
 
 // class game
 // {
@@ -72,7 +73,7 @@ export class MainServerService {
 	}
 	@WebSocketServer() server;
 	wait_list: Client[] = []; //WAIT LIST FOR MATCHMAKING
-	games : game[] = [];	  //LIST OF GAMES WHICH IS RUNNING
+	rooms : Map<string, Room>;	  //LIST OF GAMES WHICH IS RUNNING
 
 	after_init()
 	{
@@ -117,6 +118,8 @@ export class MainServerService {
 	//TRY MAKE A LITTLE MATCH MAKING
 	async create_games() // MAKE GAMES (MATCH MACKING)
 	{
+		// There could be more precise condition to make matchmaking.
+		// ex) clients could search for certain 'type' of games
 		console.log("create_game");
 		while (this.wait_list.length > 1)
 		{
@@ -124,14 +127,19 @@ export class MainServerService {
 			const id_one : any = await this.getIdUserByUsername(this.wait_list[0].username);
 			const id_two : any = await this.getIdUserByUsername(this.wait_list[1].username);
 
-			const  querry = this.dataSource.createQueryRunner(); 
+			const querry = this.dataSource.createQueryRunner(); 
 			await querry.connect();
 			await querry.startTransaction();
-			const res_game_entity : any = await querry.manager.insert(GameEntity,
-				{player1: id_one, player2: id_two, date_game: new Date(), is_finished: false, is_cancelled: false, is_abandoned: false, is_disconnected: false}
-			);
+			// const res_game_entity : any = await querry.manager.insert(GameEntity,
+			// 	{player1: id_one, player2: id_two, date_game: new Date(), is_finished: false, is_cancelled: false, is_abandoned: false, is_disconnected: false}
+			// );
 			await querry.commitTransaction();
-			this.games.push(new game(this.wait_list[0], this.wait_list[1], res_game_entity.id));
+
+			let room = new Room([id_one, id_two]);
+			this.rooms[room.id] = room;
+
+			room.broadcast();
+
 			this.wait_list = this.wait_list.slice(1);
 		}
 	}
@@ -149,22 +157,28 @@ export class MainServerService {
 		this.create_games();
 		client.emit("add_in_wait_list");
 	}
-	@Interval(1000 / 30) //WHILE(1) 30 TIME / S
-	init_game()
-	{
-		if (this.games.length)
-		{
-			for (let g of this.games)
-			{
-				g.check_ball();
-				g.c1.sock.emit("set_data", {x: g.balle_x, y: g.balle_y});
-				g.c2.sock.emit("set_data", {x: g.balle_x, y: g.balle_y});
-			}
-		}
-	}
-	@SubscribeMessage('pute') // PUTE
+	// @Interval(1000 / 30) //WHILE(1) 30 TIME / S
+	// init_game()
+	// {
+	// 	if (this.rooms.size)
+	// 	{
+	// 		for (let room of this.rooms)
+	// 		{
+	// 			room.check_ball();
+	// 			room.c1.sock.emit("set_data", {x: room.balle_x, y: room.balle_y});
+	// 			room.c2.sock.emit("set_data", {x: room.balle_x, y: room.balle_y});
+	// 		}
+	// 	}
+	// }
+	@SubscribeMessage('test') // TEST
 	handleEvent(@MessageBody('data') data: string, @ConnectedSocket() client: Socket): string {
 		return (data);
+	}
+
+
+	static broadcast(clients: Array<Client>, msg: any) {
+		for (let client of clients)
+			client.sock.send(msg);
 	}
 	
 }
