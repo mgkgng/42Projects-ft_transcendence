@@ -21,6 +21,21 @@ services:
       - /usr/src/app/node_modules
     depends_on:
       - back
+  front_svelte:
+    container_name: front_svelte
+    build: ./docker_svelte
+    ports:
+      - "3002:3002"
+    networks:
+      - net
+    env_file:
+      - .env
+    volumes:
+      - ./docker_svelte/src:/usr/src/app/src
+      - /app/node_modules
+    depends_on:
+      - back
+      - front
   back:
     container_name: back 
     build: ./back

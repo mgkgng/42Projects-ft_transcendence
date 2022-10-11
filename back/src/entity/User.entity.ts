@@ -4,6 +4,7 @@ import { MessageChatRoomEntity } from "./MessageChatRoom.entity";
 import { MessageDirectEntity } from "./MessageDirect.entity";
 import { UserBlockEntity } from "./UserBlock.entity";
 import { UserChatRoomEntity } from "./UserChatRoom.entity";
+import { UserFriendEntity } from "./UserFriend.entity";
 
 @Entity()
 export class UserEntity 
@@ -27,6 +28,10 @@ export class UserEntity
 	relation_userBlocker: UserBlockEntity[];
 	@OneToMany(() => UserBlockEntity, (user: UserBlockEntity) => user.id_user_blocked)
 	relation_userBlocked: UserBlockEntity[];
+	@OneToMany(() => UserFriendEntity, (user: UserFriendEntity) => user.id_first_user)
+	relation_friend_requested: UserFriendEntity[];
+	@OneToMany(() => UserFriendEntity, (user: UserFriendEntity) => user.id_second_user)
+	relation_friend_accepted: UserFriendEntity[];
 
 	@Column()	
 	email: string;

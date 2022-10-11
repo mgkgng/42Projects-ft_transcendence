@@ -1,8 +1,13 @@
 back/node_modules
 bd/*
 front/node_modules
+<<<<<<< HEAD
 **.vscode
 node_modules
 pong_front/node_modules
 
 npx @nestjs/cli
+=======
+docker_svelte/node_modules
+**.vscode
+>>>>>>> master

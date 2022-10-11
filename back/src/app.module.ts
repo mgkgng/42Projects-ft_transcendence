@@ -9,6 +9,7 @@ import { UserEntity } from './entity/User.entity';
 import { HttpModule } from '@nestjs/axios';
 import { JwtModule } from '@nestjs/jwt';
 import { UserChatRoomEntity } from './entity/UserChatRoom.entity';
+import { UserFriendEntity } from './entity/UserFriend.entity';
 import { ChatRoomEntity } from './entity/ChatRoom.entity';
 import { GameEntity } from './entity/Game.entity';
 import { MessageChatRoomEntity } from './entity/MessageChatRoom.entity';
@@ -31,9 +32,9 @@ import { ChatRoomModule } from './chatRoom/chatRoom.module';
       password: process.env.POSTGRES_PASSWORD,
       database: process.env.POSTGRES_USER,
       synchronize: true,
-      autoLoadEntities: true,   
+      autoLoadEntities: true,
     }),
-   MainServerModule, ChatRoomModule , UserModule, AuthModule, HttpModule, JwtModule, ChatDirectMessageModule, ScheduleModule.forRoot(), GameserverModule],
+   MainServerModule, ChatRoomModule , UserModule, AuthModule, HttpModule, JwtModule, ChatDirectMessageModule, ScheduleModule.forRoot()],
   controllers: [AppController],
   providers: [AppService, AuthService],
 })
