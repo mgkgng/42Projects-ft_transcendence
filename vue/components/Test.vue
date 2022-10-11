@@ -11,6 +11,7 @@
 	height: 500px;
 	background-color: rgb(191, 191, 253);
 }
+
 .nuxt-logo {
   height: 180px;
 }

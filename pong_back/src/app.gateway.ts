@@ -1,5 +1,7 @@
 import { 
 	MessageBody,
+	OnGatewayConnection,
+	OnGatewayDisconnect,
 	SubscribeMessage,
 	WebSocketGateway, 
 	WebSocketServer 
@@ -214,8 +216,8 @@ class Room {
 	// }
 }
 
-@WebSocketGateway(3000)
-export class AppGateway {
+@WebSocketGateway()
+export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	clients: Map<string, Client>
 
 	constructor() {
@@ -225,9 +227,15 @@ export class AppGateway {
 	@WebSocketServer()
 	server: Server;
 
-	handleConnection(client: any) {
-		if (this.clients.has(client.id))
+	async handleConnection(client: any) {
+		console.log("New Connection on site.")
+		if (!this.clients.has(client.id))
 			this.clients.set(client.id, client);
+	}
+
+	async handleDisconnect(client: any) {
+		console.log("Disconnect.")
+		this.clients.delete(client.id);
 	}
 
 	@SubscribeMessage("Connexion")
