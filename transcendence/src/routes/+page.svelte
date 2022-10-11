@@ -21,11 +21,11 @@
 	import DarkMode from "$lib/DarkMode.svelte";
 
 	import { client } from "$lib/stores/client";
-    import { onMount } from "svelte/types/runtime/internal/lifecycle";
+    // import { onMount } from "svelte";
 
-	onMount(() => {
+	// onMount(() => {
 
-	});
+	// });
 </script>
 
 <div class="container">

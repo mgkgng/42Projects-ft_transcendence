@@ -63,7 +63,6 @@
 </style>
 
 <script lang="ts">
-	import { io } from 'socket.io-client';
 	import { onMount } from "svelte";
 	import RoundButton from "./RoundButton.svelte";
 	import '$lib/scss/app.scss';
@@ -74,8 +73,6 @@
 		duration: number;
 		angle: number;
 	};
-
-	const socket = io();
 
 	export let darkMode = false;
 

@@ -3,5 +3,6 @@ bd/*
 front/node_modules
 **.vscode
 node_modules
+pong_front/node_modules
 
 npx @nestjs/cli

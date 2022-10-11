@@ -1,5 +1,6 @@
 import { writable } from "svelte/store";
 import { browser } from "$app/environment";
+import { WebSocket } from "vite";
 
 function uid() {
 	const set = '0123456789abcdefghiklmnopqrstuvwxyz';
@@ -20,7 +21,8 @@ class Client {
 		this.id = uid();
 		this.listeners = new Map();
 		this.callbacksOnConnection = new Set();
-		this.sock = new WebSocket(`ws://${location.hostname}:3001`);	
+		this.sock = new WebSocket("ws://localhost:3000");
+		// this.sock = new WebSocket(`ws://${location.hostname}:3001`);	
 		this.sock.onmessage = (msg: any) => {
 			this.listeners.get(msg.event)?.(msg.data);
 		}
