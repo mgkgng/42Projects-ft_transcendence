@@ -21,11 +21,13 @@
 	import DarkMode from "$lib/DarkMode.svelte";
 
 	import { client } from "$lib/stores/client";
-    // import { onMount } from "svelte";
+    import { onMount } from "svelte";
 
-	// onMount(() => {
-
-	// });
+	onMount(() => {
+		$client.addListener("resTest", () => {
+			console.log("res arrived!");
+		})
+	});
 </script>
 
 <div class="container">

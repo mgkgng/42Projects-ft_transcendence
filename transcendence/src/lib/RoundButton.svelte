@@ -51,6 +51,7 @@
 	import { onMount } from "svelte";
 	import { goto } from "$app/navigation";
 	import '$lib/scss/app.scss';
+	import { client } from "./stores/client";
 
 	export let circleRadius;
 
@@ -73,7 +74,11 @@
 <div>
 	<div class="circle-button" style="--from1: {angleLogin[0]}deg; --to1: {angleLogin[1]}deg;
 	--from2: {angleLogin[2]}deg; --to2: {angleLogin[3]}deg"
-		on:click={()=>{ goto(`/login`); }}
+		on:click={()=>{
+			$client.sock.send(JSON.stringify({
+				event: "Test"
+			}));
+		}}
 	>
 		<h2>Login</h2>
 	</div>

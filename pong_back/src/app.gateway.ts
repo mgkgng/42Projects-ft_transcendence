@@ -245,5 +245,13 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		this.clients.set(data.id, data);
 	}
 
+	@SubscribeMessage("Test")
+	test(client: any) {
+		console.log("test received!");
+		client.send(JSON.stringify({
+			event: "resTest"
+		}))
+	}
+
 
 }

@@ -100,9 +100,7 @@
 	onMount(() => {
 		circlesAround = createCircles();
 
-		socket.on('eventFromServer', (msg) => {
-			console.log(msg);
-		})
+
 	});
 
 </script>

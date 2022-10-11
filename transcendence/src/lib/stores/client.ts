@@ -23,6 +23,7 @@ class Client {
 		if (browser) {
 			this.sock = new WebSocket('ws://localhost:3000');
 			this.sock.onmessage = (msg: any) => {
+				console.log("receving something", msg);
 				this.listeners.get(msg.event)?.(msg.data);
 			}
 		}
