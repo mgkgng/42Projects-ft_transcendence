@@ -1,32 +1,46 @@
 import { writable } from "svelte/store";
 import { browser } from "$app/environment";
 import { WebSocket } from "vite";
-import { uid } from "/uid";
+
+function uid() {
+	const set = '0123456789abcdefghiklmnopqrstuvwxyz';
+	
+	return (Array(16).map(x => set[Math.random() * set.length]).join(''));
+}
 
 class Client {
 	id: string;
-	socket: WebSocket;
+	sock: WebSocket;
 	callbacksOnConnection: Set<Function>;
+	listeners: Map<string, Function>;
 
 	//Websocket
 	// addEventListener
 	// removeEventListener
 	constructor() {
 		this.id = uid();
+		this.listeners = new Map();
 		this.callbacksOnConnection = new Set();
-		this.socket = new WebSocket(`ws://${location.hostname}:3000`);
+		this.sock = new WebSocket(`ws://localhost:3000`);
+	
+		this.sock.onmessage = (msg: any) => {
+			this.listeners.get(msg.event)?.(msg.data);
+		}
 	}
 
 	connect() {
 		if (!browser)
 			return ;
 		
-		this.socket.onopen = () => {
+		this.sock.onopen = () => {
 			console.log('Connected');
-			this.socket.send(
+			this.sock.send(
 				JSON.stringify({
 					event: "Connexion",
-					data: this.id
+					data: {
+						id: this.id,
+						sock: this.sock
+					}
 				})
 			)
 		};
@@ -34,28 +48,28 @@ class Client {
 
 	OnConnection(func: Function) {
 		this.callbacksOnConnection.add(func);
-		if (this.socket?.readyState === WebSocket.OPEN)
+		if (this.sock?.readyState === WebSocket.OPEN)
 			func();
 	}
 	
-	addListener(type, callback) {
-		this.listeners[type] = callback;
+	addListener(type: string, callback: Function) {
+		this.listeners.set(type, callback);
 	}
 
-	removeListener(type) {
-		this.listeners[type] = undefined;
+	removeListener(type: string) {
+		this.listeners.delete(type);
 	}
 
-	send(data) {
-		if (this.socket?.readyState === WebSocket.OPEN) {
-			try {
-				this.socket.s
-			} catch(e) {
+	// send(data: any) {
+	// 	if (this.socket?.readyState === WebSocket.OPEN) {
+	// 		try {
+	// 			this.socket.s
+	// 		} catch(e) {
 				
-			}
-			return ;
-  		}
-	}
+	// 		}
+	// 		return ;
+  	// 	}
+	// }
 }
 
 export const client = writable(new Client());``
