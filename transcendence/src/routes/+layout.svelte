@@ -15,7 +15,8 @@
 </style>
 
 <script lang="ts">
-	import "$lib/stores/client.js";
+	import '$lib/stores/store';
+	// import "$lib/stores/client.ts";
 	import { darkMode } from "$lib/stores/var";
 
 	let dark : boolean;

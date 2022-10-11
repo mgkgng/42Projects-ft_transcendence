@@ -9,7 +9,7 @@ function uid() {
 
 class Client {
 	id: string;
-	sock: WebSocket;
+	sock: any;
 	callbacksOnConnection: Set<Function>;
 	listeners: Map<string, Function>;
 
@@ -20,9 +20,11 @@ class Client {
 		this.id = uid();
 		this.listeners = new Map();
 		this.callbacksOnConnection = new Set();
-		this.sock = new WebSocket(`ws://${location.hostname}:3001`);	
-		this.sock.onmessage = (msg: any) => {
-			this.listeners.get(msg.event)?.(msg.data);
+		if (browser) {
+			this.sock = new WebSocket('ws://localhost:3000');
+			this.sock.onmessage = (msg: any) => {
+				this.listeners.get(msg.event)?.(msg.data);
+			}
 		}
 	}
 
