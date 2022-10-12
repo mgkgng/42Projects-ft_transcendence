@@ -54,7 +54,7 @@ class Client {
 	}
 
 	send(data: any) {
-		if (this?.sock?.readyState === WebSocket.OPEN)
+		if (this?.sock?.readyState === WebSocket.OPEN) // TODO websocket is not defined
 		{
 			//console.log('send data = ', data);
 			try {
@@ -273,13 +273,13 @@ class Room {
 @WebSocketGateway()
 export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	clients: Map<string, Client>;
+	rooms: Map<string, Room>;
 	queue: Array<Client>;
-	rooms: Array<Room>;
 
 	constructor() {
 		this.clients = new Map<string, Client>();
+		this.rooms = new Map<string, Room>();
 		this.queue = [];
-		this.rooms = [];
 	}
 
 	@WebSocketServer()
@@ -323,11 +323,23 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				data: room.id
 			}));
 			console.log("sending matchfound.");
-			this.rooms.push(room);
+			this.rooms.set(room.id, room);
 			this.queue = this.queue.slice(2);
 		}
 		console.log("Queue length at the end: ", this.queue.length);
 
+	}
+
+	@SubscribeMessage("RoomCheck")
+	roomCheck(@MessageBody() data: any) {
+		console.log("RoomCheck", data);
+
+		let client = this.getClient(data.client);
+		console.log("I'm sending it to ", client.id);
+		client.sock.send(JSON.stringify({
+			event: "RoomInfo",
+			data: (this.rooms.has(data.room)) ? true : false
+		}));
 	}
 
 	static broadcast(clients: any, msg: any) {

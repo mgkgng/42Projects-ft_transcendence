@@ -27,14 +27,15 @@
 	onMount(() => {
 		console.log("I'm on the main page.");
 		
-		$client.addListener("resTest", () => {
-			console.log("res arrived!");
-		});
-
 		$client.addListener("MatchFound", (data: any) => {
 			console.log("MatchFound", data);
 			goto(`/play/${data}`);
 		});
+
+		return (() => {
+			$client.removeListener("MatchFound");
+		})
+
 	});
 </script>
 

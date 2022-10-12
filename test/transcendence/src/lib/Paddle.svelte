@@ -12,7 +12,6 @@
 </style>
 
 <script lang="ts">
-	import { io } from "socket.io-client";
 	import { darkMode } from "$lib/stores/var";
 
 	let dark : boolean;
