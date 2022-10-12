@@ -8,6 +8,11 @@ import {
 } from "@nestjs/websockets";
 import { Server } from 'ws';
 
+const WsMessage = {
+	
+}
+
+
 function uid() {
 	const set = '0123456789abcdefghiklmnopqrstuvwxyz';
 	
@@ -23,15 +28,15 @@ class Client {
 	//Websocket
 	// addEventListener
 	// removeEventListener
-	constructor(sock: any) {
-		this.id = uid();
+	constructor(id: string, sock: any) {
+		this.id = id;
 		this.sock = sock;
 		this.listeners = new Map();
 		
-		this.sock.onmessage = (msg: any) => {
-			console.log("receving something", msg);
-			this.listeners.get(msg.event)?.(msg.data);
-		}
+		// this.sock.onmessage = (msg: any) => {
+		// 	console.log("receving something", msg);
+		// 	this.listeners.get(msg.event)?.(msg.data);
+		// }
 	}
 
 	onDisconnect(callback: Function) {
@@ -45,6 +50,22 @@ class Client {
 	removeListener(type: string) {
 		this.listeners.delete(type);
 	}
+
+	send(data: any) {
+		if (this?.sock?.readyState === WebSocket.OPEN)
+		{
+			//console.log('send data = ', data);
+			try {
+				this?.sock?.send?.(JSON.stringify(data));
+			} catch (e) {
+				console.trace('Error: [send]', data, e);
+			}
+			return ;
+		}
+		// this.queue.push(data);
+	}
+
+
 }
 const PaddleSize = {
 	XSmall: 20,
@@ -170,7 +191,8 @@ class Room {
 	isPlaying: boolean;
 	
 	// constructor(clients, mapchoice: string, mode: string, maxpoint: number) {
-	constructor(clients, maxpoint: number = 20) {
+	constructor(clients: any, maxpoint: number = 20) {
+		console.log("constructor: ", clients.length);
 		this.id = uid();
 		//this.chat = new ChatRoomService();
 		this.clients = new Map();
@@ -193,16 +215,21 @@ class Room {
 	 * pass the clients as parameters
 	 */
 	broadcast(msg: any) {
-		Server.broadcast(this.getClients(), msg);
+		console.log(this.getClients().length);
+		AppGateway.broadcast(this.getClients(), msg);
 	}
 
-	addClients(clients) {
+	addClients(clients: any) {
+		console.log("addClientS: ", clients.length);
 		for (let client of clients)
 			this.addClient(client);
+		console.log("after addClientS: ", this.clients.size);
 	}
 
 	addClient(client: any) {
+		console.log("addClient", client);
 		this.clients.set(client.id, client);
+		// this.clients[client.id] = client;
 		//this.chat.append_user_to_room();
 		//console.log('Room -> addClient', this.clients.size);
 		/* IMPORTANT TO REMOVE THE CLIENT */
@@ -216,7 +243,11 @@ class Room {
 	}
 
 	getClients() {
-		return ([...this.clients.values()]);
+		// console.log(this.clients);
+		// console.log("============");
+		// console.log([...this.clients.values()]);
+		console.log("getClients: ", this.clients.size);
+		return (Array.from(this.clients.values()));
 	}
 
 	putScore(winner, reason) {
@@ -246,6 +277,7 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	constructor() {
 		this.clients = new Map<string, Client>();
 		this.queue = [];
+		this.rooms = [];
 	}
 
 	@WebSocketServer()
@@ -263,40 +295,45 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
 	@SubscribeMessage("Connexion")
-	handleConnexion(client): void {
+	handleConnexion(client: any, data: any) {
 		// console.log("test", client);
-		let connection = new Client(client);
+		console.log("data", data);
+		let connection = new Client(data, client);
 		this.clients.set(connection.id, connection);
 		
 		connection.sock.send(JSON.stringify({
 			event: "resTest"
 		}))
-		// console.log(data.id, 'Connected');
-		// this.clients.set(data.id, data);
-	}
-
-	@SubscribeMessage("Test")
-	test(client: any) {
-		console.log("test received!");
-		client.send(JSON.stringify({
-			event: "resTest"
-		}))
 	}
 
 	@SubscribeMessage("JoinQueue")
-	joinQueue(client: any) {
-		console.log("Join Queue");
+	joinQueue(@MessageBody() data: any) {
+		console.log("Join Queue", data);
+		let client = this.getClient(data);
+
 		this.queue.push(client);
-		console.log(this.queue.length);
+		console.log("Queue length at the beginning: ", this.queue.length);
 
 		if (this.queue.length > 1) {
 			let room = new Room([this.queue[0], this.queue[1]]);
-			this.queue[0].sock.send(JSON.stringify({
+			room.broadcast(JSON.stringify({
 				event: 'MatchFound',
 				data: room.id
 			}));
+			console.log("sending matchfound.");
+			this.rooms.push(room);
 			this.queue.slice(2);
 		}
+		console.log("Queue length at the end: ", this.queue.length);
+
 	}
 
+	static broadcast(clients: any, msg: any) {
+		for (let client of clients)
+			client.sock.send(msg);
+	}
+
+	getClient(id: string) {
+		return (this.clients.get(id));
+	}
 }

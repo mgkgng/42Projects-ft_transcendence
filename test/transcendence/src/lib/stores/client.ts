@@ -4,7 +4,10 @@ import { browser } from "$app/environment";
 function uid() {
 	const set = '0123456789abcdefghiklmnopqrstuvwxyz';
 	
-	return (Array(16).map(x => set[Math.random() * set.length]).join(''));
+	let res: string = "";
+	for (let i = 0; i < 16; i++)
+		res += set[Math.floor(Math.random() * set.length)];
+	return (res);
 }
 
 class Client {
@@ -40,7 +43,7 @@ class Client {
 			this.sock.send(
 				JSON.stringify({
 					event: "Connexion",
-					data: "hshs"
+					data: this.id
 				})
 			)
 
@@ -50,7 +53,6 @@ class Client {
 
 		this.sock.onmessage = (msg: any) => {
 			let data = JSON.parse(msg.data);
-
 			this.listeners.get(data.event)?.(data?.data);
 		}
 	}

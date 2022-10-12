@@ -90,7 +90,8 @@
 				message = "Login required!";
 			}
 			$client.sock.send(JSON.stringify({
-				event: 'JoinQueue'
+				event: 'JoinQueue',
+				data: $client.id
 			}));
 		}}
 	>
