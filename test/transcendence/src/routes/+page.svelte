@@ -29,12 +29,12 @@
 		
 		$client.addListener("resTest", () => {
 			console.log("res arrived!");
-		})
+		});
 
 		$client.addListener("MatchFound", (data: any) => {
 			console.log("MatchFound", data);
-			goto(`/play/{data.data}`);
-		})
+			goto(`/play/${data}`);
+		});
 	});
 </script>
 

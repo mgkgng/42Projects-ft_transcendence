@@ -12,11 +12,13 @@ const WsMessage = {
 	
 }
 
-
 function uid() {
 	const set = '0123456789abcdefghiklmnopqrstuvwxyz';
 	
-	return (Array(16).map(x => set[Math.random() * set.length]).join(''));
+	let res: string = "";
+	for (let i = 0; i < 16; i++)
+		res += set[Math.floor(Math.random() * set.length)];
+	return (res);
 }
 
 class Client {
@@ -322,7 +324,7 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			}));
 			console.log("sending matchfound.");
 			this.rooms.push(room);
-			this.queue.slice(2);
+			this.queue = this.queue.slice(2);
 		}
 		console.log("Queue length at the end: ", this.queue.length);
 
