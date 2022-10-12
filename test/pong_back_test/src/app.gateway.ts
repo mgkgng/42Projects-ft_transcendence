@@ -217,7 +217,6 @@ class Room {
 	 * pass the clients as parameters
 	 */
 	broadcast(msg: any) {
-		console.log(this.getClients().length);
 		AppGateway.broadcast(this.getClients(), msg);
 	}
 
@@ -275,11 +274,13 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	clients: Map<string, Client>;
 	rooms: Map<string, Room>;
 	queue: Array<Client>;
+	control: Map<string, any>;
 
 	constructor() {
 		this.clients = new Map<string, Client>();
 		this.rooms = new Map<string, Room>();
 		this.queue = [];
+		this.control = new Map<string, any>();
 	}
 
 	@WebSocketServer()
@@ -312,6 +313,13 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	joinQueue(@MessageBody() data: any) {
 		console.log("Join Queue", data);
 		let client = this.getClient(data);
+
+		if (this.queue.includes(client)) {
+			// TODO: should optimize the algorithm later
+			
+			console.log("already joined the queue");
+			return ;
+		}
 
 		this.queue.push(client);
 		console.log("Queue length at the beginning: ", this.queue.length);
@@ -350,6 +358,31 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}));
 	}
 
+	@SubscribeMessage("PaddleMove")
+	paddleMove(@MessageBody() data: any) {
+		console.log("PaddleMove", data);
+
+		// calcul algorithm launched here
+		
+		let room = this.getRoom(data.room);
+		let intervalId = setInterval(() => {
+			console.log("paddle moving");
+		// 	// room.broadcast({
+		// 	// 	event: "PaddleUpdate"
+		// 	// });
+		}, 20);
+		this.control.set(data.client, intervalId);
+	}
+
+	@SubscribeMessage("PaddleStop")
+	paddleStop(@MessageBody() data: any) {
+		// calcul algorithm launched here
+
+		console.log("PaddleStop==================================", data);
+		clearInterval(this.control.get(data));
+		this.control.delete(data);
+	}
+
 	static broadcast(clients: any, msg: any) {
 		for (let client of clients)
 			client.sock.send(msg);
@@ -361,5 +394,11 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	getRoom(id: string) {
 		return (this.rooms.get(id));
+	}
+
+	paddleUpdate(room: any) {
+		room.broadcast({
+			event: "PaddleUpdate"
+		});
 	}
 }

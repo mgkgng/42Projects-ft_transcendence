@@ -28,7 +28,7 @@
 </script>
 
 {#if roomRes}
-<Room roomInfo={roomInfo}/>
+<Room roomId={roomId} roomInfo={roomInfo}/>
 {:else}
 <RoomNotFound />
 {/if}

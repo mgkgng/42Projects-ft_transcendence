@@ -78,8 +78,10 @@
 	import { UserType } from './stores/var';
 	import Paddle from './Paddle.svelte';
     import { Pong } from './pong/Pong';
+    import { identity } from 'svelte/internal';
 
 	export let roomInfo: any;
+	export let roomId: string;
 
 	// let gameMap = new GameMap(mapWidth.Small, mapHeight.Small, PaddleSize.Medium);
 
@@ -89,17 +91,19 @@
 
 	let grapped = false;
 
+	let moving = false;
+
 	onMount(()=> {
 		userIndex = ($client.id == roomInfo.players[0]) ? UserType.Player1 
 			: ($client.id == roomInfo.players[1]) ? UserType.Player2 
 			: UserType.Watcher;
 
 		$client.addListener("PaddleUpdate", () => {
-
+			console.log("PaddleUpdate");
 		});
 
 		$client.addListener("GameUpdate", () => {
-
+			console.log("GameUpdate");
 		});
 	});
 
@@ -134,27 +138,38 @@ on:mousemove={(event)=>{
 		console.log(event);
 }}
 
-on:keydown={(event) => {
-	if (!callBack && event.code == 'KeyA') {
-		callBack = setInterval(() => {
-			myPos -= 10;
-		}, 20);
-		// i should here send data to back
-	}
-	if (!callBack && event.code == 'KeyD') {
-		callBack = setInterval(() => {
-			myPos += 10;
-		}, 20);
-		// i should here send data to back
-	}
+on:keypress={(event) => {
+	console.log("down");
+	if (userIndex == UserType.Watcher
+	|| (event.code != 'KeyA' && event.code != 'KeyD'))
+		return ;
+
+	if (moving)
+		return ;
+
+	moving = true;
+	
+	$client.sock.send(JSON.stringify({
+		event: "PaddleMove",
+		data: {
+			client: $client.id,
+			room: roomId,
+			left: (event.code == 'KeyA')
+		}
+	}));
 }}
 
 on:keyup={(event)=>{
-	if (callBack) {
-		clearInterval(callBack);
-		// setTimeout(callBack, 200);
-		callBack = undefined;
-	}
+	if (event.code != 'KeyA' && event.code != 'KeyD')
+		return ;
+	
+	//* TODO some precision to make
+	$client.sock.send(JSON.stringify({
+		event: "PaddleStop",
+		data: $client.id
+	}));
+
+	moving = false;
 }}
 
 />
