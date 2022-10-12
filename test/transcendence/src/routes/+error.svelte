@@ -17,6 +17,7 @@
 
 <script>
 	import DarkMode from "$lib/DarkMode.svelte";
+    import Navbar from "$lib/Navbar.svelte";
     import Title from "$lib/Title.svelte";
 </script>
 
@@ -24,4 +25,5 @@
 <div class="container">
 	<DarkMode/>
 	<Title title={"Error 404"} mainPage={false}/>
+	<Navbar />
 </div>
