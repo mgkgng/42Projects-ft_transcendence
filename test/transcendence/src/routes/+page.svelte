@@ -40,7 +40,7 @@
 
 <div class="container">
 	<DarkMode/>
-	<Title />
+	<Title title={"transcendence"} mainPage={true} />
 	<Navbar />
 </div>
 

@@ -75,6 +75,8 @@
 	};
 
 	export let darkMode = false;
+	export let title: string;
+	export let mainPage: boolean;
 
 	let circlesAround: Array<Circle> = [];
 	let circleRadius = 250;
@@ -110,7 +112,9 @@
 	{#each circlesAround as circleInfo}
 	<div class="circle-around" style="--dist: {circleRadius + 45}px; --size: {circleInfo.size}px; --duration: {circleInfo.duration}s; --angle: {circleInfo.angle}deg; --angle2: {circleInfo.angle + 360}deg"></div>
 	{/each}
+	{#if mainPage}
 	<RoundButton bind:showMessage={showMessage} bind:message={message} circleRadius={circleRadius}/>
-	<h1 class="title">transcendence</h1>
+	{/if}
+	<h1 class="title">{title}</h1>
 	<div class="msg">{message}</div>
 </div>

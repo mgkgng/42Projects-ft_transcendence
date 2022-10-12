@@ -54,15 +54,15 @@ h1 { font-size: $h1; font-weight: bold; }
 
 @font-face {
 	font-family: 'alpha-prota';
-	src: URL('fonts/AlphaProta.ttf') format('truetype');
+	src: URL('/fonts/AlphaProta.ttf') format('truetype');
 }
 
 @font-face {
 	font-family: 'modernism-narrow';
-	src: URL('fonts/Modernism-Narrow.ttf') format('truetype');
+	src: URL('/fonts/Modernism-Narrow.ttf') format('truetype');
 }
 
 @font-face {
 	font-family: 'modernism';
-	src: URL('fonts/Modernism.ttf') format('truetype');
+	src: URL('/fonts/Modernism.ttf') format('truetype');
 }
