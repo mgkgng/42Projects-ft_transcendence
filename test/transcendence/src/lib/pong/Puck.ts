@@ -1,4 +1,4 @@
-export class Ball {
+export class Puck {
 	posX: number;
 	posY: number;
 	vectorX: number;

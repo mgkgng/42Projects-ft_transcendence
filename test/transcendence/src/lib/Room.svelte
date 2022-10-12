@@ -71,63 +71,63 @@
 	}
 </style>
 
-<script>
-	import Paddle from "$lib/Paddle.svelte";
+<script lang="ts">
 	import { onMount } from 'svelte';
 	import DarkMode from "$lib/DarkMode.svelte";
 	import { client } from "$lib/stores/client";
-	import { page } from "$app/stores";
+	import { UserType } from './stores/var';
+	import Paddle from './Paddle.svelte';
+    import { Pong } from './pong/Pong';
+
+	export let roomInfo: any;
 
 	// let gameMap = new GameMap(mapWidth.Small, mapHeight.Small, PaddleSize.Medium);
 
+	let pong = new Pong();
+
+	let userIndex: number
+
 	let grapped = false;
 
-	// let oppoPos = (gameMap.width - gameMap.paddleSize) / 2;
-	// let myPos = (gameMap.height - gameMap.paddleSize) / 2;
-
-	let myScore;
-	let opponentScore;
-
-	let id = $page.params.id;
-
 	onMount(()=> {
-		myScore = 0;
-		opponentScore = 0;
-	/* here we distribute information about the room
-	: playersInfo, playMode, mapInfo */
+		userIndex = ($client.id == roomInfo.players[0]) ? UserType.Player1 
+			: ($client.id == roomInfo.players[1]) ? UserType.Player2 
+			: UserType.Watcher;
+		
 
-	/* and then here I visualize the map */
+		$client.addListener("PaddleUpdate", () => {
 
-	/* there should be a listener for score updating */
-		// $client.socket.addEventListener("Match", () => {
-			
-		// });
+		})
+		
+		$client.addListener("GameUpdate", () => {
+
+		})
 	});
 
 </script>
 
-<DarkMode/>
 <div class="container">
-	ROOMFOUND!
+	<!-- <DarkMode/> -->
 </div>
-<!-- <div class="container">
+
+<div class="container">
 	<div class="game-container" >
-		<div class="game" style="width: {gameMap.width}px; height: {gameMap.height}px;">
+		<div class="game" style="width: {pong.gameMap.width}px; height: {pong.gameMap.height}px;">
 			<div class="beyond-above"></div>
 			<div class="bar-container-above">
-				<Paddle pos={oppoPos} paddleWidth={gameMap.paddleSize} gameWidth={gameMap.width} gameHeight={gameMap.height} />
+				<Paddle pos={pong.paddlePos[0]} paddleWidth={pong.gameMap.paddleSize} gameWidth={pong.gameMap.width} gameHeight={pong.gameMap.height} />
 			</div>
 			<div class="map">
 				<div class="main-circle "></div>
 			</div>
 			<div class="bar-container-below">
-				<Paddle pos={myPos} paddleWidth={gameMap.paddleSize} gameWidth={gameMap.width} gameHeight={gameMap.height} />
+				<Paddle pos={pong.paddlePos[1]} paddleWidth={pong.gameMap.paddleSize} gameWidth={pong.gameMap.width} gameHeight={pong.gameMap.height} />
 			</div>
 			<div class="beyond-below"></div>
 		</div>
 	</div>
 	<div class="central-line"></div>
-</div> -->
+</div>
 
 <svelte:window
 on:mouseup={()=>{

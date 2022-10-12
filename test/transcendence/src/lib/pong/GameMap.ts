@@ -1,4 +1,5 @@
-import { Block } from "./Block";
+import type { Block } from "./Block";
+// import { Block } from "./Block";
 
 export const PaddleSize = {
 	XSmall: 20,

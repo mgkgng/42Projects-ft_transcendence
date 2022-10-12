@@ -335,10 +335,18 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		console.log("RoomCheck", data);
 
 		let client = this.getClient(data.client);
-		console.log("I'm sending it to ", client.id);
+		let room = this.getRoom(data.room);
+
 		client.sock.send(JSON.stringify({
 			event: "RoomInfo",
-			data: (this.rooms.has(data.room)) ? true : false
+			data: {
+				res: (room) ? true : false,
+				roomInfo: (room) ? {
+					players: [room.players[0].id, room.players[1].id],
+					maxpoint: room.maxpoint,
+					scores: room.scores
+				} : undefined
+			}
 		}));
 	}
 
@@ -349,5 +357,9 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	getClient(id: string) {
 		return (this.clients.get(id));
+	}
+
+	getRoom(id: string) {
+		return (this.rooms.get(id));
 	}
 }

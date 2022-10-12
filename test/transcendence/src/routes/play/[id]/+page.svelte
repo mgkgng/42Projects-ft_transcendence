@@ -7,6 +7,7 @@
 
 	let roomId = $page.params.id;
 	let roomRes: boolean;
+	let roomInfo: any;
 
 	onMount(() => {
 		$client.sock.send(JSON.stringify({
@@ -19,13 +20,15 @@
 
 		$client.addListener("RoomInfo", (data: any) => {
 			console.log("RoomInfo", data);
-			roomRes = data;
+			console.log(typeof(data.roomInfo));
+			roomRes = data.res;
+			roomInfo = data.roomInfo;
 		})
 	});
 </script>
 
 {#if roomRes}
-<Room />
+<Room roomInfo={roomInfo}/>
 {:else}
 <RoomNotFound />
 {/if}
