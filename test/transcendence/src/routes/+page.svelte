@@ -22,10 +22,18 @@
 
 	import { client } from "$lib/stores/client";
     import { onMount } from "svelte";
+    import { goto } from "$app/navigation";
 
 	onMount(() => {
+		console.log("I'm on the main page.");
+		
 		$client.addListener("resTest", () => {
 			console.log("res arrived!");
+		})
+
+		$client.addListener("MatchFound", (data: any) => {
+			console.log("MatchFound", data);
+			goto(`/play/{data.data}`);
 		})
 	});
 </script>

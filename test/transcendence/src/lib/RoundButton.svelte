@@ -89,7 +89,9 @@
 				showMessage = true;
 				message = "Login required!";
 			}
-			goto(`/play`);
+			$client.sock.send(JSON.stringify({
+				event: 'JoinQueue'
+			}));
 		}}
 	>
 		<h2>Play</h2>

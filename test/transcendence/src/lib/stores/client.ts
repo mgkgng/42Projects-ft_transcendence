@@ -22,10 +22,12 @@ class Client {
 		this.callbacksOnConnection = new Set();
 		if (browser) {
 			this.sock = new WebSocket('ws://localhost:3000');
+			console.log(this.sock);
 			this.sock.onmessage = (msg: any) => {
 				console.log("receving something", msg);
 				this.listeners.get(msg.event)?.(msg.data);
 			}
+			this.connect();
 		}
 	}
 
@@ -38,19 +40,29 @@ class Client {
 			this.sock.send(
 				JSON.stringify({
 					event: "Connexion",
-					data: {
-						id: this.id,
-						sock: this.sock
-					}
+					data: "hshs"
 				})
 			)
+
+			for (let func of this.callbacksOnConnection)
+				func();
 		};
+
+		this.sock.onmessage = (msg: any) => {
+			let data = JSON.parse(msg.data);
+
+			this.listeners.get(data.event)?.(data?.data);
+		}
 	}
 
 	OnConnection(func: Function) {
 		this.callbacksOnConnection.add(func);
 		if (this.sock?.readyState === WebSocket.OPEN)
 			func();
+	}
+
+	removeOnConnection(func: Function) {
+		this.callbacksOnConnection.delete(func);
 	}
 	
 	addListener(type: string, callback: Function) {
@@ -60,17 +72,6 @@ class Client {
 	removeListener(type: string) {
 		this.listeners.delete(type);
 	}
-
-	// send(data: any) {
-	// 	if (this.socket?.readyState === WebSocket.OPEN) {
-	// 		try {
-	// 			this.socket.s
-	// 		} catch(e) {
-				
-	// 		}
-	// 		return ;
-  	// 	}
-	// }
 }
 
 export const client = writable(new Client());

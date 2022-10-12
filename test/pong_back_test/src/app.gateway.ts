@@ -14,18 +14,38 @@ function uid() {
 	return (Array(16).map(x => set[Math.random() * set.length]).join(''));
 }
 
-class Client
-{
-	username : string;
-	sock : WebSocket;
-	// constructor(socket_client : Socket, username : string)
-	constructor(username: string, sock: WebSocket)
-	{
-		this.username = username;
-		this.sock = sock;
-	}
-};
+class Client {
+	id: string;
+	sock: any;
+	callbacksOnConnection: Set<Function>;
+	listeners: Map<string, Function>;
 
+	//Websocket
+	// addEventListener
+	// removeEventListener
+	constructor(sock: any) {
+		this.id = uid();
+		this.sock = sock;
+		this.listeners = new Map();
+		
+		this.sock.onmessage = (msg: any) => {
+			console.log("receving something", msg);
+			this.listeners.get(msg.event)?.(msg.data);
+		}
+	}
+
+	onDisconnect(callback: Function) {
+		this.sock.addListener('close', callback);
+	}
+	
+	addListener(type: string, callback: Function) {
+		this.listeners.set(type, callback);
+	}
+
+	removeListener(type: string) {
+		this.listeners.delete(type);
+	}
+}
 const PaddleSize = {
 	XSmall: 20,
 	Small : 40,
@@ -141,8 +161,8 @@ class Pong {
 
 class Room {
 	id: string;
-	clients: Map<string, Client>;
-	players: Array<Client>;
+	clients: Map<string, any>;
+	players: Array<any>;
 	scores: Array<number>;
 	maxpoint: number;
 	pong: Pong;
@@ -153,17 +173,17 @@ class Room {
 	constructor(clients, maxpoint: number = 20) {
 		this.id = uid();
 		//this.chat = new ChatRoomService();
+		this.clients = new Map();
+		
 		this.addClients(clients);
 
 		this.pong = new Pong();
 		
-		this.players[0] = clients[0];
-		this.players[1] = clients[1];
+		this.players = [clients[0], clients[1]];
 
 		this.maxpoint = maxpoint;
 		
-		this.scores[0] = 0;
-		this.scores[1] = 0;
+		this.scores = [0 , 0];
 		
 		this.isPlaying = false;
 	}
@@ -181,11 +201,12 @@ class Room {
 			this.addClient(client);
 	}
 
-	addClient(client) {
-		this.clients.set(client.username, client);
+	addClient(client: any) {
+		this.clients.set(client.id, client);
 		//this.chat.append_user_to_room();
 		//console.log('Room -> addClient', this.clients.size);
-		client.onDisconnect(() => this.removeClient(client));
+		/* IMPORTANT TO REMOVE THE CLIENT */
+		// client.onDisconnect(() => this.removeClient(client));
 	}
 
 	removeClient(client) {
@@ -218,19 +239,22 @@ class Room {
 
 @WebSocketGateway()
 export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
-	clients: Map<string, Client>
+	clients: Map<string, Client>;
+	queue: Array<Client>;
+	rooms: Array<Room>;
 
 	constructor() {
 		this.clients = new Map<string, Client>();
+		this.queue = [];
 	}
 
 	@WebSocketServer()
 	server: Server;
 
 	async handleConnection(client: any) {
-		console.log("New Connection on site.")
-		if (!this.clients.has(client.id))
-			this.clients.set(client.id, client);
+		console.log("New Connection on site.");
+		// let connection = new Client(client.sock);
+		// this.clients.set(connection.id, connection);
 	}
 
 	async handleDisconnect(client: any) {
@@ -239,10 +263,16 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
 	@SubscribeMessage("Connexion")
-	handleConnexion(@MessageBody() data: any): void {
-		console.log("test", data);
-		console.log(data.id, 'Connected');
-		this.clients.set(data.id, data);
+	handleConnexion(client): void {
+		// console.log("test", client);
+		let connection = new Client(client);
+		this.clients.set(connection.id, connection);
+		
+		connection.sock.send(JSON.stringify({
+			event: "resTest"
+		}))
+		// console.log(data.id, 'Connected');
+		// this.clients.set(data.id, data);
 	}
 
 	@SubscribeMessage("Test")
@@ -253,5 +283,20 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}))
 	}
 
+	@SubscribeMessage("JoinQueue")
+	joinQueue(client: any) {
+		console.log("Join Queue");
+		this.queue.push(client);
+		console.log(this.queue.length);
+
+		if (this.queue.length > 1) {
+			let room = new Room([this.queue[0], this.queue[1]]);
+			this.queue[0].sock.send(JSON.stringify({
+				event: 'MatchFound',
+				data: room.id
+			}));
+			this.queue.slice(2);
+		}
+	}
 
 }
