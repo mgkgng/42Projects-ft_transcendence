@@ -1,7 +1,7 @@
 <style lang="scss">
 	.container {
 		background-color: #fff;
-		
+
 		display: grid;
 		grid-template-columns: 20% 70% ;
 		height: 100%;
@@ -85,7 +85,7 @@
 
 	let pong = new Pong();
 
-	let userIndex: number
+	let userIndex: number;
 
 	let grapped = false;
 
@@ -93,22 +93,17 @@
 		userIndex = ($client.id == roomInfo.players[0]) ? UserType.Player1 
 			: ($client.id == roomInfo.players[1]) ? UserType.Player2 
 			: UserType.Watcher;
-		
 
 		$client.addListener("PaddleUpdate", () => {
 
-		})
-		
+		});
+
 		$client.addListener("GameUpdate", () => {
 
-		})
+		});
 	});
 
 </script>
-
-<div class="container">
-	<!-- <DarkMode/> -->
-</div>
 
 <div class="container">
 	<div class="game-container" >
@@ -138,9 +133,8 @@ on:mousemove={(event)=>{
 	if (grapped)
 		console.log(event);
 }}
-/>
 
-<!-- on:keydown={(event) => {
+on:keydown={(event) => {
 	if (!callBack && event.code == 'KeyA') {
 		callBack = setInterval(() => {
 			myPos -= 10;
@@ -161,4 +155,6 @@ on:keyup={(event)=>{
 		// setTimeout(callBack, 200);
 		callBack = undefined;
 	}
-}} -->
+}}
+
+/>
