@@ -63,6 +63,14 @@
 		border-radius: 50%;
 		background-color: transparentize($main, 0.2)
 	}
+
+	.pong-score {
+		display: flex;
+		flex-direction: column;
+
+		justify-content: center;
+		height: 100%;
+	}
 </style>
 
 <script lang="ts">
@@ -75,6 +83,7 @@
 	import { Puck } from './pong/Puck';
     import { identity } from 'svelte/internal';
     import PongPuck from './PongPuck.svelte';
+    import ScoreBox from './ScoreBox.svelte';
 
 	export let roomInfo: any;
 	export let roomId: string;
@@ -84,6 +93,7 @@
 	// TODO GameMap info should go into the pong's constructor
 	let pong = new Pong();
 	let puck: any = undefined;
+	let scores: Array<number> = [0, 0];
 
 	let userType: number;
 	let userIndex: number = 0;
@@ -104,6 +114,8 @@
 		if (userType == UserType.Player2)
 			[userIndex, opponentIndex] = [opponentIndex, userIndex];
 
+		scores = roomInfo.scores;
+
 		$client.addListener("PaddleUpdate", (data: any) => {
 			// console.log("PaddleUpdate");
 			pong.paddlePos[data.player] = data.paddlePos;
@@ -123,6 +135,7 @@
 
 		$client.addListener("ScoreUpdate", (data: any) => {
 			console.log("ScoreUpdate", data);
+			scores[data]++;
 		});
 
 		return (() => {
@@ -146,7 +159,11 @@
 			gameWidth={pong.gameMap.width} gameHeight={pong.gameMap.height}
 			user={true}/>
 	</div>
-	<div class="central-line"></div>
+	<!-- <div class="central-line"></div> -->
+	<div class="pong-score">
+		<ScoreBox score={scores[opponentIndex]}/>
+		<ScoreBox score={scores[userIndex]}/>
+	</div>
 </div>
 
 <svelte:window

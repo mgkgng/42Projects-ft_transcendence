@@ -2,6 +2,17 @@
 	.score-box {
 		display: flex;
 		flex-direction: row;
+
+		color: #fff;
+		font-size: 128px;
+
+		border: 5px dashed #fff;
+
+		width: 3em;
+		height: 5em;
+
+		align-items: center;
+		justify-content: center;
 	}
 </style>
 
