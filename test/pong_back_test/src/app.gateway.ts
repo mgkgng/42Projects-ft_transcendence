@@ -85,7 +85,7 @@ const MapWidth = {
 }
 
 const MapHeight = {
-	Small: 600,
+	Small: 400,
 	Medium: 800,
 	Large: 1000
 }
@@ -194,7 +194,7 @@ class Pong {
 
 	movePaddle(userIndex: number, left: boolean) {
 		//TODO put the accelerating speed on paddle
-		
+
 		if ((this.paddlePos[userIndex] == this.moveMin && left)
 			|| (this.paddlePos[userIndex] == this.moveMax && !left))
 			return ;
@@ -275,6 +275,17 @@ class Room {
 		// console.log([...this.clients.values()]);
 		console.log("getClients: ", this.clients.size);
 		return (Array.from(this.clients.values()));
+	}
+
+	startPong() {
+		this.broadcast(JSON.stringify({
+			event: "PongStart",
+			data: (Math.floor(Math.random() * 2)) ? 1 : -1
+		}))
+
+		setTimeout(() => {
+
+		}, 2000);
 	}
 
 	putScore(winner, reason) {

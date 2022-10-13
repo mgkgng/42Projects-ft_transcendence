@@ -1,16 +1,18 @@
 <style lang="scss">
 	.paddle {
-		width: 80px;
+		position: relative;
+		margin: 0;
+		width: var(--paddleWidth);
 		height: 12px;
 
 		border-radius: 2em;
 
-		position: relative;
 		left: var(--pos);
 
 	}
 
 	.user {
+		margin: 0;
 		box-shadow: 0px 0px 20px 8px $red;
 	}
 
@@ -33,9 +35,16 @@
 
 	export let pos : number;
 
+	let deadZoneHeight = 50;
+
+	$: console.log(paddleWidth);
+
 </script>
 
 <div class="paddle {(user) ? "user" : ""}"
 	style="{(dark) ? "background-color: #fff" : "background-color: #000"};
-		--pos: {(user) ? pos : gameWidth - pos}px; --paddleWidth = {paddleWidth}px"></div>
+		top: {(!user) ? deadZoneHeight: gameHeight - deadZoneHeight * 2}px;
+		--pos: {(user) ? pos - paddleWidth / 2 : gameWidth - pos + paddleWidth / 2}px;
+		--paddleWidth: {paddleWidth}px">
+</div>
 

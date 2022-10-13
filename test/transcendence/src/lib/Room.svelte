@@ -9,22 +9,15 @@
 		align-items: center;
 	}
 
-	.game-container {
-		width: 800px;
-		height: 600px;
-		padding: 2em;
+	.pong {
+		padding: 0;
 		border: dashed 5px white;
 
-		display: flex;
-		justify-content: center;
-		align-items: center;
+		// display: flex;
+		// justify-content: center;
+		// align-items: center;
 	}
 
-	.game {
-		position: relative;
-		display: grid;
-		grid-template-rows: 4% 3% 80% 3% 4%;
-	}
 
 	.bar-container-above {
 		position: relative;
@@ -78,13 +71,16 @@
 	import Paddle from './Paddle.svelte';
     import { Pong } from './pong/Pong';
     import { identity } from 'svelte/internal';
+    import Puck from './Puck.svelte';
 
 	export let roomInfo: any;
 	export let roomId: string;
 
 	// let gameMap = new GameMap(mapWidth.Small, mapHeight.Small, PaddleSize.Medium);
 
+	// TODO GameMap info should go into the pong's constructor
 	let pong = new Pong();
+
 
 	let userType: number;
 	let userIndex: number = 0;
@@ -108,6 +104,15 @@
 			pong.paddlePos[data.player] = data.paddlePos;
 		});
 
+		$client.addListener("PongStart", (data: any) => {
+			console.log("PongStart");
+
+			// TODO Timer for 2 seconds
+			setTimeout(() => {
+
+			}, 2000);
+		})
+
 		$client.addListener("GameUpdate", () => {
 			console.log("GameUpdate");
 		});
@@ -121,19 +126,14 @@
 </script>
 
 <div class="container">
-	<div class="game-container" >
-		<div class="game" style="width: {pong.gameMap.width}px; height: {pong.gameMap.height}px;">
-			<div class="beyond-above"></div>
-			<div class="bar-container-above">
-				<Paddle pos={pong.paddlePos[opponentIndex]} paddleWidth={pong.gameMap.paddleSize} gameWidth={pong.gameMap.width} gameHeight={pong.gameMap.height} user={false}/>
-			</div>
-			<div class="map">
-			</div>
-			<div class="bar-container-below">
-				<Paddle pos={pong.paddlePos[userIndex]} paddleWidth={pong.gameMap.paddleSize} gameWidth={pong.gameMap.width} gameHeight={pong.gameMap.height} user={true}/>
-			</div>
-			<div class="beyond-below"></div>
-		</div>
+	<div class="pong" style="width: {pong.gameMap.width}px; height: {pong.gameMap.height}px;">
+		<Paddle pos={pong.paddlePos[opponentIndex]} paddleWidth={pong.gameMap.paddleSize}
+			gameWidth={pong.gameMap.width} gameHeight={pong.gameMap.height}
+			user={false}/>
+		<Puck />
+		<Paddle pos={pong.paddlePos[userIndex]} paddleWidth={pong.gameMap.paddleSize}
+			gameWidth={pong.gameMap.width} gameHeight={pong.gameMap.height}
+			user={true}/>
 	</div>
 	<div class="central-line"></div>
 </div>
@@ -157,7 +157,7 @@ on:keypress={(event) => {
 		return ;
 
 	moving = true;
-	
+
 	$client.sock.send(JSON.stringify({
 		event: "PaddleMove",
 		data: {

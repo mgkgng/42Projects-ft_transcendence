@@ -15,7 +15,7 @@ export const MapWidth = {
 }
 
 export const MapHeight = {
-	Small: 600,
+	Small: 400,
 	Medium: 800,
 	Large: 1000
 }
