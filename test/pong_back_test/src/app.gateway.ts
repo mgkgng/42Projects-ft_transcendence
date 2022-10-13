@@ -279,6 +279,8 @@ class Room {
 	}
 
 	static startPong(room: any) {
+		if (!room)
+			return ;
 		room.broadcast(JSON.stringify({
 			event: "PongStart",
 			data: {
@@ -288,10 +290,6 @@ class Room {
 				posY: room.pong.puck.posY
 			}
 		}))
-
-		setTimeout(() => {
-
-		}, 2000);
 	}
 
 	putScore(winner, reason) {
@@ -444,11 +442,5 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	getRoom(id: string) {
 		return (this.rooms.get(id));
-	}
-
-	paddleUpdate(room: any) {
-		room.broadcast({
-			event: "PaddleUpdate"
-		});
 	}
 }

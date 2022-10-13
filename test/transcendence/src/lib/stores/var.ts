@@ -7,3 +7,5 @@ export const UserType = {
 	Player2: 1,
 	Watcher: 2
 }
+
+export const FPS = 20; // This is for setTimeOut etc

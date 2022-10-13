@@ -1,6 +1,6 @@
 <style lang="scss">
 	.paddle {
-		position: relative;
+		position: absolute;
 		margin: 0;
 		width: var(--paddleWidth);
 		height: 12px;
@@ -8,6 +8,10 @@
 		border-radius: 2em;
 
 		left: var(--pos);
+		z-index: 2;
+
+		box-shadow: 0px 0px 20px 8px $yellow;
+
 
 	}
 
@@ -43,7 +47,7 @@
 
 <div class="paddle {(user) ? "user" : ""}"
 	style="{(dark) ? "background-color: #fff" : "background-color: #000"};
-		top: {(!user) ? deadZoneHeight: gameHeight - deadZoneHeight * 2}px;
+		top: {(!user) ? deadZoneHeight: gameHeight - deadZoneHeight}px;
 		--pos: {(user) ? pos - paddleWidth / 2 : gameWidth - pos + paddleWidth / 2}px;
 		--paddleWidth: {paddleWidth}px">
 </div>

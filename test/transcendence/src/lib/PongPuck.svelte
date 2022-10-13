@@ -1,13 +1,15 @@
 <style>
 	.puck {
-		position: relative;
+		position: absolute;
 		margin: 0;
 
-		z-index: 2;
+		z-index: 1;
 		width: 30px;
 		aspect-ratio: 1 / 1;
 		border-radius: 50%;
-		background-color: blue;
+		background-color: #fff;
+		box-shadow: 0px 0px 10px 10px green;
+
 	}
 </style>
 

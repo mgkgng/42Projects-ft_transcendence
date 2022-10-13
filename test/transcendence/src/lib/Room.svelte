@@ -10,6 +10,8 @@
 	}
 
 	.pong {
+		position: relative;
+		
 		padding: 0;
 		border: dashed 5px white;
 

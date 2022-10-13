@@ -6,7 +6,7 @@ export class Puck {
 	gameWidth: number;
 	gameHeight: number;
 
-	constructor(gameWidth : number, gameHeight : number, vectorX : number, vectorY : number) { // temporary test
+	constructor(gameWidth : number, gameHeight : number, vectorX : number = 0, vectorY : number = 1) { // temporary test
 		this.vectorX = vectorX;
 		this.vectorY = vectorY;
 		this.gameWidth = gameWidth;
