@@ -2,13 +2,19 @@
 	.paddle {
 		width: 80px;
 		height: 12px;
-		box-shadow: 0px 0px 20px 8px $main;
 
 		border-radius: 2em;
 
 		position: relative;
 		left: var(--pos);
+
 	}
+
+	.user {
+		box-shadow: 0px 0px 20px 8px $red;
+	}
+
+
 </style>
 
 <script lang="ts">
@@ -20,6 +26,7 @@
 		dark = value;
 	});
 
+	export let user: boolean;
 	export let gameWidth : number;
 	export let gameHeight : number;
 	export let paddleWidth : number;
@@ -28,5 +35,5 @@
 
 </script>
 
-<div class="paddle" style="{(dark) ? "background-color: #000" : "background-color: #fff"}; --pos: {pos}px; --paddleWidth = {paddleWidth}px"></div>
+<div class="paddle {(user) ? "user" : ""}" style="{(dark) ? "background-color: #fff" : "background-color: #000"}; --pos: {pos}px; --paddleWidth = {paddleWidth}px"></div>
 

@@ -1,6 +1,5 @@
 <style lang="scss">
 	.container {
-		background-color: #fff;
 
 		display: grid;
 		grid-template-columns: 20% 70% ;
@@ -87,16 +86,20 @@
 
 	let pong = new Pong();
 
-	let userIndex: number;
+	let userType: number;
+	let userIndex: number = 0;
+	let opponentIndex: number = 1;
 
 	let grapped = false;
 
 	let moving = false;
 
 	onMount(()=> {
-		userIndex = ($client.id == roomInfo.players[0]) ? UserType.Player1 
+		userType = ($client.id == roomInfo.players[0]) ? UserType.Player1 
 			: ($client.id == roomInfo.players[1]) ? UserType.Player2 
 			: UserType.Watcher;
+		if (userType == UserType.Player2)
+			[userIndex, opponentIndex] = [opponentIndex, userIndex];
 
 		$client.addListener("PaddleUpdate", () => {
 			console.log("PaddleUpdate");
@@ -114,13 +117,12 @@
 		<div class="game" style="width: {pong.gameMap.width}px; height: {pong.gameMap.height}px;">
 			<div class="beyond-above"></div>
 			<div class="bar-container-above">
-				<Paddle pos={pong.paddlePos[0]} paddleWidth={pong.gameMap.paddleSize} gameWidth={pong.gameMap.width} gameHeight={pong.gameMap.height} />
+				<Paddle pos={pong.paddlePos[opponentIndex]} paddleWidth={pong.gameMap.paddleSize} gameWidth={pong.gameMap.width} gameHeight={pong.gameMap.height} user={false}/>
 			</div>
 			<div class="map">
-				<div class="main-circle "></div>
 			</div>
 			<div class="bar-container-below">
-				<Paddle pos={pong.paddlePos[1]} paddleWidth={pong.gameMap.paddleSize} gameWidth={pong.gameMap.width} gameHeight={pong.gameMap.height} />
+				<Paddle pos={pong.paddlePos[userIndex]} paddleWidth={pong.gameMap.paddleSize} gameWidth={pong.gameMap.width} gameHeight={pong.gameMap.height} user={true}/>
 			</div>
 			<div class="beyond-below"></div>
 		</div>
@@ -139,7 +141,6 @@ on:mousemove={(event)=>{
 }}
 
 on:keypress={(event) => {
-	console.log("down");
 	if (userIndex == UserType.Watcher
 	|| (event.code != 'KeyA' && event.code != 'KeyD'))
 		return ;

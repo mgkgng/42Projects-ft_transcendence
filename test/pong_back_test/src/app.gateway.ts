@@ -367,9 +367,9 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		let room = this.getRoom(data.room);
 		let intervalId = setInterval(() => {
 			console.log("paddle moving");
-		// 	// room.broadcast({
-		// 	// 	event: "PaddleUpdate"
-		// 	// });
+			room.broadcast(JSON.stringify({
+				event: "PaddleUpdate"
+			}));
 		}, 20);
 		this.control.set(data.client, intervalId);
 	}
