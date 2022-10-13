@@ -11,7 +11,7 @@
 
 	.pong {
 		position: relative;
-		
+
 		padding: 0;
 		border: dashed 5px white;
 
@@ -92,6 +92,8 @@
 	let grapped = false;
 
 	let moving = false;
+	
+	let puckMoving;
 
 	$: console.log("My Paddle Position: ", pong.paddlePos[userIndex]);
 
@@ -107,23 +109,25 @@
 			pong.paddlePos[data.player] = data.paddlePos;
 		});
 
-		$client.addListener("PongStart", (data: any) => {
-			console.log("PongStart");
+		$client.addListener("LoadBall", (data: any) => {
+			console.log("LoadBall");
 			puck = new Puck(pong.gameMap.width, pong.gameMap.height, data.vectorX, data.vectorY);
+		});
 
-			// TODO Timer for 2 seconds
-			setTimeout(() => {
+		$client.addListener("PongStart", (data: any) => {
+			console.log("PongStart", data);
+			// puckMoving = setInterval(() => {
 
-			}, 2000);
-		})
+			// }, 20);
+		});
 
-		$client.addListener("GameUpdate", () => {
-			console.log("GameUpdate");
+		$client.addListener("ScoreUpdate", (data: any) => {
+			console.log("ScoreUpdate", data);
 		});
 
 		return (() => {
 			$client.removeListener("PaddleUpdate");
-			$client.removeListener("GameUpdate");
+			$client.removeListener("ScoreUpdate");
 			$client.removeListener("PongStart");
 		})
 	});

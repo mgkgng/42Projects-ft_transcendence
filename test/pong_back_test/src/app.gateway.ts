@@ -141,20 +141,45 @@ class Puck {
 		this.posY = gameHeight / 2;
 	}
 
-	// this is the callBack function 
-	move() {
-		this.posX += this.vectorX;
-		this.posY += this.vectorY;
+	setCheckPuck(room: any) {
+		// calculating the interval
+		let frameDuration = 20;
+		let deadZoneHeight = 30;
 
-		//* here should check if it hits any wall */
+		let distToDeath = (this.vectorY > 0)
+			? (this.gameHeight - deadZoneHeight) - this.posY
+			: this.posY - deadZoneHeight; 
 
-		//* then here we should find the vector value */
+		let timeOut = (distToDeath / this.vectorY) * frameDuration;
+		console.log("checking the timeOut: ", timeOut);
+
+		setTimeout(() => {
+			
+			// checking the puck....
+
+			// and if the paddle didn't hit the puck...
+
+			room.broadcast(JSON.stringify({
+				event: "ScoreUpdate",
+				data: (this.vectorY > 0) ? 0 : 1
+			}));
+		}, timeOut);
 	}
 
-	getHit(vectorX: number, vectorY: number) {
-		this.vectorX = vectorX;
-		this.vectorY = vectorY;
-	}
+	// old codes
+	// move() {
+	// 	this.posX += this.vectorX;
+	// 	this.posY += this.vectorY;
+
+	// 	//* here should check if it hits any wall */
+
+	// 	//* then here we should find the vector value */
+	// }
+
+	// getHit(vectorX: number, vectorY: number) {
+	// 	this.vectorX = vectorX;
+	// 	this.vectorY = vectorY;
+	// }
 }
 
 class GameMap {
@@ -281,15 +306,24 @@ class Room {
 	static startPong(room: any) {
 		if (!room)
 			return ;
+
 		room.broadcast(JSON.stringify({
-			event: "PongStart",
+			event: "LoadBall",
 			data: {
 				vectorX: room.pong.puck.vectorX,
 				vectorY: room.pong.puck.vectorY,
 				posX: room.pong.puck.posX,
 				posY: room.pong.puck.posY
 			}
-		}))
+		}));
+		
+		setTimeout(() => {
+			room.broadcast(JSON.stringify({
+				event: "PongStart"
+			}))
+			room.pong.puck.setCheckPuck(room);
+			console.log("set check puck");			
+		}, 2000);
 	}
 
 	putScore(winner, reason) {
