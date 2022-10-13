@@ -193,9 +193,18 @@ class Pong {
 	}
 
 	movePaddle(userIndex: number, left: boolean) {
-		if (this.paddlePos[userIndex] == this.moveMin || this.paddlePos[userIndex] == this.moveMax)
+		//TODO put the accelerating speed on paddle
+		
+		if ((this.paddlePos[userIndex] == this.moveMin && left)
+			|| (this.paddlePos[userIndex] == this.moveMax && !left))
 			return ;
-		this.paddlePos[userIndex] += (left) ? -1 : 1;
+
+		this.paddlePos[userIndex] += (left) ? -3 : 3;
+
+		if (this.paddlePos[userIndex] <= this.moveMin)
+			this.paddlePos[userIndex] == this.moveMin;
+		else if (this.paddlePos[userIndex] >= this.moveMax)
+			this.paddlePos[userIndex] == this.moveMax;
 	}
 }
 
