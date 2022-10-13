@@ -103,7 +103,7 @@
 
 	let moving = false;
 	
-	let puckMoving;
+	let puckMoving: any;
 
 	$: console.log("My Paddle Position: ", pong.paddlePos[userIndex]);
 
@@ -128,13 +128,16 @@
 
 		$client.addListener("PongStart", (data: any) => {
 			console.log("PongStart", data);
-			// puckMoving = setInterval(() => {
 
-			// }, 20);
+			puckMoving = setInterval(() => {
+				puck.move();
+				puck = puck;
+			}, 20);
 		});
-
+ 
 		$client.addListener("ScoreUpdate", (data: any) => {
 			console.log("ScoreUpdate", data);
+			clearInterval(puckMoving);
 			scores[data]++;
 		});
 
