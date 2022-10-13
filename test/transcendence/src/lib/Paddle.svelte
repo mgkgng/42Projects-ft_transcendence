@@ -35,5 +35,7 @@
 
 </script>
 
-<div class="paddle {(user) ? "user" : ""}" style="{(dark) ? "background-color: #fff" : "background-color: #000"}; --pos: {pos}px; --paddleWidth = {paddleWidth}px"></div>
+<div class="paddle {(user) ? "user" : ""}"
+	style="{(dark) ? "background-color: #fff" : "background-color: #000"};
+		--pos: {(user) ? pos : gameWidth - pos}px; --paddleWidth = {paddleWidth}px"></div>
 
