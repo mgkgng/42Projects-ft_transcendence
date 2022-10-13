@@ -131,7 +131,8 @@ class Puck {
 	gameWidth: number;
 	gameHeight: number;
 
-	constructor(gameWidth : number, gameHeight : number, vectorX : number = 1, vectorY : number = 1) {
+	constructor(gameWidth : number, gameHeight : number,
+		vectorX : number = 0, vectorY : number = (Math.floor(Math.random() * 2)) ? 1 : -1) { // temporary test
 		this.vectorX = vectorX;
 		this.vectorY = vectorY;
 		this.gameWidth = gameWidth;
@@ -277,10 +278,15 @@ class Room {
 		return (Array.from(this.clients.values()));
 	}
 
-	startPong() {
-		this.broadcast(JSON.stringify({
+	static startPong(room: any) {
+		room.broadcast(JSON.stringify({
 			event: "PongStart",
-			data: (Math.floor(Math.random() * 2)) ? 1 : -1
+			data: {
+				vectorX: room.pong.puck.vectorX,
+				vectorY: room.pong.puck.vectorY,
+				posX: room.pong.puck.posX,
+				posY: room.pong.puck.posY
+			}
 		}))
 
 		setTimeout(() => {
@@ -393,6 +399,8 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				} : undefined
 			}
 		}));
+
+		setTimeout(Room.startPong, 2000, room);
 	}
 
 	@SubscribeMessage("PaddleMove")

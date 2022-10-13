@@ -1,8 +1,6 @@
 <style>
 	.puck {
 		position: relative;
-		top: 100px;
-		left: 100px;
 		margin: 0;
 
 		z-index: 2;
@@ -13,8 +11,11 @@
 	}
 </style>
 
-<script>
-
+<script lang="ts">
+	export let posX: number;
+	export let posY: number;
 </script>
 
-<div class="puck"></div>
+<div class="puck"
+	style="top: {posX}px; left: {posY}px;">
+</div>

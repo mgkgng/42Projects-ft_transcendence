@@ -70,8 +70,9 @@
 	import { UserType } from './stores/var';
 	import Paddle from './Paddle.svelte';
     import { Pong } from './pong/Pong';
+	import { Puck } from './pong/Puck';
     import { identity } from 'svelte/internal';
-    import Puck from './Puck.svelte';
+    import PongPuck from './PongPuck.svelte';
 
 	export let roomInfo: any;
 	export let roomId: string;
@@ -80,7 +81,7 @@
 
 	// TODO GameMap info should go into the pong's constructor
 	let pong = new Pong();
-
+	let puck: any = undefined;
 
 	let userType: number;
 	let userIndex: number = 0;
@@ -100,12 +101,13 @@
 			[userIndex, opponentIndex] = [opponentIndex, userIndex];
 
 		$client.addListener("PaddleUpdate", (data: any) => {
-			console.log("PaddleUpdate");
+			// console.log("PaddleUpdate");
 			pong.paddlePos[data.player] = data.paddlePos;
 		});
 
 		$client.addListener("PongStart", (data: any) => {
 			console.log("PongStart");
+			puck = new Puck(pong.gameMap.width, pong.gameMap.height, data.vectorX, data.vectorY);
 
 			// TODO Timer for 2 seconds
 			setTimeout(() => {
@@ -120,6 +122,7 @@
 		return (() => {
 			$client.removeListener("PaddleUpdate");
 			$client.removeListener("GameUpdate");
+			$client.removeListener("PongStart");
 		})
 	});
 
@@ -130,7 +133,9 @@
 		<Paddle pos={pong.paddlePos[opponentIndex]} paddleWidth={pong.gameMap.paddleSize}
 			gameWidth={pong.gameMap.width} gameHeight={pong.gameMap.height}
 			user={false}/>
-		<Puck />
+		{#if puck}
+		<PongPuck posX={puck.posX} posY={puck.posY}/>
+		{/if}
 		<Paddle pos={pong.paddlePos[userIndex]} paddleWidth={pong.gameMap.paddleSize}
 			gameWidth={pong.gameMap.width} gameHeight={pong.gameMap.height}
 			user={true}/>
