@@ -94,6 +94,8 @@
 
 	let moving = false;
 
+	$: console.log("My Paddle Position: ", pong.paddlePos[userIndex]);
+
 	onMount(()=> {
 		userType = ($client.id == roomInfo.players[0]) ? UserType.Player1 
 			: ($client.id == roomInfo.players[1]) ? UserType.Player2 
@@ -101,13 +103,19 @@
 		if (userType == UserType.Player2)
 			[userIndex, opponentIndex] = [opponentIndex, userIndex];
 
-		$client.addListener("PaddleUpdate", () => {
+		$client.addListener("PaddleUpdate", (data: any) => {
 			console.log("PaddleUpdate");
+			pong.paddlePos[data.player] = data.paddlePos;
 		});
 
 		$client.addListener("GameUpdate", () => {
 			console.log("GameUpdate");
 		});
+
+		return (() => {
+			$client.removeListener("PaddleUpdate");
+			$client.removeListener("GameUpdate");
+		})
 	});
 
 </script>
@@ -141,7 +149,7 @@ on:mousemove={(event)=>{
 }}
 
 on:keypress={(event) => {
-	if (userIndex == UserType.Watcher
+	if (userType == UserType.Watcher
 	|| (event.code != 'KeyA' && event.code != 'KeyD'))
 		return ;
 
@@ -154,6 +162,7 @@ on:keypress={(event) => {
 		event: "PaddleMove",
 		data: {
 			client: $client.id,
+			player: userType,
 			room: roomId,
 			left: (event.code == 'KeyA')
 		}

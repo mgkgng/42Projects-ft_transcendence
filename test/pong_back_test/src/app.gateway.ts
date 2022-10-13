@@ -6,6 +6,8 @@ import {
 	WebSocketGateway, 
 	WebSocketServer 
 } from "@nestjs/websockets";
+import { runInThisContext } from "vm";
+import { threadId } from "worker_threads";
 import { Server } from 'ws';
 
 const WsMessage = {
@@ -121,7 +123,7 @@ class Block {
 	}
 }
 
-class Ball {
+class Puck {
 	posX: number;
 	posY: number;
 	vectorX: number;
@@ -174,11 +176,26 @@ class GameMap {
 
 class Pong {
 	gameMap: GameMap;
-	ball: Ball;
+	puck: Puck;
+	paddlePos: Array<number>;
+	moveMin: number;
+	moveMax: number;
 
 	constructor() {
 		this.gameMap = new GameMap();
-		this.ball = new Ball(this.gameMap.width, this.gameMap.height);
+		this.puck = new Puck(this.gameMap.width, this.gameMap.height);
+
+		let initPos = (this.gameMap.width - this.gameMap.paddleSize) / 2;
+		this.paddlePos = [initPos, initPos];
+
+		this.moveMin = 0;
+		this.moveMax = this.gameMap.width - this.gameMap.paddleSize;
+	}
+
+	movePaddle(userIndex: number, left: boolean) {
+		if (this.paddlePos[userIndex] == this.moveMin || this.paddlePos[userIndex] == this.moveMax)
+			return ;
+		this.paddlePos[userIndex] += (left) ? -1 : 1;
 	}
 }
 
@@ -362,13 +379,18 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	paddleMove(@MessageBody() data: any) {
 		console.log("PaddleMove", data);
 
-		// calcul algorithm launched here
-		
 		let room = this.getRoom(data.room);
+
+		// calcul algorithm launched here
+
 		let intervalId = setInterval(() => {
-			console.log("paddle moving");
+			room.pong.movePaddle(data.player, data.left);
 			room.broadcast(JSON.stringify({
-				event: "PaddleUpdate"
+				event: "PaddleUpdate",
+				data: {
+					player: data.player,
+					paddlePos: room.pong.paddlePos[data.player]
+				}
 			}));
 		}, 20);
 		this.control.set(data.client, intervalId);
