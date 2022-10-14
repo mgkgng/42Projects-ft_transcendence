@@ -361,13 +361,13 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@WebSocketServer()
 	server: Server;
 
-	async handleConnection(client: any) {
+	async handleConnection(client: any) { //TODO handle connection here
 		console.log("New Connection on site.");
 		// let connection = new Client(client.sock);
 		// this.clients.set(connection.id, connection);
 	}
 
-	async handleDisconnect(client: any) {
+	async handleDisconnect(client: any) { //TODO handle connection here
 		console.log("Disconnect.")
 		this.clients.delete(client.id);
 	}
@@ -378,10 +378,6 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		console.log("data", data);
 		let connection = new Client(data, client);
 		this.clients.set(connection.id, connection);
-		
-		connection.sock.send(JSON.stringify({
-			event: "resTest"
-		}))
 	}
 
 	@SubscribeMessage("JoinQueue")
@@ -420,15 +416,21 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		let client = this.getClient(data.client);
 		let room = this.getRoom(data.room);
 
+		if (!room) {
+			client.sock.send(JSON.stringify({
+				event: "RoomNotFound"
+			}))
+			return ;
+		}
+
 		client.sock.send(JSON.stringify({
 			event: "RoomInfo",
 			data: {
-				res: (room) ? true : false,
-				roomInfo: (room) ? {
+				roomInfo: {
 					players: [room.players[0].id, room.players[1].id],
 					maxpoint: room.maxpoint,
 					scores: room.scores
-				} : undefined
+				}
 			}
 		}));
 

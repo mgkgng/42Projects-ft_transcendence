@@ -8,7 +8,7 @@
 
 		border: 5px dashed #fff;
 
-		width: 3em;
+		max-width: 150px;
 		height: 5em;
 
 		align-items: center;

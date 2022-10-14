@@ -8,4 +8,4 @@ export const UserType = {
 	Watcher: 2
 }
 
-export const FPS = 20; // This is for setTimeOut etc
+export const frameDuration = 20; // This is for setTimeOut etc

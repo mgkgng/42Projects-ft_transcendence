@@ -1,6 +1,5 @@
 <style lang="scss">
 	.container {
-
 		display: grid;
 		grid-template-columns: 20% 70% ;
 		height: 100%;

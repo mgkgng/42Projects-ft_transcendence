@@ -1,14 +1,6 @@
 import { writable } from "svelte/store";
 import { browser } from "$app/environment";
-
-function uid() {
-	const set = '0123456789abcdefghiklmnopqrstuvwxyz';
-	
-	let res: string = "";
-	for (let i = 0; i < 16; i++)
-		res += set[Math.floor(Math.random() * set.length)];
-	return (res);
-}
+import { uid } from "./lib";
 
 class Client {
 	id: string;
@@ -16,9 +8,6 @@ class Client {
 	callbacksOnConnection: Set<Function>;
 	listeners: Map<string, Function>;
 
-	//Websocket
-	// addEventListener
-	// removeEventListener
 	constructor() {
 		this.id = uid();
 		this.listeners = new Map();
