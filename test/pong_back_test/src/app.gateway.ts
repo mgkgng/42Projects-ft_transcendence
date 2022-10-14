@@ -132,8 +132,7 @@ class Puck {
 	gameHeight: number;
 
 	constructor(gameWidth : number, gameHeight : number,
-		// vectorX : number = (Math.floor(Math.random() * 6)) * ((Math.floor(Math.random() * 2)) ? 1 : -1), 
-		vectorX: number = 0,
+		vectorX : number = (Math.floor(Math.random() * 6) + 1) * ((Math.floor(Math.random() * 2)) ? 1 : -1), 
 		vectorY: number = (Math.floor(Math.random() * 2)) ? 3 : -3) { // temporary test
 		this.vectorX = vectorX;
 		this.vectorY = vectorY;
@@ -146,11 +145,13 @@ class Puck {
 	setCheckPuck(room: any) {
 		// calculating the interval
 		let frameDuration = 20;
-		let deadZoneHeight = 30;
+		let deadZoneHeight = 50;
+		let paddleHeight = 12;
+		let ballSize = 30;
 
 		let distToDeath = (this.vectorY > 0)
-			? (this.gameHeight - deadZoneHeight) - this.posY
-			: this.posY - deadZoneHeight; 
+			? (this.gameHeight - deadZoneHeight - paddleHeight) - this.posY
+			: this.posY - deadZoneHeight - paddleHeight; 
 		console.log("vector check: ", this.vectorY);
 		console.log("puck pos check: ", this.posY);
 		console.log("distance check: ", distToDeath);
@@ -160,41 +161,54 @@ class Puck {
 
 		let deathPointX = this.calculPosX(distToDeath, frameDuration);
 		console.log("checking deathPoint: ", deathPointX);
+
+		room.broadcast(JSON.stringify({
+			event: "DeathPointUpdate",
+			data: deathPointX
+		}));
+
 		setTimeout(() => {
 			
 			// checking if the paddle hits the puck...
-			let paddlePos = room.pong.paddlePos[(this.vectorY > 0) ? 1 : 0];
+			let paddlePos = (this.vectorY > 0) ? room.pong.paddlePos[1] : room.pong.paddlePos[0];
 			console.log("checking paddlePos: ", paddlePos);
 			if (deathPointX > paddlePos && deathPointX < paddlePos + room.pong.gameMap.paddleSize) {
 				console.log("PuckHit");
 				room.broadcast(JSON.stringify({
 					event: "PuckHit"
 				}));
-				this.posY = (this.vectorY > 0) ? (this.gameHeight - deadZoneHeight) : deadZoneHeight;
+				this.posX = deathPointX;
+				this.posY = (this.vectorY > 0) ? (this.gameHeight - deadZoneHeight - paddleHeight) : deadZoneHeight + paddleHeight;
 				this.vectorY *= -1;
 				this.setCheckPuck(room);
 				return ;
-			}
+			} else {
+				room.broadcast(JSON.stringify({
+					event: "ScoreUpdate",
+					data: (this.vectorY > 0) ? 0 : 1
+				}));
 
+			}
 			// and if the paddle didn't hit the puck...
-			room.broadcast(JSON.stringify({
-				event: "ScoreUpdate",
-				data: (this.vectorY > 0) ? 0 : 1
-			}));
 		}, timeOut);
 	}
 
 	calculPosX(distToDeath: number, frameDuration: number) {
-		let frameOut = distToDeath / frameDuration;
+		let frameOut = distToDeath / this.vectorY;
+		// TODO precision should be made, it should be because of the css stuff
+		if (frameOut < 0)
+			frameOut = -frameOut + 1;
 		let deathPointX = this.posX;
 		let vecX = this.vectorX;
+
+		console.log("frameout test: ", frameOut);
 
 		for (let i = 0; i < frameOut; i++) {
 			if (deathPointX < 0 || deathPointX > this.gameWidth - 30)
 				vecX *= -1;
 			deathPointX += vecX;
 		}
-		return (deathPointX);
+		return ((this.vectorY > 0) ? this.gameWidth - deathPointX : deathPointX);
 	}
 }
 
@@ -241,7 +255,7 @@ class Pong {
 			|| (this.paddlePos[userIndex] == this.moveMax && !left))
 			return ;
 
-		this.paddlePos[userIndex] += (left) ? -3 : 3;
+		this.paddlePos[userIndex] += (left) ? -5 : 5;
 
 		if (this.paddlePos[userIndex] <= this.moveMin)
 			this.paddlePos[userIndex] == this.moveMin;

@@ -87,6 +87,15 @@
 		justify-content: center;
 		height: 100%;
 	}
+
+	.deathPoint {
+		position: absolute;
+		width: 12px;
+		aspect-ratio: 1 / 1;
+		border-radius: 50%;
+		background-color: peru;
+		z-index: 10;
+	}
 </style>
 
 <script lang="ts">
@@ -99,6 +108,7 @@
 	import { Puck } from './pong/Puck';
     import PongPuck from './PongPuck.svelte';
     import ScoreBox from './ScoreBox.svelte';
+    import { GameMap } from './pong/GameMap';
 
 	export let roomInfo: any;
 	export let roomId: string;
@@ -116,10 +126,13 @@
 
 	let grapped = false;
 
+	let deathPoint: number;
+
 	let moving = false;
 	
 	let puckMoving: any;
 
+	$: console.log("My User Index: ", userIndex);
 	$: console.log("My Paddle Position: ", pong.paddlePos[userIndex]);
 
 	onMount(()=> {
@@ -148,6 +161,11 @@
 				puck.move();
 				puck = puck;
 			}, 20);
+		});
+
+		$client.addListener("DeathPointUpdate", (data: any) => {
+			console.log("DeathPointUpdate");
+			deathPoint = data;
 		});
 
 		$client.addListener("PuckHit", (data: any) => {
@@ -188,8 +206,14 @@
 			user={true}/>
 		<div class="test" style="left: {pong.paddlePos[userIndex]}px; top: {pong.gameMap.height - 50}px;
 		"></div>
-		<div class="central-line-vertical"></div>
-		<div class="central-line-horizontal"></div>	
+
+		{#if deathPoint && puck}
+		<div class="deathPoint"
+			style="left: {(puck.vectorY < 0) ? deathPoint : pong.gameMap.width - deathPoint - 30}px;
+			top: {(puck.vectorY < 0 && userIndex || puck.vectorY > 0 && !userIndex) ? 50 : pong.gameMap.height - 50}px;"></div>
+		{/if}
+		<!-- <div class="central-line-vertical"></div>
+		<div class="central-line-horizontal"></div>	 -->
 	</div>
 	<!-- <div class="central-line"></div> -->
 	<!-- <div class="pong-score">
