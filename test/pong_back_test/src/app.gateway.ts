@@ -473,7 +473,7 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					maxpoint: room.maxpoint,
 					scores: room.scores,
 					mapSize: [room.pong.gameMap.width, room.pong.gameMap.height],
-					paddleSize: [room.pong.gameMap.paddleSize]
+					paddleSize: room.pong.gameMap.paddleSize
 				}
 			}
 		}));

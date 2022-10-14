@@ -120,7 +120,7 @@
 	let puck: any = undefined;
 	let scores: Array<number> = [0, 0];
 
-	let paddlePos: Array<number> = [roomInfo.mapSize[0], roomInfo.mapSize[1]];
+	let paddlePos: Array<number> = [];
 
 	let userType: number;
 	let userIndex: number = UserType.Player1;
@@ -144,6 +144,11 @@
 			[userIndex, opponentIndex] = [opponentIndex, userIndex];
 
 		scores = roomInfo.scores;
+		paddlePos = [
+			(roomInfo.mapSize[0] + roomInfo.paddleSize) / 2, 
+			(roomInfo.mapSize[0] - roomInfo.paddleSize)/ 2
+		];
+		console.log(paddlePos);
 
 		console.log("My User Index: ", userIndex);
 
@@ -209,9 +214,10 @@
 
 <div class="container">
 	<div class="pong" style="width: {roomInfo.mapSize[0]}px; height: {roomInfo.mapSize[1]}px;">
+		{#if paddlePos.length}
 		<Paddle pos={paddlePos[opponentIndex]} paddleWidth={roomInfo.paddleSize}
 			gameWidth={roomInfo.mapSize[0]} gameHeight={roomInfo.mapSize[1]}
-			user={false}/>
+			user={false} userIndex={userIndex}/>
 		<div class="test" style="left: {paddlePos[opponentIndex]}px; top: 50px;"></div>
 		{#if puck}
 		<PongPuck posX={(userIndex == UserType.Player1) ? roomInfo.mapSize[0] - puck.posX : puck.posX}
@@ -222,6 +228,7 @@
 			user={true} userIndex={userIndex}/>
 		<div class="test" style="left: {paddlePos[userIndex]}px; top: {roomInfo.mapSize[1] - 50}px;
 		"></div>
+		{/if}
 
 		{#if deathPoint && puck}
 		<div class="deathPoint"
