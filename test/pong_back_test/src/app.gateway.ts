@@ -262,6 +262,8 @@ class Room {
 		this.scores = [0 , 0];
 		
 		this.isPlaying = false;
+
+		setTimeout(Room.startPong, 2000, this);
 	}
 
 	/**
@@ -303,6 +305,8 @@ class Room {
 		return (Array.from(this.clients.values()));
 	}
 
+	// need static because used often with setTimeOut() func
+	// sent by setTimeOut(), 'this' is initialised by timeOut class
 	static startPong(room: any) {
 		if (!room)
 			return ;
@@ -325,6 +329,7 @@ class Room {
 			console.log("set check puck");			
 		}, 2000);
 	}
+
 
 	putScore(winner, reason) {
 
@@ -434,7 +439,6 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			}
 		}));
 
-		setTimeout(Room.startPong, 2000, room);
 	}
 
 	@SubscribeMessage("PaddleMove")
