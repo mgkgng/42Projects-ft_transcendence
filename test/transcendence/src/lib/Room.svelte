@@ -95,8 +95,8 @@
 	let scores: Array<number> = [0, 0];
 
 	let userType: number;
-	let userIndex: number = 0;
-	let opponentIndex: number = 1;
+	let userIndex: number = UserType.Player1;
+	let opponentIndex: number = UserType.Player2;
 
 	let grapped = false;
 
@@ -156,7 +156,8 @@
 			gameWidth={pong.gameMap.width} gameHeight={pong.gameMap.height}
 			user={false}/>
 		{#if puck}
-		<PongPuck posX={puck.posX} posY={puck.posY}/>
+		<PongPuck posX={puck.posX}
+			posY={(userIndex == UserType.Player1) ? pong.gameMap.height - puck.posY : puck.posY} />
 		{/if}
 		<Paddle pos={pong.paddlePos[userIndex]} paddleWidth={pong.gameMap.paddleSize}
 			gameWidth={pong.gameMap.width} gameHeight={pong.gameMap.height}

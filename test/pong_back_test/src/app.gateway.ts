@@ -331,7 +331,6 @@ class Room {
 		}, 2000);
 	}
 
-
 	putScore(winner, reason) {
 
 		// Broadcast result
