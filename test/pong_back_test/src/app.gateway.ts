@@ -170,9 +170,10 @@ class Puck {
 		setTimeout(() => {
 			
 			// checking if the paddle hits the puck...
-			let paddlePos = (this.vectorY > 0) ? room.pong.paddlePos[1] : room.pong.paddlePos[0];
+			let paddlePos = (this.vectorY > 0) ? room.pong.paddlePos[1] : this.gameWidth - room.pong.paddlePos[0];
 			console.log("checking paddlePos: ", paddlePos);
-			if (deathPointX > paddlePos && deathPointX < paddlePos + room.pong.gameMap.paddleSize) {
+			if ((this.vectorY < 0 && deathPointX > paddlePos - room.pong.gameMap.paddleSize && deathPointX < paddlePos)
+				|| (this.vectorY > 0 && deathPointX > paddlePos && deathPointX < paddlePos + room.pong.gameMap.paddleSize)) {
 				console.log("PuckHit");
 				room.broadcast(JSON.stringify({
 					event: "PuckHit"
@@ -183,6 +184,7 @@ class Puck {
 				this.setCheckPuck(room);
 				return ;
 			} else {
+				console.log("ScoreUpdate");
 				room.broadcast(JSON.stringify({
 					event: "ScoreUpdate",
 					data: (this.vectorY > 0) ? 0 : 1
@@ -208,7 +210,10 @@ class Puck {
 				vecX *= -1;
 			deathPointX += vecX;
 		}
-		return ((this.vectorY > 0) ? this.gameWidth - deathPointX : deathPointX);
+
+		return(deathPointX);
+
+		// return ((this.vectorY < 0) ? this.gameWidth - deathPointX : this.gameWidth - deathPointX);
 	}
 }
 

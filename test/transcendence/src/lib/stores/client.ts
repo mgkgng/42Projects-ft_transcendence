@@ -42,7 +42,7 @@ class Client {
 
 		this.sock.onmessage = (msg: any) => {
 			let data = JSON.parse(msg.data);
-			console.log("OnMessage", data);
+			// console.log("OnMessage", data);
 			this.listeners.get(data.event)?.(data?.data);
 		}
 	}

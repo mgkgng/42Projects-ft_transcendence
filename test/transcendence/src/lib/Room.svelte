@@ -132,8 +132,7 @@
 	
 	let puckMoving: any;
 
-	$: console.log("My User Index: ", userIndex);
-	$: console.log("My Paddle Position: ", pong.paddlePos[userIndex]);
+	// $: console.log("My Paddle Position: ", pong.paddlePos[userIndex]);
 
 	onMount(()=> {
 		userType = ($client.id == roomInfo.players[0]) ? UserType.Player1 
@@ -144,9 +143,12 @@
 
 		scores = roomInfo.scores;
 
+		console.log("My User Index: ", userIndex);
+
 		$client.addListener("PaddleUpdate", (data: any) => {
 			// console.log("PaddleUpdate");
-			pong.paddlePos[data.player] = data.paddlePos;
+			pong.paddlePos[data.player] = (data.player == UserType.Player1) ? pong.gameMap.width - data.paddlePos
+				: data.paddlePos;
 		});
 
 		$client.addListener("LoadBall", (data: any) => {
@@ -212,8 +214,8 @@
 			style="left: {(puck.vectorY < 0) ? deathPoint : pong.gameMap.width - deathPoint - 30}px;
 			top: {(puck.vectorY < 0 && userIndex || puck.vectorY > 0 && !userIndex) ? 50 : pong.gameMap.height - 50}px;"></div>
 		{/if}
-		<!-- <div class="central-line-vertical"></div>
-		<div class="central-line-horizontal"></div>	 -->
+		<div class="central-line-vertical"></div>
+		<div class="central-line-horizontal"></div>	
 	</div>
 	<!-- <div class="central-line"></div> -->
 	<!-- <div class="pong-score">
@@ -248,7 +250,8 @@ on:keypress={(event) => {
 			client: $client.id,
 			player: userType,
 			room: roomId,
-			left: (event.code == 'KeyA')
+			left: (userType == UserType.Player2 && event.code == 'KeyA'
+				|| userType == UserType.Player1 && event.code == 'KeyD')
 		}
 	}));
 }}
