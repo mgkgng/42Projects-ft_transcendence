@@ -138,6 +138,7 @@
 			console.log("ScoreUpdate", data);
 			clearInterval(puckMoving);
 			scores[data]++;
+			puck = undefined;
 		});
 
 		return (() => {

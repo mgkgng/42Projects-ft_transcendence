@@ -149,8 +149,9 @@ class Puck {
 		let distToDeath = (this.vectorY > 0)
 			? (this.gameHeight - deadZoneHeight) - this.posY
 			: this.posY - deadZoneHeight; 
+		console.log("distance check: ", distToDeath);
 
-		let timeOut = (distToDeath / this.vectorY) * frameDuration;
+		let timeOut = Math.abs((distToDeath / this.vectorY)) * frameDuration;
 		console.log("checking the timeOut: ", timeOut);
 
 		setTimeout(() => {
