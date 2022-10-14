@@ -17,6 +17,9 @@ export class Puck {
 
 	// this is the callBack function 
 	move() {
+		if (this.posX < 0 || this.posX > this.gameWidth - 30) //puck size counted
+		this.vectorX *= -1;
+
 		this.posX += this.vectorX;
 		this.posY += this.vectorY;
 

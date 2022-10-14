@@ -132,7 +132,8 @@ class Puck {
 	gameHeight: number;
 
 	constructor(gameWidth : number, gameHeight : number,
-		vectorX : number = 0, vectorY : number = (Math.floor(Math.random() * 2)) ? 1 : -1) { // temporary test
+		vectorX : number = (Math.floor(Math.random() * 6)) * ((Math.floor(Math.random() * 2)) ? 1 : -1), 
+		vectorY : number = (Math.floor(Math.random() * 2)) ? 3 : -3) { // temporary test
 		this.vectorX = vectorX;
 		this.vectorY = vectorY;
 		this.gameWidth = gameWidth;

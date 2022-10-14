@@ -164,10 +164,10 @@
 			user={true}/>
 	</div>
 	<!-- <div class="central-line"></div> -->
-	<div class="pong-score">
+	<!-- <div class="pong-score">
 		<ScoreBox score={scores[opponentIndex]}/>
 		<ScoreBox score={scores[userIndex]}/>
-	</div>
+	</div> -->
 </div>
 
 <svelte:window
