@@ -29,7 +29,7 @@ export class GameMap {
 
 	constructor(mapWidth: number = MapWidth.Medium,
 		mapHeight: number = MapHeight.Medium,
-		paddleSize: number = PaddleSize.Medium,
+		paddleSize: number = PaddleSize.Large,
 		blocks: Array<Block> = []) {
 		this.width = mapWidth;
 		this.height = mapHeight;

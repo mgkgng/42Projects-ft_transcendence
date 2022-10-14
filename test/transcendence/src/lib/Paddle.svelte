@@ -2,17 +2,13 @@
 	.paddle {
 		position: absolute;
 		margin: 0;
-		width: var(--paddleWidth);
 		height: 12px;
 
 		border-radius: 2em;
 
-		left: var(--pos);
 		z-index: 2;
 
 		box-shadow: 0px 0px 20px 8px $yellow;
-
-
 	}
 
 	.user {
@@ -48,7 +44,7 @@
 <div class="paddle {(user) ? "user" : ""}"
 	style="{(dark) ? "background-color: #fff" : "background-color: #000"};
 		top: {(!user) ? deadZoneHeight: gameHeight - deadZoneHeight}px;
-		--pos: {(user) ? pos - paddleWidth / 2 : gameWidth - pos + paddleWidth / 2}px;
-		--paddleWidth: {paddleWidth}px">
+		left: {(user) ? pos : gameWidth - pos - paddleWidth}px;
+		width: {paddleWidth}px">
 </div>
 

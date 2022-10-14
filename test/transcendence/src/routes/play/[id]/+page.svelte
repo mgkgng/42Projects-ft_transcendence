@@ -8,8 +8,15 @@
 		padding: 0;
 	}
 
+	.loading-box {
+		height: 100%;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
 	.msg {
-		color: $main;
+		color: #fff;
 	}
 </style>
 
@@ -59,7 +66,7 @@
 {#if roomFound}
 <Room roomId={roomId} roomInfo={roomInfo}/>
 {:else if !roomNotFound}
-<div>
+<div class="loading-box">
 	<h1 class="msg">LOADING...</h1>
 </div>
 {:else}

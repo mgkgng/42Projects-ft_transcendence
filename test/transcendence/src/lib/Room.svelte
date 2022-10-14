@@ -19,6 +19,15 @@
 		// align-items: center;
 	}
 
+	.test {
+		position: absolute;
+		width: 10px;
+		aspect-ratio: 1 / 1;
+		border-radius: 50%;
+		background-color: blue;
+
+		z-index: 4;
+	}
 
 	.bar-container-above {
 		position: relative;
@@ -32,13 +41,21 @@
 		align-items: center;
 	}
 
-	.central-line {
+	.central-line-horizontal {
+		position: absolute;
+		left: 50%;
+		height: 800px;
+		border: dashed 3px aqua;
+	}
+
+	.central-line-vertical {
 		position: absolute;
 		top: 50%;
-		width: 500px;
+		width: 700px;
 		height: 0;
-		border: dashed 3px transparentize($main, 0.7);
+		border: dashed 3px aqua;
 	}
+
 
 	.beyond-above {
 		background-color: transparentize($main, 0.2);
@@ -135,6 +152,7 @@
 
 		$client.addListener("PuckHit", (data: any) => {
 			console.log("PuckHit");
+			puck.vectorY *= -1;
 		});
  
 		$client.addListener("ScoreUpdate", (data: any) => {
@@ -160,6 +178,7 @@
 		<Paddle pos={pong.paddlePos[opponentIndex]} paddleWidth={pong.gameMap.paddleSize}
 			gameWidth={pong.gameMap.width} gameHeight={pong.gameMap.height}
 			user={false}/>
+		<div class="test" style="left: {pong.paddlePos[opponentIndex]}px; top: 50px;"></div>
 		{#if puck}
 		<PongPuck posX={puck.posX}
 			posY={(userIndex == UserType.Player1) ? pong.gameMap.height - puck.posY : puck.posY} />
@@ -167,6 +186,10 @@
 		<Paddle pos={pong.paddlePos[userIndex]} paddleWidth={pong.gameMap.paddleSize}
 			gameWidth={pong.gameMap.width} gameHeight={pong.gameMap.height}
 			user={true}/>
+		<div class="test" style="left: {pong.paddlePos[userIndex]}px; top: {pong.gameMap.height - 50}px;
+		"></div>
+		<div class="central-line-vertical"></div>
+		<div class="central-line-horizontal"></div>	
 	</div>
 	<!-- <div class="central-line"></div> -->
 	<!-- <div class="pong-score">

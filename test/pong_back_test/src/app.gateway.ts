@@ -132,8 +132,9 @@ class Puck {
 	gameHeight: number;
 
 	constructor(gameWidth : number, gameHeight : number,
-		vectorX : number = (Math.floor(Math.random() * 6)) * ((Math.floor(Math.random() * 2)) ? 1 : -1), 
-		vectorY : number = (Math.floor(Math.random() * 2)) ? 3 : -3) { // temporary test
+		// vectorX : number = (Math.floor(Math.random() * 6)) * ((Math.floor(Math.random() * 2)) ? 1 : -1), 
+		vectorX: number = 0,
+		vectorY: number = (Math.floor(Math.random() * 2)) ? 3 : -3) { // temporary test
 		this.vectorX = vectorX;
 		this.vectorY = vectorY;
 		this.gameWidth = gameWidth;
@@ -150,21 +151,28 @@ class Puck {
 		let distToDeath = (this.vectorY > 0)
 			? (this.gameHeight - deadZoneHeight) - this.posY
 			: this.posY - deadZoneHeight; 
+		console.log("vector check: ", this.vectorY);
+		console.log("puck pos check: ", this.posY);
 		console.log("distance check: ", distToDeath);
 
 		let timeOut = Math.abs((distToDeath / this.vectorY)) * frameDuration;
 		console.log("checking the timeOut: ", timeOut);
 
 		let deathPointX = this.calculPosX(distToDeath, frameDuration);
-
+		console.log("checking deathPoint: ", deathPointX);
 		setTimeout(() => {
 			
 			// checking if the paddle hits the puck...
 			let paddlePos = room.pong.paddlePos[(this.vectorY > 0) ? 1 : 0];
+			console.log("checking paddlePos: ", paddlePos);
 			if (deathPointX > paddlePos && deathPointX < paddlePos + room.pong.gameMap.paddleSize) {
+				console.log("PuckHit");
 				room.broadcast(JSON.stringify({
 					event: "PuckHit"
 				}));
+				this.posY = (this.vectorY > 0) ? (this.gameHeight - deadZoneHeight) : deadZoneHeight;
+				this.vectorY *= -1;
+				this.setCheckPuck(room);
 				return ;
 			}
 
@@ -199,7 +207,7 @@ class GameMap {
 
 	constructor(mapWidth: number = MapWidth.Medium,
 		mapHeight: number = MapHeight.Medium,
-		paddleSize: number = PaddleSize.Medium,
+		paddleSize: number = PaddleSize.Large,
 		blocks: Array<Block> = []) {
 		this.width = mapWidth;
 		this.height = mapHeight;
@@ -439,7 +447,7 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage("PaddleMove")
 	paddleMove(@MessageBody() data: any) {
-		console.log("PaddleMove", data);
+		// console.log("PaddleMove", data);
 
 		let room = this.getRoom(data.room);
 
@@ -460,9 +468,6 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage("PaddleStop")
 	paddleStop(@MessageBody() data: any) {
-		// calcul algorithm launched here
-
-		console.log("PaddleStop==================================", data);
 		clearInterval(this.control.get(data));
 		this.control.delete(data);
 	}
