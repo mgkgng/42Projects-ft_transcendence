@@ -96,6 +96,13 @@
 		background-color: peru;
 		z-index: 10;
 	}
+
+	.button-launch {
+		width: 50px;
+		aspect-ratio: 1 / 1;
+		border-radius: 50%;
+		background-color: peru;
+	}
 </style>
 
 <script lang="ts">

@@ -46,7 +46,7 @@
 <div class="paddle {(user) ? "user" : ""}"
 	style="{(dark) ? "background-color: #fff" : "background-color: #000"};
 		top: {(!user) ? deadZoneHeight: gameHeight - deadZoneHeight}px;
-		left: {(user && !userIndex || !user && userIndex) ? pos - paddleWidth : pos}px;
+		left: {((user && !userIndex) || (!userIndex && !user)) ? pos - paddleWidth : pos}px;
 		width: {paddleWidth}px">
 </div>
 
