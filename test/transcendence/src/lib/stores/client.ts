@@ -57,12 +57,17 @@ class Client {
 		this.callbacksOnConnection.delete(func);
 	}
 	
-	addListener(type: string, callback: Function) {
-		this.listeners.set(type, callback);
+	addListener(listener: string, callback: Function) {
+		this.listeners.set(listener, callback);
 	}
 
-	removeListener(type: string) {
-		this.listeners.delete(type);
+	removeListener(listener: string) {
+		this.listeners.delete(listener);
+	}
+
+	removeListeners(listeners: Array<string>) {
+		for (let listener of listeners)
+			this.removeListener(listener);
 	}
 }
 

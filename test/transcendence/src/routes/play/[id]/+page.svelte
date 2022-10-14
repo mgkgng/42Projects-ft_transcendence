@@ -51,8 +51,7 @@
 
 		return (() => {
 			$client.removeOnConnection(roomcheck);
-			$client.removeListener("RoomNotFound");
-			$client.removeListener("RoomInfo");
+			$client.removeListeners(["RoomNotFound", "RoomInfo"]);
 		});
 	});
 </script>

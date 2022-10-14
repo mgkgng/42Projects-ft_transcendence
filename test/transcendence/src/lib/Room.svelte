@@ -80,7 +80,6 @@
 	import Paddle from './Paddle.svelte';
     import { Pong } from './pong/Pong';
 	import { Puck } from './pong/Puck';
-    import { identity } from 'svelte/internal';
     import PongPuck from './PongPuck.svelte';
     import ScoreBox from './ScoreBox.svelte';
 
@@ -133,6 +132,10 @@
 				puck = puck;
 			}, 20);
 		});
+
+		$client.addListener("PuckHit", (data: any) => {
+			console.log("PuckHit");
+		});
  
 		$client.addListener("ScoreUpdate", (data: any) => {
 			console.log("ScoreUpdate", data);
@@ -142,9 +145,11 @@
 		});
 
 		return (() => {
-			$client.removeListener("PaddleUpdate");
-			$client.removeListener("ScoreUpdate");
-			$client.removeListener("PongStart");
+			$client.removeListeners(["PaddleUpdate",
+				"LoadBall",
+				"ScoreUpdate",
+				"PuckHit",
+				"PongStart"]);
 		})
 	});
 

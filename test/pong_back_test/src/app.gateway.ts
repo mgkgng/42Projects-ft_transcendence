@@ -155,12 +155,20 @@ class Puck {
 		let timeOut = Math.abs((distToDeath / this.vectorY)) * frameDuration;
 		console.log("checking the timeOut: ", timeOut);
 
+		let deathPointX = this.calculPosX(distToDeath, frameDuration);
+
 		setTimeout(() => {
 			
-			// checking the puck....
+			// checking if the paddle hits the puck...
+			let paddlePos = room.pong.paddlePos[(this.vectorY > 0) ? 1 : 0];
+			if (deathPointX > paddlePos && deathPointX < paddlePos + room.pong.gameMap.paddleSize) {
+				room.broadcast(JSON.stringify({
+					event: "PuckHit"
+				}));
+				return ;
+			}
 
 			// and if the paddle didn't hit the puck...
-
 			room.broadcast(JSON.stringify({
 				event: "ScoreUpdate",
 				data: (this.vectorY > 0) ? 0 : 1
@@ -168,20 +176,18 @@ class Puck {
 		}, timeOut);
 	}
 
-	// old codes
-	// move() {
-	// 	this.posX += this.vectorX;
-	// 	this.posY += this.vectorY;
+	calculPosX(distToDeath: number, frameDuration: number) {
+		let frameOut = distToDeath / frameDuration;
+		let deathPointX = this.posX;
+		let vecX = this.vectorX;
 
-	// 	//* here should check if it hits any wall */
-
-	// 	//* then here we should find the vector value */
-	// }
-
-	// getHit(vectorX: number, vectorY: number) {
-	// 	this.vectorX = vectorX;
-	// 	this.vectorY = vectorY;
-	// }
+		for (let i = 0; i < frameOut; i++) {
+			if (deathPointX < 0 || deathPointX > this.gameWidth - 30)
+				vecX *= -1;
+			deathPointX += vecX;
+		}
+		return (deathPointX);
+	}
 }
 
 class GameMap {
@@ -189,7 +195,7 @@ class GameMap {
 	blocks : Array<Block>;
 	width: number;
 	height: number;
-	paddleSize: number;
+	paddleSize: number; // TODO put it into class Pong
 
 	constructor(mapWidth: number = MapWidth.Medium,
 		mapHeight: number = MapHeight.Medium,
@@ -248,7 +254,6 @@ class Room {
 	
 	// constructor(clients, mapchoice: string, mode: string, maxpoint: number) {
 	constructor(clients: any, maxpoint: number = 20) {
-		console.log("constructor: ", clients.length);
 		this.id = uid();
 		//this.chat = new ChatRoomService();
 		this.clients = new Map();
@@ -277,33 +282,24 @@ class Room {
 	}
 
 	addClients(clients: any) {
-		console.log("addClientS: ", clients.length);
 		for (let client of clients)
 			this.addClient(client);
-		console.log("after addClientS: ", this.clients.size);
 	}
 
 	addClient(client: any) {
-		console.log("addClient", client);
 		this.clients.set(client.id, client);
 		// this.clients[client.id] = client;
 		//this.chat.append_user_to_room();
 		//console.log('Room -> addClient', this.clients.size);
-		/* IMPORTANT TO REMOVE THE CLIENT */
+		/* TODO IMPORTANT TO REMOVE THE CLIENT */
 		// client.onDisconnect(() => this.removeClient(client));
 	}
 
-	removeClient(client) {
+	removeClient(client: any) {
 		this.clients.delete(client.username);
-		// this.chat.removeClient(client);
-		// console.log('Room -> removeClient', this.clients.size);
 	}
 
 	getClients() {
-		// console.log(this.clients);
-		// console.log("============");
-		// console.log([...this.clients.values()]);
-		console.log("getClients: ", this.clients.size);
 		return (Array.from(this.clients.values()));
 	}
 
@@ -328,7 +324,6 @@ class Room {
 				event: "PongStart"
 			}))
 			room.pong.puck.setCheckPuck(room);
-			console.log("set check puck");			
 		}, 2000);
 	}
 
