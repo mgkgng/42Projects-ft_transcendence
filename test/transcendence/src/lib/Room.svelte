@@ -111,7 +111,6 @@
 	import { client } from "$lib/stores/client";
 	import { UserType } from './stores/var';
 	import Paddle from './Paddle.svelte';
-    import { Pong } from './pong/Pong';
 	import { Puck } from './pong/Puck';
     import PongPuck from './PongPuck.svelte';
     import ScoreBox from './ScoreBox.svelte';
@@ -123,13 +122,12 @@
 	// let gameMap = new GameMap(mapWidth.Small, mapHeight.Small, PaddleSize.Medium);
 
 	// TODO GameMap info should go into the pong's constructor
-	let pong = new Pong();
 	let puck: any = undefined;
 	let scores: Array<number> = [0, 0];
 
 	let paddlePos: Array<number> = [
 			(roomInfo.mapSize[0] + roomInfo.paddleSize) / 2, 
-			(roomInfo.mapSize[0] - roomInfo.paddleSize)/ 2
+			(roomInfo.mapSize[0] + roomInfo.paddleSize) / 2
 	];
 
 	let userType: number;
@@ -144,7 +142,7 @@
 	
 	let puckMoving: any;
 
-	// $: console.log("My Paddle Position: ", pong.paddlePos[userIndex]);
+	$: console.log(paddlePos);
 
 	onMount(()=> {
 		userType = ($client.id == roomInfo.players[0]) ? UserType.Player1 
@@ -171,7 +169,7 @@
 
 		$client.addListener("LoadBall", (data: any) => {
 			console.log("LoadBall");
-			puck = new Puck(pong.gameMap.width, pong.gameMap.height, data.vectorX, data.vectorY);
+			puck = new Puck(roomInfo.mapSize[0], roomInfo.mapSize[1], data.vectorX, data.vectorY);
 		});
 
 		$client.addListener("PongStart", (data: any) => {
