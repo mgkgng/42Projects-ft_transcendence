@@ -152,7 +152,7 @@ class Puck {
 		let distToDeath = (this.vectorY > 0)
 			? (this.gameHeight - deadZoneHeight - paddleHeight) - this.posY
 			: this.posY - deadZoneHeight - paddleHeight; 
-		console.log("vector check: ", this.vectorY);
+		console.log("vector check: ", this.vectorX, this.vectorY);
 		console.log("puck pos check: ", this.posY);
 		console.log("distance check: ", distToDeath);
 
@@ -190,8 +190,22 @@ class Puck {
 					data: (this.vectorY > 0) ? 0 : 1
 				}));
 
+				if (room.scores[0] == room.maxpoint || room.scores[1] == room.maxpoint) {
+					room.broadcast(JSON.stringify({
+						event: "GameFinished",
+						data: (room.scores[0] > room.scores[1]) ? 0 : 1
+					}));
+
+					// TODO Save the game to the database
+
+					return ;
+				}
+
+				room.pong.puck = new Puck(room.pong.gameMap.width, room.pong.gameMap.height);
+				setTimeout(() => {
+					Room.startPong(room);
+				}, 1000);
 			}
-			// and if the paddle didn't hit the puck...
 		}, timeOut);
 	}
 
@@ -457,7 +471,9 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				roomInfo: {
 					players: [room.players[0].id, room.players[1].id],
 					maxpoint: room.maxpoint,
-					scores: room.scores
+					scores: room.scores,
+					mapSize: [room.pong.gameMap.width, room.pong.gameMap.height],
+					paddleSize: [room.pong.gameMap.paddleSize]
 				}
 			}
 		}));
@@ -466,7 +482,7 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage("PaddleMove")
 	paddleMove(@MessageBody() data: any) {
-		// console.log("PaddleMove", data);
+		console.log("PaddleMove", data);
 
 		let room = this.getRoom(data.room);
 

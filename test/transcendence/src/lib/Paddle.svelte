@@ -29,6 +29,8 @@
 	});
 
 	export let user: boolean;
+	export let userIndex: number;
+
 	export let gameWidth : number;
 	export let gameHeight : number;
 	export let paddleWidth : number;
@@ -44,7 +46,7 @@
 <div class="paddle {(user) ? "user" : ""}"
 	style="{(dark) ? "background-color: #fff" : "background-color: #000"};
 		top: {(!user) ? deadZoneHeight: gameHeight - deadZoneHeight}px;
-		left: {(user) ? pos : gameWidth - pos - paddleWidth}px;
+		left: {(user && !userIndex || !user && userIndex) ? pos - paddleWidth : pos}px;
 		width: {paddleWidth}px">
 </div>
 

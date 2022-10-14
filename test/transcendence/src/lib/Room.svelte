@@ -120,6 +120,8 @@
 	let puck: any = undefined;
 	let scores: Array<number> = [0, 0];
 
+	let paddlePos: Array<number> = [roomInfo.mapSize[0], roomInfo.mapSize[1]];
+
 	let userType: number;
 	let userIndex: number = UserType.Player1;
 	let opponentIndex: number = UserType.Player2;
@@ -146,9 +148,14 @@
 		console.log("My User Index: ", userIndex);
 
 		$client.addListener("PaddleUpdate", (data: any) => {
-			// console.log("PaddleUpdate");
-			pong.paddlePos[data.player] = (data.player == UserType.Player1) ? pong.gameMap.width - data.paddlePos
-				: data.paddlePos;
+			console.log("PaddleUpdate", data);
+			if ((data.player == UserType.Player1 && userIndex == UserType.Player2) ||
+				(data.player == UserType.Player2 && userIndex == UserType.Player2))
+				paddlePos[data.player] = data.paddlePos;
+			else
+				paddlePos[data.player] = roomInfo.mapSize[0] - data.paddlePos;
+
+			// data.paddlePos;
 		});
 
 		$client.addListener("LoadBall", (data: any) => {
@@ -182,6 +189,13 @@
 			puck = undefined;
 		});
 
+		$client.addListener("GameFinished", (data: any) => {
+			console.log("GameFinished");
+			console.log((userType == data) ? "You Win!"
+				: (userType != UserType.Watcher) ? "You Lose!" 
+				: ".");
+		})
+
 		return (() => {
 			$client.removeListeners(["PaddleUpdate",
 				"LoadBall",
@@ -194,25 +208,25 @@
 </script>
 
 <div class="container">
-	<div class="pong" style="width: {pong.gameMap.width}px; height: {pong.gameMap.height}px;">
-		<Paddle pos={pong.paddlePos[opponentIndex]} paddleWidth={pong.gameMap.paddleSize}
-			gameWidth={pong.gameMap.width} gameHeight={pong.gameMap.height}
+	<div class="pong" style="width: {roomInfo.mapSize[0]}px; height: {roomInfo.mapSize[1]}px;">
+		<Paddle pos={paddlePos[opponentIndex]} paddleWidth={roomInfo.paddleSize}
+			gameWidth={roomInfo.mapSize[0]} gameHeight={roomInfo.mapSize[1]}
 			user={false}/>
-		<div class="test" style="left: {pong.paddlePos[opponentIndex]}px; top: 50px;"></div>
+		<div class="test" style="left: {paddlePos[opponentIndex]}px; top: 50px;"></div>
 		{#if puck}
-		<PongPuck posX={puck.posX}
-			posY={(userIndex == UserType.Player1) ? pong.gameMap.height - puck.posY : puck.posY} />
+		<PongPuck posX={(userIndex == UserType.Player1) ? roomInfo.mapSize[0] - puck.posX : puck.posX}
+			posY={(userIndex == UserType.Player1) ? roomInfo.mapSize[1] - puck.posY : puck.posY} />
 		{/if}
-		<Paddle pos={pong.paddlePos[userIndex]} paddleWidth={pong.gameMap.paddleSize}
-			gameWidth={pong.gameMap.width} gameHeight={pong.gameMap.height}
-			user={true}/>
-		<div class="test" style="left: {pong.paddlePos[userIndex]}px; top: {pong.gameMap.height - 50}px;
+		<Paddle pos={paddlePos[userIndex]} paddleWidth={roomInfo.paddleSize}
+			gameWidth={roomInfo.mapSize[0]} gameHeight={roomInfo.mapSize[1]}
+			user={true} userIndex={userIndex}/>
+		<div class="test" style="left: {paddlePos[userIndex]}px; top: {roomInfo.mapSize[1] - 50}px;
 		"></div>
 
 		{#if deathPoint && puck}
 		<div class="deathPoint"
-			style="left: {(puck.vectorY < 0) ? deathPoint : pong.gameMap.width - deathPoint - 30}px;
-			top: {(puck.vectorY < 0 && userIndex || puck.vectorY > 0 && !userIndex) ? 50 : pong.gameMap.height - 50}px;"></div>
+			style="left: {(puck.vectorY < 0) ? deathPoint : roomInfo.mapSize[0] - deathPoint - 30}px;
+			top: {(puck.vectorY < 0 && userIndex || puck.vectorY > 0 && !userIndex) ? 50 : roomInfo.mapSize[1] - 50}px;"></div>
 		{/if}
 		<div class="central-line-vertical"></div>
 		<div class="central-line-horizontal"></div>	
@@ -250,8 +264,8 @@ on:keypress={(event) => {
 			client: $client.id,
 			player: userType,
 			room: roomId,
-			left: (userType == UserType.Player2 && event.code == 'KeyA'
-				|| userType == UserType.Player1 && event.code == 'KeyD')
+			left: (userType == UserType.Player1 && event.code == 'KeyD'
+				|| userType == UserType.Player2 && event.code == 'KeyA')
 		}
 	}));
 }}
