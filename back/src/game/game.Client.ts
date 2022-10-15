@@ -43,6 +43,4 @@ export class Client {
 		}
 		// this.queue.push(data);
 	}
-
-
 }

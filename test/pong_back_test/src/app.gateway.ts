@@ -165,13 +165,13 @@ class Puck {
 			// let paddlePos = (this.vectorY > 0) ? room.pong.paddlePos[1] : this.gameWidth - room.pong.paddlePos[0];
 			let paddlePos = (this.vectorY > 0) ? room.pong.paddlePos[1] : room.pong.paddlePos[0];
 
-			if (this.vectorY < 0) {
-				// || (this.vectorY > 0)) {
+			if ((this.vectorY < 0)
+				|| (this.vectorY > 0)) {
 				room.broadcast(JSON.stringify({
 					event: "PuckHit"
 				}));
 				// this.posX = deathPointX;
-				// this.posY = (this.vectorY > 0) ? (this.gameHeight - deadZoneHeight - paddleHeight) : deadZoneHeight + paddleHeight;
+				this.posY = (this.vectorY > 0) ? (this.gameHeight - deadZoneHeight - paddleHeight) : deadZoneHeight + paddleHeight;
 				this.vectorY *= -1;
 				this.setCheckPuck(room);
 				return ;
@@ -205,26 +205,26 @@ class Puck {
 		}, timeOut);
 	}
 
-	// calculPosX() {
-	// 	// TODO precision should be made, it should be because of the css stuff
-	// 	let distToDeath = (this.vectorY > 0)
-	// 		? (this.gameHeight - 30 - 12) - this.posY
-	// 		: this.posY - 30 - 12; 
-	// 	let deathPointX = this.posX;
-	// 	let vecX = this.vectorX;
+	calculPosX() {
+		// TODO precision should be made, it should be because of the css stuff
+		let distToDeath = (this.vectorY > 0)
+			? (this.gameHeight - 30 - 12) - this.posY
+			: this.posY - 30 - 12; 
+		let deathPointX = this.posX;
+		let vecX = this.vectorX;
 
-	// 	let inc = Math.abs(this.vectorY);
-	// 	for (let i = 0; i < distToDeath / 20; i++) {
-	// 		deathPointX += vecX;
-	// 		if (deathPointX < 0 || deathPointX > this.gameWidth - 30) {
-	// 			vecX *= -1;
-	// 			deathPointX += vecX;
-	// 		}
-	// 		// console.log(deathPointX);
-	// 	}
+		let inc = Math.abs(this.vectorY);
+		for (let i = 0; i < distToDeath / 20; i++) {
+			deathPointX += vecX;
+			if (deathPointX < 0 || deathPointX > this.gameWidth - 30) {
+				vecX *= -1;
+				deathPointX += vecX;
+			}
+			// console.log(deathPointX);
+		}
 
-	// 	return (deathPointX);
-	// }
+		return (deathPointX);
+	}
 }
 
 class GameMap {
@@ -289,7 +289,7 @@ class Room {
 	isPlaying: boolean;
 	
 	// constructor(clients, mapchoice: string, mode: string, maxpoint: number) {
-	constructor(clients: any, maxpoint: number = 3) {
+	constructor(clients: any, maxpoint: number = 25) {
 		this.id = uid();
 		//this.chat = new ChatRoomService();
 		this.clients = new Map();

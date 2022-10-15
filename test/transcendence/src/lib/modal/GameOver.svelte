@@ -16,6 +16,4 @@
 <p>Testing Modal...</p>
 <button on:click = {() => {
 	goto('/');
-}}>
-HOME	
-</button>
+}}>HOME</button>

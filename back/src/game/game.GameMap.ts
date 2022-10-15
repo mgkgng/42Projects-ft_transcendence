@@ -2,7 +2,6 @@ import {Block} from "./game.Block"
 import { MapHeight, MapWidth, PaddleSize } from "./game.utils";
 
 export class GameMap {
-
 	blocks : Array<Block>;
 	width: number;
 	height: number;

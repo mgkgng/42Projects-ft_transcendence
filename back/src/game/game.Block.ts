@@ -27,8 +27,5 @@ export class Block {
 		this.moveInfo = moveInfo;
 	}
 
-	move() {
-		
-	}
+	// move() {}
 }
-

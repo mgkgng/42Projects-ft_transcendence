@@ -13,7 +13,7 @@ export class Room {
 	isPlaying: boolean;
 	
 	// constructor(clients, mapchoice: string, mode: string, maxpoint: number) {
-	constructor(clients: any, maxpoint: number = 20) {
+	constructor(clients: any, maxpoint: number = 25) {
 		this.id = uid();
 		//this.chat = new ChatRoomService();
 		this.clients = new Map();
@@ -87,11 +87,9 @@ export class Room {
 		}, 2000);
 	}
 
-	putScore(winner, reason) {
+	putScore() {
 
 		// Broadcast result
-		this.broadcast({
-		});
 
 		// Store the game in db
 		//this.storeGame();

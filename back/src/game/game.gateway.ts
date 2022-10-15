@@ -39,8 +39,7 @@ export class GameGateway {
 	@WebSocketServer()
 	server: Server;
 
-	@UseGuards(AuthGuard('jwt'))
-	handleConnection(client: any) { //TODO handle connection here
+	async handleConnection(client: any) { //TODO handle connection here
 		console.log("New Connection on site.");
 		// let connection = new Client(client.sock);
 		// this.clients.set(connection.id, connection);
@@ -119,7 +118,7 @@ export class GameGateway {
 
 	@SubscribeMessage("PaddleMove")
 	paddleMove(@MessageBody() data: any) {
-		console.log("PaddleMove", data);
+		// console.log("PaddleMove", data);
 
 		let room = this.getRoom(data.room);
 

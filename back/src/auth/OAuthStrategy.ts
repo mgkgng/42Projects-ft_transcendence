@@ -24,6 +24,7 @@ export class OAuthStrategy extends PassportStrategy(Strategy, "oauth") {
 		{
 			const find = ({username: data.login, email: data.email, is_42_user: true, img: data.image_url});
 			console.log("Find :");
+			//TODO it's here to get userInfo
 			console.log(find);
 			return (find);
 		}

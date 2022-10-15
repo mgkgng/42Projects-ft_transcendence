@@ -37,8 +37,8 @@ export class MainServerService {
 	handleConnection(@Request() req)
 	{
 		console.log("Connect to main");
-		const user : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
-		const client_username = user.username;
+		const user : any = (this.jwtServer.decode(req.handshake?.headers?.authorization.split(' ')[1]));
+		const client_username = user?.username;
 	}
 
 	handleDisconnect(@Request() req)
