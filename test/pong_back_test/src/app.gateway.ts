@@ -118,9 +118,7 @@ class Block {
 		this.moveInfo = moveInfo;
 	}
 
-	move() {
-		
-	}
+	// move() {}
 }
 
 class Puck {
@@ -149,22 +147,17 @@ class Puck {
 		let paddleHeight = 12;
 		let ballSize = 30;
 
-
-		console.log("SETCHECKPUCK");
 		let distToDeath = (this.vectorY > 0)
 			? (this.gameHeight - deadZoneHeight - paddleHeight) - this.posY
-			: this.posY - deadZoneHeight - paddleHeight; 
+			: this.posY - deadZoneHeight - paddleHeight; // it functions well
 
 		let timeOut = Math.abs((distToDeath / this.vectorY)) * frameDuration;
+		// let deathPointX = this.calculPosX();
 
-		console.log("puck pos: ", this.posX, this.posY);
-		let deathPointX = this.calculPosX();
-		console.log("DeathPoint: ", deathPointX);
-
-		room.broadcast(JSON.stringify({
-			event: "DeathPointUpdate",
-			data: deathPointX
-		}));
+		// room.broadcast(JSON.stringify({
+		// 	event: "DeathPointUpdate",
+		// 	data: deathPointX
+		// }));
 
 		setTimeout(() => {
 			
@@ -172,26 +165,27 @@ class Puck {
 			// let paddlePos = (this.vectorY > 0) ? room.pong.paddlePos[1] : this.gameWidth - room.pong.paddlePos[0];
 			let paddlePos = (this.vectorY > 0) ? room.pong.paddlePos[1] : room.pong.paddlePos[0];
 
-			if ((this.vectorY < 0)
-				|| (this.vectorY > 0)) {
+			if (this.vectorY < 0) {
+				// || (this.vectorY > 0)) {
 				room.broadcast(JSON.stringify({
 					event: "PuckHit"
 				}));
-				this.posX = deathPointX;
-				this.posY = (this.vectorY > 0) ? (this.gameHeight - deadZoneHeight - paddleHeight) : deadZoneHeight + paddleHeight;
+				// this.posX = deathPointX;
+				// this.posY = (this.vectorY > 0) ? (this.gameHeight - deadZoneHeight - paddleHeight) : deadZoneHeight + paddleHeight;
 				this.vectorY *= -1;
 				this.setCheckPuck(room);
 				return ;
 			} else {
-				console.log("death point was: ", deathPointX);
-				console.log("checking paddlePos: ", paddlePos);
-
 				console.log("ScoreUpdate");
+	
+				let winner = (this.vectorY > 0) ? 0 : 1;
 				room.broadcast(JSON.stringify({
 					event: "ScoreUpdate",
 					data: (this.vectorY > 0) ? 0 : 1
 				}));
+				room.scores[winner]++;
 
+				console.log("Actual score: ", room.scores[0], ":", room.scores[1]);
 				if (room.scores[0] == room.maxpoint || room.scores[1] == room.maxpoint) {
 					room.broadcast(JSON.stringify({
 						event: "GameFinished",
@@ -199,7 +193,7 @@ class Puck {
 					}));
 
 					// TODO Save the game to the database
-
+					room.putScore();
 					return ;
 				}
 
@@ -211,30 +205,29 @@ class Puck {
 		}, timeOut);
 	}
 
-	calculPosX() {
-		// TODO precision should be made, it should be because of the css stuff
-		let distToDeath = (this.vectorY > 0)
-			? (this.gameHeight - 30 - 12) - this.posY
-			: this.posY - 30 - 12; 
-		let deathPointX = this.posX;
-		let vecX = this.vectorX;
+	// calculPosX() {
+	// 	// TODO precision should be made, it should be because of the css stuff
+	// 	let distToDeath = (this.vectorY > 0)
+	// 		? (this.gameHeight - 30 - 12) - this.posY
+	// 		: this.posY - 30 - 12; 
+	// 	let deathPointX = this.posX;
+	// 	let vecX = this.vectorX;
 
-		let inc = Math.abs(this.vectorY);
-		for (let i = 0; i < distToDeath / 20; i++) {
-			deathPointX += vecX;
-			if (deathPointX < 0 || deathPointX > this.gameWidth - 30) {
-				vecX *= -1;
-				deathPointX += vecX;
-			}
-			// console.log(deathPointX);
-		}
+	// 	let inc = Math.abs(this.vectorY);
+	// 	for (let i = 0; i < distToDeath / 20; i++) {
+	// 		deathPointX += vecX;
+	// 		if (deathPointX < 0 || deathPointX > this.gameWidth - 30) {
+	// 			vecX *= -1;
+	// 			deathPointX += vecX;
+	// 		}
+	// 		// console.log(deathPointX);
+	// 	}
 
-		return (deathPointX);
-	}
+	// 	return (deathPointX);
+	// }
 }
 
 class GameMap {
-
 	blocks : Array<Block>;
 	width: number;
 	height: number;
@@ -296,7 +289,7 @@ class Room {
 	isPlaying: boolean;
 	
 	// constructor(clients, mapchoice: string, mode: string, maxpoint: number) {
-	constructor(clients: any, maxpoint: number = 20) {
+	constructor(clients: any, maxpoint: number = 3) {
 		this.id = uid();
 		//this.chat = new ChatRoomService();
 		this.clients = new Map();
@@ -370,11 +363,9 @@ class Room {
 		}, 2000);
 	}
 
-	putScore(winner, reason) {
+	putScore() {
 
 		// Broadcast result
-		this.broadcast({
-		});
 
 		// Store the game in db
 		//this.storeGame();
