@@ -5,5 +5,5 @@ RUN npm ci
 COPY . .
 RUN npm run build
 ENV PORT 3002
-EXPOSE 3002
-CMD ["node", "build"]
+EXPOSE 3002 
+CMD ["npm", "run", "dev"]

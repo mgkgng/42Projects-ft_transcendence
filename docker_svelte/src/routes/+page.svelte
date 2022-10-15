@@ -1,12 +1,11 @@
 <style lang="scss">
-	main {
-		padding: 0;
+	.container {
+		max-height: 100%;
+		background-color: rgba(0, 0, 0, 0);
 		display: grid;
-		height: 100vh;
 		grid-template-rows: 90vh 10vh;
 		gap: 0;
 		padding: 0;
-		background-color: var(--col);
 	}
 
 	@keyframes size-change {
@@ -14,40 +13,35 @@
 		50% { transform: scale(1.3) }
 		100% { transform: scale(1) }
 	}
-
-	.color-change-circle {
-		position: absolute;
-		bottom: -40px;
-		left: -40px;
-		width: 80px;
-		aspect-ratio: 1 / 1;
-		border-radius: 50%;
-		// box-shadow: 0px 0px 50px 10px #000;
-		cursor: pointer;
-
-		animation-name: size-change;
-		animation-duration: 3.5s;
-		animation-iteration-count: infinite;
-		animation-timing-function: linear;
-
-		overflow: hidden; // doesn't work yet
-	}
 </style>
 
 <script lang="ts">
 	import Title from "$lib/Title.svelte";
 	import Navbar from "$lib/Navbar.svelte";
+	import DarkMode from "$lib/DarkMode.svelte";
 
-	let darkMode = false;
+	import { client } from "$lib/stores/client";
+    import { onMount } from "svelte";
+    import { goto } from "$app/navigation";
+
+	onMount(() => {
+		console.log("I'm on the main page.");
+		
+		$client.addListener("MatchFound", (data: any) => {
+			console.log("MatchFound", data);
+			goto(`/play/${data}`);
+		});
+
+		return (() => {
+			$client.removeListener("MatchFound");
+		})
+
+	});
 </script>
 
-<main style="{(darkMode) ? "background-color: #000" : "background-color: #fff"}">
-	<div class="color-change-circle" on:click={() => {
-		darkMode = !darkMode;
-	}}
-	style="{(darkMode) ? "background-color: rgba(255, 255, 255, .9)" : "background-color: rgba(0, 0, 0, .9)"}"></div>
-
-	<Title />
-	<Navbar bind:darkMode={darkMode} />
-</main>
+<div class="container">
+	<DarkMode/>
+	<Title title={"transcendence"} mainPage={true} />
+	<Navbar />
+</div>
 

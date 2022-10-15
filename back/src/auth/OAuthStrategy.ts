@@ -14,6 +14,7 @@ export class OAuthStrategy extends PassportStrategy(Strategy, "oauth") {
   }
 
   async validate(@MessageBody() username: string, @MessageBody() code : string): Promise<any> {
+	console.log("TEST", username, code);
 	const res = await this.authService.validateUser42(code);
 	console.log("Get token : ", code);
 	if (res)

@@ -1,5 +1,4 @@
 <style lang="scss">
-
 	.container {
 		display: flex;
 		align-items: center;
@@ -64,17 +63,22 @@
 </style>
 
 <script lang="ts">
-	import { io } from 'socket.io-client';
 	import { onMount } from "svelte";
 	import RoundButton from "./RoundButton.svelte";
 	import '$lib/scss/app.scss';
     import MainCircle from './MainCircle.svelte';
 
-	const socket = io();
+	type Circle = {
+		size: number;
+		duration: number;
+		angle: number;
+	};
 
 	export let darkMode = false;
+	export let title: string;
+	export let mainPage: boolean;
 
-	let circlesAround = [];
+	let circlesAround: Array<Circle> = [];
 	let circleRadius = 250;
 
 	let showMessage = false;
@@ -83,11 +87,6 @@
 	function createCircles() {
 		let res = [];
 		let circleNb = Math.floor(Math.random() * 10 + 15);
-		type Circle = {
-				size: number;
-				duration: number;
-				angle: number;
-		};
 		
 		for (let i = 0; i < circleNb; i++) {
 			let circle: Circle = {
@@ -103,20 +102,19 @@
 	onMount(() => {
 		circlesAround = createCircles();
 
-		socket.on('eventFromServer', (msg) => {
-			console.log(msg);
-		})
+
 	});
 
 </script>
 
 <div class="container">
 	<MainCircle circleRadius={circleRadius}/>
-
 	{#each circlesAround as circleInfo}
-	<div class="circle-around" style="--dist: {circleRadius + 45}px; --startY: {circleInfo.y}px; --size: {circleInfo.size}px; --duration: {circleInfo.duration}s; --angle: {circleInfo.angle}deg; --angle2: {circleInfo.angle + 360}deg"></div>
+	<div class="circle-around" style="--dist: {circleRadius + 45}px; --size: {circleInfo.size}px; --duration: {circleInfo.duration}s; --angle: {circleInfo.angle}deg; --angle2: {circleInfo.angle + 360}deg"></div>
 	{/each}
+	{#if mainPage}
 	<RoundButton bind:showMessage={showMessage} bind:message={message} circleRadius={circleRadius}/>
-	<h1 class="title">transcendence</h1>
+	{/if}
+	<h1 class="title">{title}</h1>
 	<div class="msg">{message}</div>
-</div>	
+</div>

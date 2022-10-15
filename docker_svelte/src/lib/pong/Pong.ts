@@ -7,11 +7,19 @@
 
 /* puck { vectorVelocity, } */
 
+import { Puck } from "./Puck";
+import { GameMap } from "./GameMap";
+
 export class Pong {
-	vectorVelocity: number;
+	gameMap: GameMap;
+	puck: Puck;
+	paddlePos: Array<number>;
 
 	constructor() {
-		this.vectorVelocity = 0;
-		
+		this.gameMap = new GameMap();
+		this.puck = new Puck(this.gameMap.width, this.gameMap.height);
+
+		let initPos = (this.gameMap.width - this.gameMap.paddleSize) / 2;
+		this.paddlePos = [initPos, initPos];
 	}
 }
