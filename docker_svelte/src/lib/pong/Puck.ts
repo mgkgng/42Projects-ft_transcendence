@@ -1,4 +1,4 @@
-export class Ball {
+export class Puck {
 	posX: number;
 	posY: number;
 	vectorX: number;
@@ -6,7 +6,7 @@ export class Ball {
 	gameWidth: number;
 	gameHeight: number;
 
-	constructor(vectorX : number, vectorY : number, gameWidth : number, gameHeight : number) {
+	constructor(gameWidth : number, gameHeight : number, vectorX : number = 0, vectorY : number = 1) { // temporary test
 		this.vectorX = vectorX;
 		this.vectorY = vectorY;
 		this.gameWidth = gameWidth;
@@ -17,6 +17,9 @@ export class Ball {
 
 	// this is the callBack function 
 	move() {
+		if (this.posX < 0 || this.posX > this.gameWidth - 30) //puck size counted
+		this.vectorX *= -1;
+
 		this.posX += this.vectorX;
 		this.posY += this.vectorY;
 

@@ -1,31 +1,12 @@
-import type { Block } from "./Block";
-// import { Block } from "./Block";
-
-export const PaddleSize = {
-	XSmall: 20,
-	Small : 40,
-	Medium : 80,
-	Large : 130
-}
-
-export const MapWidth = {
-	Small: 400,
-	Medium: 700,
-	Large: 1000
-}
-
-export const MapHeight = {
-	Small: 400,
-	Medium: 800,
-	Large: 1000
-}
+import {Block} from "./game.Block"
+import { MapHeight, MapWidth, PaddleSize } from "./game.utils";
 
 export class GameMap {
 
 	blocks : Array<Block>;
 	width: number;
 	height: number;
-	paddleSize: number;
+	paddleSize: number; // TODO put it into class Pong
 
 	constructor(mapWidth: number = MapWidth.Medium,
 		mapHeight: number = MapHeight.Medium,

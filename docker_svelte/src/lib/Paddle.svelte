@@ -1,17 +1,35 @@
 <style lang="scss">
 	.paddle {
-		width: 80px;
+		position: absolute;
+		margin: 0;
 		height: 12px;
-		background-color: transparentize($main, 0.5);
+
 		border-radius: 2em;
 
-		position: relative;
-		left: var(--pos);
+		z-index: 2;
+
+		box-shadow: 0px 0px 20px 8px $yellow;
 	}
+
+	.user {
+		margin: 0;
+		box-shadow: 0px 0px 20px 8px $red;
+	}
+
+
 </style>
 
 <script lang="ts">
-	import { io } from "socket.io-client";
+	import { darkMode } from "$lib/stores/var";
+
+	let dark : boolean;
+
+	darkMode.subscribe(value => {
+		dark = value;
+	});
+
+	export let user: boolean;
+	export let userIndex: number;
 
 	export let gameWidth : number;
 	export let gameHeight : number;
@@ -19,8 +37,16 @@
 
 	export let pos : number;
 
+	let deadZoneHeight = 50;
+
+	$: console.log(paddleWidth);
 
 </script>
 
-<div class="paddle" style="--pos: {pos}px; --paddleWidth = {paddleWidth}px"></div>
+<div class="paddle {(user) ? "user" : ""}"
+	style="{(dark) ? "background-color: #fff" : "background-color: #000"};
+		top: {(!user) ? deadZoneHeight: gameHeight - deadZoneHeight}px;
+		left: {((user && !userIndex) || (!userIndex && !user)) ? pos - paddleWidth : pos}px;
+		width: {paddleWidth}px">
+</div>
 

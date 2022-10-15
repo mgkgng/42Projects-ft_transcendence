@@ -21,6 +21,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { ChatDirectMessageModule } from './chatDirectMessage/chatDirectMessage.module';
 import { ChatRoomService } from './chatRoom/chatRoom.gatway';
 import { ChatRoomModule } from './chatRoom/chatRoom.module';
+import { GameModule } from './game/game.module';
 
 @Module({
   imports: [
@@ -34,7 +35,7 @@ import { ChatRoomModule } from './chatRoom/chatRoom.module';
       synchronize: true,
       autoLoadEntities: true,
     }),
-   MainServerModule, ChatRoomModule , UserModule, AuthModule, HttpModule, JwtModule, ChatDirectMessageModule, ScheduleModule.forRoot()],
+   MainServerModule, ChatRoomModule , UserModule, AuthModule, HttpModule, JwtModule, ChatDirectMessageModule, GameModule, ScheduleModule.forRoot()],
   controllers: [AppController],
   providers: [AppService, AuthService],
 })
