@@ -6,11 +6,11 @@
 		color: #fff;
 		font-size: 128px;
 
-		border: 5px dashed #fff;
+		border: 2px dashed #fff;
+		border-left: 0;
 
 		max-width: 150px;
-		height: 5em;
-
+		
 		align-items: center;
 		justify-content: center;
 	}

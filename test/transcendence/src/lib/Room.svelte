@@ -12,7 +12,8 @@
 		position: relative;
 
 		padding: 0;
-		border: dashed 5px white;
+		border: dashed 3px white;
+		border-radius: 2.5em;
 
 		// display: flex;
 		// justify-content: center;
@@ -41,17 +42,17 @@
 		align-items: center;
 	}
 
-	.central-line-horizontal {
+	.central-line-vertical {
 		position: absolute;
 		left: 50%;
-		height: 800px;
+		height: 100%;
 		border: dashed 3px aqua;
 	}
 
-	.central-line-vertical {
+	.central-line-horizontal {
 		position: absolute;
 		top: 50%;
-		width: 700px;
+		width: 100%;
 		height: 0;
 		border: dashed 3px aqua;
 	}
@@ -86,6 +87,8 @@
 
 		justify-content: center;
 		height: 100%;
+
+		gap: 1em;
 	}
 
 	.deathPoint {
@@ -115,6 +118,8 @@
     import PongPuck from './PongPuck.svelte';
     import ScoreBox from './ScoreBox.svelte';
     import { GameMap } from './pong/GameMap';
+    import Modal from './tools/Modal.svelte';
+    import GameOver from './modal/GameOver.svelte';
 
 	export let roomInfo: any;
 	export let roomId: string;
@@ -140,6 +145,8 @@
 	let moving = false;
 	
 	let puckMoving: any;
+	
+	let gameFinishedModal: any;
 
 	$: console.log(paddlePos);
 
@@ -207,7 +214,8 @@
 			console.log((userType == data) ? "You Win!"
 				: (userType != UserType.Watcher) ? "You Lose!" 
 				: ".");
-		})
+			gameFinishedModal.open();
+		});
 
 		return (() => {
 			$client.removeListeners(["PaddleUpdate",
@@ -221,11 +229,11 @@
 </script>
 
 <div class="container">
-	<div class="pong" style="width: {roomInfo.mapSize[0]}px; height: {roomInfo.mapSize[1]}px;">
+	<div class="pong" style="min-width: {roomInfo.mapSize[0]}px; min-height: {roomInfo.mapSize[1]}px;">
 		<Paddle pos={paddlePos[opponentIndex]} paddleWidth={roomInfo.paddleSize}
 			gameWidth={roomInfo.mapSize[0]} gameHeight={roomInfo.mapSize[1]}
 			user={false} userIndex={userIndex}/>
-		<div class="test" style="left: {paddlePos[opponentIndex]}px; top: 50px;"></div>
+		<!-- <div class="test" style="left: {paddlePos[opponentIndex]}px; top: 50px;"></div> -->
 		{#if puck}
 		<PongPuck posX={(userIndex == UserType.Player1) ? roomInfo.mapSize[0] - puck.posX : puck.posX}
 			posY={(userIndex == UserType.Player1) ? roomInfo.mapSize[1] - puck.posY : puck.posY} />
@@ -233,22 +241,26 @@
 		<Paddle pos={paddlePos[userIndex]} paddleWidth={roomInfo.paddleSize}
 			gameWidth={roomInfo.mapSize[0]} gameHeight={roomInfo.mapSize[1]}
 			user={true} userIndex={userIndex}/>
-		<div class="test" style="left: {paddlePos[userIndex]}px; top: {roomInfo.mapSize[1] - 50}px;
-		"></div>
-
+		<!-- <div class="test" style="left: {paddlePos[userIndex]}px; top: {roomInfo.mapSize[1] - 50}px;
+		"></div> -->
+<!-- 
 		{#if deathPoint && puck}
 		<div class="deathPoint"
 			style="left: {deathPoint}px;
 			top: {(puck.vectorY < 0 && userIndex || puck.vectorY > 0 && !userIndex) ? 50 : roomInfo.mapSize[1] - 50}px;"></div>
-		{/if}
-		<div class="central-line-vertical"></div>
-		<div class="central-line-horizontal"></div>	
+		{/if} -->
+		<!-- <div class="central-line-vertical"></div>
+		<div class="central-line-horizontal"></div>	 -->
 	</div>
 	<div class="pong-score">
 		<ScoreBox score={scores[opponentIndex]}/>
 		<ScoreBox score={scores[userIndex]}/>
 	</div>
 </div>
+
+<Modal bind:this={gameFinishedModal} closeOnBgClick={false}>
+	<GameOver />
+</Modal>
 
 <svelte:window
 on:mouseup={()=>{

@@ -101,8 +101,6 @@
 
 	onMount(() => {
 		circlesAround = createCircles();
-
-
 	});
 
 </script>

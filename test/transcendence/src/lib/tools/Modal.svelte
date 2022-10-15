@@ -29,7 +29,7 @@
 		overflow: auto;
 		/*padding: 2rem;*/
 		gap: 2rem;
-		background: transparentize($card, .05);
+		background: transparentize(#fff, .05);
 	}
 	.backdrop {
 		position: fixed;
