@@ -49,7 +49,6 @@
 
 <script lang="ts">
 	import { onMount } from "svelte";
-	import { goto } from "$app/navigation";
 	import '$lib/scss/app.scss';
 	import { client } from "./stores/client";
 
