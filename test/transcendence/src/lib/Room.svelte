@@ -125,14 +125,13 @@
 	let puck: any = undefined;
 	let scores: Array<number> = [0, 0];
 
-	let paddlePos: Array<number> = [
-			(roomInfo.mapSize[0] + roomInfo.paddleSize) / 2, 
-			(roomInfo.mapSize[0] + roomInfo.paddleSize) / 2
-	];
-
 	let userType: number;
 	let userIndex: number = UserType.Player1;
 	let opponentIndex: number = UserType.Player2;
+
+	let initPos = (roomInfo.mapSize[0] + roomInfo.paddleSize) / 2;
+	let paddlePos: Array<number> = [initPos, initPos];
+
 
 	let grapped = false;
 
@@ -148,10 +147,15 @@
 		userType = ($client.id == roomInfo.players[0]) ? UserType.Player1 
 			: ($client.id == roomInfo.players[1]) ? UserType.Player2 
 			: UserType.Watcher;
-		if (userType == UserType.Player2)
+		if (userType == UserType.Player2) {
 			[userIndex, opponentIndex] = [opponentIndex, userIndex];
+			// TODO (this is kinda brut force)
+			paddlePos[0] -= roomInfo.paddleSize, paddlePos[1] -= roomInfo.paddleSize;
+		}
 
 		scores = roomInfo.scores;
+		
+
 		console.log(paddlePos);
 
 		console.log("My User Index: ", userIndex);
@@ -211,7 +215,7 @@
 				"ScoreUpdate",
 				"PuckHit",
 				"PongStart"]);
-		})
+		});
 	});
 
 </script>
@@ -234,17 +238,16 @@
 
 		{#if deathPoint && puck}
 		<div class="deathPoint"
-			style="left: {(puck.vectorY < 0) ? deathPoint : roomInfo.mapSize[0] - deathPoint - 30}px;
+			style="left: {deathPoint}px;
 			top: {(puck.vectorY < 0 && userIndex || puck.vectorY > 0 && !userIndex) ? 50 : roomInfo.mapSize[1] - 50}px;"></div>
 		{/if}
 		<div class="central-line-vertical"></div>
 		<div class="central-line-horizontal"></div>	
 	</div>
-	<!-- <div class="central-line"></div> -->
-	<!-- <div class="pong-score">
+	<div class="pong-score">
 		<ScoreBox score={scores[opponentIndex]}/>
 		<ScoreBox score={scores[userIndex]}/>
-	</div> -->
+	</div>
 </div>
 
 <svelte:window

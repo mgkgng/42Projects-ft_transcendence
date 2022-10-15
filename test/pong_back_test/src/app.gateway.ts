@@ -145,22 +145,21 @@ class Puck {
 	setCheckPuck(room: any) {
 		// calculating the interval
 		let frameDuration = 20;
-		let deadZoneHeight = 50;
+		let deadZoneHeight = 30;
 		let paddleHeight = 12;
 		let ballSize = 30;
 
+
+		console.log("SETCHECKPUCK");
 		let distToDeath = (this.vectorY > 0)
 			? (this.gameHeight - deadZoneHeight - paddleHeight) - this.posY
 			: this.posY - deadZoneHeight - paddleHeight; 
-		// console.log("vector check: ", this.vectorX, this.vectorY);
-		// console.log("puck pos check: ", this.posY);
-		// console.log("distance check: ", distToDeath);
 
 		let timeOut = Math.abs((distToDeath / this.vectorY)) * frameDuration;
-		// console.log("checking the timeOut: ", timeOut);
 
-		let deathPointX = this.calculPosX(distToDeath, frameDuration);
-		console.log("checking deathPoint: ", deathPointX);
+		console.log("puck pos: ", this.posX, this.posY);
+		let deathPointX = this.calculPosX();
+		console.log("DeathPoint: ", deathPointX);
 
 		room.broadcast(JSON.stringify({
 			event: "DeathPointUpdate",
@@ -170,12 +169,11 @@ class Puck {
 		setTimeout(() => {
 			
 			// checking if the paddle hits the puck...
-			let paddlePos = (this.vectorY > 0) ? room.pong.paddlePos[1] : this.gameWidth - room.pong.paddlePos[0];
-			console.log((this.vectorY > 0) ? "This is Player2's turn." : "This is Player1's turn");
-			console.log("checking paddlePos: ", paddlePos);
-			if ((this.vectorY > 0 && deathPointX > paddlePos && deathPointX < paddlePos + room.pong.gameMap.paddleSize)
-			|| (this.vectorY < 0 && deathPointX < paddlePos && deathPointX > paddlePos - room.pong.gameMap.paddleSize)) {
-				console.log("PuckHit");
+			// let paddlePos = (this.vectorY > 0) ? room.pong.paddlePos[1] : this.gameWidth - room.pong.paddlePos[0];
+			let paddlePos = (this.vectorY > 0) ? room.pong.paddlePos[1] : room.pong.paddlePos[0];
+
+			if ((this.vectorY < 0)
+				|| (this.vectorY > 0)) {
 				room.broadcast(JSON.stringify({
 					event: "PuckHit"
 				}));
@@ -185,6 +183,9 @@ class Puck {
 				this.setCheckPuck(room);
 				return ;
 			} else {
+				console.log("death point was: ", deathPointX);
+				console.log("checking paddlePos: ", paddlePos);
+
 				console.log("ScoreUpdate");
 				room.broadcast(JSON.stringify({
 					event: "ScoreUpdate",
@@ -210,25 +211,25 @@ class Puck {
 		}, timeOut);
 	}
 
-	calculPosX(distToDeath: number, frameDuration: number) {
-		let frameOut = distToDeath / this.vectorY;
+	calculPosX() {
 		// TODO precision should be made, it should be because of the css stuff
-		if (frameOut < 0)
-			frameOut = -frameOut + 1;
+		let distToDeath = (this.vectorY > 0)
+			? (this.gameHeight - 30 - 12) - this.posY
+			: this.posY - 30 - 12; 
 		let deathPointX = this.posX;
 		let vecX = this.vectorX;
 
-		console.log("frameout test: ", frameOut);
-
-		for (let i = 0; i < frameOut; i++) {
-			if (deathPointX < 0 || deathPointX > this.gameWidth - 30)
-				vecX *= -1;
+		let inc = Math.abs(this.vectorY);
+		for (let i = 0; i < distToDeath / 20; i++) {
 			deathPointX += vecX;
+			if (deathPointX < 0 || deathPointX > this.gameWidth - 30) {
+				vecX *= -1;
+				deathPointX += vecX;
+			}
+			// console.log(deathPointX);
 		}
 
-		// return(deathPointX);
-
-		return ((this.vectorY < 0) ? this.gameWidth - deathPointX : deathPointX);
+		return (deathPointX);
 	}
 }
 
@@ -483,7 +484,7 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage("PaddleMove")
 	paddleMove(@MessageBody() data: any) {
-		console.log("PaddleMove", data);
+		// console.log("PaddleMove", data);
 
 		let room = this.getRoom(data.room);
 
