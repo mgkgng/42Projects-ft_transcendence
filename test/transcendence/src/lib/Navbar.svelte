@@ -49,11 +49,11 @@
 
 <div class="nav-bar">
 	<div class="menus" style="--col: {col}">
-		<div class="menu">Menu1</div>
-		<div class="menu">Menu2</div>
+		<div class="menu">About</div>
+		<div class="menu">Join</div>
 		<div class="menu">About</div>
 		<div class="menu">Menu3</div>
 		<div class="menu">Menu4</div>
 	</div>
-	<!-- <LightBar /> -->
+	<LightBar />
 </div>

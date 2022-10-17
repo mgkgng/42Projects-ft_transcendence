@@ -1,13 +1,26 @@
 <style lang="scss">
 	.light-bar {
 		position: relative;
-		left: var(--posX);
+		left: 500px;
 		width: 150px;
-		height: 10px;
+		height: 0px;
 		border-radius: 5rem;
-		background-color: rgba(255, 255, 255, 0.5);
-		box-shadow: 0px -40px 80px 40px transparentize($main, 0.4);
+		border: none;
+		background-color: #fff;
+		box-shadow: 0px 0 10px 40px transparentize($main2, 0.4);
 		translate: .5s;
+	}
+
+	.test {
+		position: relative;
+		left: 520px;
+		background-color: transparentize($main, .5);
+		width: 100px;
+		height: 20px;
+		border-radius: 5rem;
+		box-shadow: 0px 0 10px 20px transparentize($main, 0.4);
+
+		border: none;
 	}
 </style>
 
@@ -16,6 +29,7 @@
 </script>
 
 <div class="light-bar" style="--posX: {posX}px"></div>
+<!-- <div class="test"></div> -->
 
 <svelte:window on:mousemove={ (e)=> {
 	if (e.screenY < 800)

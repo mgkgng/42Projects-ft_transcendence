@@ -1,6 +1,8 @@
 <style lang="scss">
 	.main-circle {
-		position: relative;
+		position: absolute;
+		z-index: 88;
+		left: 20%;
 		width: var(--width);
 		background-color: #000;
 		aspect-ratio: 1 / 1;
@@ -19,8 +21,10 @@
 
 	.shadow {
 		position: absolute;
+
+		left: 35%;
 		width: var(--width);
-		background-color: rgba(0, 0, 0,0 );
+		background-color: rgb(49, 211, 240);
 		aspect-ratio: 1 / 1;
 		border-radius: 50%;
 
@@ -32,6 +36,7 @@
 		// box-shadow: 0px 0px 550px 50px $main;
 		// box-shadow: 0px 0px 750px 100px $main;
 		box-shadow: 5px -5px 5px 5px rgb(49, 211, 240); //maybe?
+		box-shadow: 0px 0px 750px 100px $main;
 	}
 </style>
 

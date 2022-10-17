@@ -45,9 +45,9 @@ export class Puck {
 			// checking if the paddle hits the puck...
 			// let paddlePos = (this.vectorY > 0) ? room.pong.paddlePos[1] : this.gameWidth - room.pong.paddlePos[0];
 			let paddlePos = (this.vectorY > 0) ? room.pong.paddlePos[1] : room.pong.paddlePos[0];
-			if (deathPointX > paddlePos && deathPointX < paddlePos + room.pong.gameMap.paddleSize) {
+			// if (deathPointX > paddlePos && deathPointX < paddlePos + room.pong.gameMap.paddleSize) {
 			// line below is to make the puck bounce permantly
-			// if (this.vectorY) {
+			if (this.vectorY) {
 				console.log("Puck Hit.");
 				
 				room.broadcast(JSON.stringify({
