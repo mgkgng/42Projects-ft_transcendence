@@ -29,9 +29,11 @@ export class Puck {
 		let distToDeath = (this.vectorY > 0)
 			? (this.gameHeight - deadZoneHeight - paddleHeight) - this.posY
 			: this.posY - deadZoneHeight - paddleHeight; // it functions well
+		
+		let frameNb = Math.floor(Math.abs((distToDeath / this.vectorY)));
 
-		let timeOut = Math.abs((distToDeath / this.vectorY)) * frameDuration;
-		// let deathPointX = this.calculPosX();
+		let timeOut = frameNb * frameDuration;
+		let deathPointX = this.calculPosX(frameNb);
 
 		// room.broadcast(JSON.stringify({
 		// 	event: "DeathPointUpdate",
@@ -43,14 +45,14 @@ export class Puck {
 			// checking if the paddle hits the puck...
 			// let paddlePos = (this.vectorY > 0) ? room.pong.paddlePos[1] : this.gameWidth - room.pong.paddlePos[0];
 			let paddlePos = (this.vectorY > 0) ? room.pong.paddlePos[1] : room.pong.paddlePos[0];
-
-			if (this.vectorY < 0) {
-				// || (this.vectorY > 0)) {
+			if (this.vectorY > 0 || deathPointX > paddlePos && deathPointX < paddlePos + room.pong.gameMap.paddleSize) {
+				console.log("Puck Hit.");
+				
 				room.broadcast(JSON.stringify({
 					event: "PuckHit"
 				}));
-				// this.posX = deathPointX;
-				// this.posY = (this.vectorY > 0) ? (this.gameHeight - deadZoneHeight - paddleHeight) : deadZoneHeight + paddleHeight;
+				this.posX = deathPointX;
+				this.posY = (this.vectorY > 0) ? (this.gameHeight - deadZoneHeight - paddleHeight) : deadZoneHeight + paddleHeight;
 				this.vectorY *= -1;
 				this.setCheckPuck(room);
 				return ;
@@ -84,24 +86,17 @@ export class Puck {
 		}, timeOut);
 	}
 
-	// calculPosX() {
-	// 	// TODO precision should be made, it should be because of the css stuff
-	// 	let distToDeath = (this.vectorY > 0)
-	// 		? (this.gameHeight - 30 - 12) - this.posY
-	// 		: this.posY - 30 - 12; 
-	// 	let deathPointX = this.posX;
-	// 	let vecX = this.vectorX;
+	calculPosX(frameNb: number) {
+		// TODO precision should be made, it should be because of the css stuff
+		let deathPointX = this.posX;
 
-	// 	let inc = Math.abs(this.vectorY);
-	// 	for (let i = 0; i < distToDeath / 20; i++) {
-	// 		deathPointX += vecX;
-	// 		if (deathPointX < 0 || deathPointX > this.gameWidth - 30) {
-	// 			vecX *= -1;
-	// 			deathPointX += vecX;
-	// 		}
-	// 		// console.log(deathPointX);
-	// 	}
-
-	// 	return (deathPointX);
-	// }
+		for (let i = 0; i < frameNb; i++) {
+			deathPointX += this.vectorX;
+			if (deathPointX < 0 || deathPointX > this.gameWidth - 30) {
+				this.vectorX *= -1;
+				deathPointX += this.vectorX;
+			}
+		}
+		return (deathPointX);
+	}
 }

@@ -1,7 +1,7 @@
 import { writable } from "svelte/store";
 import { browser } from "$app/environment";
 import { uid } from "./lib";
-import io from 'socket.io-client';
+// import io from 'socket.io-client';
 
 class Client {
 	id: string;
@@ -14,8 +14,7 @@ class Client {
 		this.listeners = new Map();
 		this.callbacksOnConnection = new Set();
 		if (browser) {
-			// this.sock = new WebSocket(`ws://${location.hostname}:3000`);
-			this.sock = io(`ws://${location.hostname}:3000`);
+			this.sock = new WebSocket(`ws://${location.hostname}:3000`);
 			console.log(this.sock);
 			this.sock.onmessage = (msg: any) => {
 				console.log("receving something", msg);
