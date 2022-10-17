@@ -134,6 +134,21 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		this.control.delete(data);
 	}
 
+	@SubscribeMessage("AskRooms")
+	askRooms(@MessageBody() data: any) {
+		let client = this.getClient(data);
+	
+		// I need to think more about how i should save the data and how i'll send it
+		// there should be at least these information:
+		// playersInfo, availability / format (max point, map, mode...)
+		// and then if the game is going on...
+		// score...
+		// client.sock.send(JSON.stringify({
+		// 	event: "GetAllRooms",
+		// 	data: 
+		// }))
+	}
+
 	static broadcast(clients: any, msg: any) {
 		for (let client of clients)
 			client.sock.send(msg);

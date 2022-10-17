@@ -43,6 +43,7 @@
 <script lang="ts">
     import LightBar from "./LightBar.svelte";
 	import { darkMode } from "$lib/stores/var";
+    import { goto } from "$app/navigation";
 
 	let dark : boolean;
 
@@ -50,7 +51,6 @@
 		dark = value;
 	});
 
-	import '$lib/scss/app.scss';
 
 	$: col = (dark) ? "#fff" : "#000"
 </script>
@@ -59,7 +59,9 @@
 <div class="nav-bar">
 	<div class="menus" style="--col: {col}">
 		<div class="menu">About</div>
-		<div class="menu">Rooms</div>
+		<div class="menu" on:click={() => {
+			goto('/rooms');
+		}}>Rooms</div>
 		<div class="menu">Menu3</div>
 		<div class="menu">Menu4</div>
 	</div>
