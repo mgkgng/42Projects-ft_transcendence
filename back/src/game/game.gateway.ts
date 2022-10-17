@@ -148,11 +148,6 @@ export class GameGateway {
 			client.sock.send(msg);
 	}
 
-	getClient(id: string) {
-		return (this.clients.get(id));
-	}
-
-	getRoom(id: string) {
-		return (this.rooms.get(id));
-	}
+	getClient(id: string) { return (this.clients.get(id)); }
+	getRoom(id: string) { return (this.rooms.get(id)); }
 }
