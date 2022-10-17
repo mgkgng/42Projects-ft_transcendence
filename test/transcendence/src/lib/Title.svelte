@@ -48,7 +48,7 @@
 		border: none;
 		box-shadow: 0px 0px 5px 5px rgb(49, 211, 240); //maybe?
 
-		animation-name: rotate;
+		animation-name: rotate-rev;
 		animation-duration: var(--duration);
 		animation-iteration-count: infinite;
 		animation-timing-function: linear;
@@ -117,7 +117,7 @@
 
 	function createCircles() {
 		let res = [];
-		let circleNb = Math.floor(Math.random() * 5 + 5);
+		let circleNb = Math.floor(Math.random() * 10 + 10);
 		
 		for (let i = 0; i < circleNb; i++) {
 			let circle: Circle = {
@@ -137,7 +137,7 @@
 		for (let i = 0; i < circleNb; i++) {
 			let circle: Circle = {
 				size : Math.floor(Math.random() * 20 + 8),
-				duration : Math.floor(Math.random() * 5 + 15),
+				duration : Math.floor(Math.random() * 50 + 15),
 				angle : Math.floor(Math.random() * 360)
 			};
 			res.push(circle);
@@ -157,13 +157,13 @@
 
 
 	{#each blues as blue}
-	<div class="blue-circle-around" style="--dist: {circleRadius + 35}px; --size: {blue.size}px; --duration: {blue.duration}s; --angle: {blue.angle}deg; --angle2: {blue.angle + 360}deg"></div>
+	<div class="blue-circle-around" style="--dist: {circleRadius + 85}px; --size: {blue.size}px; --duration: {blue.duration}s; --angle: {blue.angle}deg; --angle2: {blue.angle + 360}deg"></div>
 	{/each}
 
 	<MainCircle circleRadius={circleRadius}/>
 
 	{#each circlesAround as circleInfo}
-	<div class="circle-around" style="--dist: {circleRadius + 105}px; --size: {circleInfo.size}px; --duration: {circleInfo.duration}s; --angle: {circleInfo.angle}deg; --angle2: {circleInfo.angle + 360}deg"></div>
+	<div class="circle-around" style="--dist: {circleRadius + 85}px; --size: {circleInfo.size}px; --duration: {circleInfo.duration}s; --angle: {circleInfo.angle}deg; --angle2: {circleInfo.angle + 360}deg"></div>
 	{/each}
 
 	<!-- {#if mainPage}

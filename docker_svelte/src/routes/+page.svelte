@@ -2,8 +2,7 @@
 	.container {
 		max-height: 100%;
 		background-color: rgba(0, 0, 0, 0);
-		display: grid;
-		grid-template-rows: 90vh 10vh;
+		display: flex;
 		gap: 0;
 		padding: 0;
 	}
@@ -17,7 +16,6 @@
 
 <script lang="ts">
 	import Title from "$lib/Title.svelte";
-	import Navbar from "$lib/Navbar.svelte";
 	import DarkMode from "$lib/DarkMode.svelte";
 
 	import { client } from "$lib/stores/client";
@@ -40,8 +38,7 @@
 </script>
 
 <div class="container">
-	<DarkMode/>
+	<!-- <DarkMode/> -->
 	<Title title={"transcendence"} mainPage={true} />
-	<Navbar />
 </div>
 

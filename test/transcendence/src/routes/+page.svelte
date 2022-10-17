@@ -8,16 +8,10 @@
 		padding: 0;
 	}
 
-	@keyframes size-change {
-		0% { transform: scale(1) }
-		50% { transform: scale(1.3) }
-		100% { transform: scale(1) }
-	}
 </style>
 
 <script lang="ts">
 	import Title from "$lib/Title.svelte";
-	import Navbar from "$lib/Navbar.svelte";
 	import DarkMode from "$lib/DarkMode.svelte";
 
 	import { client } from "$lib/stores/client";
@@ -40,8 +34,6 @@
 </script>
 
 <div class="container">
-	<DarkMode/>
 	<Title title={"transcendence"} mainPage={true} />
-	<Navbar />
 </div>
 
