@@ -21,9 +21,9 @@
 
 	.circle-around {
 		position: absolute;
-		z-index: 88;
+		// z-index: 88;
 		top: 49%;
-		left: 45%;
+		left: 50%;
 		right: 0;
 		width: var(--size);
 		aspect-ratio: 1 / 1;
@@ -39,13 +39,14 @@
 	.blue-circle-around {
 		position: absolute;
 		top: 49%;
-		left: 60%;
+		left: 50%;
 		right: 0;
 		width: var(--size);
 		aspect-ratio: 1 / 1;
 		border-radius: 50%;
-		background-color: $main2;
+		background-color: transparentize($main2, .0);
 		border: none;
+		box-shadow: 0px 0px 5px 5px rgb(49, 211, 240); //maybe?
 
 		animation-name: rotate;
 		animation-duration: var(--duration);
@@ -116,7 +117,7 @@
 
 	function createCircles() {
 		let res = [];
-		let circleNb = Math.floor(Math.random() * 8 + 5);
+		let circleNb = Math.floor(Math.random() * 5 + 5);
 		
 		for (let i = 0; i < circleNb; i++) {
 			let circle: Circle = {
@@ -153,15 +154,17 @@
 </script>
 
 <div class="container">
-	<MainCircle circleRadius={circleRadius}/>
-	{#each circlesAround as circleInfo}
-	<div class="circle-around" style="--dist: {circleRadius + 45}px; --size: {circleInfo.size}px; --duration: {circleInfo.duration}s; --angle: {circleInfo.angle}deg; --angle2: {circleInfo.angle + 360}deg"></div>
-	{/each}
+
 
 	{#each blues as blue}
-	<div class="blue-circle-around" style="--dist: {circleRadius + 45}px; --size: {blue.size}px; --duration: {blue.duration}s; --angle: {blue.angle}deg; --angle2: {blue.angle + 360}deg"></div>
+	<div class="blue-circle-around" style="--dist: {circleRadius + 35}px; --size: {blue.size}px; --duration: {blue.duration}s; --angle: {blue.angle}deg; --angle2: {blue.angle + 360}deg"></div>
 	{/each}
 
+	<MainCircle circleRadius={circleRadius}/>
+
+	{#each circlesAround as circleInfo}
+	<div class="circle-around" style="--dist: {circleRadius + 105}px; --size: {circleInfo.size}px; --duration: {circleInfo.duration}s; --angle: {circleInfo.angle}deg; --angle2: {circleInfo.angle + 360}deg"></div>
+	{/each}
 
 	<!-- {#if mainPage}
 	<RoundButton bind:showMessage={showMessage} bind:message={message} circleRadius={circleRadius}/>

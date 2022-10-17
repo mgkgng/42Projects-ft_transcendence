@@ -4,9 +4,11 @@
 		height: 100%;
 		grid-template-rows: 50% 5%;
 		padding: 0 2em;
+		z-index: 3;
 	}
 
 	.menus {
+		// z-index: 3;
 		display: flex;
 		flex-direction: row;
 		height: 100%;
@@ -29,6 +31,13 @@
 			opacity: .9;
 		}
 	}
+
+	.button {
+		width: 100px;
+		aspect-ratio: 1 / 1;
+		border-radius: 50%;
+		background-color: #fff;
+	}
 </style>
 
 <script lang="ts">
@@ -50,8 +59,7 @@
 <div class="nav-bar">
 	<div class="menus" style="--col: {col}">
 		<div class="menu">About</div>
-		<div class="menu">Join</div>
-		<div class="menu">About</div>
+		<div class="menu">Rooms</div>
 		<div class="menu">Menu3</div>
 		<div class="menu">Menu4</div>
 	</div>
