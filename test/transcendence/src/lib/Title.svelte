@@ -166,9 +166,9 @@
 	<div class="circle-around" style="--dist: {circleRadius + 85}px; --size: {circleInfo.size}px; --duration: {circleInfo.duration}s; --angle: {circleInfo.angle}deg; --angle2: {circleInfo.angle + 360}deg"></div>
 	{/each}
 
-	<!-- {#if mainPage}
+	{#if mainPage}
 	<RoundButton bind:showMessage={showMessage} bind:message={message} circleRadius={circleRadius}/>
-	{/if} -->
+	{/if}
 	<h1 class="title">{title}</h1>
 	<div class="msg">{message}</div>
 </div>
