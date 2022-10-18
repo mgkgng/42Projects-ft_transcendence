@@ -2,27 +2,37 @@ import {Pong} from "./app.Pong"
 import {AppGateway} from "./app.gateway"
 import {uid} from "./app.utils"
 
+const Difficulty = {
+	0 : 3,
+	1 : 5,
+	2 : 8,
+	3 : 15
+}
+
 export class Room {
 	id: string;
 	clients: Map<string, any>;
 	players: Array<any>;
 	scores: Array<number>;
 	maxpoint: number;
+	difficulty: number
 	pong: Pong;
 	//chat: ChatRoomService
 	isPlaying: boolean;
 	
 	// constructor(clients, mapchoice: string, mode: string, maxpoint: number) {
-	constructor(clients: any, maxpoint: number = 5) {
+	constructor(clients: any, maxpoint: number = 5, difficulty: number = 1) {
 		this.id = uid();
 		//this.chat = new ChatRoomService();
 		this.clients = new Map();
 		
 		this.addClients(clients);
 
-		this.pong = new Pong();
+		this.difficulty = Difficulty[difficulty];
+
+		this.pong = new Pong(this.difficulty);
 		
-		this.players = [clients[0], clients[1]];
+		this.players = clients;
 
 		this.maxpoint = maxpoint;
 		

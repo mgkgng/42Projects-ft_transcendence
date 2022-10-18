@@ -9,10 +9,9 @@ export class Puck {
 	gameHeight: number;
 
 	constructor(gameWidth : number, gameHeight : number,
-		vectorX : number = (Math.floor(Math.random() * 6) + 1) * ((Math.floor(Math.random() * 2)) ? 1 : -1), 
-		vectorY: number = (Math.floor(Math.random() * 2)) ? 30 : -30) { // temporary test
-		this.vectorX = vectorX;
-		this.vectorY = vectorY;
+		vectorY: number) { // temporary test
+		this.vectorX = (Math.floor(Math.random() * 6) + 1) * ((Math.floor(Math.random() * 2)) ? 1 : -1);
+		this.vectorY = vectorY * ((Math.floor(Math.random() * 2)) ? 1 : -1);
 		this.gameWidth = gameWidth;
 		this.gameHeight = gameHeight;
 		this.posX = gameWidth / 2;
@@ -80,7 +79,7 @@ export class Puck {
 					return ;
 				}
 
-				room.pong.puck = new Puck(room.pong.gameMap.width, room.pong.gameMap.height);
+				room.pong.puck = new Puck(room.pong.gameMap.width, room.pong.gameMap.height, room.difficulty);
 				setTimeout(() => {
 					Room.startPong(room);
 				}, 1000);

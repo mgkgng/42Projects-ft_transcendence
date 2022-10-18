@@ -27,6 +27,8 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
     import { onMount } from "svelte";
+    import { identity } from "svelte/internal";
+    import Bar from "./Bar.svelte";
 	import { client } from "./stores/client";
 
 	let mapType: number = 0;
@@ -35,11 +37,6 @@
 
 
 	onMount(() => {
-		$client.addListener("RoomCreated", (data: any) => {
-			goto('/play/' + data);
-		});
-
-		return ($client.removeListener("RoomCreated"));
 	});
 </script>
 
@@ -70,6 +67,7 @@
 			$client.sock.send(JSON.stringify({
 				event: "CreateRoom",
 				data: {
+					client: $client.id,
 					mapType: mapType,
 					maxPoint: maxPoint,
 					difficulty: difficulty

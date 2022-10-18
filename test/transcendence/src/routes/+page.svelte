@@ -26,8 +26,15 @@
 			goto(`/play/${data}`);
 		});
 
+
+		$client.addListener("RoomCreated", (data: any) => {
+			console.log("RoomCreated", data);
+
+			goto('/play/' + data);
+		});
+
 		return (() => {
-			$client.removeListener("MatchFound");
+			$client.removeListeners(["MatchFound", "RoomCreated"]);
 		})
 
 	});

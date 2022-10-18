@@ -149,6 +149,22 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		// }))
 	}
 
+	@SubscribeMessage("CreateRoom")
+	createRoom(@MessageBody() data: any) {
+		
+		let client = this.getClient(data.client);
+
+		let room = new Room([client], data.maxPoint);
+
+		this.rooms.set(room.id, room);
+
+		console.log("I'm sending", room.id);
+		client.sock.send(JSON.stringify({
+			event: "RoomCreated",
+			data: room.id
+		}));
+	}
+
 	static broadcast(clients: any, msg: any) {
 		for (let client of clients)
 			client.sock.send(msg);
