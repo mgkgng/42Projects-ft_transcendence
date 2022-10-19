@@ -142,7 +142,7 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		
 		client.sock.send(JSON.stringify({
 			event: "GetAllRooms",
-			data: [...this.rooms]
+			data: [...this.rooms].filter(room => room[1].privateMode == false)
 		}));
 	}
 

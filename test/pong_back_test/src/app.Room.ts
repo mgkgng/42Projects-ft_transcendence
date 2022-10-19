@@ -19,6 +19,7 @@ export class Room {
 	pong: Pong;
 	//chat: ChatRoomService
 	isPlaying: boolean;
+	privateMode: boolean;
 	
 	// constructor(clients, mapchoice: string, mode: string, maxpoint: number) {
 	constructor(clients: any,
@@ -32,13 +33,13 @@ export class Room {
 		this.addClients(clients);
 
 		this.difficulty = Difficulty[difficulty];
+		this.privateMode = privateMode;
 
 		this.pong = new Pong(this.difficulty);
 		
 		this.players = clients;
 
 		this.maxpoint = maxpoint;
-		
 		this.scores = [0 , 0];
 		
 		// later isPlayer condition could be more developped
