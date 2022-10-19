@@ -1,4 +1,4 @@
-import { Controller, Get } from "@nestjs/common";
+import { Controller, Get, Query } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { UserEntity } from "src/entity/User.entity";
 import { UserFriendEntity } from "src/entity/UserFriend.entity";
@@ -13,48 +13,64 @@ export class friendSystemController {
         private userFriendRepository : Repository<UserFriendEntity>
     ) {}
 
-    @Get('/getFriendForHadufer')
-    async handleGetFriendForHadufer()
-    {
-        const qb = this.userFriendRepository.createQueryBuilder('u');
-        const qbu = this.userRepository.createQueryBuilder('u');
-        let username = "hadufer";
-        return await qb
-        .leftJoinAndSelect("u.id_first_user", "friendrequester")
-        .leftJoinAndSelect("u.id_second_user", "friendrequested")
-        .where(`friendrequester.username = '${username}' OR friendrequested.username = '${username}'`)
-        // .getSql();
-        .getMany();
-    }
-
-    @Get('addFriend/:username')
+    @Get('addFriend')
     async handleMakeFriend()
     {
         const qb = this.userFriendRepository.createQueryBuilder('u');
         const qbu = this.userRepository.createQueryBuilder('u');
 
         const newUserRel = new UserFriendEntity();
-        newUserRel.id_first_user = await qbu.select().where("u.id_g = 1").getOneOrFail();
-        newUserRel.id_second_user = await qbu.select().where("u.id_g = 2").getOneOrFail();
+        newUserRel.id_first_user = await qbu.select().where("u.username = 'John'").getOneOrFail();
+        newUserRel.id_second_user = await qbu.select().where("u.username = 'bobby'").getOneOrFail();
+        newUserRel.is_user_friend = true;
         // await this.userRepository.update()
+        
         return this.userFriendRepository.save([newUserRel]);
         
     }
     
     @Get("debugUserFriendList")
-    async debugUserList()
+    async debugUserFriendList()
     {
         const qb = this.userFriendRepository.createQueryBuilder('u');
         const qbu = this.userRepository.createQueryBuilder('u');
         return await this.userFriendRepository.find({relations: ['id_first_user', 'id_second_user']})
     }
 
-    // IsFriendWith
-    // async isFriendWith(first_id_g : number, second_id_g : number)
-    // {
-    //     const qb = this.userFriendRepository.createQueryBuilder('u');
-    //     const qbFriendRequest = qb.select("u.")
-    // }
+    @Get("debugUser")
+    async debugUserList()
+    {
+        const qb = this.userFriendRepository.createQueryBuilder('u');
+        const qbu = this.userRepository.createQueryBuilder('u');
+        return await this.userRepository.find({relations:{relation_friend_requested: true, relation_friend_accepted: true}})
+    }
+
+    @Get("addNew")
+    async addNew()
+    {
+        let user = new UserEntity;
+        user.email = "bobby@bobby.com"
+        user.password = "passbobby"
+        user.username = "bobby";
+        return await this.userRepository.save(user);
+    }
+
+    @Get("isfriendwith?")
+    async isFriendWithByUsername(@Query('first_username') first_username : string,
+                                @Query('second_username') second_username : string)
+    {
+        const qb = this.userFriendRepository.createQueryBuilder('u');
+        first_username = "John";
+        second_username = "bobby";
+        return await qb
+        .leftJoinAndSelect("u.id_first_user", "friendrequester")
+        .leftJoinAndSelect("u.id_second_user", "friendrequested")
+        .where(`friendrequester.username = '${first_username}' OR friendrequested.username = '${second_username}'`)
+        .andWhere(`friendrequester.username = '${second_username}' OR friendrequested.username = '${first_username}'`)
+        .andWhere(`u.is_user_friend = true`)
+        // .getSql();
+        .getMany();
+    }
 
     // Friend Request
 
