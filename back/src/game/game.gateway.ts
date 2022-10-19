@@ -15,6 +15,7 @@ import {Puck} from "./game.Puck"
 import {Room} from "./game.Room"
 import { UseGuards, Request, HttpException } from '@nestjs/common';
 import { AuthGuard } from "@nestjs/passport";
+import { UserBlockEntity } from "src/entity/UserBlock.entity";
 	
 
 @WebSocketGateway({
@@ -39,6 +40,7 @@ export class GameGateway {
 	@WebSocketServer()
 	server: Server;
 
+	@UseGuards(AuthGuard("jwt"))
 	async handleConnection(client: any) { //TODO handle connection here
 		console.log("New Connection on site.");
 		// let connection = new Client(client.sock);

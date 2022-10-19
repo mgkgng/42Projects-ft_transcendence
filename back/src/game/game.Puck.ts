@@ -1,4 +1,5 @@
 import { Room } from "./game.Room";
+import { MapHeight } from "./game.utils";
 
 export class Puck {
 	posX: number;
@@ -9,8 +10,10 @@ export class Puck {
 	gameHeight: number;
 
 	constructor(gameWidth : number, gameHeight : number,
-		vectorX : number = (Math.floor(Math.random() * 6) + 1) * ((Math.floor(Math.random() * 2)) ? 1 : -1), 
-		vectorY: number = (Math.floor(Math.random() * 2)) ? 3 : -3) { // temporary test
+		//vectorX : number = (Math.floor(Math.random() * 6) + 1) * ((Math.floor(Math.random() * 2)) ? 1 : -1), 
+		//vectorY: number = (Math.floor(Math.random() * 2)) ? 3 : -3) { // temporary test
+		vectorX : number = 2,
+		vectorY: number = -3){
 		this.vectorX = vectorX;
 		this.vectorY = vectorY;
 		this.gameWidth = gameWidth;
@@ -27,34 +30,34 @@ export class Puck {
 		let ballSize = 30;
 
 		let distToDeath = (this.vectorY > 0)
-			? (this.gameHeight - deadZoneHeight - paddleHeight) - this.posY
-			: this.posY - deadZoneHeight - paddleHeight; // it functions well
+			? (this.gameHeight - deadZoneHeight - paddleHeight) - this.posY - 30
+			: this.posY - deadZoneHeight - paddleHeight - 30;
 
-		let timeOut = Math.abs((distToDeath / this.vectorY)) * frameDuration;
-		// let deathPointX = this.calculPosX();
-
-		// room.broadcast(JSON.stringify({
-		// 	event: "DeathPointUpdate",
-		// 	data: deathPointX
-		// }));
-
+		let timeOut = Math.abs((distToDeath/this.vectorY)) * frameDuration;
+		let deathPointX = this.calculPosX();
+		console.log("Pos death: ", this.calculPosX());
+		console.log("POS: ", this.posX, this.posY);
+		room.broadcast(JSON.stringify({
+			event: "DeathPointUpdate",
+		 	data: deathPointX
+		 }));
+		console.log("Timeout:", timeOut);
 		setTimeout(() => {
 			
 			// checking if the paddle hits the puck...
 			// let paddlePos = (this.vectorY > 0) ? room.pong.paddlePos[1] : this.gameWidth - room.pong.paddlePos[0];
 			let paddlePos = (this.vectorY > 0) ? room.pong.paddlePos[1] : room.pong.paddlePos[0];
-
-			if (this.vectorY < 0) {
-				// || (this.vectorY > 0)) {
+			if ((this.vectorY > 0)
+				|| (this.vectorY < 0)){
 				room.broadcast(JSON.stringify({
 					event: "PuckHit"
 				}));
-				// this.posX = deathPointX;
-				// this.posY = (this.vectorY > 0) ? (this.gameHeight - deadZoneHeight - paddleHeight) : deadZoneHeight + paddleHeight;
+				this.posX = deathPointX;
+				this.posY = (this.vectorY > 0) ? (this.gameHeight - deadZoneHeight - paddleHeight) : deadZoneHeight + paddleHeight;
 				this.vectorY *= -1;
 				this.setCheckPuck(room);
 				return ;
-			} else {
+			} else { 
 				console.log("ScoreUpdate");
 	
 				let winner = (this.vectorY > 0) ? 0 : 1;
@@ -83,7 +86,8 @@ export class Puck {
 			}
 		}, timeOut);
 	}
-
+	// 	return (deathPointX);
+	// }
 	// calculPosX() {
 	// 	// TODO precision should be made, it should be because of the css stuff
 	// 	let distToDeath = (this.vectorY > 0)

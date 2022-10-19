@@ -26,6 +26,7 @@ export class AuthService {
 		try {
 			const rep = await lastValueFrom(this.httpService.post("https://api.intra.42.fr/oauth/token", "grant_type=authorization_code&code=" + code + "&client_id=" + iud + "&client_secret=" + secret + "&redirect_uri=http://localhost:3002"));
 			const res = await lastValueFrom(this.httpService.get("https://api.intra.42.fr/v2/me", {headers: {Authorization: "Bearer " + rep.data.access_token}}));
+			console.log(res);
 			return (res);
 		} catch (error) {	return null;	}
 	//GET USER TOKEN 42

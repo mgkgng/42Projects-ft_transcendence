@@ -74,10 +74,10 @@ class Client {
 	//AXEL MODIFICATION	
 	async send42Tok(url: any)
 	{
-		if (localStorage.getItem('transcendence-jwt') != null)
+		if (localStorage.getItem('transcendence-jwt') != null
+		&& localStorage.getItem('transcendence-jwt') != undefined)
 		{
 			const tok = localStorage.getItem('transcendence-jwt');
-			
 			try
 			{
 				this.socket = io("http://localhost:3000",{
@@ -86,33 +86,31 @@ class Client {
 					}
 				});
 				return (true);
-			}
-			catch
-			{
-				return (false);
+			}catch{
+				console.log("error");
 			}
 		}
 		if (url.has('code'))
 		{
-			console.log(url.get('code'));
-			console.log("username=oui&password=" + url.get('code'));
-			let tok : any;
-			const res : any = await fetch("http://localhost:3000/auth42",{
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				  },
-				body:JSON.stringify({username: "oui", password: url.get('code')}),
-			}).then(function(res : any) {
-				tok = res.access_token;
-			});
-			this.socket = io("http://localhost:3000",{
-				extraHeaders: {
-					Authorization: "Bearer " + tok,
-				}
-			});
-			localStorage.setItem('transcendence-jwt', tok);
-			return (true);
+			try {
+				const res : any = await fetch("http://localhost:3000/auth42",{
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					  },
+					body:JSON.stringify({username: "oui", password: url.get('code')}),
+				});
+				const tok = await res.json();
+				this.socket = io("http://localhost:3000",{
+					extraHeaders: {
+						Authorization: "Bearer " + tok.access_token,
+					}
+				});
+				localStorage.setItem('transcendence-jwt', tok.access_token);
+				return (true);
+			}catch{
+				return (false);
+			}
 		}
 		return (false);
 	}

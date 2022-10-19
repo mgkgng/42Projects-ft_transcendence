@@ -189,6 +189,7 @@
 		$client.addListener("PuckHit", (data: any) => {
 			console.log("PuckHit");
 			puck.vectorY *= -1;
+			console.log(puck.posX, puck.posY);
 		});
  
 		$client.addListener("ScoreUpdate", (data: any) => {
