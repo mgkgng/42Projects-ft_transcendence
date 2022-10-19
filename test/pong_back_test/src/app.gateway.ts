@@ -139,10 +139,11 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		// playersInfo, availability / format (max point, map, mode...)
 		// and then if the game is going on...
 		// score...
-		// client.sock.send(JSON.stringify({
-		// 	event: "GetAllRooms",
-		// 	data: 
-		// }))
+		
+		client.sock.send(JSON.stringify({
+			event: "GetAllRooms",
+			data: [...this.rooms]
+		}));
 	}
 
 	@SubscribeMessage("CreateRoom")

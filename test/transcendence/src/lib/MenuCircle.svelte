@@ -110,10 +110,10 @@
 	import { client } from "./stores/client";
 
 	export let createGameModal: any;
+	export let roomListModal: any;
 
 	let expanded = false;
 
-	$: console.log(expanded);
 </script>
 
 <div class="container">
@@ -122,7 +122,9 @@
 	</button>
 	<div class="menu {expanded && "expanded"}">
 		<button class="button">hello</button>
-		<button class="button">Rooms</button>
+		<button class="button" on:click={() => {
+			roomListModal.open();
+		}}>Rooms</button>
 		<button class="button" on:click={() => {
 			if ($client.room.length) {
 				// TODO should give a message

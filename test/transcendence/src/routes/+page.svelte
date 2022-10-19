@@ -20,24 +20,24 @@
 	import { client } from "$lib/stores/client";
     import { onMount } from "svelte";
     import { goto } from "$app/navigation";
+    import RoomList from "$lib/RoomList.svelte";
 
 	let createGameModal: any;
+	let roomListModal: any;
 
-	onMount(() => {
-		console.log("I'm on the main page.");
-		
+	onMount(() => {	
+		// console.log("hello?");	
 		$client.addListener("MatchFound", (data: any) => {
 			console.log("MatchFound", data);
 			$client.room = data;
 			goto(`/play/${data}`);
 		});
 
-
 		$client.addListener("RoomCreated", (data: any) => {
 			console.log("RoomCreated", data);
 			$client.room = data;
 			createGameModal.close();
-			goto(`/play/${data}`);
+			goto("/play/" + data);
 		});
 
 		return (() => {
@@ -50,10 +50,14 @@
 	<CreateGame />
 </Modal>
 
+<Modal bind:this={roomListModal} closeOnBgClick={true}>
+	<RoomList />
+</Modal>
+
 <div class="container">
 	<Title title={"transcendence"} mainPage={true} />
 </div>
 <DarkMode/>
-<MenuCircle createGameModal={createGameModal}/>
+<MenuCircle createGameModal={createGameModal} roomListModal={roomListModal}/>
 
 

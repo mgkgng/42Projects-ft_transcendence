@@ -3,57 +3,44 @@
 		width: 100%;
 		height: 100%;
 		display: flex;
+		flex-direction: column;
 
 		justify-content: center;
 		align-items: center;
 
-		color: #fff;
+		font-family: sans-serif;
+		color: #000;
 		text-align: center;
 	}
 
-	.room-container {
-		width: 80%;
-		height: 80%;
-		border: 2px solid #fff;
-		border-radius: 2em;
-
-		padding-top: 2em;
-
-		display: grid;
-		grid-template-rows: 10% 5% 80%;
-
-		position: relative;
-	}
 	.tools {
 		position: relative;
 		left: 30%;
 		align-items: right;
 		width: 100%;
+		height: 20%;
 		// border: 2px solid #fff;
 	}
 
-	.rooms {
-
-	}
-
-	.room {
-
+	.room-container {
+		width: 100%;
+		height: 100%;
 	}
 </style>
 
 <script lang="ts">
-    import { onMount } from "svelte";
+	import { onMount } from "svelte";
 	import { client } from "$lib/stores/client"
 
 	let rooms: Map<string, any> = new Map();
-	let showList: Array<any>;
+	let roomArray: Array<any>;
 	let seeAvailable: boolean = true;
 
-	$: console.log(seeAvailable);
-
-	$: showList = (seeAvailable) ? [...rooms.values()].filter(room => room.available == true)
+	$: roomArray = (seeAvailable) ? [...rooms?.values()].filter(room => room.available == true)
 		: [...rooms.values()];
 
+
+	$: console.log(rooms);
 	onMount(() => {
 		$client.sock.send(JSON.stringify({
 			event: "AskRooms",
@@ -61,8 +48,9 @@
 		}));
 
 		$client.addListener("GetAllRooms", (data: any) => {
-			//rooms = 
-			// TODO getAllRooms
+			for (let roomData of data)
+				rooms.set(roomData[0], roomData[1]);
+			console.log("GetAllRooms", rooms);
 		});
 
 		$client.addListener("UpdateRooms", (data: any) => {
@@ -74,29 +62,23 @@
 		})
 
 		return (() => {
-			$client.removeListeners(["UpdateRooms"]);
+			$client.removeListeners(["GetAllRooms", "UpdateRooms"]);
 		})
 	});
 </script>
 
 <div class="container">
+	<div class="tools">
+		<label class="form">
+			<input type="checkbox" bind:checked={seeAvailable} />
+			Available
+		</label>
+	</div>
 	<div class="room-container">
-		<div>
-			<h1>Rooms</h1>
+		{#each roomArray as room}
+		<div class="room-card">
+			{room.id}
 		</div>
-		<div class="tools">
-			<label class="form">
-				<input type="checkbox" bind:checked={seeAvailable} />
-				Available
-			</label>
-		</div>
-		<div class="rooms">
-			{#each showList as room}
-			<div class="room">
-				
-			</div>
-			{/each}
-		</div>
+		{/each}
 	</div>
 </div>
-
