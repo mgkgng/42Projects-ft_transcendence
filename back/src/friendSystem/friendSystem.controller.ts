@@ -49,19 +49,19 @@ export class friendSystemController {
     async addNew()
     {
         let user = new UserEntity;
-        user.email = "bobby@bobby.com"
-        user.password = "passbobby"
-        user.username = "bobby";
+        user.id_g = 1;
+        user.username = "john"
         return await this.userRepository.save(user);
     }
 
     @Get("isfriendwith?")
-    async isFriendWithByUsername(@Query('first_username') first_username : string,
-                                @Query('second_username') second_username : string)
+    async isFriendWithByUsername(@Query() query : {first_username : string, second_username : string})
     {
         const qb = this.userFriendRepository.createQueryBuilder('u');
-        first_username = "John";
-        second_username = "bobby";
+        console.log(query.first_username)
+        console.log(query.second_username)
+        let first_username = query.first_username;
+        let second_username = query.second_username;
         return await qb
         .leftJoinAndSelect("u.id_first_user", "friendrequester")
         .leftJoinAndSelect("u.id_second_user", "friendrequested")
