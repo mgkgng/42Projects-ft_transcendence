@@ -15,13 +15,13 @@ class Client {
 		this.listeners = new Map();
 		this.callbacksOnConnection = new Set();
 		if (browser) {
-			this.sock = new WebSocket('ws://localhost:3000');
-			console.log(this.sock);
-			this.sock.onmessage = (msg: any) => {
-				console.log("receving something", msg);
-				this.listeners.get(msg.event)?.(msg.data);
-			}
-			this.connect();
+			//this.sock = new WebSocket('ws://localhost:3000');
+			//console.log(this.sock);
+			//this.sock.onmessage = (msg: any) => {
+				//console.log("receving something", msg);
+				//this.listeners.get(msg.event)?.(msg.data);
+			//}
+			//this.connect();
 		}
 	}
 
@@ -29,20 +29,18 @@ class Client {
 		if (!browser)
 			return ;
 		
-		this.sock.onopen = () => {
-			console.log('Connected');
-			this.sock.send(
-				JSON.stringify({
-					event: "Connexion",
-					data: this.id
-				})
-			)
+		console.log('Connected');
+		/*this.socket.emit(
+			JSON.stringify({
+				event: "Connexion",
+				data: this.id
+			})
+		)*/
+		this.socket.emit("Connexion", {	data: this.id	})
+		for (let func of this.callbacksOnConnection)
+			func();
 
-			for (let func of this.callbacksOnConnection)
-				func();
-		};
-
-		this.sock.onmessage = (msg: any) => {
+		this.socket.onmessage = (msg: any) => {
 			let data = JSON.parse(msg.data);
 			// console.log("OnMessage", data);
 			this.listeners.get(data.event)?.(data?.data);
@@ -85,6 +83,7 @@ class Client {
 						Authorization: "Bearer " + tok,
 					}
 				});
+				this.connect();
 				return (true);
 			}catch{
 				console.log("error");
@@ -107,6 +106,7 @@ class Client {
 					}
 				});
 				localStorage.setItem('transcendence-jwt', tok.access_token);
+				this.connect();
 				return (true);
 			}catch{
 				return (false);

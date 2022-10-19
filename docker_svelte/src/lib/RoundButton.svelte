@@ -72,7 +72,7 @@
 		login = await $client.send42Tok(new URLSearchParams(window.location.search));
 		if (login)
 		{
-			const val = await jwt_decode(localStorage.getItem("transcendence-jwt"));
+			const val : any = await jwt_decode(localStorage.getItem("transcendence-jwt"));
 			console.log("Hello: ", val.username);
 		}
 		//END MOD
@@ -106,10 +106,11 @@
 				showMessage = true;
 				message = "Login required!";
 			}
-			$client.sock.send(JSON.stringify({
+			/*$client.socket.send(JSON.stringify({
 				event: 'JoinQueue',
 				data: $client.id
-			}));
+			}));*/
+			$client.socket.emit("JoinQueue", { data: $client.id });
 		}}
 	>
 		<h2>Play</h2>

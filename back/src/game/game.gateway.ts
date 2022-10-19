@@ -54,7 +54,7 @@ export class GameGateway {
 
 	@SubscribeMessage("Connexion")
 	handleConnexion(client: any, data: any) {
-		// console.log("test", client);
+		//console.log("test", client);
 		console.log("data", data);
 		let connection = new Client(data, client);
 		this.clients.set(connection.id, connection);

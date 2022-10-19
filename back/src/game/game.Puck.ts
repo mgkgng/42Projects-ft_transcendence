@@ -86,6 +86,24 @@ export class Puck {
 			}
 		}, timeOut);
 	}
+ 	calculPosX() {
+	 	// TODO precision should be made, it should be because of the css stuff
+		let y_final = (this.vectorY > 0) ? (this.gameHeight - 30 - 15 - 12) : (30 + 15 + 12);
+		let y_inter = this.posY + 15; //center position of ball
+		let x_inter = this.posX + 15;
+		let vectorX_inter = this.vectorX;
+		if	(this.vectorX == 0) //if he is up/down
+			return (this.posX);
+		let b = 0; // b for ax + b = y
+		while ((y_inter < y_final && this.vectorY > 0) || (y_inter > y_final && this.vectorY < 0))
+		{
+			b = y_inter - (this.vectorY / vectorX_inter) * x_inter;
+			y_inter =  (vectorX_inter > 0 ? (this.vectorY / vectorX_inter) * (this.gameWidth - 15) : 15) + b;
+			x_inter = (vectorX_inter > 0 ? (this.gameWidth - 15) : 15);
+			vectorX_inter *= -1;
+		}
+		return ((y_final - b) / (this.vectorY / vectorX_inter) * -1) + (vectorX_inter * -1 > 0 ? -15 : 15);
+	}
 	// 	return (deathPointX);
 	// }
 	// calculPosX() {

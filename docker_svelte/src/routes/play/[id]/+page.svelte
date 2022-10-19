@@ -33,13 +33,19 @@
 	let roomInfo: any;
 
 	function roomcheck() {
-		$client.sock.send(JSON.stringify({
+		/*$client.socket.send(JSON.stringify({
 			event: 'RoomCheck',
 			data: {
 				client: $client.id,
 				room: roomId
 			}
-		}));
+		}));*/
+		$client.socket.emit('RoomCheck',
+			{
+				client: $client.id,
+				room: roomId
+			}
+		);
 	}
 
 	onMount(() => {

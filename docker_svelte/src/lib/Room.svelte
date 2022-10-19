@@ -268,7 +268,7 @@ on:keypress={(event) => {
 
 	moving = true;
 
-	$client.sock.send(JSON.stringify({
+	/*$client.socket.send(JSON.stringify({
 		event: "PaddleMove",
 		data: {
 			client: $client.id,
@@ -277,7 +277,14 @@ on:keypress={(event) => {
 			left: (userType == UserType.Player1 && event.code == 'KeyD'
 				|| userType == UserType.Player2 && event.code == 'KeyA')
 		}
-	}));
+	}));*/
+	$client.socket.emit("PaddleMove", {
+		client: $client.id,
+		player: userType,
+		room: roomId,
+		left: (userType == UserType.Player1 && event.code == 'KeyD'
+			|| userType == UserType.Player2 && event.code == 'KeyA')
+	});
 }}
 
 on:keyup={(event)=>{
@@ -285,11 +292,13 @@ on:keyup={(event)=>{
 		return ;
 	
 	//* TODO some precision to make
-	$client.sock.send(JSON.stringify({
+	/*$client.socket.send(JSON.stringify({
 		event: "PaddleStop",
 		data: $client.id
-	}));
-
+	}));*/
+	$client.socket.emit("PaddleStop",
+		{	data: $client.id	}
+	);
 	moving = false;
 }}
 
