@@ -154,8 +154,6 @@
 </script>
 
 <div class="container">
-
-
 	{#each blues as blue}
 	<div class="blue-circle-around" style="--dist: {circleRadius + 85}px; --size: {blue.size}px; --duration: {blue.duration}s; --angle: {blue.angle}deg; --angle2: {blue.angle + 360}deg"></div>
 	{/each}

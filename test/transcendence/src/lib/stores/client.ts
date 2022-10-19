@@ -8,11 +8,13 @@ class Client {
 	sock: any;
 	callbacksOnConnection: Set<Function>;
 	listeners: Map<string, Function>;
+	room: string;
 
 	constructor() {
 		this.id = uid();
 		this.listeners = new Map();
 		this.callbacksOnConnection = new Set();
+		this.room = "";
 		if (browser) {
 			this.sock = new WebSocket(`ws://${location.hostname}:3000`);
 			console.log(this.sock);

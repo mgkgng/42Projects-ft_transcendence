@@ -3,6 +3,7 @@ export class Client {
 	sock: any;
 	callbacksOnConnection: Set<Function>;
 	listeners: Map<string, Function>;
+	room: string; // room to which the client actually belongs
 
 	//Websocket
 	// addEventListener
@@ -11,6 +12,7 @@ export class Client {
 		this.id = id;
 		this.sock = sock;
 		this.listeners = new Map();
+		this.room = "";
 		
 		// this.sock.onmessage = (msg: any) => {
 		// 	console.log("receving something", msg);

@@ -43,8 +43,6 @@
 	let mapType: number = 2;
 	let privateMode: boolean = false;
 
-	onMount(() => {
-	});
 </script>
 
 <div class="container">

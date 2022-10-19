@@ -2,7 +2,7 @@
 	.container {
 		font-family: sans-serif; // for now
 	}
-	
+
 	@keyframes size-change {
 		0% { transform: scale(1) }
 		50% { transform: scale(1.2) }
@@ -106,11 +106,12 @@
 </style>
 
 <script lang="ts">
-    import CreateGame from "./CreateGame.svelte";
-import Modal from "./tools/Modal.svelte";
+    import Room from "./Room.svelte";
+	import { client } from "./stores/client";
+
+	export let createGameModal: any;
 
 	let expanded = false;
-	let createGameModal: any;
 
 	$: console.log(expanded);
 </script>
@@ -123,12 +124,14 @@ import Modal from "./tools/Modal.svelte";
 		<button class="button">hello</button>
 		<button class="button">Rooms</button>
 		<button class="button" on:click={() => {
+			if ($client.room.length) {
+				// TODO should give a message
+				console.log("You are already in a game!")
+				return;
+			}
 			createGameModal.open();
 		}}>Create</button>
 		<button class="button" on:click={() => { expanded = false; }}>X</button>
 	</div>
 </div>
 
-<Modal bind:this={createGameModal} closeOnBgClick={true}>
-	<CreateGame />
-</Modal>

@@ -21,7 +21,10 @@ export class Room {
 	isPlaying: boolean;
 	
 	// constructor(clients, mapchoice: string, mode: string, maxpoint: number) {
-	constructor(clients: any, maxpoint: number = 5, difficulty: number = 1) {
+	constructor(clients: any,
+		maxpoint: number = 5,
+		difficulty: number = 1,
+		privateMode: boolean = false) {
 		this.id = uid();
 		//this.chat = new ChatRoomService();
 		this.clients = new Map();
@@ -38,9 +41,12 @@ export class Room {
 		
 		this.scores = [0 , 0];
 		
+		// later isPlayer condition could be more developped
 		this.isPlaying = false;
-
-		setTimeout(Room.startPong, 2000, this);
+		if (this.players.length == 2) {
+			this.isPlaying = true;
+			setTimeout(Room.startPong, 2000, this);
+		}
 	}
 
 	/**

@@ -49,7 +49,6 @@
 
 <script lang="ts">
 	import { onMount } from "svelte";
-	import '$lib/scss/app.scss';
 	import { client } from "./stores/client";
 
 	export let circleRadius;

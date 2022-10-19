@@ -53,28 +53,25 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	joinQueue(@MessageBody() data: any) {
 		console.log("Join Queue", data);
 		let client = this.getClient(data);
-
-		if (this.queue.includes(client)) {
-			// TODO: should optimize the algorithm later
-			
-			console.log("already joined the queue");
+		// TODO: should maybe optimize the algorithm later -- for includes
+		if (client.room.length || this.queue.includes(client))
 			return ;
-		}
 
 		this.queue.push(client);
-		console.log("Queue length at the beginning: ", this.queue.length);
 
 		if (this.queue.length > 1) {
 			let room = new Room([this.queue[0], this.queue[1]]);
+			this.queue[0].room = room.id;
+			this.queue[1].room = room.id;
+
 			room.broadcast(JSON.stringify({
 				event: 'MatchFound',
 				data: room.id
 			}));
-			console.log("sending matchfound.");
+
 			this.rooms.set(room.id, room);
 			this.queue = this.queue.slice(2);
 		}
-		console.log("Queue length at the end: ", this.queue.length);
 
 	}
 
@@ -95,13 +92,12 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		client.sock.send(JSON.stringify({
 			event: "RoomInfo",
 			data: {
-				roomInfo: {
-					players: [room.players[0].id, room.players[1].id],
+					players: (room.players.length === 2) ? [room.players[0].id, room.players[1].id]
+						: [room.players[0].id],
 					maxpoint: room.maxpoint,
 					scores: room.scores,
 					mapSize: [room.pong.gameMap.width, room.pong.gameMap.height],
 					paddleSize: room.pong.gameMap.paddleSize
-				}
 			}
 		}));
 
@@ -151,14 +147,14 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage("CreateRoom")
 	createRoom(@MessageBody() data: any) {
-		
 		let client = this.getClient(data.client);
+		if (client.room.length)
+			return ;
 
-		let room = new Room([client], data.maxPoint);
-
+		let room = new Room([client], data.maxPoint, data.difficulty, data.privateMode);
 		this.rooms.set(room.id, room);
+		client.room = room.id;
 
-		console.log("I'm sending", room.id);
 		client.sock.send(JSON.stringify({
 			event: "RoomCreated",
 			data: room.id

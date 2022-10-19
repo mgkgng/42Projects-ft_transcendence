@@ -20,9 +20,7 @@
 <script lang="ts">
 	import '$lib/stores/client';
 	import { darkMode } from "$lib/stores/var";
-    import DarkMode from '$lib/DarkMode.svelte';
-    import MenuCircle from '$lib/MenuCircle.svelte';
-
+   
 	let dark : boolean;
 
 	darkMode.subscribe(value => {
@@ -32,7 +30,5 @@
 
 <main style="{(dark) ? "background-color: #000" : "background-color: #fff"}">
 	<slot />
-	<DarkMode/>
-	<MenuCircle />
 </main>
 
