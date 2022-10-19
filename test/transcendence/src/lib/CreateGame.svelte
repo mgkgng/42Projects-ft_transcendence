@@ -2,6 +2,8 @@
 	.container {
 		width: 100%;
 		height: 100%;
+		font-family: sans-serif; // for now
+		font-size: 19px;
 	}
 
 	.box {
@@ -10,6 +12,7 @@
 		gap: 2em;
 
 		align-items: center;
+		justify-content: center;
 	}
 
 	.line {
@@ -20,6 +23,10 @@
 	}
 
 	button {
+		padding: 2em;
+		border-radius: 2em;
+		background-color: transparentize($main, 0.3);
+		color: #fff;
 		cursor: pointer;
 	}
 </style>
@@ -31,10 +38,10 @@
     import Bar from "./Bar.svelte";
 	import { client } from "./stores/client";
 
-	let mapType: number = 0;
 	let maxPoint: number = 10;
-	let difficulty: number = 1;
-
+	let difficulty: number = 3;
+	let mapType: number = 2;
+	let privateMode: boolean = false;
 
 	onMount(() => {
 	});
@@ -42,26 +49,29 @@
 
 <div class="container">
 	<div class="box">
-		<div class="line">
-			<p>Map Type</p>
-			<button on:click={()=>{ if (mapType > 0) mapType--; }}>&#8595;</button>
-			<p>{mapType + 1}</p>
-			<button on:click={()=>{ if (mapType < 3) mapType++; }}>&#8593;</button>
 
-		</div>
-		<div class="line">
-			<p>Max Point</p>
-			<button on:click={()=>{ if (maxPoint > 0) maxPoint--; }}>&#8595;</button>
-			<p>{maxPoint}</p>
-			<button on:click={()=>{ if (maxPoint < 20) maxPoint++; }}>&#8593;</button>
-	
-		</div>
-		<div class="line">
-			<p>Difficulty</p>
-			<button on:click={()=>{ if (difficulty > 0) difficulty--; }}>&#8595;</button>
-			<p>{difficulty}</p>
-			<button on:click={()=>{ if (difficulty < 3) difficulty++; }}>&#8593;</button>
-		</div>
+		<label>
+			<input type=radio bind:group={mapType} name="mapType" value={1}> Map 1
+			<input type=radio bind:group={mapType} name="mapType" value={2}> Map 2
+			<input type=radio bind:group={mapType} name="mapType" value={3}> Map 3
+		</label>
+
+		<label>
+			Max Point: 
+			<input type=number bind:value={maxPoint} min=0 max=20>
+			<input type=range bind:value={maxPoint} min=0 max=20>
+		</label>
+
+		<label>
+			Difficulty: 
+			<input type=number bind:value={difficulty} min=1 max=5>
+			<input type=range bind:value={difficulty} min=1 max=5>
+		</label>
+
+		<label>
+			<input type=radio bind:group={privateMode} name="privateMode" value={false}> Public
+			<input type=radio bind:group={privateMode} name="privateMode" value={true}> Private
+		</label>
 
 		<button on:click={()=>{
 			$client.sock.send(JSON.stringify({
@@ -70,10 +80,11 @@
 					client: $client.id,
 					mapType: mapType,
 					maxPoint: maxPoint,
-					difficulty: difficulty
+					difficulty: difficulty,
+					privateMode: privateMode
 				}
 			}));
-		}}>Submit</button>
+		}}>Create Game</button>
 	</div>
 	
 </div>

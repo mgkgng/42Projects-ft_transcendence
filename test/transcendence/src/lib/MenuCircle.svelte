@@ -1,5 +1,8 @@
 <style lang="scss">
-
+	.container {
+		font-family: sans-serif; // for now
+	}
+	
 	@keyframes size-change {
 		0% { transform: scale(1) }
 		50% { transform: scale(1.2) }
@@ -18,6 +21,7 @@
 	}
 
 	.menu-circle {
+
 
 		position: absolute;
 
@@ -111,16 +115,18 @@ import Modal from "./tools/Modal.svelte";
 	$: console.log(expanded);
 </script>
 
-<button class="menu-circle"
-	on:click={() => { expanded = true; }}>
-</button>
-<div class="menu {expanded && "expanded"}">
-	<button class="button">hello</button>
-	<button class="button">Rooms</button>
-	<button class="button" on:click={() => {
-		createGameModal.open();
-	}}>Create</button>
-	<button class="button" on:click={() => { expanded = false; }}>X</button>
+<div class="container">
+	<button class="menu-circle"
+		on:click={() => { expanded = true; }}>
+	</button>
+	<div class="menu {expanded && "expanded"}">
+		<button class="button">hello</button>
+		<button class="button">Rooms</button>
+		<button class="button" on:click={() => {
+			createGameModal.open();
+		}}>Create</button>
+		<button class="button" on:click={() => { expanded = false; }}>X</button>
+	</div>
 </div>
 
 <Modal bind:this={createGameModal} closeOnBgClick={true}>
