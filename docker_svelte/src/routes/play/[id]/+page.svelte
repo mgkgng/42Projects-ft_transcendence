@@ -51,12 +51,12 @@
 	onMount(() => {
 		$client.OnConnection(roomcheck);
 
-		$client.addListener("RoomNotFound", () => {
+		$client.socket.on("RoomNotFound", () => {
 			console.log("RoomNotFound");
 			roomNotFound = true;
 		});
 
-		$client.addListener("RoomInfo", (data: any) => {
+		$client.socket.on("RoomInfo", (data: any) => {
 			console.log("RoomInfo", data);
 			roomFound = true;
 			roomInfo = data.roomInfo;

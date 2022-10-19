@@ -40,11 +40,11 @@ class Client {
 		for (let func of this.callbacksOnConnection)
 			func();
 
-		this.socket.onmessage = (msg: any) => {
-			let data = JSON.parse(msg.data);
+		//this.socket.onmessage = (msg: any) => {
+			//let data = JSON.parse(msg.data);
 			// console.log("OnMessage", data);
-			this.listeners.get(data.event)?.(data?.data);
-		}
+			//this.listeners.get(data.event)?.(data?.data);
+		//}
 	}
 
 	OnConnection(func: Function) {
