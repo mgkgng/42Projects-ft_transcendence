@@ -43,6 +43,7 @@ export class ChatRoomService {
 
 	//OK
 	//{}
+	//get email, username, img of current socket user
 	@SubscribeMessage('get_user_info')
 	async get_user_infos(@MessageBody() data: any, @ConnectedSocket() client: Socket, @Request() req)
 	{
@@ -58,6 +59,7 @@ export class ChatRoomService {
 		}
 	}
 	//OK
+	//Create new room with current socker user as admin
 	//{room_name: string, is_password_protected: bool, room_password: string}
 	@SubscribeMessage('new_room')
 	async creat_room(@MessageBody() data: any, @Request() req)
@@ -88,6 +90,7 @@ export class ChatRoomService {
 		}
 	}
 	//OK
+	//Add user to a room 
 	//{room_name: string, username: string, room_password? : string}
 	@SubscribeMessage('append_user_to_room')
 	async append_user_to_room(@MessageBody() data: any, @ConnectedSocket() client: Socket, @Request() req)
@@ -114,6 +117,7 @@ export class ChatRoomService {
 		}
 	}
 	//OK
+	//Get all messages in room (Error if current socket user is not in the room)
 	//{room_name: string }
 	@SubscribeMessage('get_message_room')
 	async getMessageRoom(@MessageBody() data: number, @ConnectedSocket() client: Socket, @Request() req) 
@@ -147,6 +151,7 @@ export class ChatRoomService {
 		}
 	}
 	//OK
+	//Get a page of messages in room (Error if current socket user is not in the room)
 	//{room_name: string, page_number: number, size_page: number }
 	@SubscribeMessage('get_message_room_page')
 	async getMessageRoomPage(@MessageBody() data: any, @ConnectedSocket() client: Socket, @Request() req) 
@@ -183,6 +188,7 @@ export class ChatRoomService {
 		}
 	}
 	//OK	
+	//Add message in a room (Error if current socket user is not in the room)
 	//{room_name: string, content_message: string}
 	@SubscribeMessage('new_message_room')
 	async newMessageRoom(@MessageBody() data: any, @ConnectedSocket() client: Socket, @Request() req)
@@ -217,6 +223,7 @@ export class ChatRoomService {
 		}
 	}
 	//OK
+	//Get all rooms for the current socket user
 	//{}
 	@SubscribeMessage('get_my_rooms')
 	async getMyRoom(@MessageBody() data, @ConnectedSocket() client: Socket)
@@ -232,6 +239,7 @@ export class ChatRoomService {
 		client.emit("get_my_rooms", name);
 	}
 	//OK
+	//Get all rooms in the databases
 	//{}
 	@SubscribeMessage('get_all_rooms')
 	async getALLRooms(@MessageBody() data, @ConnectedSocket() client: Socket)
@@ -242,6 +250,7 @@ export class ChatRoomService {
 		console.log(res);
 		client.emit("get_all_rooms", res);
 	}
+	//Ban a user if current socket user is Admin on the room 
 	//{room_name:string, username_ban: string, ban_end: Date}
 	@SubscribeMessage('ban_user')
 	async setBanUser(@MessageBody() data, @ConnectedSocket() client: Socket, @Request() req)
@@ -269,6 +278,7 @@ export class ChatRoomService {
 			}
 	}
 	//OK
+	//Mute a user if current socket user is Admin on the room 
 	//{room_name:string, username_ban: string, mute_end: Date}
 	@SubscribeMessage('mute_user')
 	async setMuteUser(@MessageBody() data, @ConnectedSocket() client: Socket, @Request() req)
@@ -296,6 +306,7 @@ export class ChatRoomService {
 			}
 	}
 	//OK
+	//Set other user as admin if current socket user is Admin on the room 
 	//{room_name:string, username_new_admin: string}
 	@SubscribeMessage('set_admin')
 	async setAdminUser(@MessageBody() data, @ConnectedSocket() client: Socket, @Request() req)
