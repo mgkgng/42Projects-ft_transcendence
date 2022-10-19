@@ -1,5 +1,7 @@
 <style lang="scss">
 	.container {
+		position: relative;
+
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -11,9 +13,16 @@
 		to { transform: rotate(var(--angle2)) translateX(var(--dist)) rotate(var(--angle2))}
 	}
 
+	@keyframes rotate-rev {
+		from { transform: rotate(var(--angle2)) translateX(var(--dist)) rotate(var(--angle2))}
+		to { transform: rotate(var(--angle)) translateX(var(--dist)) rotate(var(--angle))}
+	}
+
+
 	.circle-around {
 		position: absolute;
-		top: 44%;
+		// z-index: 88;
+		top: 49%;
 		left: 50%;
 		right: 0;
 		width: var(--size);
@@ -21,7 +30,25 @@
 		border-radius: 50%;
 		background-color: #000;
 
-		animation-name: rotate;
+		animation-name: rotate-rev;
+		animation-duration: var(--duration);
+		animation-iteration-count: infinite;
+		animation-timing-function: linear;
+	}
+
+	.blue-circle-around {
+		position: absolute;
+		top: 49%;
+		left: 50%;
+		right: 0;
+		width: var(--size);
+		aspect-ratio: 1 / 1;
+		border-radius: 50%;
+		background-color: transparentize($main2, .0);
+		border: none;
+		box-shadow: 0px 0px 5px 5px rgb(49, 211, 240); //maybe?
+
+		animation-name: rotate-rev;
 		animation-duration: var(--duration);
 		animation-iteration-count: infinite;
 		animation-timing-function: linear;
@@ -29,6 +56,8 @@
 
 	.title {
 		position: absolute;
+		z-index: 99;
+
 		background-color: rgba(0, 0, 0, 0);
 		margin: 2em;
 		padding: .3em 0 .1em;
@@ -81,12 +110,14 @@
 	let circlesAround: Array<Circle> = [];
 	let circleRadius = 250;
 
+	let blues: Array<Circle> = [];
+
 	let showMessage = false;
 	let message = "";
 
 	function createCircles() {
 		let res = [];
-		let circleNb = Math.floor(Math.random() * 10 + 15);
+		let circleNb = Math.floor(Math.random() * 10 + 10);
 		
 		for (let i = 0; i < circleNb; i++) {
 			let circle: Circle = {
@@ -99,17 +130,40 @@
 		return (res)
 	}
 
+	function createBlueCircles() {
+		let res = [];
+		let circleNb = Math.floor(Math.random() * 5 + 3);
+		
+		for (let i = 0; i < circleNb; i++) {
+			let circle: Circle = {
+				size : Math.floor(Math.random() * 20 + 8),
+				duration : Math.floor(Math.random() * 50 + 15),
+				angle : Math.floor(Math.random() * 360)
+			};
+			res.push(circle);
+		}
+		return (res)
+
+	}
+
 	onMount(() => {
 		circlesAround = createCircles();
+		blues = createBlueCircles();
 	});
 
 </script>
 
 <div class="container">
-	<MainCircle circleRadius={circleRadius}/>
-	{#each circlesAround as circleInfo}
-	<div class="circle-around" style="--dist: {circleRadius + 45}px; --size: {circleInfo.size}px; --duration: {circleInfo.duration}s; --angle: {circleInfo.angle}deg; --angle2: {circleInfo.angle + 360}deg"></div>
+	{#each blues as blue}
+	<div class="blue-circle-around" style="--dist: {circleRadius + 85}px; --size: {blue.size}px; --duration: {blue.duration}s; --angle: {blue.angle}deg; --angle2: {blue.angle + 360}deg"></div>
 	{/each}
+
+	<MainCircle circleRadius={circleRadius}/>
+
+	{#each circlesAround as circleInfo}
+	<div class="circle-around" style="--dist: {circleRadius + 85}px; --size: {circleInfo.size}px; --duration: {circleInfo.duration}s; --angle: {circleInfo.angle}deg; --angle2: {circleInfo.angle + 360}deg"></div>
+	{/each}
+
 	{#if mainPage}
 	<RoundButton bind:showMessage={showMessage} bind:message={message} circleRadius={circleRadius}/>
 	{/if}

@@ -9,375 +9,9 @@ import {
 import { runInThisContext } from "vm";
 import { threadId } from "worker_threads";
 import { Server } from 'ws';
+import { Client } from "./app.Client";
+import { Room } from "./app.Room";
 
-const WsMessage = {
-	
-}
-
-function uid() {
-	const set = '0123456789abcdefghiklmnopqrstuvwxyz';
-	
-	let res: string = "";
-	for (let i = 0; i < 16; i++)
-		res += set[Math.floor(Math.random() * set.length)];
-	return (res);
-}
-
-class Client {
-	id: string;
-	sock: any;
-	callbacksOnConnection: Set<Function>;
-	listeners: Map<string, Function>;
-
-	//Websocket
-	// addEventListener
-	// removeEventListener
-	constructor(id: string, sock: any) {
-		this.id = id;
-		this.sock = sock;
-		this.listeners = new Map();
-		
-		// this.sock.onmessage = (msg: any) => {
-		// 	console.log("receving something", msg);
-		// 	this.listeners.get(msg.event)?.(msg.data);
-		// }
-	}
-
-	onDisconnect(callback: Function) {
-		this.sock.addListener('close', callback);
-	}
-	
-	addListener(type: string, callback: Function) {
-		this.listeners.set(type, callback);
-	}
-
-	removeListener(type: string) {
-		this.listeners.delete(type);
-	}
-
-	send(data: any) {
-		if (this?.sock?.readyState === WebSocket.OPEN) // TODO websocket is not defined
-		{
-			//console.log('send data = ', data);
-			try {
-				this?.sock?.send?.(JSON.stringify(data));
-			} catch (e) {
-				console.trace('Error: [send]', data, e);
-			}
-			return ;
-		}
-		// this.queue.push(data);
-	}
-
-
-}
-const PaddleSize = {
-	XSmall: 20,
-	Small : 40,
-	Medium : 80,
-	Large : 130
-}
-
-const MapWidth = {
-	Small: 400,
-	Medium: 700,
-	Large: 1000
-}
-
-const MapHeight = {
-	Small: 400,
-	Medium: 800,
-	Large: 1000
-}
-
-interface moveInfo {
-	move: boolean,
-	vectorX: number,
-	vectorY: number,
-	moveWidth: number,
-	moveHeight: number
-}
-
-class Block {
-	startX : number;
-	startY: number;
-	endX : number;
-	endY : number;
-	gameWidth: number;
-	gameHeight: number;
-	moveInfo: moveInfo;
-
-	constructor(startX: number, startY: number, endX: number, endY: number, 
-		gameWidth: number, gameHeight: number, moveInfo: moveInfo) {
-		this.startX = startX;
-		this.startY = startY;
-		this.endX = endX;
-		this.endY = endY;
-		this.gameWidth = gameWidth;
-		this.gameHeight = gameHeight;
-		this.moveInfo = moveInfo;
-	}
-
-	// move() {}
-}
-
-class Puck {
-	posX: number;
-	posY: number;
-	vectorX: number;
-	vectorY: number;
-	gameWidth: number;
-	gameHeight: number;
-
-	constructor(gameWidth : number, gameHeight : number,
-		vectorX : number = (Math.floor(Math.random() * 6) + 1) * ((Math.floor(Math.random() * 2)) ? 1 : -1), 
-		vectorY: number = (Math.floor(Math.random() * 2)) ? 3 : -3) { // temporary test
-		this.vectorX = vectorX;
-		this.vectorY = vectorY;
-		this.gameWidth = gameWidth;
-		this.gameHeight = gameHeight;
-		this.posX = gameWidth / 2;
-		this.posY = gameHeight / 2;
-	}
-
-	setCheckPuck(room: any) {
-		// calculating the interval
-		let frameDuration = 20;
-		let deadZoneHeight = 30;
-		let paddleHeight = 12;
-		let ballSize = 30;
-
-		let distToDeath = (this.vectorY > 0)
-			? (this.gameHeight - deadZoneHeight - paddleHeight) - this.posY
-			: this.posY - deadZoneHeight - paddleHeight; // it functions well
-
-		let timeOut = Math.abs((distToDeath / this.vectorY)) * frameDuration;
-		// let deathPointX = this.calculPosX();
-
-		// room.broadcast(JSON.stringify({
-		// 	event: "DeathPointUpdate",
-		// 	data: deathPointX
-		// }));
-
-		setTimeout(() => {
-			
-			// checking if the paddle hits the puck...
-			// let paddlePos = (this.vectorY > 0) ? room.pong.paddlePos[1] : this.gameWidth - room.pong.paddlePos[0];
-			let paddlePos = (this.vectorY > 0) ? room.pong.paddlePos[1] : room.pong.paddlePos[0];
-
-			if ((this.vectorY < 0)
-				|| (this.vectorY > 0)) {
-				room.broadcast(JSON.stringify({
-					event: "PuckHit"
-				}));
-				// this.posX = deathPointX;
-				this.posY = (this.vectorY > 0) ? (this.gameHeight - deadZoneHeight - paddleHeight) : deadZoneHeight + paddleHeight;
-				this.vectorY *= -1;
-				this.setCheckPuck(room);
-				return ;
-			} else {
-				console.log("ScoreUpdate");
-	
-				let winner = (this.vectorY > 0) ? 0 : 1;
-				room.broadcast(JSON.stringify({
-					event: "ScoreUpdate",
-					data: (this.vectorY > 0) ? 0 : 1
-				}));
-				room.scores[winner]++;
-
-				console.log("Actual score: ", room.scores[0], ":", room.scores[1]);
-				if (room.scores[0] == room.maxpoint || room.scores[1] == room.maxpoint) {
-					room.broadcast(JSON.stringify({
-						event: "GameFinished",
-						data: (room.scores[0] > room.scores[1]) ? 0 : 1
-					}));
-
-					// TODO Save the game to the database
-					room.putScore();
-					return ;
-				}
-
-				room.pong.puck = new Puck(room.pong.gameMap.width, room.pong.gameMap.height);
-				setTimeout(() => {
-					Room.startPong(room);
-				}, 1000);
-			}
-		}, timeOut);
-	}
-
-	calculPosX() {
-		// TODO precision should be made, it should be because of the css stuff
-		let distToDeath = (this.vectorY > 0)
-			? (this.gameHeight - 30 - 12) - this.posY
-			: this.posY - 30 - 12; 
-		let deathPointX = this.posX;
-		let vecX = this.vectorX;
-
-		let inc = Math.abs(this.vectorY);
-		for (let i = 0; i < distToDeath / 20; i++) {
-			deathPointX += vecX;
-			if (deathPointX < 0 || deathPointX > this.gameWidth - 30) {
-				vecX *= -1;
-				deathPointX += vecX;
-			}
-			// console.log(deathPointX);
-		}
-
-		return (deathPointX);
-	}
-}
-
-class GameMap {
-	blocks : Array<Block>;
-	width: number;
-	height: number;
-	paddleSize: number; // TODO put it into class Pong
-
-	constructor(mapWidth: number = MapWidth.Medium,
-		mapHeight: number = MapHeight.Medium,
-		paddleSize: number = PaddleSize.Large,
-		blocks: Array<Block> = []) {
-		this.width = mapWidth;
-		this.height = mapHeight;
-		this.paddleSize = paddleSize;
-		this.blocks = blocks;
-	}
-}
-
-class Pong {
-	gameMap: GameMap;
-	puck: Puck;
-	paddlePos: Array<number>;
-	moveMin: number;
-	moveMax: number;
-
-	constructor() {
-		this.gameMap = new GameMap();
-		this.puck = new Puck(this.gameMap.width, this.gameMap.height);
-
-		let initPos = (this.gameMap.width - this.gameMap.paddleSize) / 2;
-		this.paddlePos = [initPos, initPos];
-
-		this.moveMin = 0;
-		this.moveMax = this.gameMap.width - this.gameMap.paddleSize;
-	}
-
-	movePaddle(userIndex: number, left: boolean) {
-		//TODO put the accelerating speed on paddle
-
-		if ((this.paddlePos[userIndex] == this.moveMin && left)
-			|| (this.paddlePos[userIndex] == this.moveMax && !left))
-			return ;
-
-		this.paddlePos[userIndex] += (left) ? -5 : 5;
-
-		if (this.paddlePos[userIndex] <= this.moveMin)
-			this.paddlePos[userIndex] == this.moveMin;
-		else if (this.paddlePos[userIndex] >= this.moveMax)
-			this.paddlePos[userIndex] == this.moveMax;
-	}
-}
-
-class Room {
-	id: string;
-	clients: Map<string, any>;
-	players: Array<any>;
-	scores: Array<number>;
-	maxpoint: number;
-	pong: Pong;
-	//chat: ChatRoomService
-	isPlaying: boolean;
-	
-	// constructor(clients, mapchoice: string, mode: string, maxpoint: number) {
-	constructor(clients: any, maxpoint: number = 25) {
-		this.id = uid();
-		//this.chat = new ChatRoomService();
-		this.clients = new Map();
-		
-		this.addClients(clients);
-
-		this.pong = new Pong();
-		
-		this.players = [clients[0], clients[1]];
-
-		this.maxpoint = maxpoint;
-		
-		this.scores = [0 , 0];
-		
-		this.isPlaying = false;
-
-		setTimeout(Room.startPong, 2000, this);
-	}
-
-	/**
-	 * Use the static server method to broadcast,
-	 * pass the clients as parameters
-	 */
-	broadcast(msg: any) {
-		AppGateway.broadcast(this.getClients(), msg);
-	}
-
-	addClients(clients: any) {
-		for (let client of clients)
-			this.addClient(client);
-	}
-
-	addClient(client: any) {
-		this.clients.set(client.id, client);
-		// this.clients[client.id] = client;
-		//this.chat.append_user_to_room();
-		//console.log('Room -> addClient', this.clients.size);
-		/* TODO IMPORTANT TO REMOVE THE CLIENT */
-		// client.onDisconnect(() => this.removeClient(client));
-	}
-
-	removeClient(client: any) {
-		this.clients.delete(client.username);
-	}
-
-	getClients() {
-		return (Array.from(this.clients.values()));
-	}
-
-	// need static because used often with setTimeOut() func
-	// sent by setTimeOut(), 'this' is initialised by timeOut class
-	static startPong(room: any) {
-		if (!room)
-			return ;
-
-		room.broadcast(JSON.stringify({
-			event: "LoadBall",
-			data: {
-				vectorX: room.pong.puck.vectorX,
-				vectorY: room.pong.puck.vectorY,
-				posX: room.pong.puck.posX,
-				posY: room.pong.puck.posY
-			}
-		}));
-		
-		setTimeout(() => {
-			room.broadcast(JSON.stringify({
-				event: "PongStart"
-			}))
-			room.pong.puck.setCheckPuck(room);
-		}, 2000);
-	}
-
-	putScore() {
-
-		// Broadcast result
-
-		// Store the game in db
-		//this.storeGame();
-
-		// Destroy room
-		//this.onEnd?.();
-	}
-
-	// async storeGame() {
-	// 	// Store the game result in db
-	// }
-}
 
 @WebSocketGateway()
 export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -419,28 +53,25 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	joinQueue(@MessageBody() data: any) {
 		console.log("Join Queue", data);
 		let client = this.getClient(data);
-
-		if (this.queue.includes(client)) {
-			// TODO: should optimize the algorithm later
-			
-			console.log("already joined the queue");
+		// TODO: should maybe optimize the algorithm later -- for includes
+		if (client.room.length || this.queue.includes(client))
 			return ;
-		}
 
 		this.queue.push(client);
-		console.log("Queue length at the beginning: ", this.queue.length);
 
 		if (this.queue.length > 1) {
 			let room = new Room([this.queue[0], this.queue[1]]);
+			this.queue[0].room = room.id;
+			this.queue[1].room = room.id;
+
 			room.broadcast(JSON.stringify({
 				event: 'MatchFound',
 				data: room.id
 			}));
-			console.log("sending matchfound.");
+
 			this.rooms.set(room.id, room);
 			this.queue = this.queue.slice(2);
 		}
-		console.log("Queue length at the end: ", this.queue.length);
 
 	}
 
@@ -461,13 +92,12 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		client.sock.send(JSON.stringify({
 			event: "RoomInfo",
 			data: {
-				roomInfo: {
-					players: [room.players[0].id, room.players[1].id],
+					players: (room.players.length === 2) ? [room.players[0].id, room.players[1].id]
+						: [room.players[0].id],
 					maxpoint: room.maxpoint,
 					scores: room.scores,
 					mapSize: [room.pong.gameMap.width, room.pong.gameMap.height],
 					paddleSize: room.pong.gameMap.paddleSize
-				}
 			}
 		}));
 
@@ -498,6 +128,38 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	paddleStop(@MessageBody() data: any) {
 		clearInterval(this.control.get(data));
 		this.control.delete(data);
+	}
+
+	@SubscribeMessage("AskRooms")
+	askRooms(@MessageBody() data: any) {
+		let client = this.getClient(data);
+	
+		// I need to think more about how i should save the data and how i'll send it
+		// there should be at least these information:
+		// playersInfo, availability / format (max point, map, mode...)
+		// and then if the game is going on...
+		// score...
+		
+		client.sock.send(JSON.stringify({
+			event: "GetAllRooms",
+			data: [...this.rooms].filter(room => room[1].privateMode == false)
+		}));
+	}
+
+	@SubscribeMessage("CreateRoom")
+	createRoom(@MessageBody() data: any) {
+		let client = this.getClient(data.client);
+		if (client.room.length)
+			return ;
+
+		let room = new Room([client], data.maxPoint, data.difficulty, data.privateMode);
+		this.rooms.set(room.id, room);
+		client.room = room.id;
+
+		client.sock.send(JSON.stringify({
+			event: "RoomCreated",
+			data: room.id
+		}));
 	}
 
 	static broadcast(clients: any, msg: any) {

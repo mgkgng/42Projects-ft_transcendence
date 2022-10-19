@@ -53,7 +53,7 @@
 		$client.addListener("RoomInfo", (data: any) => {
 			console.log("RoomInfo", data);
 			roomFound = true;
-			roomInfo = data.roomInfo;
+			roomInfo = data;
 		});
 
 		return (() => {

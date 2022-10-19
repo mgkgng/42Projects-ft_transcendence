@@ -1,22 +1,23 @@
 import { writable } from "svelte/store";
 import { browser } from "$app/environment";
 import { uid } from "./lib";
+// import io from 'socket.io-client';
 
 class Client {
 	id: string;
 	sock: any;
 	callbacksOnConnection: Set<Function>;
 	listeners: Map<string, Function>;
+	room: string;
 
 	constructor() {
 		this.id = uid();
 		this.listeners = new Map();
 		this.callbacksOnConnection = new Set();
+		this.room = "";
 		if (browser) {
-			this.sock = new WebSocket('ws://localhost:3000');
-			console.log(this.sock);
+			this.sock = new WebSocket(`ws://${location.hostname}:3000`);
 			this.sock.onmessage = (msg: any) => {
-				console.log("receving something", msg);
 				this.listeners.get(msg.event)?.(msg.data);
 			}
 			this.connect();
@@ -42,7 +43,8 @@ class Client {
 
 		this.sock.onmessage = (msg: any) => {
 			let data = JSON.parse(msg.data);
-			// console.log("OnMessage", data);
+			console.log("OnMessage", data);
+			console.log(this.listeners);
 			this.listeners.get(data.event)?.(data?.data);
 		}
 	}

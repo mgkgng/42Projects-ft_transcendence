@@ -1,13 +1,13 @@
 <style lang="scss">
 	@keyframes rotate {	
-		from { transform: rotate(var(--from1)) translateX(350px) rotate(var(--to1)); }
-		to { transform: rotate(var(--from2)) translateX(350px) rotate(var(--to2)); }
+		from { transform: rotate(var(--from1)) translateX(300px) rotate(var(--to1)); }
+		to { transform: rotate(var(--from2)) translateX(300px) rotate(var(--to2)); }
 	}
 
 	.circle-button {
 		position: absolute;
-		top: 40%;
-		left: 43%;
+		top: 42%;
+		left: 35%;
 
 		background-color: transparentize(#000000, 0.1);
 		width: 100px;
@@ -49,7 +49,6 @@
 
 <script lang="ts">
 	import { onMount } from "svelte";
-	import '$lib/scss/app.scss';
 	import { client } from "./stores/client";
 
 	export let circleRadius;

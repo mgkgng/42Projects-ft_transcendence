@@ -147,9 +147,7 @@
 	let puckMoving: any;
 	
 	let gameFinishedModal: any;
-
-	$: console.log(paddlePos);
-
+	
 	onMount(()=> {
 		userType = ($client.id == roomInfo.players[0]) ? UserType.Player1 
 			: ($client.id == roomInfo.players[1]) ? UserType.Player2 
@@ -162,11 +160,6 @@
 
 		scores = roomInfo.scores;
 		
-
-		console.log(paddlePos);
-
-		console.log("My User Index: ", userIndex);
-
 		$client.addListener("PaddleUpdate", (data: any) => {
 			console.log("PaddleUpdate", data);
 			if ((data.player == UserType.Player1 && userIndex == UserType.Player2) ||

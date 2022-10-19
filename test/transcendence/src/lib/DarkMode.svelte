@@ -1,4 +1,10 @@
 <style lang="scss">
+	@keyframes size-change {
+		0% { transform: scale(1) }
+		50% { transform: scale(1.2) }
+		100% { transform: scale(1) }
+	}
+
 	.color-change-circle {
 		position: absolute;
 		bottom: -40px;

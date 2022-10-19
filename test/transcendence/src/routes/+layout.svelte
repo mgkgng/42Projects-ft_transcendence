@@ -9,15 +9,18 @@
 
 	main {
 		padding: 0;
+		width: 100vw;
 		height: 100vh;
+		overflow: hidden;
 	}
+
 
 </style>
 
 <script lang="ts">
 	import '$lib/stores/client';
 	import { darkMode } from "$lib/stores/var";
-
+   
 	let dark : boolean;
 
 	darkMode.subscribe(value => {
