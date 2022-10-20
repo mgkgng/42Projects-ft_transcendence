@@ -82,7 +82,7 @@ export class friendSystemController {
         let unparsedQuery = await qb
         .leftJoinAndSelect("u.id_first_user", "friendrequester")
         .leftJoinAndSelect("u.id_second_user", "friendrequested")
-        .where(`friendrequester.username = '${username}' OR friendrequested.username = '${username}'`)
+        .where(`friendrequester.username = :username OR friendrequested.username = :username`, {username: username})
         .andWhere(`u.is_user_friend = true`)
         .getMany();
 
@@ -133,8 +133,6 @@ export class friendSystemController {
         }
         return firstHaveAlreadyRequestedEntity;
     }
-
-    // Accept Friend
 
     // Delete Friend
 }
