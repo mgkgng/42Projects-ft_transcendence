@@ -59,75 +59,31 @@ export class friendSystemController {
         return await this.userRepository.save(user);
     }
 
-    // Do a request on this route to ask if 2 user are friend
     @Get("isfriendwith?")
     async isFriendWithByUsername(@Query() query : {first_username : string, second_username : string})
     {
         return this.friendSystemService.isFriendWithByUsername(query.first_username, query.second_username);
     }
 
-    // Do a request to this route to ask for the friendList of a user
     @Get("getFriendList?")
     async getFriendList(@Query() query : {username : string })
     {
-        const qb = this.userFriendRepository.createQueryBuilder('u');
-        let username = query.username;
-        let unparsedQuery = await qb
-        .leftJoinAndSelect("u.id_first_user", "friendrequester")
-        .leftJoinAndSelect("u.id_second_user", "friendrequested")
-        .where(`friendrequester.username = :username OR friendrequested.username = :username`, {username: username})
-        .andWhere(`u.is_user_friend = true`)
-        .getMany();
-
-        let i : number = 0;
-        let parsedList = [];
-        unparsedQuery.forEach(element => {
-            if (element.id_first_user.username == username)
-                parsedList.push(element.id_second_user);
-            if (element.id_second_user.username == username)
-                parsedList.push(element.id_first_user);
-            i++;
-        });
-        return parsedList;
+        return this.friendSystemService.getFriendList(query.username);
     }
 
-    // If first_username have already asked second_username no request is send
-    // If second_username have already asked first_username the field is_user_friend
-    // of the request from second_username become true.
     @Get("askfriend?")
     async askFriend(@Query() query : {first_username : string, second_username : string})
     {
-        const qbu = this.userRepository.createQueryBuilder('u');
-        const qb = this.userFriendRepository.createQueryBuilder('u');
-        let first_username = query.first_username;
-        let second_username = query.second_username;
-        let firstHaveAlreadyBeenRequestEntity = await qb.leftJoinAndSelect("u.id_first_user", "friendrequester")
-        .leftJoinAndSelect("u.id_second_user", "friendrequested")
-        .where(`friendrequester.username = :second_username AND friendrequested.username = :first_username`, {first_username : first_username, second_username: second_username})
-        .getOne();
-        let firstHaveAlreadyRequestedEntity = await qb
-        .where(`friendrequester.username = :first_username AND friendrequested.username = :second_username`, {first_username : first_username, second_username: second_username})
-        .getOne();
-        if (firstHaveAlreadyBeenRequestEntity)
-        {
-            firstHaveAlreadyBeenRequestEntity.is_user_friend = true;
-            return await this.userFriendRepository.save(firstHaveAlreadyBeenRequestEntity);   
-        }
-        else if (firstHaveAlreadyRequestedEntity == null)
-        {
-            const newUserRel = new UserFriendEntity();
-            newUserRel.id_first_user = await qbu.select().where(`u.username = :first_username`, {first_username : first_username}).getOneOrFail();
-            newUserRel.id_second_user = await qbu.select().where(`u.username = :second_username`, {second_username : second_username}).getOneOrFail();
-            newUserRel.is_user_friend = false;
-            return await this.userFriendRepository.save(newUserRel);
-        }
-        return firstHaveAlreadyRequestedEntity;
+        return this.friendSystemService.askFriend(query.first_username, query.second_username)
     }
+
+    // unaskFriend to do
 
     @Get('unfriend?')
     async unfriend(@Query() query : {first_username : string, second_username : string})
     {
-
+        return this.friendSystemService.unfriend(query.first_username, query.second_username)
     }
+
     // Delete Friend
 }
