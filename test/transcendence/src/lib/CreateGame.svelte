@@ -35,7 +35,6 @@
     import { goto } from "$app/navigation";
     import { onMount } from "svelte";
     import { identity } from "svelte/internal";
-    import Bar from "./Bar.svelte";
 	import { client } from "./stores/client";
 
 	let maxPoint: number = 10;

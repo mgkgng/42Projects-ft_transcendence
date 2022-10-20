@@ -24,9 +24,10 @@
 <style lang="scss">
 	.card {
 		width: 100%;
-		max-width: 30rem;
-		max-height: 100vh;
+		max-width: 70vw;
+		max-height: 90vh;
 		overflow: auto;
+		padding: 0;
 		/*padding: 2rem;*/
 		gap: 2rem;
 		background: transparentize(#fff, .05);

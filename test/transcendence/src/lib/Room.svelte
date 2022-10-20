@@ -1,7 +1,5 @@
 <style lang="scss">
 	.container {
-		width: 60%;
-		height: 60%;
 		display: flex;
 		justify-content: center;
 		align-items: center;
@@ -14,6 +12,7 @@
 		border: dashed 3px white;
 		border-radius: 2.5em;
 
+		background-color: #000;
 		// display: flex;
 		// justify-content: center;
 		// align-items: center;
@@ -255,6 +254,7 @@
 </script>
 
 <div class="container">
+	{#if roomInfo}
 	<div class="pong" style="min-width: {roomInfo?.mapSize[0]}px; min-height: {roomInfo?.mapSize[1]}px;">
 		{#if roomInfo.players.length > 1}
 		<Paddle pos={paddlePos[opponentIndex]} paddleWidth={roomInfo?.paddleSize}
@@ -281,9 +281,13 @@
 		<div class="central-line-horizontal"></div>	 -->
 	</div>
 	<div class="pong-score">
+		<!-- solution for now, later it will be an empty score box with question mark -->
+		{#if roomInfo.players.length > 1}
 		<ScoreBox score={scores[opponentIndex]}/>
 		<ScoreBox score={scores[userIndex]}/>
+		{/if}
 	</div>
+	{/if}
 </div>
 
 <Modal bind:this={gameFinishedModal} closeOnBgClick={false}>
