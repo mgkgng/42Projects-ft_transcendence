@@ -77,7 +77,6 @@ export class friendSystemController {
     async getFriendList(@Query() query : {username : string })
     {
         const qb = this.userFriendRepository.createQueryBuilder('u');
-        console.log(query.username)
         let username = query.username;
         let unparsedQuery = await qb
         .leftJoinAndSelect("u.id_first_user", "friendrequester")
@@ -87,7 +86,6 @@ export class friendSystemController {
         .getMany();
 
         let i : number = 0;
-        console.log(unparsedQuery)
         let parsedList = [];
         unparsedQuery.forEach(element => {
             if (element.id_first_user.username == username)
@@ -118,13 +116,11 @@ export class friendSystemController {
         .getOne();
         if (firstHaveAlreadyBeenRequestEntity)
         {
-            console.log("i exist")
             firstHaveAlreadyBeenRequestEntity.is_user_friend = true;
             return await this.userFriendRepository.save(firstHaveAlreadyBeenRequestEntity);   
         }
         else if (firstHaveAlreadyRequestedEntity == null)
         {
-            console.log("i doesnt exist")
             const newUserRel = new UserFriendEntity();
             newUserRel.id_first_user = await qbu.select().where(`u.username = '${first_username}'`).getOneOrFail();
             newUserRel.id_second_user = await qbu.select().where(`u.username = '${second_username}'`).getOneOrFail();
