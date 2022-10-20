@@ -1,8 +1,7 @@
 <style lang="scss">
 	.container {
-		display: grid;
-		grid-template-columns: 20% 70% ;
-		height: 100%;
+		width: 60%;
+		height: 60%;
 		display: flex;
 		justify-content: center;
 		align-items: center;
@@ -121,8 +120,9 @@
     import Modal from './tools/Modal.svelte';
     import GameOver from './modal/GameOver.svelte';
 
-	export let roomInfo: any;
 	export let roomId: string;
+
+	let roomInfo: any;
 
 	// let gameMap = new GameMap(mapWidth.Small, mapHeight.Small, PaddleSize.Medium);
 
@@ -134,7 +134,7 @@
 	let userIndex: number = UserType.Player1;
 	let opponentIndex: number = UserType.Player2;
 
-	let initPos = (roomInfo.mapSize[0] + roomInfo.paddleSize) / 2;
+	let initPos = (roomInfo?.mapSize[0] + roomInfo?.paddleSize) / 2;
 	let paddlePos: Array<number> = [initPos, initPos];
 
 
@@ -148,17 +148,45 @@
 	
 	let gameFinishedModal: any;
 	
+	function roomcheck() {
+		$client.sock.send(JSON.stringify({
+			event: 'RoomCheck',
+			data: {
+				client: $client.id,
+				room: roomId
+			}
+		}));
+	}
+
 	onMount(()=> {
-		userType = ($client.id == roomInfo.players[0]) ? UserType.Player1 
-			: ($client.id == roomInfo.players[1]) ? UserType.Player2 
-			: UserType.Watcher;
+
+		$client.OnConnection(roomcheck);
+
+		// $client.addListener("RoomNotFound", () => {
+		// 	console.log("RoomNotFound");
+		// 	roomNotFound = true;
+		// });
+
+		$client.addListener("RoomInfo", (data: any) => {
+			console.log("RoomInfo", data);
+			roomInfo = data;
+		});
+
+		// plus tard je le rends plus beau
+		if (roomInfo?.players.length > 1)
+			userType = UserType.Player1;
+		else
+			userType = ($client.id == roomInfo?.players[0]) ? UserType.Player1 
+				: ($client.id == roomInfo?.players[1]) ? UserType.Player2 
+				: UserType.Watcher;
+
 		if (userType == UserType.Player2) {
 			[userIndex, opponentIndex] = [opponentIndex, userIndex];
 			// TODO (this is kinda brut force)
-			paddlePos[0] -= roomInfo.paddleSize, paddlePos[1] -= roomInfo.paddleSize;
+			paddlePos[0] -= roomInfo?.paddleSize, paddlePos[1] -= roomInfo?.paddleSize;
 		}
 
-		scores = roomInfo.scores;
+		scores = roomInfo?.scores;
 		
 		$client.addListener("PaddleUpdate", (data: any) => {
 			console.log("PaddleUpdate", data);
@@ -166,14 +194,14 @@
 				(data.player == UserType.Player2 && userIndex == UserType.Player2))
 				paddlePos[data.player] = data.paddlePos;
 			else
-				paddlePos[data.player] = roomInfo.mapSize[0] - data.paddlePos;
+				paddlePos[data.player] = roomInfo?.mapSize[0] - data.paddlePos;
 
 			// data.paddlePos;
 		});
 
 		$client.addListener("LoadBall", (data: any) => {
 			console.log("LoadBall");
-			puck = new Puck(roomInfo.mapSize[0], roomInfo.mapSize[1], data.vectorX, data.vectorY);
+			puck = new Puck(roomInfo?.mapSize[0], roomInfo?.mapSize[1], data.vectorX, data.vectorY);
 		});
 
 		$client.addListener("PongStart", (data: any) => {
@@ -211,7 +239,12 @@
 		});
 
 		return (() => {
-			$client.removeListeners(["PaddleUpdate",
+			$client.removeOnConnection(roomcheck);
+			$client.removeListeners([]);
+			$client.removeListeners([
+				"RoomNotFound",
+				"RoomInfo", 
+				"PaddleUpdate",
 				"LoadBall",
 				"ScoreUpdate",
 				"PuckHit",
@@ -222,25 +255,27 @@
 </script>
 
 <div class="container">
-	<div class="pong" style="min-width: {roomInfo.mapSize[0]}px; min-height: {roomInfo.mapSize[1]}px;">
-		<Paddle pos={paddlePos[opponentIndex]} paddleWidth={roomInfo.paddleSize}
-			gameWidth={roomInfo.mapSize[0]} gameHeight={roomInfo.mapSize[1]}
+	<div class="pong" style="min-width: {roomInfo?.mapSize[0]}px; min-height: {roomInfo?.mapSize[1]}px;">
+		{#if roomInfo.players.length > 1}
+		<Paddle pos={paddlePos[opponentIndex]} paddleWidth={roomInfo?.paddleSize}
+			gameWidth={roomInfo?.mapSize[0]} gameHeight={roomInfo?.mapSize[1]}
 			user={false} userIndex={userIndex}/>
+		{/if}
 		<!-- <div class="test" style="left: {paddlePos[opponentIndex]}px; top: 50px;"></div> -->
 		{#if puck}
-		<PongPuck posX={(userIndex == UserType.Player1) ? roomInfo.mapSize[0] - puck.posX : puck.posX}
-			posY={(userIndex == UserType.Player1) ? roomInfo.mapSize[1] - puck.posY : puck.posY} />
+		<PongPuck posX={(userIndex == UserType.Player1) ? roomInfo?.mapSize[0] - puck.posX : puck.posX}
+			posY={(userIndex == UserType.Player1) ? roomInfo?.mapSize[1] - puck.posY : puck.posY} />
 		{/if}
-		<Paddle pos={paddlePos[userIndex]} paddleWidth={roomInfo.paddleSize}
-			gameWidth={roomInfo.mapSize[0]} gameHeight={roomInfo.mapSize[1]}
+		<Paddle pos={paddlePos[userIndex]} paddleWidth={roomInfo?.paddleSize}
+			gameWidth={roomInfo?.mapSize[0]} gameHeight={roomInfo?.mapSize[1]}
 			user={true} userIndex={userIndex}/>
-		<!-- <div class="test" style="left: {paddlePos[userIndex]}px; top: {roomInfo.mapSize[1] - 50}px;
+		<!-- <div class="test" style="left: {paddlePos[userIndex]}px; top: {roomInfo?.mapSize[1] - 50}px;
 		"></div> -->
 <!-- 
 		{#if deathPoint && puck}
 		<div class="deathPoint"
 			style="left: {deathPoint}px;
-			top: {(puck.vectorY < 0 && userIndex || puck.vectorY > 0 && !userIndex) ? 50 : roomInfo.mapSize[1] - 50}px;"></div>
+			top: {(puck.vectorY < 0 && userIndex || puck.vectorY > 0 && !userIndex) ? 50 : roomInfo?.mapSize[1] - 50}px;"></div>
 		{/if} -->
 		<!-- <div class="central-line-vertical"></div>
 		<div class="central-line-horizontal"></div>	 -->

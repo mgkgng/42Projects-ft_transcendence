@@ -34,7 +34,7 @@
 
 		z-index: 9998;
 
-		background-color: rgb(163, 219, 229);
+		background-color: #3868B6;
 		box-shadow: 0px 0px 5px 20px rgb(49, 211, 240); //maybe?
 		box-shadow: 0px 0px 40px 10px $main; //maybe?
 		transform-origin: right;
@@ -81,7 +81,8 @@
 		width: 50px;
 		height: 50px;
 
-		background-color: rgb(163, 219, 229);
+		// background-color: rgb(163, 219, 229);
+		background-color: #3868B6;
 
 		transition: .7s;
 

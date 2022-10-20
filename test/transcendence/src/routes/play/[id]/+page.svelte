@@ -45,10 +45,10 @@
 	onMount(() => {
 		$client.OnConnection(roomcheck);
 
-		$client.addListener("RoomNotFound", () => {
-			console.log("RoomNotFound");
-			roomNotFound = true;
-		});
+		// $client.addListener("RoomNotFound", () => {
+		// 	console.log("RoomNotFound");
+		// 	roomNotFound = true;
+		// });
 
 		$client.addListener("RoomInfo", (data: any) => {
 			console.log("RoomInfo", data);

@@ -21,23 +21,28 @@
     import { onMount } from "svelte";
     import { goto } from "$app/navigation";
     import RoomList from "$lib/RoomList.svelte";
+    import Room from "$lib/Room.svelte";
 
 	let createGameModal: any;
 	let roomListModal: any;
+	let roomModal: any;
+	let roomId: string = "";
 
 	onMount(() => {	
 		// console.log("hello?");	
 		$client.addListener("MatchFound", (data: any) => {
 			console.log("MatchFound", data);
+			roomId = data;
 			$client.room = data;
-			goto(`/play/${data}`);
+			roomModal.open();
 		});
 
 		$client.addListener("RoomCreated", (data: any) => {
 			console.log("RoomCreated", data);
+			roomId = data;
 			$client.room = data;
 			createGameModal.close();
-			goto("/play/" + data);
+			roomModal.open();
 		});
 
 		return (() => {
@@ -52,6 +57,10 @@
 
 <Modal bind:this={roomListModal} closeOnBgClick={true}>
 	<RoomList />
+</Modal>
+
+<Modal bind:this={roomModal} closeOnBgClick={false}>
+	<Room roomId={roomId}/>
 </Modal>
 
 <div class="container">
