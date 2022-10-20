@@ -109,10 +109,10 @@ export class friendSystemController {
         let second_username = query.second_username;
         let firstHaveAlreadyBeenRequestEntity = await qb.leftJoinAndSelect("u.id_first_user", "friendrequester")
         .leftJoinAndSelect("u.id_second_user", "friendrequested")
-        .where(`friendrequester.username = '${second_username}' AND friendrequested.username = '${first_username}'`)
+        .where(`friendrequester.username = :second_username AND friendrequested.username = :first_username`, {first_username : first_username, second_username: second_username})
         .getOne();
         let firstHaveAlreadyRequestedEntity = await qb
-        .where(`friendrequester.username = '${first_username}' AND friendrequested.username = '${second_username}'`)
+        .where(`friendrequester.username = :first_username AND friendrequested.username = :second_username`, {first_username : first_username, second_username: second_username})
         .getOne();
         if (firstHaveAlreadyBeenRequestEntity)
         {
@@ -122,8 +122,8 @@ export class friendSystemController {
         else if (firstHaveAlreadyRequestedEntity == null)
         {
             const newUserRel = new UserFriendEntity();
-            newUserRel.id_first_user = await qbu.select().where(`u.username = '${first_username}'`).getOneOrFail();
-            newUserRel.id_second_user = await qbu.select().where(`u.username = '${second_username}'`).getOneOrFail();
+            newUserRel.id_first_user = await qbu.select().where(`u.username = :first_username`, {first_username : first_username}).getOneOrFail();
+            newUserRel.id_second_user = await qbu.select().where(`u.username = :second_username`, {second_username : second_username}).getOneOrFail();
             newUserRel.is_user_friend = false;
             return await this.userFriendRepository.save(newUserRel);
         }
