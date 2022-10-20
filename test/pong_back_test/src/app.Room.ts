@@ -12,6 +12,7 @@ const Difficulty = {
 export class Room {
 	id: string;
 	clients: Map<string, any>;
+	title: string;
 	players: Array<any>;
 	scores: Array<number>;
 	maxpoint: number;
@@ -24,6 +25,7 @@ export class Room {
 	
 	// constructor(clients, mapchoice: string, mode: string, maxpoint: number) {
 	constructor(clients: any,
+		title: string,
 		maxpoint: number = 5,
 		difficulty: number = 1,
 		privateMode: boolean = false) {
@@ -31,6 +33,8 @@ export class Room {
 		//this.chat = new ChatRoomService();
 		this.clients = new Map();
 		
+		this.title = title;
+
 		this.addClients(clients);
 
 		this.difficulty = Difficulty[difficulty];

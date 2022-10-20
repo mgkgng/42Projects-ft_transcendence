@@ -4,6 +4,8 @@
 		height: 100%;
 		font-family: sans-serif; // for now
 		font-size: 19px;
+
+		color: #fff;
 	}
 
 	.box {
@@ -29,23 +31,30 @@
 		color: #fff;
 		cursor: pointer;
 	}
+
+	.text-input {
+		background-color: #fff;
+		color: #000;
+	}
 </style>
 
 <script lang="ts">
-    import { goto } from "$app/navigation";
-    import { onMount } from "svelte";
-    import { identity } from "svelte/internal";
 	import { client } from "../stores/client";
 
 	let maxPoint: number = 10;
 	let difficulty: number = 3;
 	let mapType: number = 2;
 	let privateMode: boolean = false;
+	let roomTitle: string = "Hello World!";
 
 </script>
 
 <div class="container">
 	<div class="box">
+		<label>
+			Title:
+			<input class="text-input" bind:value={roomTitle}>
+		</label>
 
 		<label>
 			<input type=radio bind:group={mapType} name="mapType" value={1}> Map 1
@@ -75,6 +84,7 @@
 				event: "CreateRoom",
 				data: {
 					client: $client.id,
+					title: roomTitle,
 					mapType: mapType,
 					maxPoint: maxPoint,
 					difficulty: difficulty,

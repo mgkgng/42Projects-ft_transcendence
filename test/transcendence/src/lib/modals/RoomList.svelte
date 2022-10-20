@@ -106,7 +106,7 @@
 		<button class="left icon-button" on:click={() => movePage(false)}>&lt;</button>
 		{#each roomsOnPage as room}
 		<div class="room-card">
-			{room.id}
+			{room.title}
 		</div>
 		{/each}
 		<!-- if less than perPage, gray card -->

@@ -60,7 +60,8 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		this.queue.push(client);
 
 		if (this.queue.length > 1) {
-			let room = new Room([this.queue[0], this.queue[1]]);
+			// TODO: think about it: if i just join a match randomlmy like this, it could be by default a private game
+			let room = new Room([this.queue[0], this.queue[1]], "random match");
 			this.queue[0].room = room.id;
 			this.queue[1].room = room.id;
 
@@ -152,7 +153,7 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		if (client.room.length)
 			return ;
 
-		let room = new Room([client], data.maxPoint, data.difficulty, data.privateMode);
+		let room = new Room([client], data.title, data.maxPoint, data.difficulty, data.privateMode);
 		this.rooms.set(room.id, room);
 		client.room = room.id;
 
