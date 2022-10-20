@@ -1,10 +1,11 @@
-import { Controller, Get, Query } from "@nestjs/common";
+import { Controller, Get, Inject, Query } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { parse } from "path";
 import { first } from "rxjs";
 import { UserEntity } from "src/entity/User.entity";
 import { UserFriendEntity } from "src/entity/UserFriend.entity";
 import { Repository } from "typeorm";
+import { friendSystemService } from "./friendSystem.service";
 
 @Controller()
 export class friendSystemController {
@@ -12,7 +13,9 @@ export class friendSystemController {
         @InjectRepository(UserEntity)
         private userRepository : Repository<UserEntity>,
         @InjectRepository(UserFriendEntity)
-        private userFriendRepository : Repository<UserFriendEntity>
+        private userFriendRepository : Repository<UserFriendEntity>,
+        @Inject(friendSystemService)
+        private friendSystemService : friendSystemService
     ) {}
 
     @Get('addFriend')
@@ -60,16 +63,7 @@ export class friendSystemController {
     @Get("isfriendwith?")
     async isFriendWithByUsername(@Query() query : {first_username : string, second_username : string})
     {
-        const qb = this.userFriendRepository.createQueryBuilder('u');
-        let first_username = query.first_username;
-        let second_username = query.second_username;
-        return await qb
-        .leftJoinAndSelect("u.id_first_user", "friendrequester")
-        .leftJoinAndSelect("u.id_second_user", "friendrequested")
-        .where(`friendrequester.username = :first_username OR friendrequested.username = :second_username`, {first_username : first_username, second_username: second_username})
-        .andWhere(`friendrequester.username = :second_username OR friendrequested.username = :first_username`, {first_username : first_username, second_username: second_username})
-        .andWhere(`u.is_user_friend = true`)
-        .getOne();
+        return this.friendSystemService.isFriendWithByUsername(query.first_username, query.second_username);
     }
 
     // Do a request to this route to ask for the friendList of a user
@@ -130,5 +124,10 @@ export class friendSystemController {
         return firstHaveAlreadyRequestedEntity;
     }
 
+    @Get('unfriend?')
+    async unfriend(@Query() query : {first_username : string, second_username : string})
+    {
+
+    }
     // Delete Friend
 }
