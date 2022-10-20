@@ -20,6 +20,7 @@ export class Room {
 	//chat: ChatRoomService
 	isPlaying: boolean;
 	privateMode: boolean;
+	available: boolean;
 	
 	// constructor(clients, mapchoice: string, mode: string, maxpoint: number) {
 	constructor(clients: any,
@@ -48,6 +49,8 @@ export class Room {
 			this.isPlaying = true;
 			setTimeout(Room.startPong, 2000, this);
 		}
+
+		this.available = (this.players.length > 1) ? false : true;
 	}
 
 	/**

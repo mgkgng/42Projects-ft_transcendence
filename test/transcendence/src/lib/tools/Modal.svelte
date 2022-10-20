@@ -6,14 +6,9 @@
 
 	let state = false;
 
-
-	export function toggle(_state = !state)
-	{ state = _state; }
-
-	export function open()
-	{ toggle(true); }
-	export function close()
-	{ toggle(false); }
+	export function toggle(_state = !state) { state = _state; }
+	export function open() { toggle(true); }
+	export function close() { toggle(false); }
 
 	function handleBgClick() {
     	if (closeOnBgClick)
@@ -27,10 +22,9 @@
 		max-width: 70vw;
 		max-height: 90vh;
 		overflow: auto;
-		padding: 0;
 		/*padding: 2rem;*/
 		gap: 2rem;
-		background: transparentize(#fff, .05);
+		background: transparentize(#000, .05);
 	}
 	.backdrop {
 		position: fixed;
@@ -46,13 +40,13 @@
 </style>
 
 {#if state}
-	<Portal>
-		<div class="backdrop" tabindex="-1" on:click={handleBgClick}>
-			<div class={cssClass} on:click={e => {
-                e.stopPropagation();
-            }}>
-				<slot />
-			</div>
+<Portal>
+	<div class="backdrop" tabindex="-1" on:click={handleBgClick}>
+		<div class={cssClass} on:click={e => {
+			e.stopPropagation();
+		}}>
+			<slot />
 		</div>
-	</Portal>
+	</div>
+</Portal>
 {/if}
