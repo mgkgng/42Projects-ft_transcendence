@@ -104,20 +104,31 @@
 		border-radius: 50%;
 		background-color: peru;
 	}
+
+	.loading-box {
+		height: 100%;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.msg {
+		color: #fff;
+	}
 </style>
 
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import DarkMode from "$lib/DarkMode.svelte";
 	import { client } from "$lib/stores/client";
-	import { UserType } from './stores/var';
-	import Paddle from './Paddle.svelte';
-	import { Puck } from './pong/Puck';
-    import PongPuck from './PongPuck.svelte';
-    import ScoreBox from './ScoreBox.svelte';
-    import { GameMap } from './pong/GameMap';
-    import Modal from './tools/Modal.svelte';
-    import GameOver from './modal/GameOver.svelte';
+	import { UserType } from '$lib/stores/var';
+	import Paddle from '$lib/Paddle.svelte';
+	import { Puck } from '$lib/pong/Puck';
+    import PongPuck from '$lib/PongPuck.svelte';
+    import ScoreBox from '$lib/ScoreBox.svelte';
+    import { GameMap } from '$lib/pong/GameMap';
+    import Modal from '$lib/tools/Modal.svelte';
+    import GameOver from '$lib/modals/GameOver.svelte';
 
 	export let roomId: string;
 
@@ -146,6 +157,8 @@
 	let puckMoving: any;
 	
 	let gameFinishedModal: any;
+
+	let roomFound: boolean;
 	
 	function roomcheck() {
 		$client.sock.send(JSON.stringify({
@@ -168,6 +181,7 @@
 
 		$client.addListener("RoomInfo", (data: any) => {
 			console.log("RoomInfo", data);
+			roomFound = true;
 			roomInfo = data;
 		});
 
@@ -253,6 +267,7 @@
 
 </script>
 
+{#if roomFound}
 <div class="container">
 	{#if roomInfo}
 	<div class="pong" style="min-width: {roomInfo?.mapSize[0]}px; min-height: {roomInfo?.mapSize[1]}px;">
@@ -289,6 +304,11 @@
 	</div>
 	{/if}
 </div>
+{:else}
+<div class="loading-box">
+	<h1 class="msg">LOADING...</h1>
+</div>
+{/if}
 
 <Modal bind:this={gameFinishedModal} closeOnBgClick={false}>
 	<GameOver />

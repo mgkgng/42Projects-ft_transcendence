@@ -14,14 +14,14 @@
 	import Title from "$lib/Title.svelte";
 	import DarkMode from '$lib/DarkMode.svelte';
     import MenuCircle from '$lib/MenuCircle.svelte';
-	import CreateGame from "$lib/CreateGame.svelte";
+	import CreateGame from "$lib/modals/CreateGame.svelte";
 	import Modal from "$lib/tools/Modal.svelte";
 
 	import { client } from "$lib/stores/client";
     import { onMount } from "svelte";
     import { goto } from "$app/navigation";
-    import RoomList from "$lib/RoomList.svelte";
-    import Room from "$lib/Room.svelte";
+    import RoomList from "$lib/modals/RoomList.svelte";
+    import Room from "$lib/modals/Room.svelte";
 
 	let createGameModal: any;
 	let roomListModal: any;

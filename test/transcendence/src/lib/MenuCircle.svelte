@@ -107,7 +107,7 @@
 </style>
 
 <script lang="ts">
-    import Room from "./Room.svelte";
+    import Room from "$lib/modals/Room.svelte";
 	import { client } from "./stores/client";
 
 	export let createGameModal: any;

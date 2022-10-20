@@ -35,7 +35,7 @@
     import { goto } from "$app/navigation";
     import { onMount } from "svelte";
     import { identity } from "svelte/internal";
-	import { client } from "./stores/client";
+	import { client } from "../stores/client";
 
 	let maxPoint: number = 10;
 	let difficulty: number = 3;
