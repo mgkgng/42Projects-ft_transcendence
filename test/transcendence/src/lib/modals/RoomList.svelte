@@ -40,7 +40,7 @@
 		cursor: pointer;
 
 		&:hover {
-			background-color: transparentize($main, 0.6);
+			background-color: transparentize($red, 0.5);
 		}
 	}
 

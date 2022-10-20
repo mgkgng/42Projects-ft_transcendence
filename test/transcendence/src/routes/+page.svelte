@@ -28,6 +28,8 @@
 	let roomModal: any;
 	let roomId: string = "";
 
+	let menuExpanded: boolean;
+
 	onMount(() => {	
 		// console.log("hello?");	
 		$client.addListener("MatchFound", (data: any) => {
@@ -42,6 +44,7 @@
 			roomId = data;
 			$client.room = data;
 			createGameModal.close();
+			menuExpanded = false;
 			roomModal.open();
 		});
 
@@ -67,6 +70,6 @@
 	<Title title={"transcendence"} mainPage={true} />
 </div>
 <DarkMode/>
-<MenuCircle createGameModal={createGameModal} roomListModal={roomListModal}/>
+<MenuCircle createGameModal={createGameModal} roomListModal={roomListModal} bind:expanded={menuExpanded}/>
 
 

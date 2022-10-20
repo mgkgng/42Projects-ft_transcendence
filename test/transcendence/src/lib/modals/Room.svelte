@@ -98,13 +98,6 @@
 		z-index: 10;
 	}
 
-	.button-launch {
-		width: 50px;
-		aspect-ratio: 1 / 1;
-		border-radius: 50%;
-		background-color: peru;
-	}
-
 	.loading-box {
 		height: 100%;
 		display: flex;
@@ -114,6 +107,13 @@
 
 	.msg {
 		color: #fff;
+	}
+
+	button {
+		width: 50px;
+		height: 20px;
+		background-color: blue;
+		cursor: pointer;
 	}
 </style>
 
@@ -303,6 +303,22 @@
 		{/if}
 	</div>
 	{/if}
+	<div class="button-container">
+		<!-- there should be a difference between host-guest mode and random matching mode -->
+		{#if userType == UserType.Player1}
+		<button>
+			START
+		</button>
+		{:else if userType == UserType.Player2}
+		<button>
+			READY
+		</button>
+		{/if}
+
+		<button>
+			QUIT
+		</button>
+	</div>
 </div>
 {:else}
 <div class="loading-box">
