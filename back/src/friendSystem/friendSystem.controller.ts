@@ -66,8 +66,8 @@ export class friendSystemController {
         return await qb
         .leftJoinAndSelect("u.id_first_user", "friendrequester")
         .leftJoinAndSelect("u.id_second_user", "friendrequested")
-        .where(`friendrequester.username = '${first_username}' OR friendrequested.username = '${second_username}'`)
-        .andWhere(`friendrequester.username = '${second_username}' OR friendrequested.username = '${first_username}'`)
+        .where(`friendrequester.username = :first_username OR friendrequested.username = :second_username`, {first_username : first_username, second_username: second_username})
+        .andWhere(`friendrequester.username = :second_username OR friendrequested.username = :first_username`, {first_username : first_username, second_username: second_username})
         .andWhere(`u.is_user_friend = true`)
         .getOne();
     }
