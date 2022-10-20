@@ -74,16 +74,18 @@ export class friendSystemController {
     @Get("askfriend?")
     async askFriend(@Query() query : {first_username : string, second_username : string})
     {
-        return this.friendSystemService.askFriend(query.first_username, query.second_username)
+        return this.friendSystemService.askFriend(query.first_username, query.second_username);
     }
 
-    // unaskFriend to do
+    @Get('unaskfriend?')
+    async unaskFriend(@Query() query : {first_username : string, second_username : string})
+    {
+        return this.friendSystemService.unAskFriend(query.first_username, query.second_username);
+    }
 
     @Get('unfriend?')
     async unfriend(@Query() query : {first_username : string, second_username : string})
     {
-        return this.friendSystemService.unfriend(query.first_username, query.second_username)
+        return this.friendSystemService.unFriend(query.first_username, query.second_username);
     }
-
-    // Delete Friend
 }

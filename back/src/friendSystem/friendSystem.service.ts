@@ -81,12 +81,28 @@ export class friendSystemService {
 
     // This function will delete the entry from the userFriendEntity table
     // where the friend appear
-    async unfriend(first_username : string, second_username : string)
+    async unFriend(first_username : string, second_username : string)
     {
         const qb = this.userFriendRepository.createQueryBuilder('u');
         let isFriendEntity = await this.isFriendWithByUsername(first_username, second_username);
         if (isFriendEntity == null)
             return ;
         return qb.delete().where(`id_g = ${isFriendEntity.id_g}`).execute();
+    }
+
+    // If first_username have asked second_username as friend
+    // and this function is called by first_username then it unfriend
+    // them.
+    async unAskFriend(first_username : string, second_username : string)
+    {
+        const qb = this.userFriendRepository.createQueryBuilder('u');
+        let isRequestedEntity = await qb
+        .leftJoinAndSelect("u.id_first_user", "friendrequester")
+        .leftJoinAndSelect("u.id_second_user", "friendrequested")
+        .where("friendrequester.username = :first_username AND friendrequested.username = :second_username", {first_username: first_username, second_username: second_username})
+        .getOne();
+        if (isRequestedEntity == null)
+            return ;
+        return await this.unFriend(first_username, second_username);
     }
 }
