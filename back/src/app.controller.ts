@@ -14,7 +14,7 @@ export class AppController {
     return ("Je te baise");
   }
   @UseGuards(AuthGuard('jwt'))
-  @Get()
+  @Get("/hello")
   test(): string {
     return "Hello World";
   } 

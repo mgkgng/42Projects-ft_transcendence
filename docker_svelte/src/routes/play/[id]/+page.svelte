@@ -33,24 +33,30 @@
 	let roomInfo: any;
 
 	function roomcheck() {
-		$client.sock.send(JSON.stringify({
+		/*$client.socket.send(JSON.stringify({
 			event: 'RoomCheck',
 			data: {
 				client: $client.id,
 				room: roomId
 			}
-		}));
+		}));*/
+		$client.socket.emit('RoomCheck',
+			{
+				client: $client.id,
+				room: roomId
+			}
+		);
 	}
 
 	onMount(() => {
 		$client.OnConnection(roomcheck);
 
-		$client.addListener("RoomNotFound", () => {
+		$client.socket.on("RoomNotFound", () => {
 			console.log("RoomNotFound");
 			roomNotFound = true;
 		});
 
-		$client.addListener("RoomInfo", (data: any) => {
+		$client.socket.on("RoomInfo", (data: any) => {
 			console.log("RoomInfo", data);
 			roomFound = true;
 			roomInfo = data.roomInfo;

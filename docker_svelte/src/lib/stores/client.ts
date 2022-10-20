@@ -15,13 +15,13 @@ class Client {
 		this.listeners = new Map();
 		this.callbacksOnConnection = new Set();
 		if (browser) {
-			this.sock = new WebSocket('ws://localhost:3000');
-			console.log(this.sock);
-			this.sock.onmessage = (msg: any) => {
-				console.log("receving something", msg);
-				this.listeners.get(msg.event)?.(msg.data);
-			}
-			this.connect();
+			//this.sock = new WebSocket('ws://localhost:3000');
+			//console.log(this.sock);
+			//this.sock.onmessage = (msg: any) => {
+				//console.log("receving something", msg);
+				//this.listeners.get(msg.event)?.(msg.data);
+			//}
+			//this.connect();
 		}
 	}
 
@@ -29,24 +29,22 @@ class Client {
 		if (!browser)
 			return ;
 		
-		this.sock.onopen = () => {
-			console.log('Connected');
-			this.sock.send(
-				JSON.stringify({
-					event: "Connexion",
-					data: this.id
-				})
-			)
+		console.log('Connected');
+		/*this.socket.emit(
+			JSON.stringify({
+				event: "Connexion",
+				data: this.id
+			})
+		)*/
+		this.socket.emit("Connexion", {	data: this.id	})
+		for (let func of this.callbacksOnConnection)
+			func();
 
-			for (let func of this.callbacksOnConnection)
-				func();
-		};
-
-		this.sock.onmessage = (msg: any) => {
-			let data = JSON.parse(msg.data);
+		//this.socket.onmessage = (msg: any) => {
+			//let data = JSON.parse(msg.data);
 			// console.log("OnMessage", data);
-			this.listeners.get(data.event)?.(data?.data);
-		}
+			//this.listeners.get(data.event)?.(data?.data);
+		//}
 	}
 
 	OnConnection(func: Function) {
@@ -74,10 +72,10 @@ class Client {
 	//AXEL MODIFICATION	
 	async send42Tok(url: any)
 	{
-		if (localStorage.getItem('transcendence-jwt') != null)
+		if (localStorage.getItem('transcendence-jwt') != null
+		&& localStorage.getItem('transcendence-jwt') != undefined)
 		{
 			const tok = localStorage.getItem('transcendence-jwt');
-			
 			try
 			{
 				this.socket = io("http://localhost:3000",{
@@ -85,34 +83,34 @@ class Client {
 						Authorization: "Bearer " + tok,
 					}
 				});
+				this.connect();
 				return (true);
-			}
-			catch
-			{
-				return (false);
+			}catch{
+				console.log("error");
 			}
 		}
 		if (url.has('code'))
 		{
-			console.log(url.get('code'));
-			console.log("username=oui&password=" + url.get('code'));
-			let tok : any;
-			const res : any = await fetch("http://localhost:3000/auth42",{
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				  },
-				body:JSON.stringify({username: "oui", password: url.get('code')}),
-			}).then(function(res : any) {
-				tok = res.access_token;
-			});
-			this.socket = io("http://localhost:3000",{
-				extraHeaders: {
-					Authorization: "Bearer " + tok,
-				}
-			});
-			localStorage.setItem('transcendence-jwt', tok);
-			return (true);
+			try {
+				const res : any = await fetch("http://localhost:3000/auth42",{
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					  },
+					body:JSON.stringify({username: "oui", password: url.get('code')}),
+				});
+				const tok = await res.json();
+				this.socket = io("http://localhost:3000",{
+					extraHeaders: {
+						Authorization: "Bearer " + tok.access_token,
+					}
+				});
+				localStorage.setItem('transcendence-jwt', tok.access_token);
+				this.connect();
+				return (true);
+			}catch{
+				return (false);
+			}
 		}
 		return (false);
 	}

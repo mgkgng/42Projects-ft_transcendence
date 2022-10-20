@@ -25,7 +25,7 @@
 	onMount(() => {
 		console.log("I'm on the main page.");
 		
-		$client.addListener("MatchFound", (data: any) => {
+		$client.socket.on("MatchFound", (data: any) => {
 			console.log("MatchFound", data);
 			goto(`/play/${data}`);
 		});

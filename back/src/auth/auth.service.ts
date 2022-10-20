@@ -24,8 +24,11 @@ export class AuthService {
 		const iud = process.env.IUD;
 		const secret = process.env.SECRET_APP;
 		try {
+			//Get token to acess with 42 API
 			const rep = await lastValueFrom(this.httpService.post("https://api.intra.42.fr/oauth/token", "grant_type=authorization_code&code=" + code + "&client_id=" + iud + "&client_secret=" + secret + "&redirect_uri=http://localhost:3002"));
+			//Get all data of the current user
 			const res = await lastValueFrom(this.httpService.get("https://api.intra.42.fr/v2/me", {headers: {Authorization: "Bearer " + rep.data.access_token}}));
+			console.log(res);
 			return (res);
 		} catch (error) {	return null;	}
 	//GET USER TOKEN 42

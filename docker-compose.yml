@@ -52,7 +52,7 @@ services:
       - bd 
   bd:
     container_name: "bd"
-    image: postgres
+    image: postgres:14.5
     env_file:
       - .env
     networks:

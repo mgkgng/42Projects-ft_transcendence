@@ -156,7 +156,7 @@
 
 		console.log("My User Index: ", userIndex);
 
-		$client.addListener("PaddleUpdate", (data: any) => {
+		$client.socket.on("PaddleUpdate", (data: any) => {
 			console.log("PaddleUpdate", data);
 			if ((data.player == UserType.Player1 && userIndex == UserType.Player2) ||
 				(data.player == UserType.Player2 && userIndex == UserType.Player2))
@@ -167,12 +167,12 @@
 			// data.paddlePos;
 		});
 
-		$client.addListener("LoadBall", (data: any) => {
+		$client.socket.on("LoadBall", (data: any) => {
 			console.log("LoadBall");
 			puck = new Puck(roomInfo.mapSize[0], roomInfo.mapSize[1], data.vectorX, data.vectorY);
 		});
 
-		$client.addListener("PongStart", (data: any) => {
+		$client.socket.on("PongStart", (data: any) => {
 			console.log("PongStart", data);
 
 			puckMoving = setInterval(() => {
@@ -181,24 +181,25 @@
 			}, 20);
 		});
 
-		$client.addListener("DeathPointUpdate", (data: any) => {
+		$client.socket.on("DeathPointUpdate", (data: any) => {
 			console.log("DeathPointUpdate");
 			deathPoint = data;
 		});
 
-		$client.addListener("PuckHit", (data: any) => {
+		$client.socket.on("PuckHit", (data: any) => {
 			console.log("PuckHit");
 			puck.vectorY *= -1;
+			console.log(puck.posX, puck.posY);
 		});
  
-		$client.addListener("ScoreUpdate", (data: any) => {
+		$client.socket.on("ScoreUpdate", (data: any) => {
 			console.log("ScoreUpdate", data);
 			clearInterval(puckMoving);
 			scores[data]++;
 			puck = undefined;
 		});
 
-		$client.addListener("GameFinished", (data: any) => {
+		$client.socket.on("GameFinished", (data: any) => {
 			console.log("GameFinished");
 			console.log((userType == data) ? "You Win!"
 				: (userType != UserType.Watcher) ? "You Lose!" 
@@ -267,7 +268,7 @@ on:keypress={(event) => {
 
 	moving = true;
 
-	$client.sock.send(JSON.stringify({
+	/*$client.socket.send(JSON.stringify({
 		event: "PaddleMove",
 		data: {
 			client: $client.id,
@@ -276,7 +277,14 @@ on:keypress={(event) => {
 			left: (userType == UserType.Player1 && event.code == 'KeyD'
 				|| userType == UserType.Player2 && event.code == 'KeyA')
 		}
-	}));
+	}));*/
+	$client.socket.emit("PaddleMove", {
+		client: $client.id,
+		player: userType,
+		room: roomId,
+		left: (userType == UserType.Player1 && event.code == 'KeyD'
+			|| userType == UserType.Player2 && event.code == 'KeyA')
+	});
 }}
 
 on:keyup={(event)=>{
@@ -284,11 +292,13 @@ on:keyup={(event)=>{
 		return ;
 	
 	//* TODO some precision to make
-	$client.sock.send(JSON.stringify({
+	/*$client.socket.send(JSON.stringify({
 		event: "PaddleStop",
 		data: $client.id
-	}));
-
+	}));*/
+	$client.socket.emit("PaddleStop",
+		{	data: $client.id	}
+	);
 	moving = false;
 }}
 
