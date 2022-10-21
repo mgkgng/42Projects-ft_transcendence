@@ -96,7 +96,7 @@ class Client {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json'
-					  },
+					},
 					body:JSON.stringify({username: "oui", password: url.get('code')}),
 				});
 				const tok = await res.json();

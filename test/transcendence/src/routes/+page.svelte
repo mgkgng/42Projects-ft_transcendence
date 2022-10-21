@@ -43,7 +43,7 @@
 			user.set(data.user);
 			document.cookie = `transcendence-jwt=${data.jwt}`;
 			loginState = true;
-			goto('/');
+			goto('/yo');
 		});
 
 		$client.addListener('ResVerifyJWT', (data: any) => {
@@ -63,7 +63,10 @@
 			console.log("allo");
 			$client.sock.send(JSON.stringify({
 				event: "AskVerifyToken",
-				data: code
+				data: {
+					client: $client.id,
+					code: code
+				}
 			}));
 		}
 

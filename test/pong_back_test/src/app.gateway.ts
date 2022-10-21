@@ -93,12 +93,12 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		client.sock.send(JSON.stringify({
 			event: "RoomInfo",
 			data: {
-					players: (room.players.length === 2) ? [room.players[0].id, room.players[1].id]
-						: [room.players[0].id],
-					maxpoint: room.maxpoint,
-					scores: room.scores,
-					mapSize: [room.pong.gameMap.width, room.pong.gameMap.height],
-					paddleSize: room.pong.gameMap.paddleSize
+				players: (room.players.length === 2) ? [room.players[0].id, room.players[1].id]
+					: [room.players[0].id],
+				maxpoint: room.maxpoint,
+				scores: room.scores,
+				mapSize: [room.pong.gameMap.width, room.pong.gameMap.height],
+				paddleSize: room.pong.gameMap.paddleSize
 			}
 		}));
 	}
@@ -166,6 +166,8 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	async verifyToken(@MessageBody() data: any) {
 		console.log("ask verify token", data);
 		let client = this.getClient(data.client);
+
+
 		client.user = await this.authService.askforToken(client, data.code);
 	}
 

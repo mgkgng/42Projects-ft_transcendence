@@ -3,10 +3,11 @@ import { HttpService } from '@nestjs/axios';
 import * as jose from 'jose';
 import { lastValueFrom } from 'rxjs';
 
-const UID = process.env.API42_UID;
-const SECRET = process.env.API42_SECRET;
-const JWT_ISSUER = process.env.JWT_ISSUER;
-const JWT_AUDIENCE = process.env.JWT_AUDIENCE;
+const UID = "u-s4t2ud-f5ff5811f4e28fa86f612098072826a0d1e9b5dd48ca96888a53143c89c113f0";
+const SECRET = "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";
+const JWT_ISSUER = "transcendence"
+// process.env.JWT_ISSUER;
+const JWT_AUDIENCE = "students";
 
 const Keys = async () => {
 	const { publicKey, privateKey } = await jose.generateKeyPair('ES256');
@@ -19,22 +20,33 @@ export class AuthService {
 
 	async getToken(code: any) {
 		try {
-			const options = {
-				method: "POST",
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({
-					"grand_type": "authorization_code",
-					"client_id": UID,
-					"client_secret": SECRET,
-					"code": code,
-					"redirect_uri": `http://localhost:5555`
-				})
-			};
-			const response = await lastValueFrom(this.httpService.post("https://api.intra.42.fr/oauth/token", options))
-			const data = await response.json();
-			return (data);
+			// const headers = {
+			// 	'Content-Type': 'application/json'
+			// }
+			// const body = {
+			// 	"grand_type": "authorization_code",
+			// 	"client_id": UID,
+			// 	"client_secret": SECRET,
+			// 	"code": code,
+			// 	"redirect_uri": `http://localhost:5555`
+			// };
+			
+			// const response = await lastValueFrom(this.httpService.post("https://api.intra.42.fr/oauth/token", body, {
+			// 	headers: headers
+			// }));
+
+			console.log(UID);
+			console.log(SECRET);
+
+			const res = await lastValueFrom(this.httpService.post("https://api.intra.42.fr/oauth/token", 
+			"grant_type=authorization_code&code=" + code
+			+ "&client_id=" + UID + "&client_secret=" + SECRET + "&redirect_uri=http://localhost:5555"));
+
+			// const res = await lastValueFrom(this.httpService.get("https://api.intra.42.fr/v2/me", {headers: {Authorization: "Bearer " + rep.data.access_token}}));
+
+			// const data = await res.json();
+			// console.log(res);
+			return (res);
 		} catch (e) {
 			console.log("Cannot get token.", e);
 		}
@@ -43,19 +55,16 @@ export class AuthService {
 	
 	async authentificateUser(code: any) {
 		const res = await this.getToken(code);
-		const access_token = res?.access_token;
+		const access_token = res?.data.access_token;
 	
+		console.log("access_token: ", access_token);
 		if (!access_token)
 			return (undefined);
 		
-		let data = await lastValueFrom(this.httpService.get("https://api.intra.42.fr/v2/me", {
-			headers: {
-				'Content-Type': 'application/json',
-				'Authorization': 'Bearer' + access_token
-			}
-		}));
+		let data = await lastValueFrom(this.httpService.get("https://api.intra.42.fr/v2/me", {headers: {Authorization: "Bearer " + res.data.access_token}}));
 	
-		data = await data.json();
+		console.log(data);
+		// data = await data.json();
 	
 		console.log("i got this:", data);
 	
@@ -78,10 +87,11 @@ export class AuthService {
 	}
 	
 	async askforToken(client: any, code: any) {
+		console.log("ask for token");
 		try {
 			const res = await this.authentificateUser(code);
 			if (!res || !res.user || !res.jwt) {
-				client.sock.send({ event: "LoginTokenError" });
+				client.sock.send(JSON.stringify({ event: "LoginTokenError" }));
 				return ;
 			}
 	
@@ -95,12 +105,13 @@ export class AuthService {
 			client.user = res.user;
 			return (res.user);
 		} catch (e) {
-			console.log('askForToken error: ', e);
+			// console.log('askForToken error: ', e);
 		}
 		return (undefined);
 	}
 	
 	async askVerifyJWT(client: any, jwt: any) {
+		console.log("ask verify jwt");
 		try {
 			const { payload, protectedHeader } = await jose.jwtVerify(jwt, Keys["publicKey"], {
 				issuer: JWT_ISSUER,
