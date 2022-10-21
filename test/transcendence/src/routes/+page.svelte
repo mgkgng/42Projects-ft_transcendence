@@ -22,16 +22,35 @@
     import { goto } from "$app/navigation";
     import RoomList from "$lib/modals/RoomList.svelte";
     import Room from "$lib/modals/Room.svelte";
+    import { user, getCookie } from "$lib/stores/user";
 
 	let createGameModal: any;
 	let roomListModal: any;
 	let roomModal: any;
+	let loginModal: any;
+
 	let roomId: string = "";
 
 	let menuExpanded: boolean;
+	let loginState: boolean;
 
-	onMount(() => {	
-		// console.log("hello?");	
+	onMount(() => {
+		$client.addListener('ResVerifJWT', (data: any) => {
+			console.log(data);
+			// Token error
+			if (data.success === 0) {
+				user.set(undefined);
+				return ;
+			} else if (data.success) {
+				console.log('success');
+				// retrieve user
+				user.set(data.user);
+				loginState = true;
+				loginModal.close();
+				// goto('/home');
+			}
+		});
+
 		$client.addListener("MatchFound", (data: any) => {
 			console.log("MatchFound", data);
 			roomId = data;
@@ -48,9 +67,42 @@
 			roomModal.open();
 		});
 
+		const jwt = getCookie("jwt");
+
+		if (jwt === undefined)
+			return ; //a verifier
+
+		function verifyJWT() {
+			if (!jwt)
+				return ;
+			$client.sock.send({
+				type: "AskVerifyJWT",
+				data: {
+					client: $client.id,
+					jwt: jwt
+				}
+			});
+		}
+
+		$client.OnConnection(verifyJWT);
+
+		$client.addListener('getLoginToken', (data: any) => {
+			console.log('getToken', data);
+			user.set(data.user);
+			document.cookie = `transcendence-jwt=${data.jwt}`;
+			loginState = true;
+			loginModal.close();
+		});
+
+		$client.addListener('LoginTokenError', (data: any) => {
+			console.log('tokenError', data);
+			// LoginErrorMsgModal.open();
+		});
+
 		return (() => {
 			$client.removeListeners(["MatchFound", "RoomCreated"]);
-		})
+			$client.removeOnConnection(verifyJWT);
+		});
 	});
 </script>
 
@@ -66,10 +118,11 @@
 	<Room roomId={roomId}/>
 </Modal>
 
-<div class="container">
-	<Title title={"transcendence"} mainPage={true} />
-</div>
+<Modal bind:this={loginModal} closeOnBgClick={false}>
+	<Login bind:loginState={loginState}/>
+</Modal>
+
+<Title title={"transcendence"} mainPage={true} />
+
 <DarkMode/>
 <MenuCircle createGameModal={createGameModal} roomListModal={roomListModal} bind:expanded={menuExpanded}/>
-
-

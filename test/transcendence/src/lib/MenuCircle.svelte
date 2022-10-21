@@ -21,8 +21,6 @@
 	}
 
 	.menu-circle {
-
-
 		position: absolute;
 
 		right: 0;

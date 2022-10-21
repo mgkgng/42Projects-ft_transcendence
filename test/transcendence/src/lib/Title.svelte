@@ -6,6 +6,8 @@
 		align-items: center;
 		justify-content: center;
 		height: 100%;
+
+		min-width: 800px;
 	}
 
 	@keyframes rotate {
@@ -167,6 +169,6 @@
 	{#if mainPage}
 	<RoundButton bind:showMessage={showMessage} bind:message={message} circleRadius={circleRadius}/>
 	{/if}
-	<h1 class="title">{title}</h1>
 	<div class="msg">{message}</div>
+	<h1 class="title">{title}</h1>
 </div>

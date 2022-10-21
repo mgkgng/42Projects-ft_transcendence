@@ -10,7 +10,6 @@
 </style>
 
 <script>
-	import { io } from "socket.io-client";
 	let grapped = false;
 
 </script>

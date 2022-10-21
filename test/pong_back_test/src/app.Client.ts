@@ -4,6 +4,7 @@ export class Client {
 	callbacksOnConnection: Set<Function>;
 	listeners: Map<string, Function>;
 	room: string; // room to which the client actually belongs
+	user: any;
 
 	//Websocket
 	// addEventListener
@@ -13,6 +14,7 @@ export class Client {
 		this.sock = sock;
 		this.listeners = new Map();
 		this.room = "";
+		this.user = undefined;
 		
 		// this.sock.onmessage = (msg: any) => {
 		// 	console.log("receving something", msg);

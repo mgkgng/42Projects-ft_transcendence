@@ -6,8 +6,6 @@ import {
 	WebSocketGateway, 
 	WebSocketServer 
 } from "@nestjs/websockets";
-import { runInThisContext } from "vm";
-import { threadId } from "worker_threads";
 import { Server } from 'ws';
 import { Client } from "./app.Client";
 import { Room } from "./app.Room";
@@ -162,6 +160,16 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			data: room.id
 		}));
 	}
+
+	@SubscribeMessage("AskVerifyJWT")
+	async verifyJWT(@MessageBody() data: any) {
+		let client = this.getClient(data.client); // TODO automize it
+		client.user = await askVerifyJWT(client, data.jwt);
+	}
+
+
+
+
 
 	static broadcast(clients: any, msg: any) {
 		for (let client of clients)
