@@ -1,8 +1,9 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Inject } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { UserEntity } from "src/entity/User.entity";
 import { UserFriendEntity } from "src/entity/UserFriend.entity";
 import { Repository } from "typeorm";
+import { MainServerService } from "src/mainServer/mainServer.gateway";
 
 @Injectable()
 export class friendSystemService {
@@ -10,7 +11,9 @@ export class friendSystemService {
         @InjectRepository(UserEntity)
         private userRepository : Repository<UserEntity>,
         @InjectRepository(UserFriendEntity)
-        private userFriendRepository : Repository<UserFriendEntity>
+        private userFriendRepository : Repository<UserFriendEntity>,
+        @Inject(MainServerService)
+        private mainServerService : MainServerService
     ) {}
 
     // Do a request on this route to ask if 2 user are friend
