@@ -32,17 +32,29 @@ export class MainServerService {
 	){
 	}
 	@WebSocketServer() server;
+	userConnectedList = []; // userConnectedList[] = {username : "username", socket : socket}
 
 	@UseGuards(AuthGuard("jwt"))
 	handleConnection(@Request() req)
 	{
 		console.log("Connect to main");
 		const user : any = (this.jwtServer.decode(req.handshake?.headers?.authorization.split(' ')[1]));
-		const client_username = user?.username;
+		const client_username : string = user.username;
+		let userConnected = {username: client_username, socket: req};
+		this.userConnectedList.push(userConnected);
+		console.log(this.userConnectedList);
 	}
 
 	handleDisconnect(@Request() req)
 	{
+		for (let i = 0; i < this.userConnectedList.length; i++)
+		{
+			if (this.userConnectedList[i].socket === req)
+			{
+				console.log(`User ${this.userConnectedList[i].username} deleted`);
+				this.userConnectedList.splice(i, 1);
+			}
+		}
 	}
 
 	after_init()

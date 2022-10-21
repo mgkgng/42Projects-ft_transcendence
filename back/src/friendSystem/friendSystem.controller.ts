@@ -28,8 +28,6 @@ export class friendSystemController {
         newUserRel.id_first_user = await qbu.select().where("u.username = 'John'").getOneOrFail();
         newUserRel.id_second_user = await qbu.select().where("u.username = 'bobby'").getOneOrFail();
         newUserRel.is_user_friend = true;
-        // await this.userRepository.update()
-        
         return this.userFriendRepository.save([newUserRel]);
         
     }
