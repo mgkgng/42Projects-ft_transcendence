@@ -1,6 +1,6 @@
 <style lang="scss">
 	.main-circle {
-		// position: absolute;
+		position: absolute;
 		// z-index: 1;
 		left: 34%;
 		width: var(--width);
@@ -20,7 +20,7 @@
 	
 
 	.shadow {
-		// position: absolute;
+		position: absolute;
 		// z-index: 77;
 
 		left: 41%;
