@@ -16,11 +16,12 @@
     import MenuCircle from '$lib/MenuCircle.svelte';
 	import CreateGame from "$lib/modals/CreateGame.svelte";
 	import Modal from "$lib/tools/Modal.svelte";
-	import Login from "$lib/modals/Login.svelte";
 
 	import { client } from "$lib/stores/client";
     import { onMount } from "svelte";
     import { goto } from "$app/navigation";
+	import { page } from '$app/stores';
+
     import RoomList from "$lib/modals/RoomList.svelte";
     import Room from "$lib/modals/Room.svelte";
     import { user, getCookie } from "$lib/stores/user";
@@ -28,7 +29,6 @@
 	let createGameModal: any;
 	let roomListModal: any;
 	let roomModal: any;
-	let loginModal: any;
 
 	let roomId: string = "";
 
@@ -36,17 +36,50 @@
 	let loginState: boolean;
 
 	onMount(() => {
+		/** Listeners for authentification*
+		*/
+		$client.addListener('ResLoginToken', (data: any) => {
+			console.log('ResLoginToken', data);
+			user.set(data.user);
+			document.cookie = `transcendence-jwt=${data.jwt}`;
+			loginState = true;
+			goto('/');
+		});
+
 		$client.addListener('ResVerifyJWT', (data: any) => {
 			console.log(data);
 			if (!data.success) {
 				user.set(undefined);
 				return ;
 			}
-
 			user.set(data.user);
 			loginState = true;
-			loginModal.close();
 		});
+
+		/** Verify authentification */
+		const code = String($page.url).split('code=')[1];
+		console.log("code: ", code);
+		if (code) {
+			console.log("allo");
+			$client.sock.send(JSON.stringify({
+				event: "AskVerifyToken",
+				data: code
+			}));
+		}
+
+		const jwt = getCookie("transcendence-jwt");
+		console.log("jwt:", jwt);
+		if (jwt) {
+			$client.sock.send(JSON.stringify({
+				type: "AskVerifyJWT",
+				data: {
+					client: $client.id,
+					jwt: jwt
+				}
+			}));
+		}
+
+		/** The Rest */
 
 		$client.addListener("MatchFound", (data: any) => {
 			console.log("MatchFound", data);
@@ -64,41 +97,14 @@
 			roomModal.open();
 		});
 
-		const jwt = getCookie("transcendence-jwt");
-
-		if (jwt === undefined)
-			return ; //a verifier
-
-		function verifyJWT() {
-			if (!jwt)
-				return ;
-			$client.sock.send({
-				type: "AskVerifyJWT",
-				data: {
-					client: $client.id,
-					jwt: jwt
-				}
-			});
-		}
-
-		$client.OnConnection(verifyJWT);
-
-		$client.addListener('ResLoginToken', (data: any) => {
-			console.log('ResLoginToken', data);
-			user.set(data.user);
-			document.cookie = `transcendence-jwt=${data.jwt}`;
-			loginState = true;
-			loginModal.close();
-		});
-
 		$client.addListener('LoginTokenError', (data: any) => {
 			console.log('tokenError', data);
 			// LoginErrorMsgModal.open();
 		});
 
 		return (() => {
-			$client.removeListeners(["MatchFound", "RoomCreated"]);
-			$client.removeOnConnection(verifyJWT);
+			$client.removeListeners(["ResLoginToken", "ResVerifyJWT", 
+				"MatchFound", "RoomCreated"]);
 		});
 	});
 </script>
@@ -113,10 +119,6 @@
 
 <Modal bind:this={roomModal} closeOnBgClick={false}>
 	<Room roomId={roomId}/>
-</Modal>
-
-<Modal bind:this={loginModal} closeOnBgClick={false}>
-	<Login bind:loginState={loginState}/>
 </Modal>
 
 <Title title={"transcendence"} mainPage={true} />

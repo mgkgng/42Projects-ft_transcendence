@@ -48,8 +48,10 @@
 </style>
 
 <script lang="ts">
+    import { goto } from "$app/navigation";
 	import { onMount } from "svelte";
 	import { client } from "./stores/client";
+	import { page } from '$app/stores';
 
 	export let circleRadius;
 
@@ -73,9 +75,7 @@
 	<div class="circle-button" style="--from1: {angleLogin[0]}deg; --to1: {angleLogin[1]}deg;
 	--from2: {angleLogin[2]}deg; --to2: {angleLogin[3]}deg"
 		on:click={()=>{
-			$client.sock.send(JSON.stringify({
-				event: "Test"
-			}));
+			goto(`https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-f5ff5811f4e28fa86f612098072826a0d1e9b5dd48ca96888a53143c89c113f0&redirect_uri=http%3A%2F%2Flocalhost%3A5555&response_type=code`);
 		}}
 	>
 		<h2>Login</h2>

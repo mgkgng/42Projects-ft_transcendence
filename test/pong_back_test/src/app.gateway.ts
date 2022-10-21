@@ -160,8 +160,16 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}));
 	}
 
+	@SubscribeMessage("AskVerifyToken") 
+	async verifyToken(@MessageBody() data: any) {
+		console.log("ask verify token", data);
+		let client = this.getClient(data.client);
+		client.user = await askforToken(client, data.code);
+	}
+
 	@SubscribeMessage("AskVerifyJWT")
 	async verifyJWT(@MessageBody() data: any) {
+		console.log("ask verify jwt", data);
 		let client = this.getClient(data.client); // TODO automize it
 		client.user = await askVerifyJWT(client, data.jwt);
 	}

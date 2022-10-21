@@ -96,7 +96,6 @@
 <script lang="ts">
 	import { onMount } from "svelte";
 	import RoundButton from "./RoundButton.svelte";
-	import '$lib/scss/app.scss';
     import MainCircle from './MainCircle.svelte';
 
 	type Circle = {
