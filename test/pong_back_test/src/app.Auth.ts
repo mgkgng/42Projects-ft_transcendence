@@ -1,4 +1,6 @@
 import * as jose from 'jose';
+import { HttpService } from '@nestjs/axios';
+import { lastValueFrom } from 'rxjs';
 
 const UID = process.env.API42_UID;
 const SECRET = process.env.API42_SECRET;
@@ -25,10 +27,8 @@ async function getToken(code: any) {
 				"redirect_uri": `http://localhost:5555`
 			})
 		};
-
-		const response = await fetch("https://api.intra.42.fr/oauth/token", options);
+		const response = await lastValueFrom(this.httpService.post("https://api.intra.42.fr/oauth/token", options))
 		const data = await response.json();
-
 		return (data);
 	} catch (e) {
 		console.log("Cannot get token.", e);
@@ -43,13 +43,12 @@ async function authentificateUser(code: any) {
 	if (!access_token)
 		return (undefined);
 	
-	let data = await fetch("https://api.intra.42.fr/v2/me", {
-		method: "GET",
+	let data = await lastValueFrom(this.httpService.get("https://api.intra.42.fr/v2/me", {
 		headers: {
 			'Content-Type': 'application/json',
-			'Authorization': 'Bearer ' + access_token				
+			'Authorization': 'Bearer' + access_token
 		}
-	});
+	}));
 
 	data = await data.json();
 

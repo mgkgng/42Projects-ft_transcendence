@@ -10,6 +10,7 @@ import { Server } from 'ws';
 import { Client } from "./app.Client";
 import { Room } from "./app.Room";
 import { askforToken, askVerifyJWT } from "./app.Auth";
+import { AuthService } from "./auth/auth.service";
 
 
 @WebSocketGateway()
@@ -19,7 +20,7 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	queue: Array<Client>;
 	control: Map<string, any>;
 
-	constructor() {
+	constructor(private authService : AuthService) {
 		this.clients = new Map<string, Client>();
 		this.rooms = new Map<string, Room>();
 		this.queue = [];
@@ -164,14 +165,14 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	async verifyToken(@MessageBody() data: any) {
 		console.log("ask verify token", data);
 		let client = this.getClient(data.client);
-		client.user = await askforToken(client, data.code);
+		client.user = await this.authService.askforToken(client, data.code);
 	}
 
 	@SubscribeMessage("AskVerifyJWT")
 	async verifyJWT(@MessageBody() data: any) {
 		console.log("ask verify jwt", data);
 		let client = this.getClient(data.client); // TODO automize it
-		client.user = await askVerifyJWT(client, data.jwt);
+		client.user = await this.authService.askVerifyJWT(client, data.jwt);
 	}
 
 	static broadcast(clients: any, msg: any) {

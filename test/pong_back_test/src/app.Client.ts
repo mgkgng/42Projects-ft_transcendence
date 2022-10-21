@@ -1,3 +1,5 @@
+
+
 export class Client {
 	id: string;
 	sock: any;
@@ -14,7 +16,7 @@ export class Client {
 		this.sock = sock;
 		this.listeners = new Map();
 		this.room = "";
-		this.user = undefined;
+		this.user = {};
 		
 		// this.sock.onmessage = (msg: any) => {
 		// 	console.log("receving something", msg);
