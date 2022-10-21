@@ -9,6 +9,7 @@ import {
 import { Server } from 'ws';
 import { Client } from "./app.Client";
 import { Room } from "./app.Room";
+import { askforToken, askVerifyJWT } from "./app.Auth";
 
 
 @WebSocketGateway()
@@ -71,7 +72,6 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			this.rooms.set(room.id, room);
 			this.queue = this.queue.slice(2);
 		}
-
 	}
 
 	@SubscribeMessage("RoomCheck")
@@ -99,7 +99,6 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					paddleSize: room.pong.gameMap.paddleSize
 			}
 		}));
-
 	}
 
 	@SubscribeMessage("PaddleMove")
@@ -166,10 +165,6 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		let client = this.getClient(data.client); // TODO automize it
 		client.user = await askVerifyJWT(client, data.jwt);
 	}
-
-
-
-
 
 	static broadcast(clients: any, msg: any) {
 		for (let client of clients)

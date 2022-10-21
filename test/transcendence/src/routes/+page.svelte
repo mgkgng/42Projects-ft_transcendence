@@ -16,6 +16,7 @@
     import MenuCircle from '$lib/MenuCircle.svelte';
 	import CreateGame from "$lib/modals/CreateGame.svelte";
 	import Modal from "$lib/tools/Modal.svelte";
+	import Login from "$lib/modals/Login.svelte";
 
 	import { client } from "$lib/stores/client";
     import { onMount } from "svelte";
@@ -35,20 +36,16 @@
 	let loginState: boolean;
 
 	onMount(() => {
-		$client.addListener('ResVerifJWT', (data: any) => {
+		$client.addListener('ResVerifyJWT', (data: any) => {
 			console.log(data);
-			// Token error
-			if (data.success === 0) {
+			if (!data.success) {
 				user.set(undefined);
 				return ;
-			} else if (data.success) {
-				console.log('success');
-				// retrieve user
-				user.set(data.user);
-				loginState = true;
-				loginModal.close();
-				// goto('/home');
 			}
+
+			user.set(data.user);
+			loginState = true;
+			loginModal.close();
 		});
 
 		$client.addListener("MatchFound", (data: any) => {
@@ -67,7 +64,7 @@
 			roomModal.open();
 		});
 
-		const jwt = getCookie("jwt");
+		const jwt = getCookie("transcendence-jwt");
 
 		if (jwt === undefined)
 			return ; //a verifier
@@ -86,8 +83,8 @@
 
 		$client.OnConnection(verifyJWT);
 
-		$client.addListener('getLoginToken', (data: any) => {
-			console.log('getToken', data);
+		$client.addListener('ResLoginToken', (data: any) => {
+			console.log('ResLoginToken', data);
 			user.set(data.user);
 			document.cookie = `transcendence-jwt=${data.jwt}`;
 			loginState = true;

@@ -82,7 +82,7 @@ export async function askforToken(client: any, code: any) {
 		}
 
 		client.sock.send({
-			event: "getLoginToken",
+			event: "ResLoginToken",
 			data: {
 				jwt: res.jwt,
 				user: res.user
@@ -93,6 +93,7 @@ export async function askforToken(client: any, code: any) {
 	} catch (e) {
 		console.log('askForToken error: ', e);
 	}
+	return (undefined);
 }
 
 export async function askVerifyJWT(client: any, jwt: any) {
@@ -111,7 +112,7 @@ export async function askVerifyJWT(client: any, jwt: any) {
 		};
 
 		client.send(JSON.stringify({
-			event: "resVerifyJWT",
+			event: "ResVerifyJWT",
 			data: {
 				success: true,
 				jwt: jwt,
@@ -127,4 +128,5 @@ export async function askVerifyJWT(client: any, jwt: any) {
 			data: { success: false }
 		}));
 	}
+	return (undefined);
 }
