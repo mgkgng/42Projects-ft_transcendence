@@ -9,8 +9,8 @@ import {
 import { Server } from 'ws';
 import { Client } from "./app.Client";
 import { Room } from "./app.Room";
-import { askforToken, askVerifyJWT } from "./app.Auth";
 import { AuthService } from "./auth/auth.service";
+import { forwardRef, Inject } from '@nestjs/common'
 
 
 @WebSocketGateway()
@@ -20,7 +20,8 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	queue: Array<Client>;
 	control: Map<string, any>;
 
-	constructor(private authService : AuthService) {
+	constructor(
+		private authService : AuthService) {
 		this.clients = new Map<string, Client>();
 		this.rooms = new Map<string, Room>();
 		this.queue = [];
