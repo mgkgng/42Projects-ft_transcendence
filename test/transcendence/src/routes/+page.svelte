@@ -17,6 +17,8 @@
 	import CreateGame from "$lib/modals/CreateGame.svelte";
 	import Modal from "$lib/tools/Modal.svelte";
 
+	import '$lib/scss/app.scss';
+	
 	import { client } from "$lib/stores/client";
     import { onMount } from "svelte";
     import { goto } from "$app/navigation";

@@ -21,9 +21,14 @@
 	import { client } from "$lib/stores/client";
     import { onMount } from "svelte";
     import { goto } from "$app/navigation";
+    import { loginState } from "$lib/stores/var";
+    import { browser } from "$app/environment";
 
 	onMount(() => {
 		console.log("I'm on the main page.");
+
+		if (!browser || !loginState || !$client.socket)
+			return;
 		
 		$client.socket.on("MatchFound", (data: any) => {
 			console.log("MatchFound", data);

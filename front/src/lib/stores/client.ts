@@ -5,7 +5,6 @@ import io from "socket.io-client";
 
 class Client {
 	id: string;
-	sock: any;
 	socket: any;
 	callbacksOnConnection: Set<Function>;
 	listeners: Map<string, Function>;
@@ -14,15 +13,7 @@ class Client {
 		this.id = uid();
 		this.listeners = new Map();
 		this.callbacksOnConnection = new Set();
-		if (browser) {
-			//this.sock = new WebSocket('ws://localhost:3000');
-			//console.log(this.sock);
-			//this.sock.onmessage = (msg: any) => {
-				//console.log("receving something", msg);
-				//this.listeners.get(msg.event)?.(msg.data);
-			//}
-			//this.connect();
-		}
+		this.socket = undefined;
 	}
 
 	connect() {
@@ -39,17 +30,11 @@ class Client {
 		this.socket.emit("Connexion", {	data: this.id	})
 		for (let func of this.callbacksOnConnection)
 			func();
-
-		//this.socket.onmessage = (msg: any) => {
-			//let data = JSON.parse(msg.data);
-			// console.log("OnMessage", data);
-			//this.listeners.get(data.event)?.(data?.data);
-		//}
 	}
 
 	OnConnection(func: Function) {
 		this.callbacksOnConnection.add(func);
-		if (this.sock?.readyState === WebSocket.OPEN)
+		if (this.socket?.readyState === WebSocket.OPEN)
 			func();
 	}
 
@@ -69,7 +54,7 @@ class Client {
 		for (let listener of listeners)
 			this.removeListener(listener);
 	}
-	//AXEL MODIFICATION	
+
 	async send42Tok(url: any)
 	{
 		if (localStorage.getItem('transcendence-jwt') != null
@@ -114,7 +99,6 @@ class Client {
 		}
 		return (false);
 	}
-	//END MODIFICATION
 }
 
 export const client = writable(new Client());

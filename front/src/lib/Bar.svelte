@@ -26,6 +26,4 @@ on:mouseup={()=>{
 on:mousemove={(event)=>{
 	if (grapped)
 		console.log(event);
-}}
-
-/>
+}}/>
