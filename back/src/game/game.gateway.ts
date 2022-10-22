@@ -16,7 +16,11 @@ import {Room} from "./game.Room"
 import { UseGuards, Request, HttpException } from '@nestjs/common';
 import { AuthGuard } from "@nestjs/passport";
 import { UserBlockEntity } from "src/entity/UserBlock.entity";
-	
+import { MainServerService } from "src/mainServer/mainServer.gateway";
+import { JwtService } from '@nestjs/jwt';
+import { GameEntity } from "src/entity/Game.entity";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository, DataSource } from "typeorm";
 
 @WebSocketGateway({
 	cors: {
@@ -30,7 +34,10 @@ export class GameGateway {
 	queue: Array<Client>;
 	control: Map<string, any>;
 
-	constructor() {
+	constructor(private mainServerService : MainServerService, private jwtService: JwtService, 
+				@InjectRepository(GameEntity) private gameRep: Repository<GameEntity>,
+				private dataSource : DataSource,
+	) {
 		this.clients = new Map<string, Client>();
 		this.rooms = new Map<string, Room>();
 		this.queue = [];
@@ -53,10 +60,11 @@ export class GameGateway {
 	}
 
 	@SubscribeMessage("Connexion")
-	handleConnexion(client: any, data: any) {
+	handleConnexion(client: any, data: any, @Request() req) {
 		//console.log("test", client);
 		console.log("data", data);
-		let connection = new Client(data, client);
+		const user: any = (this.jwtService.decode(req.handshake.headers.authorization.split(' ')[1]));
+		let connection = new Client(data, client, user.username);
 		this.clients.set(connection.id, connection);
 	}
 
@@ -76,7 +84,7 @@ export class GameGateway {
 		console.log("Queue length at the beginning: ", this.queue.length);
 
 		if (this.queue.length > 1) {
-			let room = new Room([this.queue[0], this.queue[1]]);
+			let room = new Room([this.queue[0], this.queue[1]], 25, this.gameRep, this.mainServerService, this.dataSource);
 			room.broadcast(JSON.stringify({
 				event: 'MatchFound',
 				data: room.id

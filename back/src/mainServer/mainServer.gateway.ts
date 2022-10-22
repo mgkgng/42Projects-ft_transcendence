@@ -39,7 +39,7 @@ export class MainServerService {
 	{
 		console.log("Connect to main");
 		const user : any = (this.jwtServer.decode(req.handshake?.headers?.authorization.split(' ')[1]));
-		const client_username : string = user.username;
+		const client_username : any = user.username;
 		let userConnected = {username: client_username, socket: req};
 		this.userConnectedList.push(userConnected);
 		console.log(this.userConnectedList);

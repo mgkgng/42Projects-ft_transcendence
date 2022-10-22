@@ -1,5 +1,6 @@
 export class Client {
 	id: string;
+	username: string;
 	sock: any;
 	callbacksOnConnection: Set<Function>;
 	listeners: Map<string, Function>;
@@ -7,11 +8,11 @@ export class Client {
 	//Websocket
 	// addEventListener
 	// removeEventListener
-	constructor(id: string, sock: any) {
+	constructor(id: string, sock: any, username : string) {
 		this.id = id;
 		this.sock = sock;
 		this.listeners = new Map();
-		
+		this.username = username;	
 		// this.sock.onmessage = (msg: any) => {
 		// 	console.log("receving something", msg);
 		// 	this.listeners.get(msg.event)?.(msg.data);
