@@ -55,14 +55,21 @@
 	import { loginState } from "./stores/var";
 
 	export let circleRadius;
-
 	export let showMessage;
 	export let message;
 
 	let angleRand;
 	let angleLogin: Array<number> = [], anglePlay: Array<number> = [];
 
-	onMount(async () => {
+	let login: boolean;
+
+	loginState.subscribe(value => {
+		login = value;
+	})
+
+	$: console.log("login: ", login);
+
+	onMount(() => {
 		angleRand = Math.floor(Math.random() * 180 + 90);
 		angleLogin = [angleRand, -angleRand, angleRand - 360, -angleRand + 360];
 		anglePlay = [angleRand - 180, -angleRand + 180, angleRand - 540, -angleRand + 540];
@@ -74,23 +81,24 @@
 	<div class="circle-button" style="--from1: {angleLogin[0]}deg; --to1: {angleLogin[1]}deg;
 	--from2: {angleLogin[2]}deg; --to2: {angleLogin[3]}deg"
 		on:click={()=>{
-			if (!loginState || true)
+			if (!login)
 				goto("https://api.intra.42.fr/oauth/authorize?client_id=7e2bea32b8d407dab9d25b1ab4ff8ec14118a99e50807a191bc47334ed598658&redirect_uri=http%3A%2F%2Flocalhost%3A3002&response_type=code");
 			else {
 				loginState.set(false);
 				localStorage.removeItem("transcendence-jwt");
+				goto('/');
 			}
 		}}>
-		{#if !loginState}
-			<h2>Login</h2>
+		{#if !login}
+		<h2>Login</h2>
 		{:else}
-			<h2>Logout</h2>
+		<h2>Logout</h2>
 		{/if}
 	</div>
 	<div class="circle-button" style="--from1: {anglePlay[0]}deg; --to1: {anglePlay[1]}deg;
 	--from2: {anglePlay[2]}deg; --to2: {anglePlay[3]}deg"
 		on:click={()=>{
-			if (!loginState) {
+			if (!login) {
 				showMessage = true;
 				message = "Login required!";
 			}

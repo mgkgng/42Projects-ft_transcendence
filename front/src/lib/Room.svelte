@@ -197,15 +197,7 @@
 			console.log((userType == data) ? "You Win!"
 				: (userType != UserType.Watcher) ? "You Lose!" 
 				: ".");
-		})
-
-		return (() => {
-			$client.removeListeners(["PaddleUpdate",
-				"LoadBall",
-				"ScoreUpdate",
-				"PuckHit",
-				"PongStart"]);
-		})
+		});
 	});
 
 </script>

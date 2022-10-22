@@ -59,7 +59,7 @@ export class GameGateway {
 		this.clients.delete(client.id);
 	}
 
-	@SubscribeMessage("Connexion")
+	@SubscribeMessage("Connection")
 	handleConnexion(client: any, data: any, @Request() req) {
 		//console.log("test", client);
 		console.log("data", data);
@@ -72,29 +72,26 @@ export class GameGateway {
 	joinQueue(@MessageBody() data: any) {
 		console.log("Join Queue", data);
 		let client = this.getClient(data);
-
-		if (this.queue.includes(client)) {
-			// TODO: should optimize the algorithm later
-			
-			console.log("already joined the queue");
+		// TODO: should maybe optimize the algorithm later -- for includes
+		if (client.room.length || this.queue.includes(client))
 			return ;
-		}
 
 		this.queue.push(client);
-		console.log("Queue length at the beginning: ", this.queue.length);
 
 		if (this.queue.length > 1) {
-			let room = new Room([this.queue[0], this.queue[1]], 25, this.gameRep, this.mainServerService, this.dataSource);
+			let room = new Room([this.queue[0], this.queue[1]], "test", 25, 8, true, this.gameRep, this.mainServerService, this.dataSource);
+			// TODO: think about it: if i just join a match randomlmy like this, it could be by default a private game
+			this.queue[0].room = room.id;
+			this.queue[1].room = room.id;
+
 			room.broadcast(JSON.stringify({
 				event: 'MatchFound',
 				data: room.id
 			}));
-			console.log("sending matchfound.");
+
 			this.rooms.set(room.id, room);
 			this.queue = this.queue.slice(2);
 		}
-		console.log("Queue length at the end: ", this.queue.length);
-
 	}
 
 	@SubscribeMessage("RoomCheck")
@@ -115,7 +112,8 @@ export class GameGateway {
 			event: "RoomInfo",
 			data: {
 				roomInfo: {
-					players: [room.players[0].id, room.players[1].id],
+					players: (room.players.length === 2) ? [room.players[0].id, room.players[1].id]
+						: [room.players[0].id],
 					maxpoint: room.maxpoint,
 					scores: room.scores,
 					mapSize: [room.pong.gameMap.width, room.pong.gameMap.height],
@@ -151,6 +149,38 @@ export class GameGateway {
 	paddleStop(@MessageBody() data: any) {
 		clearInterval(this.control.get(data));
 		this.control.delete(data);
+	}
+
+	@SubscribeMessage("AskRooms")
+	askRooms(@MessageBody() data: any) {
+		let client = this.getClient(data);
+	
+		// I need to think more about how i should save the data and how i'll send it
+		// there should be at least these information:
+		// playersInfo, availability / format (max point, map, mode...)
+		// and then if the game is going on...
+		// score...
+		
+		client.sock.send(JSON.stringify({
+			event: "GetAllRooms",
+			data: [...this.rooms].filter(room => room[1].privateMode == false)
+		}));
+	}
+
+	@SubscribeMessage("CreateRoom")
+	createRoom(@MessageBody() data: any) {
+		let client = this.getClient(data.client);
+		if (client.room.length)
+			return ;
+
+		let room = new Room([client], data.title, data.maxPoint, data.difficulty, data.privateMode, this.gameRep, this.mainServerService, this.dataSource);
+		this.rooms.set(room.id, room);
+		client.room = room.id;
+
+		client.sock.send(JSON.stringify({
+			event: "RoomCreated",
+			data: room.id
+		}));
 	}
 
 	static broadcast(clients: any, msg: any) {

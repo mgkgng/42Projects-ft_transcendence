@@ -21,6 +21,7 @@ export class AuthService {
 	}
 	async validateUser42(code: string): Promise<any> 
 	{
+		console.log("TEST");
 		const iud = process.env.IUD;
 		const secret = process.env.SECRET_APP;
 		try {

@@ -21,38 +21,10 @@ class Client {
 			return ;
 		
 		console.log('Connected');
-		/*this.socket.emit(
-			JSON.stringify({
-				event: "Connexion",
-				data: this.id
-			})
-		)*/
-		this.socket.emit("Connexion", {	data: this.id	})
+		
+		this.socket.emit("Connection", this.id);
 		for (let func of this.callbacksOnConnection)
 			func();
-	}
-
-	OnConnection(func: Function) {
-		this.callbacksOnConnection.add(func);
-		if (this.socket?.readyState === WebSocket.OPEN)
-			func();
-	}
-
-	removeOnConnection(func: Function) {
-		this.callbacksOnConnection.delete(func);
-	}
-	
-	addListener(listener: string, callback: Function) {
-		this.listeners.set(listener, callback);
-	}
-
-	removeListener(listener: string) {
-		this.listeners.delete(listener);
-	}
-
-	removeListeners(listeners: Array<string>) {
-		for (let listener of listeners)
-			this.removeListener(listener);
 	}
 
 	async send42Tok(url: any)
@@ -76,6 +48,7 @@ class Client {
 		}
 		if (url.has('code'))
 		{
+			console.log("ORHERE");
 			try {
 				const res : any = await fetch("http://localhost:3000/auth42",{
 					method: 'POST',
