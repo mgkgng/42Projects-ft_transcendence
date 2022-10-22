@@ -32,7 +32,7 @@ export class MainServerService {
 	){
 	}
 	@WebSocketServer() server;
-	userConnectedList = []; // userConnectedList[] = {username : "username", socket : socket}
+	userConnectedList = []; // userConnectedList[] = {username : "username", socket : socket, status : "online" | "in game" | "offline"}
 
 	@UseGuards(AuthGuard("jwt"))
 	handleConnection(@Request() req)
@@ -40,7 +40,7 @@ export class MainServerService {
 		console.log("Connect to main");
 		const user : any = (this.jwtServer.decode(req.handshake?.headers?.authorization.split(' ')[1]));
 		const client_username : string = user?.username;
-		let userConnected = {username: client_username, socket: req};
+		let userConnected = {username: client_username, socket: req, status: "online"};
 		this.userConnectedList.push(userConnected);
 		console.log(this.userConnectedList);
 	}
@@ -60,6 +60,21 @@ export class MainServerService {
 	after_init()
 	{
 	}
+
+	// Return the status of a user (online | in game) otherwise return offline
+	// the user must exist to use this function
+	getUserStatus(username : string) : string
+	{
+		for (let i = 0; i < this.userConnectedList.length; i++)
+		{
+			if (this.userConnectedList[i].username === username)
+				return this.userConnectedList[i].status;
+			else
+				return "offline";
+		}
+		return "offline";
+	}
+
 	async getIdUser(@Request() req) //GET THE UNIQ ID OF A USER
 	{
 		// const user : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));

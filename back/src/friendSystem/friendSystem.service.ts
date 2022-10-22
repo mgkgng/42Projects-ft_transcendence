@@ -29,7 +29,7 @@ export class friendSystemService {
         .getOne();
     }
 
-    // Do a request to this route to ask for the friendList of a user
+    // Do a request to this route to ask for the friendList of a user, and his status
     async getFriendList(username : string )
     {
         const qb = this.userFriendRepository.createQueryBuilder('u');
@@ -44,9 +44,15 @@ export class friendSystemService {
         let parsedList : UserEntity[] = [];
         unparsedQuery.forEach(element => {
             if (element.id_first_user.username == username)
-                parsedList.push(element.id_second_user);
+            {
+                let newUserEntStatus = {...element.id_second_user, status: this.mainServerService.getUserStatus(element.id_second_user.username)};
+                parsedList.push(newUserEntStatus);
+            }
             if (element.id_second_user.username == username)
-                parsedList.push(element.id_first_user);
+            {
+                let newUserEntStatus = {...element.id_first_user, status: this.mainServerService.getUserStatus(element.id_first_user.username)};
+                parsedList.push(newUserEntStatus);
+            }
             i++;
         });
         return parsedList;
@@ -107,5 +113,18 @@ export class friendSystemService {
         if (isRequestedEntity == null)
             return ;
         return await this.unFriend(first_username, second_username);
+    }
+
+    async changeStatus(username : string, status : string)
+    {
+        if (status != "online" && status != "offline" && status != "in game")
+            return ;
+        this.mainServerService.userConnectedList.forEach(element => {
+            if (element.username === username)
+            {
+                element.status = status;
+                return ;
+            }
+        });
     }
 }

@@ -6,6 +6,7 @@ import { UserEntity } from "src/entity/User.entity";
 import { UserFriendEntity } from "src/entity/UserFriend.entity";
 import { Repository } from "typeorm";
 import { friendSystemService } from "./friendSystem.service";
+import { MainServerService } from "src/mainServer/mainServer.gateway";
 
 @Controller()
 export class friendSystemController {
@@ -15,7 +16,9 @@ export class friendSystemController {
         @InjectRepository(UserFriendEntity)
         private userFriendRepository : Repository<UserFriendEntity>,
         @Inject(friendSystemService)
-        private friendSystemService : friendSystemService
+        private friendSystemService : friendSystemService,
+        @Inject(MainServerService)
+        private mainServerService : MainServerService
     ) {}
 
     @Get('addFriend')
@@ -48,12 +51,13 @@ export class friendSystemController {
         return await this.userRepository.find({relations:{relation_friend_requested: true, relation_friend_accepted: true}})
     }
 
-    @Get("addNew")
+    @Get("addBobby")
     async addNew()
     {
         let user = new UserEntity;
-        user.id_g = 1;
-        user.username = "john"
+        user.username = "bobby";
+        user.password = "bobbypass";
+        user.email = "bobby@bobby.fr";
         return await this.userRepository.save(user);
     }
 
@@ -85,5 +89,11 @@ export class friendSystemController {
     async unfriend(@Query() query : {first_username : string, second_username : string})
     {
         return this.friendSystemService.unFriend(query.first_username, query.second_username);
+    }
+
+    @Get('changeStatus?')
+    async changeStatus(@Query() query : {username : string, status : string})
+    {
+        return this.friendSystemService.changeStatus(query.username, query.status);
     }
 }
