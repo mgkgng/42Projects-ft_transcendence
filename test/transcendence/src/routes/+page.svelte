@@ -33,7 +33,7 @@
 	let roomId: string = "";
 
 	let menuExpanded: boolean;
-	let loginState: boolean;
+	let loginState: boolean = false;
 
 	onMount(() => {
 		/** Listeners for authentification*
@@ -43,7 +43,7 @@
 			user.set(data.user);
 			document.cookie = `transcendence-jwt=${data.jwt}`;
 			loginState = true;
-			goto('/yo');
+			goto('/');
 		});
 
 		$client.addListener('ResVerifyJWT', (data: any) => {
@@ -124,7 +124,7 @@
 	<Room roomId={roomId}/>
 </Modal>
 
-<Title title={"transcendence"} mainPage={true} />
+<Title bind:loginState={loginState} title={"transcendence"} mainPage={true} />
 
 <DarkMode/>
 <MenuCircle createGameModal={createGameModal} roomListModal={roomListModal} bind:expanded={menuExpanded}/>

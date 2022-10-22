@@ -51,17 +51,14 @@
     import { goto } from "$app/navigation";
 	import { onMount } from "svelte";
 	import { client } from "./stores/client";
-	import { page } from '$app/stores';
 
 	export let circleRadius;
-
+	export let loginState: boolean;
 	export let showMessage;
 	export let message;
 
 	let angleRand;
 	let angleLogin: Array<number> = [], anglePlay: Array<number> = [];
-
-	let login = false;
 
 	onMount(() => {
 		angleRand = Math.floor(Math.random() * 180 + 90);
@@ -72,6 +69,7 @@
 </script>
 
 <div>
+	{#if !loginState}
 	<div class="circle-button" style="--from1: {angleLogin[0]}deg; --to1: {angleLogin[1]}deg;
 	--from2: {angleLogin[2]}deg; --to2: {angleLogin[3]}deg"
 		on:click={()=>{
@@ -80,10 +78,17 @@
 	>
 		<h2>Login</h2>
 	</div>
+	{:else}
+	<div class="circle-button" style="--from1: {angleLogin[0]}deg; --to1: {angleLogin[1]}deg;
+	--from2: {angleLogin[2]}deg; --to2: {angleLogin[3]}deg"
+		on:click={()=>{ console.log("let's go to see your profile!")}}>
+		<h2>Profile</h2>
+	</div>
+	{/if}
 	<div class="circle-button" style="--from1: {anglePlay[0]}deg; --to1: {anglePlay[1]}deg;
 	--from2: {anglePlay[2]}deg; --to2: {anglePlay[3]}deg"
 		on:click={()=>{
-			if (!login) {
+			if (!loginState) {
 				showMessage = true;
 				message = "Login required!";
 			}

@@ -107,6 +107,7 @@
 	export let darkMode = false;
 	export let title: string;
 	export let mainPage: boolean;
+	export let loginState: boolean;
 
 	let circlesAround: Array<Circle> = [];
 	let circleRadius = 250;
@@ -166,7 +167,11 @@
 	{/each}
 
 	{#if mainPage}
-	<RoundButton bind:showMessage={showMessage} bind:message={message} circleRadius={circleRadius}/>
+	<RoundButton
+		bind:loginState={loginState}
+		bind:showMessage={showMessage}
+		bind:message={message}
+		circleRadius={circleRadius}/>
 	{/if}
 	<div class="msg">{message}</div>
 	<h1 class="title">{title}</h1>
