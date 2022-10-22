@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import * as jose from 'jose';
 import { lastValueFrom } from 'rxjs';
-import { stringify } from 'querystring';
 
 const UID = "u-s4t2ud-f5ff5811f4e28fa86f612098072826a0d1e9b5dd48ca96888a53143c89c113f0";
 const SECRET = "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";

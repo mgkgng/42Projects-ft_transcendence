@@ -26,6 +26,8 @@
     import Room from "$lib/modals/Room.svelte";
     import { user, getCookie } from "$lib/stores/user";
 
+	import Profile from "$lib/Profile.svelte"
+
 	let createGameModal: any;
 	let roomListModal: any;
 	let roomModal: any;
@@ -39,9 +41,13 @@
 		/** Listeners for authentification*
 		*/
 		$client.addListener('ResLoginToken', (data: any) => {
-			console.log('ResLoginToken', data);
+			console.log('ResLoginToken', data.user);
+
+			console.log("before...:", user);
 			user.set(data.user);
 			document.cookie = `transcendence-jwt=${data.jwt}`;
+			
+			console.log("What??", user);
 			loginState = true;
 			goto('/');
 		});
@@ -127,4 +133,7 @@
 <Title bind:loginState={loginState} title={"transcendence"} mainPage={true} />
 
 <DarkMode/>
+
+<!-- <Profile /> -->
+
 <MenuCircle createGameModal={createGameModal} roomListModal={roomListModal} bind:expanded={menuExpanded}/>

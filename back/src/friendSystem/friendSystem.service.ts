@@ -12,8 +12,8 @@ export class friendSystemService {
         private userRepository : Repository<UserEntity>,
         @InjectRepository(UserFriendEntity)
         private userFriendRepository : Repository<UserFriendEntity>,
-        @Inject(mainServerService)
-        private mainServerService : mainServerService
+        @Inject(MainServerService)
+        private mainServerService : MainServerService
     ) {}
 
     // Do a request on this route to ask if 2 user are friend
