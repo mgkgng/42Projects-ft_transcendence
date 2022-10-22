@@ -1,6 +1,6 @@
 import { writable } from "svelte/store";
 
-export let user = writable(undefined);
+export let user: any = writable(undefined);
 
 export function getCookie(name: string) { 
 	let cookies = document.cookie.split(';');

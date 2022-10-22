@@ -7,23 +7,9 @@ networks:
 
 #IMAGES
 services:
-  #front:
-  #  container_name: front
-  #  build: ./front
-  #  ports:
-  #    - "3001:3001"
-  #  networks:
-  #    - net
-  #  env_file:
-  #    - .env
-  #  volumes:
-  #    - ./front/src:/usr/src/app/src
-  #    - /usr/src/app/node_modules
-  #  depends_on:
-  #    - back
-  front_svelte:
-    container_name: front_svelte
-    build: ./docker_svelte
+  front:
+    container_name: front
+    build: ./front
     ports:
       - "3002:3002"
     networks:
@@ -31,8 +17,8 @@ services:
     env_file:
       - .env
     volumes:
-      - ./docker_svelte/src:/app/src
-      - ./docker_svelte/static:/app/static
+      - ./front/src:/app/src
+      - ./front/static:/app/static
       - /app/node_modules
     depends_on:
       - back

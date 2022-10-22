@@ -13,10 +13,6 @@
 
 		padding: 0;
 		border: dashed 5px white;
-
-		// display: flex;
-		// justify-content: center;
-		// align-items: center;
 	}
 
 	.test {
@@ -107,14 +103,11 @@
 
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import DarkMode from "$lib/DarkMode.svelte";
-	import { client } from "$lib/stores/client";
+=	import { client } from "$lib/stores/client";
 	import { UserType } from './stores/var';
 	import Paddle from './Paddle.svelte';
 	import { Puck } from './pong/Puck';
     import PongPuck from './PongPuck.svelte';
-    import ScoreBox from './ScoreBox.svelte';
-    import { GameMap } from './pong/GameMap';
 
 	export let roomInfo: any;
 	export let roomId: string;
@@ -268,16 +261,6 @@ on:keypress={(event) => {
 
 	moving = true;
 
-	/*$client.socket.send(JSON.stringify({
-		event: "PaddleMove",
-		data: {
-			client: $client.id,
-			player: userType,
-			room: roomId,
-			left: (userType == UserType.Player1 && event.code == 'KeyD'
-				|| userType == UserType.Player2 && event.code == 'KeyA')
-		}
-	}));*/
 	$client.socket.emit("PaddleMove", {
 		client: $client.id,
 		player: userType,
@@ -292,13 +275,9 @@ on:keyup={(event)=>{
 		return ;
 	
 	//* TODO some precision to make
-	/*$client.socket.send(JSON.stringify({
-		event: "PaddleStop",
+	$client.socket.emit("PaddleStop", {
 		data: $client.id
-	}));*/
-	$client.socket.emit("PaddleStop",
-		{	data: $client.id	}
-	);
+	});
 	moving = false;
 }}
 

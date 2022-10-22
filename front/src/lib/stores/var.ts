@@ -2,6 +2,8 @@ import { writable } from 'svelte/store';
 
 export const darkMode = writable(true);
 
+export const loginState = writable(false);
+
 export const UserType = {
 	Player1: 0,
 	Player2: 1,
