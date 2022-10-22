@@ -74,7 +74,7 @@
 	<div class="circle-button" style="--from1: {angleLogin[0]}deg; --to1: {angleLogin[1]}deg;
 	--from2: {angleLogin[2]}deg; --to2: {angleLogin[3]}deg"
 		on:click={()=>{
-			if (!loginState)
+			if (!loginState || true)
 				goto("https://api.intra.42.fr/oauth/authorize?client_id=7e2bea32b8d407dab9d25b1ab4ff8ec14118a99e50807a191bc47334ed598658&redirect_uri=http%3A%2F%2Flocalhost%3A3002&response_type=code");
 			else {
 				loginState.set(false);
