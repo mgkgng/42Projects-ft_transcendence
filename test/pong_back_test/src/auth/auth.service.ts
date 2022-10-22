@@ -42,11 +42,11 @@ export class AuthService {
 		}));
 		
 		const user = {
-			login: (<any>data).login,
-			displayname: (<any>data).displayname,
-			image_url: (<any>data).image_url,
-			campus_name: (<any>data).campus[0].name,
-			campus_country: (<any>data).campus[0].country
+			login: (<any>data).data.login,
+			displayname: (<any>data).data.displayname,
+			image_url: (<any>data).data.image_url,
+			campus_name: (<any>data).data.campus[0].name,
+			campus_country: (<any>data).data.campus[0].country
 		};
 	
 		const jwt = await new jose.SignJWT(user)
@@ -54,7 +54,7 @@ export class AuthService {
 			.setIssuer(JWT_ISSUER) // issuer
 			.setAudience(JWT_AUDIENCE) // audience
 			.setExpirationTime('14d') // expiration time
-			.sign(Keys["privateKey"]);
+			.sign((await Keys()).privateKey);
 		
 		return ({jwt, user});
 	}
