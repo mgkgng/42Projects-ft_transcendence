@@ -13,8 +13,6 @@
 		height: 100vh;
 		overflow: hidden;
 	}
-
-
 </style>
 
 <script lang="ts">
