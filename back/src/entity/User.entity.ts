@@ -42,9 +42,18 @@ export class UserEntity
 	@Column()	
 	password: string;
 
+	@Column()
+	display_name:string;
+
+	@Column()
+	campus_name: string;
+
+	@Column()
+	campus_country: string;
+
 	@Column({default: false})
 	is_42_user?: boolean;
 
 	@Column({default: ""})
-	img?: string;
+	img_url?: string;
 }

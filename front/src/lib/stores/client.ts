@@ -85,6 +85,7 @@ class Client {
 					body:JSON.stringify({username: "oui", password: url.get('code')}),
 				});
 				const tok = await res.json();
+				console.log("TOK:", tok);
 				this.socket = io("http://localhost:3000",{
 					extraHeaders: {
 						Authorization: "Bearer " + tok.access_token,

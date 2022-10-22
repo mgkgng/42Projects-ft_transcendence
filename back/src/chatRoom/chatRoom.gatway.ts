@@ -51,7 +51,7 @@ export class ChatRoomService {
 			const id_user = await this.mainServer.getIdUser(req);
 			const res = await this.dataSource.getRepository(UserEntity).createQueryBuilder("user")
 						.where("id_g = :id", {id : id_user})
-						.select(["user.email", "user.username", "user.img"]).getOne();
+						.select(["user.email", "user.username", "user.img_url", "user.display_name", "user.campus_name", "user.campus_country"]).getOne();
 			return (res);
 		}catch(e)
 		{

@@ -16,21 +16,29 @@ export class OAuthStrategy extends PassportStrategy(Strategy, "oauth") {
   async validate(@MessageBody() username: string, @MessageBody() code : string): Promise<any> {
 	const res = await this.authService.validateUser42(code);
 	console.log("Get token : ", code);
+
 	if (res)
 	{
 		let data = res.data;
+		const user : any = {
+			login: data.login,
+			displayname: data.displayname,
+			image_url: data.image_url,
+			campus_name: data.campus[0].name,
+			campus_country: data.campus[0].country
+		};
 		if (await this.userService.findOne(res.data.login)) //Check if the user is in db
 		{
-			//Maybe Update some data
-			const find = ({username: data.login, email: data.email, is_42_user: true, img: data.image_url});
-			console.log("Find :");
-			//TODO it's here to get userInfo
-			console.log(find);
+			const find = ({user});
+			console.log("Find:", find);
 			return (find);
 		}
 		else //else create the user in db
 		{
-			const create = await this.userService.create({username: data.login, password: "42", email: data.email, is_42_user: true, img: data.image_url});
+			const create = await this.userService.create({username: data.login, password: "42", email: data.email, is_42_user: true, 
+														img_url: data.image_url, display_name: user.display_name, campus_country: user.campus_country,
+														campus_name: user.campus_name
+			});
 			if (create)
 				return ({username: data.login, email: data.email, is_42_user: true, img: data.image_url});
 			else

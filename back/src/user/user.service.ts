@@ -34,7 +34,7 @@ export class UserService {
 		await querry.startTransaction();
 		try{
 			const res =  await querry.manager.insert(UserEntity,
-				{username: user.username, password: user.password, email: user.email, is_42_user: user.is_42_user, img: user.img},
+				{username: user.username, password: user.password, email: user.email, is_42_user: user.is_42_user, img_url: user.img},
 			);
 			await querry.commitTransaction();
 			return (res);

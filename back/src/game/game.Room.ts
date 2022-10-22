@@ -100,7 +100,12 @@ export class Room {
 
 		// Broadcast let user = new UserEntity;
 		// Store the game in db
-		this.storeGame();
+		try {
+			this.storeGame();
+		} 
+		catch(e) {
+			
+		}
 		// Destroy room
 		//this.onEnd?.();
 	}
