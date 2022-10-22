@@ -136,6 +136,6 @@
 
 <DarkMode/>
 
-<!-- <Profile /> -->
+<Profile />
 
-<MenuCircle createGameModal={createGameModal} roomListModal={roomListModal} bind:expanded={menuExpanded}/>
+<!-- <MenuCircle createGameModal={createGameModal} roomListModal={roomListModal} bind:expanded={menuExpanded}/> -->

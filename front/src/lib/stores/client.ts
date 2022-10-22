@@ -8,12 +8,14 @@ class Client {
 	socket: any;
 	callbacksOnConnection: Set<Function>;
 	listeners: Map<string, Function>;
+	room: string;
 
 	constructor() {
 		this.id = uid();
 		this.listeners = new Map();
 		this.callbacksOnConnection = new Set();
 		this.socket = undefined;
+		this.room = "";
 	}
 
 	connect() {
@@ -21,7 +23,7 @@ class Client {
 			return ;
 		
 		console.log('Connected');
-		
+
 		this.socket.emit("Connection", this.id);
 		for (let func of this.callbacksOnConnection)
 			func();

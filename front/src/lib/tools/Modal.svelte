@@ -6,14 +6,9 @@
 
 	let state = false;
 
-
-	export function toggle(_state = !state)
-	{ state = _state; }
-
-	export function open()
-	{ toggle(true); }
-	export function close()
-	{ toggle(false); }
+	export function toggle(_state = !state) { state = _state; }
+	export function open() { toggle(true); }
+	export function close() { toggle(false); }
 
 	function handleBgClick() {
     	if (closeOnBgClick)
@@ -23,13 +18,16 @@
 
 <style lang="scss">
 	.card {
-		width: 100%;
-		max-width: 30rem;
-		max-height: 100vh;
+		// width: 100%;
+		max-width: 70vw;
+		max-height: 90vh;
 		overflow: auto;
+
+		padding: 2em;
+
 		/*padding: 2rem;*/
 		gap: 2rem;
-		background: transparentize($card, .05);
+		background: transparentize(#000, .8);
 	}
 	.backdrop {
 		position: fixed;
@@ -45,13 +43,13 @@
 </style>
 
 {#if state}
-	<Portal>
-		<div class="backdrop" tabindex="-1" on:click={handleBgClick}>
-			<div class={cssClass} on:click={e => {
-                e.stopPropagation();
-            }}>
-				<slot />
-			</div>
+<Portal>
+	<div class="backdrop" tabindex="-1" on:click={handleBgClick}>
+		<div class={cssClass} on:click={e => {
+			e.stopPropagation();
+		}}>
+			<slot />
 		</div>
-	</Portal>
+	</div>
+</Portal>
 {/if}

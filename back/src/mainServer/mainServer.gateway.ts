@@ -38,12 +38,11 @@ export class MainServerService {
 	handleConnection(@Request() req)
 	{
 		console.log("Connect to main");
-		//const user : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
-		//console.log("USER:", user);
-		//const client_username : any = user.username;
-		//let userConnected = {username: client_username, socket: req};
-		//this.userConnectedList.push(userConnected);
-		//console.log(this.userConnectedList);
+		const user : any = (this.jwtServer.decode(req.handshake?.headers?.authorization.split(' ')[1]));
+		const client_username : string = user?.username;
+		let userConnected = {username: client_username, socket: req};
+		this.userConnectedList.push(userConnected);
+		console.log(this.userConnectedList);
 	}
 
 	handleDisconnect(@Request() req)
@@ -63,11 +62,11 @@ export class MainServerService {
 	}
 	async getIdUser(@Request() req) //GET THE UNIQ ID OF A USER
 	{
-		const user : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
-		const client_username = user.username;
-		const id_user : any = await this.dataSource.getRepository(UserEntity)
-		.createQueryBuilder().where("UserEntity.username = :u", { u: client_username }).getOneOrFail();
-		return (id_user.id_g);
+		// const user : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
+		// const client_username = user.username;
+		// const id_user : any = await this.dataSource.getRepository(UserEntity)
+		// .createQueryBuilder().where("UserEntity.username = :u", { u: client_username }).getOneOrFail();
+		// return (id_user.id_g);
 	}
 	async getIdUserByUsername(username : string) //GET THE UNIQ ID OF A USER FIND WITH USER'S USERNAME
 	{
