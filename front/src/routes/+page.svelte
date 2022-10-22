@@ -36,11 +36,6 @@
 			console.log("MatchFound", data);
 			goto(`/play/${data}`);
 		});
-
-		return (() => {
-			$client.removeListener("MatchFound");
-		})
-
 	});
 </script>
 

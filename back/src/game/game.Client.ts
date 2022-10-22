@@ -3,19 +3,15 @@ export class Client {
 	sock: any;
 	callbacksOnConnection: Set<Function>;
 	listeners: Map<string, Function>;
+	room: string; // room to which the client actually belongs
+	user: any;
 
-	//Websocket
-	// addEventListener
-	// removeEventListener
 	constructor(id: string, sock: any) {
 		this.id = id;
 		this.sock = sock;
 		this.listeners = new Map();
-		
-		// this.sock.onmessage = (msg: any) => {
-		// 	console.log("receving something", msg);
-		// 	this.listeners.get(msg.event)?.(msg.data);
-		// }
+		this.room = "";
+		this.user = {};
 	}
 
 	onDisconnect(callback: Function) {

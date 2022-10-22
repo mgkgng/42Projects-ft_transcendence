@@ -2,37 +2,61 @@ import {Pong} from "./game.Pong"
 import {GameGateway} from "./game.gateway"
 import {uid} from "./game.utils"
 
+const Difficulty = {
+	0 : 3,
+	1 : 5,
+	2 : 8,
+	3 : 15
+}
+
 export class Room {
 	id: string;
 	clients: Map<string, any>;
+	title: string;
 	players: Array<any>;
 	scores: Array<number>;
 	maxpoint: number;
+	difficulty: number
 	pong: Pong;
 	//chat: ChatRoomService
 	isPlaying: boolean;
+	privateMode: boolean;
+	available: boolean;
+
 	
 	// constructor(clients, mapchoice: string, mode: string, maxpoint: number) {
-	constructor(clients: any, maxpoint: number = 25) {
+	constructor(clients: any,
+		title: string,
+		maxpoint: number = 5,
+		difficulty: number = 1,
+		privateMode: boolean = false) {
 		this.id = uid();
 		//this.chat = new ChatRoomService();
 		this.clients = new Map();
 		
+		this.title = title;
+
 		this.addClients(clients);
 
-		this.pong = new Pong();
+		this.difficulty = Difficulty[difficulty];
+		this.privateMode = privateMode;
+
+		this.pong = new Pong(this.difficulty);
 		
-		this.players = [clients[0], clients[1]];
+		this.players = clients;
 
 		this.maxpoint = maxpoint;
-		
 		this.scores = [0 , 0];
 		
+		// later isPlayer condition could be more developped
 		this.isPlaying = false;
+		if (this.players.length == 2) {
+			this.isPlaying = true;
+			setTimeout(Room.startPong, 2000, this);
+		}
 
-		setTimeout(Room.startPong, 2000, this);
+		this.available = (this.players.length > 1) ? false : true;
 	}
-
 	/**
 	 * Use the static server method to broadcast,
 	 * pass the clients as parameters

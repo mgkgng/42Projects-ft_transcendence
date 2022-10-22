@@ -1,5 +1,5 @@
-import {Puck} from "./game.Puck"
-import {GameMap} from "./game.GameMap"
+import { Puck } from "./game.Puck";
+import { GameMap } from "./game.GameMap";
 
 export class Pong {
 	gameMap: GameMap;
@@ -8,9 +8,11 @@ export class Pong {
 	moveMin: number;
 	moveMax: number;
 
-	constructor() {
+	constructor(difficulty: number) {
 		this.gameMap = new GameMap();
-		this.puck = new Puck(this.gameMap.width, this.gameMap.height);
+		this.puck = new Puck(this.gameMap.width,
+			this.gameMap.height,
+			difficulty * ((Math.floor(Math.random() * 2)) ? 1 : -1));
 
 		let initPos = (this.gameMap.width - this.gameMap.paddleSize) / 2;
 		this.paddlePos = [initPos, initPos];
