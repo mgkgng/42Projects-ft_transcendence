@@ -1,12 +1,13 @@
 <style lang="scss">
 	.color-change-circle {
 		position: absolute;
-		bottom: -40px;
-		left: -40px;
-		width: 80px;
+		bottom: 0;
+		left: 0;
+		width: 30px;
 		aspect-ratio: 1 / 1;
-		border-radius: 50%;
-		// box-shadow: 0px 0px 50px 10px #000;
+		border-radius: 20%;
+
+		background-color: #e6e6e6;
 		cursor: pointer;
 
 		animation-name: size-change;
