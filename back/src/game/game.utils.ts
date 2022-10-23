@@ -1,7 +1,3 @@
-export const WsMessage = {
-	
-}
-
 export function uid() {
 	const set = '0123456789abcdefghiklmnopqrstuvwxyz';
 	

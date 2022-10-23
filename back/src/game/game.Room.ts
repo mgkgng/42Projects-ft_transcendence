@@ -15,64 +15,56 @@ const Difficulty = {
 }
 
 export class Room {
+	/* RoomInfo */
 	id: string;
-	clients: Map<string, any>;
 	title: string;
-	players: Array<any>;
-	scores: Array<number>;
 	maxpoint: number;
-	difficulty: number
-	pong: Pong;
-	//chat: ChatRoomService
-	isPlaying: boolean;
+	difficulty: number;
+
+	/* RoomState */
 	privateMode: boolean;
 	available: boolean;
+
+	/* RoomGame */
+	pong: Pong;
+	players: Array<any>;
+	scores: Array<number>;
+
+	/* RoomConnection */
+	clients: Map<string, any>;
+	//chat: ChatRoomService
 		
-	// constructor(clients, mapchoice: string, mode: string, maxpoint: number) {
-	constructor(clients: any, title:string, maxpoint: number = 25, difficulty : number = 8, privateMode : boolean = true,
+	constructor(players: any, title:string, maxpoint: number = 25,
+				difficulty : number = 8, privateMode : boolean = true,
 				@InjectRepository(GameEntity) private gameRep: Repository<GameEntity>, 
 				private mainServerService : MainServerService,
-				private dataSource : DataSource,
-		) {
-	
-	// constructor(clients, mapchoice: string, mode: string, maxpoint: number) {
-		maxpoint = 5
-		this.difficulty = 1,
-		this.privateMode = false
-		this.id = uid();
-		//this.chat = new ChatRoomService();
-		this.clients = new Map();
+				private dataSource : DataSource) {
 		
+		this.id = uid();
 		this.title = title;
-
-		this.addClients(clients);
-
+		this.maxpoint = maxpoint;
 		this.difficulty = Difficulty[difficulty];
+
 		this.privateMode = privateMode;
 
+		this.available = (players.length < 2) ? true : false;
+	
+		this.clients = new Map();
+		this.addClients(players);
+
 		this.pong = new Pong(this.difficulty);
-		
-		this.players = clients;
+		this.players = players;
 
-		this.maxpoint = maxpoint;
-		this.scores = [0 , 0];
+		// TODO HOST-GUEST MODE / RANDOM MODE
+		// if (randomMode)
+			// this.startPong();
 		
-		// later isPlayer condition could be more developped
-		this.isPlaying = false;
-		if (this.players.length == 2) {
-			this.isPlaying = true;
-			setTimeout(Room.startPong, 2000, this);
-		}
-
-		this.available = (this.players.length > 1) ? false : true;
 	}
 	/**
 	 * Use the static server method to broadcast,
 	 * pass the clients as parameters
 	 */
-	broadcast(msg: any) {
-		GameGateway.broadcast(this.getClients(), msg);
-	}
+	broadcast(msg: any) { GameGateway.broadcast(this.getClients(), msg); }
 
 	addClients(clients: any) {
 		for (let client of clients)
@@ -88,13 +80,9 @@ export class Room {
 		// client.onDisconnect(() => this.removeClient(client));
 	}
 
-	removeClient(client: any) {
-		this.clients.delete(client.username);
-	}
+	removeClient(client: any) { this.clients.delete(client.username); }
 
-	getClients() {
-		return (Array.from(this.clients.values()));
-	}
+	getClients() { return (Array.from(this.clients.values())); }
 
 	// need static because used often with setTimeOut() func
 	// sent by setTimeOut(), 'this' is initialised by timeOut class
@@ -119,6 +107,8 @@ export class Room {
 			room.pong.puck.setCheckPuck(room);
 		}, 2000);
 	}
+
+	startPong() { setTimeout(Room.startPong, 2000, this); }
 
 	putScore() {
 

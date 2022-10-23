@@ -4,9 +4,11 @@ import { GameMap } from "./game.GameMap";
 export class Pong {
 	gameMap: GameMap;
 	puck: Puck;
+	paddleSize: number;
 	paddlePos: Array<number>;
 	moveMin: number;
 	moveMax: number;
+	scores: Array<number>;
 
 	constructor(difficulty: number) {
 		this.gameMap = new GameMap();
@@ -19,6 +21,8 @@ export class Pong {
 
 		this.moveMin = 0;
 		this.moveMax = this.gameMap.width - this.gameMap.paddleSize;
+	
+		this.scores = [0, 0];
 	}
 
 	movePaddle(userIndex: number, left: boolean) {
