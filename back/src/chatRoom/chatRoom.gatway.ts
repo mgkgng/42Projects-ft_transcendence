@@ -76,9 +76,9 @@ export class ChatRoomService {
 			const res_chat_room = await querry.manager.insert(ChatRoomEntity,
 				{name: name, date_creation: date_creation, is_password_protected: is_password_protected, password: password}
 			);
-			const res_user_chat_room = await querry.manager.insert(UserChatRoomEntity, 
-				{id_user: id_user, room: res_chat_room.identifiers[0].id_g, is_admin: true, is_banned: false, is_muted: false}
-			);
+			// const res_user_chat_room = await querry.manager.insert(UserChatRoomEntity, 
+			// 	{id_user: id_user, room: res_chat_room.identifiers[0].id_g, is_admin: true, is_banned: false, is_muted: false}
+			// );
 			await querry.commitTransaction();
 			const client : Socket = req;
 			client.join(name);
@@ -106,10 +106,10 @@ export class ChatRoomService {
 			where("userRoom.room = :id and userRoom.id_user : id_u", {id: id_room, id_u : id_user}).getOne();
 			if (is_already_in != undefined)
 				throw new WsException("Already in room");
-			const res_user_chat_room = await this.dataSource.createQueryBuilder().insert().into(UserChatRoomEntity).values
-			([ 
-				{id_user: id_user, room: id_room, is_admin: false, is_banned: false, is_muted: false}
-			]).execute();
+			// const res_user_chat_room = await this.dataSource.createQueryBuilder().insert().into(UserChatRoomEntity).values
+			// ([ 
+			// 	{id_user: id_user, room: id_room, is_admin: false, is_banned: false, is_muted: false}
+			// ]).execute();
 		}
 		catch(e){
 			console.log("getMessage Error: bad data");
@@ -210,10 +210,10 @@ export class ChatRoomService {
 				throw new WsException("You are ban of the room");
 			if (res[0].is_muted && res[0].mute_end > new Date())
 				throw new WsException("You are mute");
-			const res_insert_message = await querry.manager.insert(MessageChatRoomEntity,
-				{ id_user: id_user, id_chat_room: id_room, content_message: message, date_message: date_creation}
-			);
-			console.log(res_insert_message);
+			// const res_insert_message = await querry.manager.insert(MessageChatRoomEntity,
+			// 	{ id_user: id_user, id_chat_room: id_room, content_message: message, date_message: date_creation}
+			// );
+			// console.log(res_insert_message);
 			await querry.commitTransaction();
 			this.server.to(data.room_name).emit('new_message_room', data);
 		} catch (e) {
