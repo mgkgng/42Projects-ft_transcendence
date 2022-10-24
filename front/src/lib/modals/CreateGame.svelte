@@ -2,7 +2,6 @@
 	.container {
 		width: 100%;
 		height: 100%;
-		font-family: sans-serif; // for now
 		font-size: 19px;
 
 		color: #fff;
@@ -39,7 +38,7 @@
 </style>
 
 <script lang="ts">
-	import { client } from "../stores/client";
+	import { client } from "$lib/stores/client";
 
 	let maxPoint: number = 10;
 	let difficulty: number = 3;

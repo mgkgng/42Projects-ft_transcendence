@@ -122,17 +122,26 @@
 			border-color: transparentize(#e6e6e6, 0.4);
 		}
 	}
+
+	.test {
+		position: absolute;
+		top: 200px;
+		left: 200px;
+
+		width: 100px;
+		height: 100px;
+		background-color: #fff;
+		color:#000;
+	}
 </style>
 
 <script lang="ts">
 	import { onMount } from "svelte";
-	import RoundButton from "./RoundButton.svelte";
-    import MainCircle from './MainCircle.svelte';
-    import MenuButton from "./MenuButton.svelte";
-    import { loginState } from "./stores/var";
-    import Modal from "./tools/Modal.svelte";
+    import { loginState } from "$lib/stores/var";
     import { goto } from "$app/navigation";
-    import EnterGame from "./modals/EnterGame.svelte";
+	import Modal from "$lib/tools/Modal.svelte";
+	import MainCircle from '$lib/MainCircle.svelte';
+    import EnterGame from "$lib/modals/EnterGame.svelte";
 
 	type Circle = {
 		size: number;
@@ -227,4 +236,11 @@
 	
 	<div class="msg">{message}</div>
 	<h1 class="title">{title}</h1>
+
+	<!-- /* if you want to test logout */
+	<div class="test" on:click={()=>{
+		loginState.set(false);
+		localStorage.removeItem("transcendence-jwt");
+		goto('/');
+	}}>LOGOUT-test</div> -->
 </div>

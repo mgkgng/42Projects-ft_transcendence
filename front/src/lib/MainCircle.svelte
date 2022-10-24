@@ -18,7 +18,6 @@
 		// box-shadow: 20px 50px 20px 20px $main;
 	}
 	
-
 	.shadow {
 		position: absolute;
 		// z-index: 77;

@@ -28,13 +28,8 @@
 	let login: boolean;
 	let dark : boolean;
 
-	loginState.subscribe(value => {
-		login = value;
-	});
-
-	darkMode.subscribe(value => {
-		dark = value;
-	});
+	loginState.subscribe(value => { login = value; });
+	darkMode.subscribe(value => { dark = value; });
 
 	onMount(async () => {
 

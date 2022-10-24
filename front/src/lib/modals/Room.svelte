@@ -119,14 +119,12 @@
 
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import DarkMode from "$lib/DarkMode.svelte";
 	import { client } from "$lib/stores/client";
 	import { UserType } from '$lib/stores/var';
-	import Paddle from '$lib/Paddle.svelte';
+	import Paddle from '$lib/game/Paddle.svelte';
 	import { Puck } from '$lib/pong/Puck';
-    import PongPuck from '$lib/PongPuck.svelte';
-    import ScoreBox from '$lib/ScoreBox.svelte';
-    import { GameMap } from '$lib/pong/GameMap';
+    import PongPuck from '$lib/game/PongPuck.svelte';
+    import ScoreBox from '$lib/game/ScoreBox.svelte';
     import Modal from '$lib/tools/Modal.svelte';
     import GameOver from '$lib/modals/GameOver.svelte';
 

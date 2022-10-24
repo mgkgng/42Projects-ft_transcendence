@@ -8,7 +8,6 @@
 		justify-content: center;
 		align-items: center;
 
-		font-family: sans-serif;
 		color: #fff;
 		text-align: center;
 	}

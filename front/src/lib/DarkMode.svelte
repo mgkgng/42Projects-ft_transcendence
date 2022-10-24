@@ -3,19 +3,14 @@
 		position: absolute;
 		bottom: 0;
 		left: 0;
-		width: 30px;
+		width: 40px;
 		aspect-ratio: 1 / 1;
 		border-radius: 20%;
-
-		background-color: #e6e6e6;
 		cursor: pointer;
 
-		animation-name: size-change;
-		animation-duration: 3.5s;
-		animation-iteration-count: infinite;
-		animation-timing-function: linear;
+		transition: .2s;
 
-		overflow: hidden; // doesn't work yet
+		&:hover { opacity: 0.2; }
 	}
 </style>
 
@@ -23,10 +18,7 @@
 	import { darkMode } from "$lib/stores/var";
 
 	let dark: boolean;
-
-	darkMode.subscribe(value => {
-		dark = value;
-	});
+	darkMode.subscribe(value => { dark = value; });
 
 </script>
 

@@ -1,3 +1,19 @@
+<style lang="scss">
+	.backdrop {
+		backdrop-filter: blur(6px);
+
+		position: fixed;
+		display: grid;
+		place-items: center;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background: #0005;
+		z-index: 99999;
+	}
+</style>
+
 <script>
 	import Portal from "./Portal.svelte";
 
@@ -15,22 +31,6 @@
       		close();
     }
 </script>
-
-<style lang="scss">
-	.backdrop {
-		backdrop-filter: blur(6px);
-
-		position: fixed;
-		display: grid;
-		place-items: center;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		background: #0005;
-		z-index: 99999;
-	}
-</style>
 
 {#if state}
 <Portal>

@@ -103,11 +103,11 @@
 
 <script lang="ts">
 	import { onMount } from 'svelte';
-=	import { client } from "$lib/stores/client";
-	import { UserType } from './stores/var';
-	import Paddle from './Paddle.svelte';
-	import { Puck } from './pong/Puck';
-    import PongPuck from './PongPuck.svelte';
+	import { client } from "$lib/stores/client";
+	import { UserType } from '$lib/stores/var';
+	import { Puck } from '$lib/pong/Puck';
+    import PongPuck from '$lib/game/PongPuck.svelte';
+	import Paddle from '$lib/game/Paddle.svelte';
 
 	export let roomInfo: any;
 	export let roomId: string;
