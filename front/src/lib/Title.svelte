@@ -95,26 +95,25 @@
 	}
 
 	.click {
-
-		// font-family: 'alpha-porta';
 		font-size: 30px;
 		position: absolute;
-		top: 65%;
+		top: 62%;
 		left: 46%;
 
 		text-align: center;
 		align-items: center;
-		
+
 		width: 6em;
 		height: 2em;
 		border-radius: 2.5em;
 
 		color: #e6e6e6;
+		letter-spacing: 4px;
 		border-bottom: solid;
 		border: solid 2.5px;
 
 		padding-top: .2em;
-		
+
 		transition: .5s;
 		cursor: pointer;
 
@@ -123,13 +122,17 @@
 			border-color: transparentize(#e6e6e6, 0.4);
 		}
 	}
-
 </style>
 
 <script lang="ts">
 	import { onMount } from "svelte";
 	import RoundButton from "./RoundButton.svelte";
     import MainCircle from './MainCircle.svelte';
+    import MenuButton from "./MenuButton.svelte";
+    import { loginState } from "./stores/var";
+    import Modal from "./tools/Modal.svelte";
+    import { goto } from "$app/navigation";
+    import EnterGame from "./modals/EnterGame.svelte";
 
 	type Circle = {
 		size: number;
@@ -149,9 +152,15 @@
 	let showMessage = false;
 	let message = "";
 
-	let showMenu: boolean = false;
+	let showMenu: boolean;
 
-	$: console.log(showMenu);
+	let login: boolean;
+
+	loginState.subscribe(value => {
+		login = value;
+	})
+
+	let EnterGameModal: any;
 
 	function createCircles() {
 		let res = [];
@@ -191,6 +200,10 @@
 
 </script>
 
+<Modal bind:this={EnterGameModal} closeOnBgClick={true}>
+	<EnterGame />
+</Modal>
+
 <div class="container">
 	{#each blues as blue}
 	<div class="blue-circle-around" style="--dist: {circleRadius + 85}px; --size: {blue.size}px; --duration: {blue.duration}s; --angle: {blue.angle}deg; --angle2: {blue.angle + 360}deg"></div>
@@ -202,23 +215,16 @@
 	<div class="circle-around" style="--dist: {circleRadius + 85}px; --size: {circleInfo.size}px; --duration: {circleInfo.duration}s; --angle: {circleInfo.angle}deg; --angle2: {circleInfo.angle + 360}deg"></div>
 	{/each}
 
-	<div class="click" on:click = {() => {
-		showMenu = !showMenu;
-	}}>play</div>
-	{#if showMenu}
-	<RoundButton
-		bind:showMessage={showMessage}
-		bind:message={message}
-		circleRadius={circleRadius}/>
+	{#if !login}
+	<div class="click" on:click={() => {
+		goto("https://api.intra.42.fr/oauth/authorize?client_id=7e2bea32b8d407dab9d25b1ab4ff8ec14118a99e50807a191bc47334ed598658&redirect_uri=http%3A%2F%2Flocalhost%3A3002&response_type=code");
+	}}>Login</div>
+	{:else}
+	<div class="click" on:click={() => {
+		EnterGameModal.open();
+	}}>Play</div>
 	{/if}
+	
 	<div class="msg">{message}</div>
 	<h1 class="title">{title}</h1>
 </div>
-
-<!-- <svelte:window
-on:mousemove={
-	(e) => {
-		showMenu = (e.pageX > 350 && e.pageX < 1350) ? true : false;
-	}
-}
-/> -->

@@ -1,5 +1,14 @@
 <style lang="scss">
 
+</style>
+
+
+	<!-- .button {
+		width: 50px;
+		height: 40px;
+		background-color: red;
+	}
+
 	.circle-button {
 		position: absolute;
 		top: 40%;
@@ -41,7 +50,7 @@
 	}
 
 
-</style>
+</style> -->
 
 <script lang="ts">
 	import { onMount } from "svelte";
@@ -57,11 +66,6 @@
 	let angleRand;
 	let angleLogin: Array<number> = [], anglePlay: Array<number> = [];
 
-	let login: boolean;
-
-	loginState.subscribe(value => {
-		login = value;
-	})
 
 	$: console.log("login: ", login);
 
@@ -73,21 +77,11 @@
 
 </script>
 
-<div>
-	<div class="buttons">
-		<div class="button">About</div>
-		<div class="button">Rooms</div>
-		<div class="button">Play</div>
-		<div class="button">Friends</div>
-		<div class="button">Setting</div>
-	</div>
-</div>
+
 
 	<!-- <div class="circle-button" style="--from1: 0deg; --to1: 20deg;
 	--from2: 0deg; --to2: 20deg"
 		on:click={()=>{
-			if (!login)
-				goto("https://api.intra.42.fr/oauth/authorize?client_id=7e2bea32b8d407dab9d25b1ab4ff8ec14118a99e50807a191bc47334ed598658&redirect_uri=http%3A%2F%2Flocalhost%3A3002&response_type=code");
 			else {
 				loginState.set(false);
 				localStorage.removeItem("transcendence-jwt");

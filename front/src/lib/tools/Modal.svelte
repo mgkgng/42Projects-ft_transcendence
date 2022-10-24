@@ -17,19 +17,9 @@
 </script>
 
 <style lang="scss">
-	.card {
-		// width: 100%;
-		max-width: 70vw;
-		max-height: 90vh;
-		overflow: auto;
-
-		padding: 2em;
-
-		/*padding: 2rem;*/
-		gap: 2rem;
-		background: transparentize(#000, .8);
-	}
 	.backdrop {
+		backdrop-filter: blur(6px);
+
 		position: fixed;
 		display: grid;
 		place-items: center;
