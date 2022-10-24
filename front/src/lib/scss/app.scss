@@ -9,7 +9,7 @@ html {
 }
 
 body {
-	font-family: 'alpha-prota';
+	font-family: 'cavier-dreams';
 	height: 100%;
 	color: $text;
 	padding: 0 !important;
@@ -55,6 +55,11 @@ h1 { font-size: $h1; font-weight: bold; }
 @font-face {
 	font-family: 'alpha-prota';
 	src: URL('/fonts/AlphaProta.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'cavier-dreams';
+	src: URL('/fonts/CaviarDreams.ttf') format('truetype');
 }
 
 @font-face {

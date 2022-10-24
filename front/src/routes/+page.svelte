@@ -70,7 +70,7 @@
 
 <Header />
 
-<Title title={"transcendence"} mainPage={true} />
+<Title title={"TRANSCENDENCE"} mainPage={true} />
 
 <DarkMode/>
 

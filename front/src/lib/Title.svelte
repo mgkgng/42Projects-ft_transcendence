@@ -61,10 +61,12 @@
 		position: absolute;
 		z-index: 99;
 
+		font-family: 'alpha-prota';
 		background-color: rgba(0, 0, 0, 0);
 		margin: 2em;
 		padding: .3em 0 .1em;
 		font-size: 75px;
+		letter-spacing: 15px;
 		text-align: center;
 		color: white;
 		user-select: none;
@@ -92,6 +94,36 @@
 		// animation-timinig-function: ease-out;
 	}
 
+	.click {
+
+		// font-family: 'alpha-porta';
+		font-size: 30px;
+		position: absolute;
+		top: 65%;
+		left: 46%;
+
+		text-align: center;
+		align-items: center;
+		
+		width: 6em;
+		height: 2em;
+		border-radius: 2.5em;
+
+		color: #e6e6e6;
+		border-bottom: solid;
+		border: solid 2.5px;
+
+		padding-top: .2em;
+		
+		transition: .5s;
+		cursor: pointer;
+
+		&:hover {
+			color: transparentize(#e6e6e6, 0.4);
+			border-color: transparentize(#e6e6e6, 0.4);
+		}
+	}
+
 </style>
 
 <script lang="ts">
@@ -116,6 +148,10 @@
 
 	let showMessage = false;
 	let message = "";
+
+	let showMenu: boolean = false;
+
+	$: console.log(showMenu);
 
 	function createCircles() {
 		let res = [];
@@ -166,7 +202,10 @@
 	<div class="circle-around" style="--dist: {circleRadius + 85}px; --size: {circleInfo.size}px; --duration: {circleInfo.duration}s; --angle: {circleInfo.angle}deg; --angle2: {circleInfo.angle + 360}deg"></div>
 	{/each}
 
-	{#if mainPage}
+	<div class="click" on:click = {() => {
+		showMenu = !showMenu;
+	}}>play</div>
+	{#if showMenu}
 	<RoundButton
 		bind:showMessage={showMessage}
 		bind:message={message}
@@ -175,3 +214,11 @@
 	<div class="msg">{message}</div>
 	<h1 class="title">{title}</h1>
 </div>
+
+<!-- <svelte:window
+on:mousemove={
+	(e) => {
+		showMenu = (e.pageX > 350 && e.pageX < 1350) ? true : false;
+	}
+}
+/> -->

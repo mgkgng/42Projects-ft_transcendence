@@ -1,8 +1,4 @@
 <style lang="scss">
-	@keyframes rotate {	
-		from { transform: rotate(var(--from1)) translateX(350px) rotate(var(--to1)); }
-		to { transform: rotate(var(--from2)) translateX(350px) rotate(var(--to2)); }
-	}
 
 	.circle-button {
 		position: absolute;
@@ -19,8 +15,8 @@
 		justify-content: center;
 		align-items: center;
 
-		animation-name: rotate;
-		animation-duration: 40s;
+		animation-name: appear;
+		animation-duration: 5s;
 		animation-iteration-count: infinite;
 		animation-timing-function: linear;
 
@@ -78,8 +74,17 @@
 </script>
 
 <div>
-	<div class="circle-button" style="--from1: {angleLogin[0]}deg; --to1: {angleLogin[1]}deg;
-	--from2: {angleLogin[2]}deg; --to2: {angleLogin[3]}deg"
+	<div class="buttons">
+		<div class="button">About</div>
+		<div class="button">Rooms</div>
+		<div class="button">Play</div>
+		<div class="button">Friends</div>
+		<div class="button">Setting</div>
+	</div>
+</div>
+
+	<!-- <div class="circle-button" style="--from1: 0deg; --to1: 20deg;
+	--from2: 0deg; --to2: 20deg"
 		on:click={()=>{
 			if (!login)
 				goto("https://api.intra.42.fr/oauth/authorize?client_id=7e2bea32b8d407dab9d25b1ab4ff8ec14118a99e50807a191bc47334ed598658&redirect_uri=http%3A%2F%2Flocalhost%3A3002&response_type=code");
@@ -106,6 +111,5 @@
 		}}
 	>
 		<h2>Play</h2>
-	</div>
-</div>
+	</div> -->
 
