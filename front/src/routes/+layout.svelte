@@ -17,9 +17,9 @@
 
 <script lang="ts">
 	import '$lib/stores/client';
+	import '$lib/scss/app.scss';
 	import { darkMode, loginState } from "$lib/stores/var";
 	import { client } from '$lib/stores/client';
-	import '$lib/scss/app.scss';
     import { onMount } from 'svelte';
 	import jwt_decode from "jwt-decode";
     import { browser } from '$app/environment';

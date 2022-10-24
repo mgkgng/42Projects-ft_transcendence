@@ -37,6 +37,7 @@
 	let createGameModal: any;
 	let roomListModal: any;
 
+	let loading = false;
 </script>
 
 <Modal bind:this={createGameModal} closeOnBgClick={true}>
@@ -50,5 +51,8 @@
 <div class="container">
 	<div class="button" on:click={()=>{ roomListModal.open(); }}>Join Room</div>
 	<div class="button" on:click={()=>{ createGameModal.open(); }}>Create Game</div>
-	<div class="button" on:click={()=>{ $client.socket.emit("JoinQueue", {data: $client.id}); }}>Random Match</div>
+	<div class="button {loading && "loading"}" on:click={()=>{
+		$client.socket.emit("JoinQueue", {data: $client.id}); 
+		loading = true;
+	}}>{(!loading) ? "Random Match" : ""}</div>
 </div>
