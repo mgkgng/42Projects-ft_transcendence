@@ -94,10 +94,20 @@
 		// animation-timinig-function: ease-out;
 	}
 
+	.click-bg {
+		position: absolute;
+		top: 68%;
+		left: 46%;
+		width: 10.5em;
+		height: 3.5em;
+		border-radius: 2.5em;
+		background: linear-gradient(90deg, $main 0%, #5610c6 60%, $main2 100%);
+	}
+	
 	.click {
 		font-size: 30px;
 		position: absolute;
-		top: 62%;
+		top: 68%;
 		left: 46%;
 
 		text-align: center;
@@ -112,14 +122,16 @@
 		border-bottom: solid;
 		border: solid 2.5px;
 
+		background-color: #000;
 		padding-top: .2em;
 
-		transition: .5s;
+		transition: .8s;
 		cursor: pointer;
 
 		&:hover {
-			color: transparentize(#e6e6e6, 0.4);
-			border-color: transparentize(#e6e6e6, 0.4);
+			color: transparentize(#e6e6e6, 0.6);
+			border-color: transparentize(#e6e6e6, 0.9);
+			background-color: transparentize(#000, .75);
 		}
 	}
 
@@ -224,6 +236,7 @@
 	<div class="circle-around" style="--dist: {circleRadius + 85}px; --size: {circleInfo.size}px; --duration: {circleInfo.duration}s; --angle: {circleInfo.angle}deg; --angle2: {circleInfo.angle + 360}deg"></div>
 	{/each}
 
+	<div class="click-bg"></div>
 	{#if !login}
 	<div class="click" on:click={() => {
 		goto("https://api.intra.42.fr/oauth/authorize?client_id=7e2bea32b8d407dab9d25b1ab4ff8ec14118a99e50807a191bc47334ed598658&redirect_uri=http%3A%2F%2Flocalhost%3A3002&response_type=code");
