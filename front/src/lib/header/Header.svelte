@@ -43,10 +43,15 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
     import UserProfile from "$lib/modals/UserProfile.svelte";
+    import { loginState } from "$lib/stores/var";
     import Modal from "$lib/tools/Modal.svelte";
 
 	let profileModal: any;
+	let login: boolean;
 
+	loginState.subscribe(value => {
+		login = value;
+	})
 </script>
 
 <Modal bind:this={profileModal} closeOnBgClick={true}>

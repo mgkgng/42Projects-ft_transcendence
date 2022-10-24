@@ -94,6 +94,14 @@ export class GameGateway {
 		}
 	}
 
+	@SubscribeMessage("LeaveQueue")
+	leaveQueue(@MessageBody() data: any) {
+		let index = this.queue.indexOf(this.getClient(data));
+		if (index > -1)
+			this.queue.splice(index, 1);
+		// TODO algo & protection revoir
+	}
+
 	@SubscribeMessage("RoomCheck")
 	roomCheck(@MessageBody() data: any) {
 		console.log("RoomCheck", data);
