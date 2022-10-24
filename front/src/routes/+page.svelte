@@ -32,9 +32,8 @@
 
 	import RoomList from "$lib/modals/RoomList.svelte";
     import Room from "$lib/modals/Room.svelte";
+    import Header from "$lib/header/Header.svelte";
     // import { user } from "$lib/stores/user";
-
-	import Profile from "$lib/Profile.svelte"
 
 	let createGameModal: any;
 	let roomListModal: any;
@@ -69,11 +68,11 @@
 	<Room roomId={roomId}/>
 </Modal>
 
+<Header />
+
 <Title title={"transcendence"} mainPage={true} />
 
 <DarkMode/>
-
-<Profile />
 
 <!-- <MenuCircle createGameModal={createGameModal} roomListModal={roomListModal} bind:expanded={menuExpanded}/> -->
 
