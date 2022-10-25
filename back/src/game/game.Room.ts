@@ -64,7 +64,7 @@ export class Room {
 	 * Use the static server method to broadcast,
 	 * pass the clients as parameters
 	 */
-	broadcast(msg: any) { GameGateway.broadcast(this.getClients(), msg); }
+	broadcast(event: string, data: any) { GameGateway.broadcast(this.getClients(), event, data); }
 
 	addClients(clients: any) {
 		for (let client of clients)

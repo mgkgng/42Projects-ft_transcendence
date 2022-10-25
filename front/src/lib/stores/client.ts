@@ -1,6 +1,5 @@
 import { writable } from "svelte/store";
 import { browser } from "$app/environment";
-import { uid } from "./lib";
 import io from "socket.io-client";
 
 class Client {
@@ -11,7 +10,7 @@ class Client {
 	room: string;
 
 	constructor() {
-		this.id = uid();
+		this.id = "";
 		this.listeners = new Map();
 		this.callbacksOnConnection = new Set();
 		this.socket = undefined;
@@ -19,14 +18,10 @@ class Client {
 	}
 
 	connect() {
+		// TODO should integrate everything into handleConnection
 		if (!browser)
 			return ;
-		
-		console.log('Connected');
-
-		this.socket.emit("Connection", this.id);
-		for (let func of this.callbacksOnConnection)
-			func();
+		this.socket.emit("Connection");
 	}
 
 	async send42Tok(url: any)
@@ -42,7 +37,6 @@ class Client {
 						Authorization: "Bearer " + tok,
 					}
 				});
-				this.connect();
 				return (true);
 			}catch{
 				console.log("error");

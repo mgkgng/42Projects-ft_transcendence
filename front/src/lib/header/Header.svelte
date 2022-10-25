@@ -62,7 +62,7 @@
 	<div class="logo" on:click={() => {
 		goto('/');
 	}}>
-		<img src="/logo.svg" alt="logo">
+		<img src="/logot.svg" alt="logo">
 	</div>
 
 	<div class="profile" on:click={() => {

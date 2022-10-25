@@ -4,11 +4,12 @@ import {
 	OnGatewayDisconnect,
 	SubscribeMessage,
 	WebSocketGateway, 
-	WebSocketServer 
+	WebSocketServer,
+	ConnectedSocket
 } from "@nestjs/websockets";
 import { runInThisContext } from "vm";
 import { threadId } from "worker_threads";
-import { Server } from 'ws';
+import { Server, Socket } from "socket.io";
 import {Client} from './game.Client'
 import {Block} from "./game.Block"
 import {Puck} from "./game.Puck"
@@ -48,24 +49,32 @@ export class GameGateway {
 	server: Server;
 
 	@UseGuards(AuthGuard("jwt"))
-	async handleConnection(client: any) { //TODO handle connection here
-		console.log("New Connection on site.");
-		// let connection = new Client(client.sock);
-		// this.clients.set(connection.id, connection);
+	async handleConnection(client: Socket) { //TODO handle connection here
+		// console.log("New Connection on site.");
+		// i don't know yet how to use well this function
 	}
 
-	async handleDisconnect(client: any) { //TODO handle connection here
+	async handleDisconnect(client: Socket) { //TODO handle connection here
 		console.log("Disconnect.")
 		this.clients.delete(client.id);
 	}
 
 	@SubscribeMessage("Connection")
-	handleConnexion(client: any, data: any, @Request() req) {
-		//console.log("test", client);
-		console.log("data", data);
+	handleConnexion(@ConnectedSocket() client: Socket, @Request() req) {
+		// console.log("Connection received", client);
 		const user: any = (this.jwtService.decode(req.handshake.headers.authorization.split(' ')[1]));
-		let connection = new Client(data, client, user.username);
-		this.clients.set(connection.id, connection);
+		// console.log(user);
+		let newClient = new Client(client, user.username);
+		this.clients.set(newClient.id, newClient);
+
+		// Should send it only once
+		client.emit("GetConnectionInfo", {
+			id: newClient.id,
+			user: {
+				username: user.username
+			}
+		})
+		// Here maybe should be db check - if user is already registered.
 	}
 
 	@SubscribeMessage("JoinQueue")
@@ -84,10 +93,7 @@ export class GameGateway {
 			this.queue[0].room = room.id;
 			this.queue[1].room = room.id;
 
-			room.broadcast(JSON.stringify({
-				event: 'MatchFound',
-				data: room.id
-			}));
+			room.broadcast('MatchFound', room.id);
 
 			this.rooms.set(room.id, room);
 			this.queue = this.queue.slice(2);
@@ -110,25 +116,18 @@ export class GameGateway {
 		let room = this.getRoom(data.room);
 
 		if (!room) {
-			client.sock.send(JSON.stringify({
-				event: "RoomNotFound"
-			}))
+			client.socket.emit("RoomNotFound");
 			return ;
 		}
 
-		client.sock.send(JSON.stringify({
-			event: "RoomInfo",
-			data: {
-				roomInfo: {
-					players: (room.players.length === 2) ? [room.players[0].id, room.players[1].id]
-						: [room.players[0].id],
-					maxpoint: room.maxpoint,
-					scores: room.scores,
-					mapSize: [room.pong.gameMap.width, room.pong.gameMap.height],
-					paddleSize: room.pong.gameMap.paddleSize
-				}
-			}
-		}));
+		client.socket.emit("RoomInfo", {
+			players: (room.players.length === 2) ? [room.players[0].id, room.players[1].id]
+				: [room.players[0].id],
+			maxpoint: room.maxpoint,
+			scores: room.scores,
+			mapSize: [room.pong.gameMap.width, room.pong.gameMap.height],
+			paddleSize: room.pong.gameMap.paddleSize
+		});
 
 	}
 
@@ -142,13 +141,10 @@ export class GameGateway {
 
 		let intervalId = setInterval(() => {
 			room.pong.movePaddle(data.player, data.left);
-			room.broadcast(JSON.stringify({
-				event: "PaddleUpdate",
-				data: {
-					player: data.player,
-					paddlePos: room.pong.paddlePos[data.player]
-				}
-			}));
+			room.broadcast("PaddleUpdate", {
+				player: data.player,
+				paddlePos: room.pong.paddlePos[data.player]
+			});
 		}, 20);
 		this.control.set(data.client, intervalId);
 	}
@@ -169,10 +165,9 @@ export class GameGateway {
 		// and then if the game is going on...
 		// score...
 		
-		client.sock.send(JSON.stringify({
-			event: "GetAllRooms",
-			data: [...this.rooms].filter(room => room[1].privateMode == false)
-		}));
+		client.socket.emit("GetAllRooms", {
+			rooms: [...this.rooms].filter(room => room[1].privateMode == false)
+		});
 	}
 
 	@SubscribeMessage("CreateRoom")
@@ -185,15 +180,12 @@ export class GameGateway {
 		this.rooms.set(room.id, room);
 		client.room = room.id;
 
-		client.sock.send(JSON.stringify({
-			event: "RoomCreated",
-			data: room.id
-		}));
+		client.socket.emit("RoomCreated", room.id);
 	}
 
-	static broadcast(clients: any, msg: any) {
+	static broadcast(clients: any, event: string, data: any) {
 		for (let client of clients)
-			client.sock.send(msg);
+			client.socket.emit(event, data);
 	}
 
 	getClient(id: string) { return (this.clients.get(id)); }

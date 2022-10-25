@@ -24,6 +24,8 @@
 	import jwt_decode from "jwt-decode";
     import { browser } from '$app/environment';
 	import io from "socket.io-client";
+    import { goto } from "$app/navigation";
+    import { user } from '../lib/stores/user';
 
 	let login: boolean;
 	let dark : boolean;
@@ -32,7 +34,6 @@
 	darkMode.subscribe(value => { dark = value; });
 
 	onMount(async () => {
-
 		if (localStorage.getItem('transcendence-jwt') != null
 		&& localStorage.getItem('transcendence-jwt') != undefined)
 		{
@@ -52,7 +53,6 @@
 
 		if (!login && url.has('code'))
 		{
-			console.log("ORHERE");
 			const res : any = await fetch("http://localhost:3000/auth42",{
 				method: 'POST',
 				headers: {
@@ -61,7 +61,6 @@
 				body:JSON.stringify({username: "oui", password: url.get('code')}),
 			});
 			const tok = await res.json();
-			console.log("TOK:", tok);
 			$client.socket = io("http://localhost:3000",{
 				extraHeaders: {
 					Authorization: "Bearer " + tok.access_token,
@@ -70,12 +69,18 @@
 			localStorage.setItem('transcendence-jwt', tok.access_token);
 			$client.connect();
 			const val : any = await jwt_decode(localStorage.getItem("transcendence-jwt"));
-			console.log("Hello: ", val);
 			loginState.set(true);
+			goto('/');
 		}
 
 		if (!browser || !$client.socket)
 			return;
+		
+		$client.socket.on("GetConnectionInfo", (data: any) => {
+			console.log("GetConnectionInfo", data);
+			$client.id = data.id;
+			user.set(data.user);
+		});
 
 		// let res = await $client.send42Tok(new URLSearchParams(window.location.search));
 		// if (res) {

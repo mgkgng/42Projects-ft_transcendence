@@ -1,44 +1,16 @@
+import { Socket } from "socket.io";
+import { uid } from "./game.utils";
+
 export class Client {
 	id: string;
 	username: string;
-	sock: any;
-	callbacksOnConnection: Set<Function>;
-	listeners: Map<string, Function>;
+	socket: Socket;
 	room: string; // room to which the client actually belongs
-	user: any;
 
-	constructor(id: string, sock: any, username : string) {
-		this.id = id;
-		this.sock = sock;
-		this.listeners = new Map();
-		this.room = "";
-		this.user = {};
+	constructor(socket: Socket, username: string) {
+		this.id = uid();
 		this.username = username;
-	}
-
-	onDisconnect(callback: Function) {
-		this.sock.addListener('close', callback);
-	}
-	
-	addListener(type: string, callback: Function) {
-		this.listeners.set(type, callback);
-	}
-
-	removeListener(type: string) {
-		this.listeners.delete(type);
-	}
-
-	send(data: any) {
-		if (this?.sock?.readyState === WebSocket.OPEN) // TODO websocket is not defined
-		{
-			//console.log('send data = ', data);
-			try {
-				this?.sock?.send?.(JSON.stringify(data));
-			} catch (e) {
-				console.trace('Error: [send]', data, e);
-			}
-			return ;
-		}
-		// this.queue.push(data);
+		this.socket = socket;
+		this.room = "";
 	}
 }

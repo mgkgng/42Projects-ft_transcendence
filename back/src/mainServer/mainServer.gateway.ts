@@ -37,12 +37,12 @@ export class MainServerService {
 	@UseGuards(AuthGuard("jwt"))
 	handleConnection(@Request() req)
 	{
-		console.log("Connect to main");
+		// console.log("Connect to main");
 		const user : any = (this.jwtServer.decode(req.handshake?.headers?.authorization.split(' ')[1]));
 		const client_username : string = user?.username;
 		let userConnected = {username: client_username, socket: req, status: "online"};
 		this.userConnectedList.push(userConnected);
-		console.log(this.userConnectedList);
+		// console.log(this.userConnectedList);
 	}
 
 	handleDisconnect(@Request() req)
@@ -51,7 +51,7 @@ export class MainServerService {
 		{
 			if (this.userConnectedList[i].socket === req)
 			{
-				console.log(`User ${this.userConnectedList[i].username} deleted`);
+				// console.log(`User ${this.userConnectedList[i].username} deleted`);
 				this.userConnectedList.splice(i, 1);
 			}
 		}

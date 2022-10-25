@@ -52,7 +52,7 @@
 	<div class="button" on:click={()=>{ roomListModal.open(); }}>Join Room</div>
 	<div class="button" on:click={()=>{ createGameModal.open(); }}>Create Game</div>
 	<div class="button {loading && "loading"}" on:click={()=>{
-		$client.socket.emit((!loading) ? "JoinQueue" : "LeaveQueue", {data: $client.id});
+		$client.socket.emit((!loading) ? "JoinQueue" : "LeaveQueue", $client.id);
 		loading = !loading;
 	}}>{(!loading) ? "Random Match" : ""}</div>
 </div>
