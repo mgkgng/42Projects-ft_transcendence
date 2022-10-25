@@ -77,11 +77,11 @@ export class MainServerService {
 
 	async getIdUser(@Request() req) //GET THE UNIQ ID OF A USER
 	{
-		// const user : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
-		// const client_username = user.username;
-		// const id_user : any = await this.dataSource.getRepository(UserEntity)
-		// .createQueryBuilder().where("UserEntity.username = :u", { u: client_username }).getOneOrFail();
-		// return (id_user.id_g);
+		 const user : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
+		 const client_username = user.username;
+		 const id_user : any = await this.dataSource.getRepository(UserEntity)
+		 .createQueryBuilder().where("UserEntity.username = :u", { u: client_username }).getOneOrFail();
+		 return (id_user.id_g);
 	}
 	async getIdUserByUsername(username : string) //GET THE UNIQ ID OF A USER FIND WITH USER'S USERNAME
 	{

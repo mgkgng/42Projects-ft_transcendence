@@ -25,7 +25,7 @@
     import { browser } from '$app/environment';
 	import io from "socket.io-client";
     import { goto } from "$app/navigation";
-    import { user } from '../lib/stores/user';
+    import { user } from '$lib/stores/user';
 
 	let login: boolean;
 	let dark : boolean;

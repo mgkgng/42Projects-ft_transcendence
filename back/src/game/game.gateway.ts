@@ -1,4 +1,5 @@
 import { 
+	ConnectedSocket,
 	MessageBody,
 	OnGatewayConnection,
 	OnGatewayDisconnect,
@@ -60,8 +61,9 @@ export class GameGateway {
 	}
 
 	@SubscribeMessage("Connection")
-	handleConnexion(@ConnectedSocket() client: Socket, @Request() req) {
-		// console.log("Connection received", client);
+	handleConnexion(@ConnectedSocket() client: Socket, @MessageBody() data: any, @Request() req) {
+		//console.log("test", client);
+		console.log("data", data);
 		const user: any = (this.jwtService.decode(req.handshake.headers.authorization.split(' ')[1]));
 		// console.log(user);
 		let newClient = new Client(client, user.username);
@@ -79,10 +81,10 @@ export class GameGateway {
 
 	@SubscribeMessage("JoinQueue")
 	joinQueue(@MessageBody() data: any) {
-		console.log("Join Queue", data);
-		let client = this.getClient(data);
-		// TODO: should maybe optimize the algorithm later -- for includes
-		if (client.room.length || this.queue.includes(client))
+		console.log("Join Queue", data.data);
+		let client = this.getClient(data.data);
+		//TODO: should maybe optimize the algorithm later -- for includes
+		if (client && (client.room.length || this.queue.includes(client)))
 			return ;
 
 		this.queue.push(client);
@@ -186,6 +188,22 @@ export class GameGateway {
 	static broadcast(clients: any, event: string, data: any) {
 		for (let client of clients)
 			client.socket.emit(event, data);
+	}
+
+	@SubscribeMessage("newChatGameMessage")
+	// {roomId: string, content: string}
+	async newChatGameMessage(@MessageBody() data: any, @Request() req) {
+		let room = this.getRoom(data.roomId);
+		const user : any = (this.jwtService.decode(req.handshake.headers.authorization.split(' ')[1]));
+		
+		room.addMessage(user.username, data.content);
+	}
+
+	@SubscribeMessage("getChatGameMessage")
+	// {roomId: string}
+	async getChatGameMessage(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
+		let room = this.getRoom(data.roomId);
+		client.emit("getChatGameMessage", room.chat);	
 	}
 
 	getClient(id: string) { return (this.clients.get(id)); }
