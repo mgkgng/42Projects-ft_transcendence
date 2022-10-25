@@ -4,7 +4,14 @@
 		height: 100%;
 		font-size: 19px;
 
+		padding: 5em;
+		background-color: transparentize(#fff, 0.65);
+		// backdrop-filter: blur(6px);
+
 		color: #fff;
+
+		border: 2px solid #fff;
+		border-radius: 5em;
 	}
 
 	.box {
@@ -26,7 +33,8 @@
 	button {
 		padding: 2em;
 		border-radius: 2em;
-		background-color: transparentize($main, 0.3);
+		border: solid #fff;
+		background-color: transparentize($main2, 0.8);
 		color: #fff;
 		cursor: pointer;
 	}

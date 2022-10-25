@@ -154,6 +154,9 @@
 	import Modal from "$lib/tools/Modal.svelte";
 	import MainCircle from '$lib/MainCircle.svelte';
     import EnterGame from "$lib/modals/EnterGame.svelte";
+    import CreateGame from "$lib/modals/CreateGame.svelte";
+    import RoomList from "$lib/modals/RoomList.svelte";
+
 
 	type Circle = {
 		size: number;
@@ -164,6 +167,9 @@
 	export let darkMode = false;
 	export let title: string;
 	export let mainPage: boolean;
+
+	let createGameModal: any;
+	let roomListModal: any;
 
 	let circlesAround: Array<Circle> = [];
 	let circleRadius = 250;
@@ -222,7 +228,15 @@
 </script>
 
 <Modal bind:this={EnterGameModal} closeOnBgClick={true}>
-	<EnterGame />
+	<EnterGame itself={EnterGameModal} createGameModal={createGameModal} roomListModal={roomListModal}/>
+</Modal>
+
+<Modal bind:this={createGameModal} closeOnBgClick={true}>
+	<CreateGame />
+</Modal>
+
+<Modal bind:this={roomListModal} closeOnBgClick={true}>
+	<RoomList />
 </Modal>
 
 <div class="container">
