@@ -1,4 +1,5 @@
 import { 
+	ConnectedSocket,
 	MessageBody,
 	OnGatewayConnection,
 	OnGatewayDisconnect,
@@ -9,6 +10,7 @@ import {
 import { runInThisContext } from "vm";
 import { threadId } from "worker_threads";
 import { Server } from 'ws';
+import { Socket } from 'socket.io';
 import {Client} from './game.Client'
 import {Block} from "./game.Block"
 import {Puck} from "./game.Puck"
@@ -60,7 +62,7 @@ export class GameGateway {
 	}
 
 	@SubscribeMessage("Connection")
-	handleConnexion(client: any, data: any, @Request() req) {
+	handleConnexion(@ConnectedSocket() client: Socket, @MessageBody() data: any, @Request() req) {
 		//console.log("test", client);
 		console.log("data", data);
 		const user: any = (this.jwtService.decode(req.handshake.headers.authorization.split(' ')[1]));
@@ -70,10 +72,10 @@ export class GameGateway {
 
 	@SubscribeMessage("JoinQueue")
 	joinQueue(@MessageBody() data: any) {
-		console.log("Join Queue", data);
-		let client = this.getClient(data);
-		// TODO: should maybe optimize the algorithm later -- for includes
-		if (client.room.length || this.queue.includes(client))
+		console.log("Join Queue", data.data);
+		let client = this.getClient(data.data);
+		//TODO: should maybe optimize the algorithm later -- for includes
+		if (client && (client.room.length || this.queue.includes(client)))
 			return ;
 
 		this.queue.push(client);
@@ -84,11 +86,10 @@ export class GameGateway {
 			this.queue[0].room = room.id;
 			this.queue[1].room = room.id;
 
-			room.broadcast(JSON.stringify({
-				event: 'MatchFound',
-				data: room.id
-			}));
-
+			room.broadcast('MatchFound', {
+				room: room.id
+			});
+			console.log("Match Found", room.id);
 			this.rooms.set(room.id, room);
 			this.queue = this.queue.slice(2);
 		}
@@ -110,15 +111,15 @@ export class GameGateway {
 		let room = this.getRoom(data.room);
 
 		if (!room) {
-			client.sock.send(JSON.stringify({
-				event: "RoomNotFound"
-			}))
+			client.sock.emit(
+				"RoomNotFound"
+			, {})
 			return ;
 		}
 
-		client.sock.send(JSON.stringify({
-			event: "RoomInfo",
-			data: {
+		client.sock.emit(
+			"RoomInfo",
+			{
 				roomInfo: {
 					players: (room.players.length === 2) ? [room.players[0].id, room.players[1].id]
 						: [room.players[0].id],
@@ -128,7 +129,7 @@ export class GameGateway {
 					paddleSize: room.pong.gameMap.paddleSize
 				}
 			}
-		}));
+		);
 
 	}
 
@@ -142,13 +143,13 @@ export class GameGateway {
 
 		let intervalId = setInterval(() => {
 			room.pong.movePaddle(data.player, data.left);
-			room.broadcast(JSON.stringify({
-				event: "PaddleUpdate",
-				data: {
+			room.broadcast(
+				"PaddleUpdate",
+				{
 					player: data.player,
 					paddlePos: room.pong.paddlePos[data.player]
 				}
-			}));
+			);
 		}, 20);
 		this.control.set(data.client, intervalId);
 	}
@@ -169,10 +170,10 @@ export class GameGateway {
 		// and then if the game is going on...
 		// score...
 		
-		client.sock.send(JSON.stringify({
-			event: "GetAllRooms",
-			data: [...this.rooms].filter(room => room[1].privateMode == false)
-		}));
+		client.sock.emit(
+			"GetAllRooms",
+			{data: [...this.rooms].filter(room => room[1].privateMode == false)}
+		);
 	}
 
 	@SubscribeMessage("CreateRoom")
@@ -185,15 +186,15 @@ export class GameGateway {
 		this.rooms.set(room.id, room);
 		client.room = room.id;
 
-		client.sock.send(JSON.stringify({
-			event: "RoomCreated",
-			data: room.id
-		}));
+		client.sock.emit(
+			"RoomCreated",
+			{ data: room.id }
+		);
 	}
 
-	static broadcast(clients: any, msg: any) {
+	static broadcast(clients: any, event, msg: any) {
 		for (let client of clients)
-			client.sock.send(msg);
+			client.sock.emit(event, msg);
 	}
 
 	getClient(id: string) { return (this.clients.get(id)); }

@@ -24,6 +24,7 @@
 	import jwt_decode from "jwt-decode";
     import { browser } from '$app/environment';
 	import io from "socket.io-client";
+    import { goto } from "$app/navigation";
 
 	let login: boolean;
 	let dark : boolean;
@@ -76,7 +77,10 @@
 
 		if (!browser || !$client.socket)
 			return;
-
+		$client.socket.on("MatchFound", (data: any) => {
+			console.log("MatchFound", data);
+			goto(`/play/${data.room}`);
+		});
 		// let res = await $client.send42Tok(new URLSearchParams(window.location.search));
 		// if (res) {
 		// 	const val : any = await jwt_decode(localStorage.getItem("transcendence-jwt"));
