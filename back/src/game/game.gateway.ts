@@ -192,6 +192,22 @@ export class GameGateway {
 		);
 	}
 
+	@SubscribeMessage("newChatGameMessage")
+	// {roomId: string, content: string}
+	async newChatGameMessage(@MessageBody() data: any, @Request() req) {
+		let room = this.getRoom(data.roomId);
+		const user : any = (this.jwtService.decode(req.handshake.headers.authorization.split(' ')[1]));
+		
+		room.addMessage(user.username, data.content);
+	}
+
+	@SubscribeMessage("getChatGameMessage")
+	// {roomId: string}
+	async getChatGameMessage(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
+		let room = this.getRoom(data.roomId);
+		client.emit("getChatGameMessage", room.chat);	
+	}
+
 	static broadcast(clients: any, event, msg: any) {
 		for (let client of clients)
 			client.sock.emit(event, msg);

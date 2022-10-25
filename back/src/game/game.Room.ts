@@ -32,7 +32,7 @@ export class Room {
 
 	/* RoomConnection */
 	clients: Map<string, any>;
-	//chat: ChatRoomService
+	chat: Map<string, string>
 		
 	constructor(players: any, title:string, maxpoint: number = 25,
 				difficulty : number = 8, privateMode : boolean = true,
@@ -69,6 +69,11 @@ export class Room {
 	addClients(clients: any) {
 		for (let client of clients)
 			this.addClient(client);
+	}
+
+	addMessage(username: string, message: string) {
+		this.chat.set(username, message);
+		this.broadcast("newChatGameMessage", {username, message});
 	}
 
 	addClient(client: any) {
