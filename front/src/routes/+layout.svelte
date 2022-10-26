@@ -73,14 +73,16 @@
 			goto('/');
 		}
 
-		if (!browser || !$client.socket)
-			return;
-		
 		$client.socket.on("GetConnectionInfo", (data: any) => {
 			console.log("GetConnectionInfo", data);
 			$client.id = data.id;
 			user.set(data.user);
 		});
+
+		if (!browser || !$client.socket)
+			return;
+		
+		
 
 		// let res = await $client.send42Tok(new URLSearchParams(window.location.search));
 		// if (res) {

@@ -57,7 +57,6 @@
 	}
 
 	.button-back {
-		// display: none;
 		width: 100%;
 		height: 100%;
 
@@ -66,10 +65,6 @@
 		border: none;
 		background-color: transparentize(#fff, 1);
 		font-size: 25px;
-
-		// &::before{
-		// 	content: '';
-		// }
 
 		&:hover {
 			display: block;

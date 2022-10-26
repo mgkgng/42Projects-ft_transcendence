@@ -22,6 +22,7 @@ import { JwtService } from '@nestjs/jwt';
 import { GameEntity } from "src/entity/Game.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository, DataSource } from "typeorm";
+import { replacer } from "./game.utils";
 
 @WebSocketGateway({
 	cors: {
@@ -43,10 +44,26 @@ export class GameGateway {
 		this.rooms = new Map<string, Room>();
 		this.queue = [];
 		this.control = new Map<string, any>();
+
+		// Testing rooms
+		this.addRoomsForTest();
 	}
 
 	@WebSocketServer()
 	server: Server;
+
+	addRoomsForTest() {
+		let room1 = new Room(['testPlayer1'], 'TestRoom1', 25, 5, false,
+			this.gameRep, this.mainServerService, this.dataSource);
+
+		let room2 = new Room(['testPlayer2'], "Welcome to this map", 18, 3, false,
+			this.gameRep, this.mainServerService, this.dataSource);
+	
+		this.rooms.set(room1.id, room1);
+		this.rooms.set(room2.id, room2);
+		console.log(this.rooms);
+	}
+
 
 	@UseGuards(AuthGuard("jwt"))
 	async handleConnection(client: Socket) { //TODO handle connection here
@@ -54,20 +71,25 @@ export class GameGateway {
 		// i don't know yet how to use well this function
 	}
 
-	async handleDisconnect(client: Socket) { //TODO handle connection here
-		console.log("Disconnect.")
+	async handleDisconnect(@ConnectedSocket() client: Socket) { //TODO handle connection here
+		console.log("Disconnection...", client.id);
 		this.clients.delete(client.id);
+
 	}
 
 	@SubscribeMessage("Connection")
-	handleConnexion(@ConnectedSocket() client: Socket, @MessageBody() data: any, @Request() req) {
-		//console.log("test", client);
-		console.log("data", data);
+	handleConnexion(@ConnectedSocket() client: Socket, @Request() req) {
+		console.log("Connection!!");
+		// console.log("data", req);
 		const user: any = (this.jwtService.decode(req.handshake.headers.authorization.split(' ')[1]));
 		// console.log(user);
 		let newClient = new Client(client, user.username);
 		this.clients.set(newClient.id, newClient);
 
+		// console.log(this.clients.keys());
+
+		// console.log("or with socketio", this.server.sockets.sockets);
+		console.log(client.id);
 		// Should send it only once
 		client.emit("GetConnectionInfo", {
 			id: newClient.id,
@@ -75,6 +97,9 @@ export class GameGateway {
 				username: user.username
 			}
 		})
+		console.log("how many: ", this.server.sockets.sockets.keys());
+		console.log("=================================");
+
 		// Here maybe should be db check - if user is already registered.
 	}
 
@@ -157,8 +182,12 @@ export class GameGateway {
 	}
 
 	@SubscribeMessage("AskRooms")
-	askRooms(@MessageBody() data: any) {
-		let client = this.getClient(data);
+	askRooms(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
+		console.log("AskRooms");
+		// let client = this.server.sockets.sockets.get(sock.id);
+		// console.log("hahaha: ", sock.id);
+		// console.log("=================================");
+		// console.log("YOYOYOYOYOYO: ", this.server.sockets.sockets.get(sock.id));
 	
 		// I need to think more about how i should save the data and how i'll send it
 		// there should be at least these information:
@@ -166,8 +195,10 @@ export class GameGateway {
 		// and then if the game is going on...
 		// score...
 		
-		client.socket.emit("GetAllRooms", {
-			rooms: [...this.rooms].filter(room => room[1].privateMode == false)
+		console.log();
+
+		client.emit("GetAllRooms", {
+			rooms: JSON.stringify([...this.rooms].filter(room => !room[1].privateMode), replacer())
 		});
 	}
 

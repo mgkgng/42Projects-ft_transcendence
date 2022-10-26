@@ -70,10 +70,13 @@
 	}
 
 	onMount(() => {
-		$client.socket.emit("AskRooms", $client.id);
+		$client.socket.emit("AskRooms", { id: $client.id });
 
 		$client.socket.on("GetAllRooms", (data: any) => {
-			for (let roomData of data)
+			console.log(data);
+			let roomsData = JSON.parse(data.rooms);
+			console.log("after", roomsData);
+			for (let roomData of roomsData)
 				rooms.set(roomData[0], roomData[1]);
 			console.log("GetAllRooms", rooms);
 			roomArray = (seeAvailable) ? [...rooms?.values()].filter(room => room.available == true)
