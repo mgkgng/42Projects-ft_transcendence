@@ -47,7 +47,10 @@
 
 <script lang="ts">
 	import { onMount } from "svelte";
-	import { client } from "$lib/stores/client"
+	import { client } from "$lib/stores/client";
+
+	export let itself: any;
+	export let enterGameModal: any;
 
 	let rooms: Map<string, any> = new Map();
 	let roomArray: Array<any>;
@@ -88,6 +91,9 @@
 </script>
 
 <div class="container">
+	<button class="button-back" on:click={()=>{
+
+	}}>&lt</button>
 	<div class="tools">
 		<label class="form">
 			<input type="checkbox" bind:checked={seeAvailable} />

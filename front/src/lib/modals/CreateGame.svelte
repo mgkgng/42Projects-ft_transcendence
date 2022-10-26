@@ -1,15 +1,14 @@
 <style lang="scss">
 	.container {
+		position: relative;
 		width: 100%;
 		height: 100%;
 		font-size: 19px;
 
 		padding: 5em;
 		background-color: transparentize(#fff, 0.65);
-		// backdrop-filter: blur(6px);
 
 		color: #fff;
-
 		border: 2px solid #fff;
 		border-radius: 5em;
 	}
@@ -30,7 +29,7 @@
 		gap: 3em;
 	}
 
-	button {
+	.submit {
 		padding: 2em;
 		border-radius: 2em;
 		border: solid #fff;
@@ -43,10 +42,48 @@
 		background-color: #fff;
 		color: #000;
 	}
+
+	.button-box {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 5em;
+		height: 100%;
+
+		padding-top: 8em;
+		padding-bottom: 8em;
+		padding-left: 1em;
+		padding-right: 1em;
+	}
+
+	.button-back {
+		// display: none;
+		width: 100%;
+		height: 100%;
+
+		transition: .3s;
+		border-radius: 2em;
+		border: none;
+		background-color: transparentize(#fff, 1);
+		font-size: 25px;
+
+		// &::before{
+		// 	content: '';
+		// }
+
+		&:hover {
+			display: block;
+			background-color: transparentize($main2, 0.8);
+		}
+	}
+
 </style>
 
 <script lang="ts">
 	import { client } from "$lib/stores/client";
+
+	export let itself: any;
+	export let enterGameModal: any;
 
 	let maxPoint: number = 10;
 	let difficulty: number = 3;
@@ -57,6 +94,12 @@
 </script>
 
 <div class="container">
+	<div class="button-box">
+		<button class="button-back" on:click={()=>{
+			itself.close();
+			enterGameModal.open();
+		}}>&lt</button>
+	</div>
 	<div class="box">
 		<label>
 			Title:
@@ -86,7 +129,7 @@
 			<input type=radio bind:group={privateMode} name="privateMode" value={true}> Private
 		</label>
 
-		<button on:click={()=>{
+		<button class="submit" on:click={()=>{
 			$client.socket.emit("CreateRoom", {
 				client: $client.id,
 				title: roomTitle,

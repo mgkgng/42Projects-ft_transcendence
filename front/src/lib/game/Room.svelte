@@ -1,8 +1,5 @@
 <style lang="scss">
 	.container {
-		display: grid;
-		grid-template-columns: 20% 70% ;
-		height: 100%;
 		display: flex;
 		justify-content: center;
 		align-items: center;
@@ -12,7 +9,13 @@
 		position: relative;
 
 		padding: 0;
-		border: dashed 5px white;
+		border: dashed 3px white;
+		border-radius: 2.5em;
+
+		background-color: #000;
+		// display: flex;
+		// justify-content: center;
+		// align-items: center;
 	}
 
 	.test {
@@ -37,17 +40,17 @@
 		align-items: center;
 	}
 
-	.central-line-horizontal {
+	.central-line-vertical {
 		position: absolute;
 		left: 50%;
-		height: 800px;
+		height: 100%;
 		border: dashed 3px aqua;
 	}
 
-	.central-line-vertical {
+	.central-line-horizontal {
 		position: absolute;
 		top: 50%;
-		width: 700px;
+		width: 100%;
 		height: 0;
 		border: dashed 3px aqua;
 	}
@@ -82,6 +85,8 @@
 
 		justify-content: center;
 		height: 100%;
+
+		gap: 1em;
 	}
 
 	.deathPoint {
@@ -93,11 +98,35 @@
 		z-index: 10;
 	}
 
-	.button-launch {
+	.loading-box {
+		height: 100%;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.msg {
+		color: #fff;
+	}
+
+	button {
 		width: 50px;
+		height: 20px;
+		background-color: blue;
+		cursor: pointer;
+	}
+
+	.mini-mode {
+		width: 45px;
 		aspect-ratio: 1 / 1;
-		border-radius: 50%;
-		background-color: peru;
+		border-radius: 20%;
+		background-color: transparentize(#fff, 0.7);
+		transition: .4s;
+		font-size: 25px;
+
+		&:hover {
+			transform: scale(1.2);
+		}
 	}
 </style>
 
@@ -105,12 +134,16 @@
 	import { onMount } from 'svelte';
 	import { client } from "$lib/stores/client";
 	import { UserType } from '$lib/stores/var';
+	import Paddle from '$lib/game/Paddle.svelte';
 	import { Puck } from '$lib/pong/Puck';
     import PongPuck from '$lib/game/PongPuck.svelte';
-	import Paddle from '$lib/game/Paddle.svelte';
+    import ScoreBox from '$lib/game/ScoreBox.svelte';
+    import Modal from '$lib/tools/Modal.svelte';
+    import GameOver from '$lib/modals/GameOver.svelte';
 
-	export let roomInfo: any;
 	export let roomId: string;
+
+	let roomInfo: any;
 
 	// let gameMap = new GameMap(mapWidth.Small, mapHeight.Small, PaddleSize.Medium);
 
@@ -118,51 +151,68 @@
 	let puck: any = undefined;
 	let scores: Array<number> = [0, 0];
 
-	let paddlePos: Array<number> = [
-			(roomInfo.mapSize[0] + roomInfo.paddleSize) / 2, 
-			(roomInfo.mapSize[0] + roomInfo.paddleSize) / 2
-	];
-
 	let userType: number;
 	let userIndex: number = UserType.Player1;
 	let opponentIndex: number = UserType.Player2;
 
+	let initPos = (roomInfo?.mapSize[0] + roomInfo?.paddleSize) / 2;
+	let paddlePos: Array<number> = [initPos, initPos];
+
+
 	let grapped = false;
-
 	let deathPoint: number;
-
 	let moving = false;
-	
 	let puckMoving: any;
+	
+	let gameFinishedModal: any;
 
-	$: console.log(paddlePos);
+	let roomFound: boolean;
+	let miniMode: boolean = false;
 
 	onMount(()=> {
-		userType = ($client.id == roomInfo.players[0]) ? UserType.Player1 
-			: ($client.id == roomInfo.players[1]) ? UserType.Player2 
-			: UserType.Watcher;
-		if (userType == UserType.Player2)
+		$client.socket.on("connection", () => {
+			$client.socket.emit("RoomCheck", {
+				client: $client.id,
+				room: roomId
+			});
+		});
+
+		$client.socket.on("RoomInfo", (data: any) => {
+			console.log("RoomInfo", data);
+			roomFound = true;
+			roomInfo = data;
+		});
+
+		// plus tard je le rends plus beau
+		if (roomInfo?.players.length > 1)
+			userType = UserType.Player1;
+		else
+			userType = ($client.id == roomInfo?.players[0]) ? UserType.Player1 
+				: ($client.id == roomInfo?.players[1]) ? UserType.Player2 
+				: UserType.Watcher;
+
+		if (userType == UserType.Player2) {
 			[userIndex, opponentIndex] = [opponentIndex, userIndex];
+			// TODO (this is kinda brut force)
+			paddlePos[0] -= roomInfo?.paddleSize, paddlePos[1] -= roomInfo?.paddleSize;
+		}
 
-		scores = roomInfo.scores;
-		console.log(paddlePos);
-
-		console.log("My User Index: ", userIndex);
-
+		scores = roomInfo?.scores;
+		
 		$client.socket.on("PaddleUpdate", (data: any) => {
 			console.log("PaddleUpdate", data);
 			if ((data.player == UserType.Player1 && userIndex == UserType.Player2) ||
 				(data.player == UserType.Player2 && userIndex == UserType.Player2))
 				paddlePos[data.player] = data.paddlePos;
 			else
-				paddlePos[data.player] = roomInfo.mapSize[0] - data.paddlePos;
+				paddlePos[data.player] = roomInfo?.mapSize[0] - data.paddlePos;
 
 			// data.paddlePos;
 		});
 
 		$client.socket.on("LoadBall", (data: any) => {
 			console.log("LoadBall");
-			puck = new Puck(roomInfo.mapSize[0], roomInfo.mapSize[1], data.vectorX, data.vectorY);
+			puck = new Puck(roomInfo?.mapSize[0], roomInfo?.mapSize[1], data.vectorX, data.vectorY);
 		});
 
 		$client.socket.on("PongStart", (data: any) => {
@@ -182,7 +232,6 @@
 		$client.socket.on("PuckHit", (data: any) => {
 			console.log("PuckHit");
 			puck.vectorY *= -1;
-			console.log(puck.posX, puck.posY);
 		});
  
 		$client.socket.on("ScoreUpdate", (data: any) => {
@@ -197,41 +246,76 @@
 			console.log((userType == data) ? "You Win!"
 				: (userType != UserType.Watcher) ? "You Lose!" 
 				: ".");
+			gameFinishedModal.open();
 		});
 	});
 
 </script>
 
+{#if !miniMode}
+{#if roomFound}
 <div class="container">
-	<div class="pong" style="width: {roomInfo.mapSize[0]}px; height: {roomInfo.mapSize[1]}px;">
-		<Paddle pos={paddlePos[opponentIndex]} paddleWidth={roomInfo.paddleSize}
-			gameWidth={roomInfo.mapSize[0]} gameHeight={roomInfo.mapSize[1]}
+	{#if roomInfo}
+	<div class="pong" style="min-width: {roomInfo?.mapSize[0]}px; min-height: {roomInfo?.mapSize[1]}px;">
+		{#if roomInfo.players.length > 1}
+		<Paddle pos={paddlePos[opponentIndex]} paddleWidth={roomInfo?.paddleSize}
+			gameWidth={roomInfo?.mapSize[0]} gameHeight={roomInfo?.mapSize[1]}
 			user={false} userIndex={userIndex}/>
-		<div class="test" style="left: {paddlePos[opponentIndex]}px; top: 50px;"></div>
-		{#if puck}
-		<PongPuck posX={(userIndex == UserType.Player1) ? roomInfo.mapSize[0] - puck.posX : puck.posX}
-			posY={(userIndex == UserType.Player1) ? roomInfo.mapSize[1] - puck.posY : puck.posY} />
 		{/if}
-		<Paddle pos={paddlePos[userIndex]} paddleWidth={roomInfo.paddleSize}
-			gameWidth={roomInfo.mapSize[0]} gameHeight={roomInfo.mapSize[1]}
+		<!-- <div class="test" style="left: {paddlePos[opponentIndex]}px; top: 50px;"></div> -->
+		{#if puck}
+		<PongPuck posX={(userIndex == UserType.Player1) ? roomInfo?.mapSize[0] - puck.posX : puck.posX}
+			posY={(userIndex == UserType.Player1) ? roomInfo?.mapSize[1] - puck.posY : puck.posY} />
+		{/if}
+		<Paddle pos={paddlePos[userIndex]} paddleWidth={roomInfo?.paddleSize}
+			gameWidth={roomInfo?.mapSize[0]} gameHeight={roomInfo?.mapSize[1]}
 			user={true} userIndex={userIndex}/>
-		<div class="test" style="left: {paddlePos[userIndex]}px; top: {roomInfo.mapSize[1] - 50}px;
-		"></div>
-
+		<!-- <div class="test" style="left: {paddlePos[userIndex]}px; top: {roomInfo?.mapSize[1] - 50}px;
+		"></div> -->
+<!-- 
 		{#if deathPoint && puck}
 		<div class="deathPoint"
-			style="left: {(puck.vectorY < 0) ? deathPoint : roomInfo.mapSize[0] - deathPoint - 30}px;
-			top: {(puck.vectorY < 0 && userIndex || puck.vectorY > 0 && !userIndex) ? 50 : roomInfo.mapSize[1] - 50}px;"></div>
-		{/if}
-		<div class="central-line-vertical"></div>
-		<div class="central-line-horizontal"></div>	
+			style="left: {deathPoint}px;
+			top: {(puck.vectorY < 0 && userIndex || puck.vectorY > 0 && !userIndex) ? 50 : roomInfo?.mapSize[1] - 50}px;"></div>
+		{/if} -->
+		<!-- <div class="central-line-vertical"></div>
+		<div class="central-line-horizontal"></div>	 -->
 	</div>
-	<!-- <div class="central-line"></div> -->
-	<!-- <div class="pong-score">
+	<div class="pong-score">
+		<!-- solution for now, later it will be an empty score box with question mark -->
+		{#if roomInfo.players.length > 1}
 		<ScoreBox score={scores[opponentIndex]}/>
 		<ScoreBox score={scores[userIndex]}/>
-	</div> -->
+		{/if}
+	</div>
+	{/if}
+	<div class="button-container">
+		<!-- there should be a difference between host-guest mode and random matching mode -->
+		{#if userType == UserType.Player1}
+		<button>START</button>
+		{:else if userType == UserType.Player2}
+		<button>READY</button>
+		{/if}
+
+		<button>QUIT</button>
+
+		<button>MINIMODE-TEST</button>
+	</div>
 </div>
+{:else}
+<div class="loading-box">
+	<h1 class="msg">LOADING...</h1>
+</div>
+{/if}
+{:else}
+<div class="container mini-mode" on:click={()=>{
+	miniMode = true;
+}}>+</div>
+{/if}
+
+<Modal bind:this={gameFinishedModal} closeOnBgClick={false}>
+	<GameOver />
+</Modal>
 
 <svelte:window
 on:mouseup={()=>{
@@ -267,9 +351,8 @@ on:keyup={(event)=>{
 		return ;
 	
 	//* TODO some precision to make
-	$client.socket.emit("PaddleStop", {
-		data: $client.id
-	});
+	$client.socket.emit("PaddleStop", $client.id)
+
 	moving = false;
 }}
 

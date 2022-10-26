@@ -5,8 +5,7 @@ import {
 	OnGatewayDisconnect,
 	SubscribeMessage,
 	WebSocketGateway, 
-	WebSocketServer,
-	ConnectedSocket
+	WebSocketServer
 } from "@nestjs/websockets";
 import { runInThisContext } from "vm";
 import { threadId } from "worker_threads";

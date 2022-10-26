@@ -156,6 +156,7 @@
     import EnterGame from "$lib/modals/EnterGame.svelte";
     import CreateGame from "$lib/modals/CreateGame.svelte";
     import RoomList from "$lib/modals/RoomList.svelte";
+	import Room from "$lib/game/Room.svelte";
 
 
 	type Circle = {
@@ -170,6 +171,8 @@
 
 	let createGameModal: any;
 	let roomListModal: any;
+	let enterGameModal: any;
+	let roomModal: any;
 
 	let circlesAround: Array<Circle> = [];
 	let circleRadius = 250;
@@ -187,7 +190,6 @@
 		login = value;
 	})
 
-	let EnterGameModal: any;
 
 	function createCircles() {
 		let res = [];
@@ -227,16 +229,20 @@
 
 </script>
 
-<Modal bind:this={EnterGameModal} closeOnBgClick={true}>
-	<EnterGame itself={EnterGameModal} createGameModal={createGameModal} roomListModal={roomListModal}/>
+<Modal bind:this={enterGameModal} closeOnBgClick={true}>
+	<EnterGame itself={enterGameModal} createGameModal={createGameModal} roomListModal={roomListModal}/>
 </Modal>
 
 <Modal bind:this={createGameModal} closeOnBgClick={true}>
-	<CreateGame />
+	<CreateGame itself={createGameModal} enterGameModal={enterGameModal}/>
 </Modal>
 
 <Modal bind:this={roomListModal} closeOnBgClick={true}>
-	<RoomList />
+	<RoomList itself={roomListModal} enterGameModal={enterGameModal}/>
+</Modal>
+
+<Modal>
+	<Room />
 </Modal>
 
 <div class="container">
@@ -257,7 +263,7 @@
 	}}>Login</div>
 	{:else}
 	<div class="click" on:click={() => {
-		EnterGameModal.open();
+		enterGameModal.open();
 	}}>Play</div>
 	{/if}
 	
