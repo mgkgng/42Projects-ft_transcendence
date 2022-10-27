@@ -1,5 +1,6 @@
 <style lang="scss">
 	.container {
+		position: relative;
 		width: 100%;
 		height: 100%;
 		display: flex;
@@ -8,7 +9,13 @@
 		justify-content: center;
 		align-items: center;
 
+		padding: 5em;
+		background-color: transparentize(#fff, 0.65);
+
 		color: #fff;
+		border: 2px solid #fff;
+		border-radius: 5em;
+
 		text-align: center;
 	}
 
@@ -40,6 +47,35 @@
 
 		&:hover {
 			background-color: transparentize($red, 0.5);
+		}
+	}
+
+	.button-box {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 5em;
+		height: 100%;
+
+		padding-top: 8em;
+		padding-bottom: 8em;
+		padding-left: 1em;
+		padding-right: 1em;
+	}
+
+	.button-back {
+		width: 100%;
+		height: 100%;
+
+		transition: .3s;
+		border-radius: 2em;
+		border: none;
+		background-color: transparentize(#fff, 1);
+		font-size: 25px;
+
+		&:hover {
+			display: block;
+			background-color: transparentize($main2, 0.8);
 		}
 	}
 
@@ -94,9 +130,12 @@
 </script>
 
 <div class="container">
-	<button class="button-back" on:click={()=>{
-
-	}}>&lt</button>
+	<div class="button-box">
+		<button class="button-back" on:click={()=>{
+			itself.close();
+			enterGameModal.open();
+		}}>&lt</button>
+	</div>
 	<div class="tools">
 		<label class="form">
 			<input type="checkbox" bind:checked={seeAvailable} />
