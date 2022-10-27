@@ -140,8 +140,10 @@
     import ScoreBox from '$lib/game/ScoreBox.svelte';
     import Modal from '$lib/tools/Modal.svelte';
     import GameOver from '$lib/modals/GameOver.svelte';
+    import ConfirmMsg from '$lib/modals/ConfirmMsg.svelte';
 
 	export let roomId: string;
+	export let itself: any;
 
 	let roomInfo: any;
 
@@ -158,6 +160,9 @@
 	let initPos = (roomInfo?.mapSize[0] + roomInfo?.paddleSize) / 2;
 	let paddlePos: Array<number> = [initPos, initPos];
 
+	let quitConfirmMsgModal: any;
+	let resQuitConfirm: boolean;
+
 
 	let grapped = false;
 	let deathPoint: number;
@@ -169,12 +174,19 @@
 	let roomFound: boolean;
 	let miniMode: boolean = false;
 
+	$: quitRoom(resQuitConfirm);
+
+	function quitRoom(res: boolean) {
+		if (res == false)
+			quitConfirmMsgModal.close();
+		else if (res == true)
+			itself.close();
+	}
+
 	onMount(()=> {
-		$client.socket.on("connection", () => {
-			$client.socket.emit("RoomCheck", {
-				client: $client.id,
-				room: roomId
-			});
+		$client.socket.emit("RoomCheck", {
+			client: $client.id,
+			room: roomId
 		});
 
 		$client.socket.on("RoomInfo", (data: any) => {
@@ -297,7 +309,7 @@
 		<button>READY</button>
 		{/if}
 
-		<button>QUIT</button>
+		<button on:click={()=>{ quitConfirmMsgModal.open(); }}>QUIT</button>
 
 		<button>MINIMODE-TEST</button>
 	</div>
@@ -315,6 +327,10 @@
 
 <Modal bind:this={gameFinishedModal} closeOnBgClick={false}>
 	<GameOver />
+</Modal>
+
+<Modal bind:this={quitConfirmMsgModal} closeOnBgClick={false}>
+	<ConfirmMsg msg={""} result={resQuitConfirm}/>
 </Modal>
 
 <svelte:window

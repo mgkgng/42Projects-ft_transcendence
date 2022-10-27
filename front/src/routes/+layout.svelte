@@ -26,9 +26,17 @@
 	import io from "socket.io-client";
     import { goto } from "$app/navigation";
     import { user } from '$lib/stores/user';
+    import Modal from '$lib/tools/Modal.svelte';
+	import Room from "$lib/game/Room.svelte";
+
 
 	let login: boolean;
 	let dark : boolean;
+
+	let roomModal: any;
+
+	let roomId: string = "";
+
 
 	loginState.subscribe(value => { login = value; });
 	darkMode.subscribe(value => { dark = value; });
@@ -82,7 +90,11 @@
 		if (!browser || !$client.socket)
 			return;
 		
-		
+		$client.socket.on("RoomCreated", (data: any) => {
+			console.log("RoomCreated", data);
+			roomId = data;
+			roomModal.open();
+		});
 
 		// let res = await $client.send42Tok(new URLSearchParams(window.location.search));
 		// if (res) {
@@ -96,3 +108,7 @@
 <main style="{(dark) ? "background-color: #000" : "background-color: #fff"}">
 	<slot />
 </main>
+
+<Modal bind:this={roomModal} closeOnBgClick={false}>
+	<Room itself={roomModal} roomId={roomId}/>
+</Modal>

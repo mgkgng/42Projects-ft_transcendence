@@ -135,18 +135,17 @@ export class GameGateway {
 	}
 
 	@SubscribeMessage("RoomCheck")
-	roomCheck(@MessageBody() data: any) {
+	roomCheck(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
 		console.log("RoomCheck", data);
 
-		let client = this.getClient(data.client);
 		let room = this.getRoom(data.room);
 
 		if (!room) {
-			client.socket.emit("RoomNotFound");
+			client.emit("RoomNotFound");
 			return ;
 		}
 
-		client.socket.emit("RoomInfo", {
+		client.emit("RoomInfo", {
 			players: (room.players.length === 2) ? [room.players[0].id, room.players[1].id]
 				: [room.players[0].id],
 			maxpoint: room.maxpoint,
@@ -203,16 +202,20 @@ export class GameGateway {
 	}
 
 	@SubscribeMessage("CreateRoom")
-	createRoom(@MessageBody() data: any) {
-		let client = this.getClient(data.client);
-		if (client.room.length)
-			return ;
+	createRoom(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
+		console.log("CreateRoom", data);
+		
+		// TODO should be able to have client's room state
+		// if (client.room.length)
+		// 	return ;
 
 		let room = new Room([client], data.title, data.maxPoint, data.difficulty, data.privateMode, this.gameRep, this.mainServerService, this.dataSource);
 		this.rooms.set(room.id, room);
-		client.room = room.id;
+		
+		// TODO should be able to set client's room state
+		// client.room = room.id;
 
-		client.socket.emit("RoomCreated", room.id);
+		client.emit("RoomCreated", room.id);
 	}
 
 	static broadcast(clients: any, event: string, data: any) {

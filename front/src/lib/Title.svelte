@@ -156,7 +156,7 @@
     import EnterGame from "$lib/modals/EnterGame.svelte";
     import CreateGame from "$lib/modals/CreateGame.svelte";
     import RoomList from "$lib/modals/RoomList.svelte";
-	import Room from "$lib/game/Room.svelte";
+    import { client } from "./stores/client";
 
 
 	type Circle = {
@@ -172,7 +172,6 @@
 	let createGameModal: any;
 	let roomListModal: any;
 	let enterGameModal: any;
-	let roomModal: any;
 
 	let circlesAround: Array<Circle> = [];
 	let circleRadius = 250;
@@ -239,10 +238,6 @@
 
 <Modal bind:this={roomListModal} closeOnBgClick={true}>
 	<RoomList itself={roomListModal} enterGameModal={enterGameModal}/>
-</Modal>
-
-<Modal>
-	<Room />
 </Modal>
 
 <div class="container">
