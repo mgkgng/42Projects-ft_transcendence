@@ -40,6 +40,12 @@
 			aspect-ratio: 1 / 1;
 			border-radius: 1em;
 			border: 2px solid transparentize(#fff, .6);
+			cursor: pointer;
+			transition: .2s;
+
+			&:hover {
+				transform: scale(1.05);
+			}
 		}
 	}
 
@@ -56,7 +62,7 @@
 </style>
 
 <script lang="ts">
-
+	// export let userInfo;
 </script>
 
 <div class="container">
