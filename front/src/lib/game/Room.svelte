@@ -12,7 +12,7 @@
 		border: dashed 3px white;
 		border-radius: 2.5em;
 
-		background-color: #000;
+		background-color: transparentize(#000, .2);
 		// display: flex;
 		// justify-content: center;
 		// align-items: center;

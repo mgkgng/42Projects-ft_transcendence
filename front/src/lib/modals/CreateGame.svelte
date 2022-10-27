@@ -133,6 +133,7 @@
 				difficulty: difficulty,
 				privateMode: privateMode
 			});
+			itself.close();
 		}}>Create Game</button>
 	</div>
 	
