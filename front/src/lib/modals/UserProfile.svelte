@@ -43,6 +43,11 @@
 			cursor: pointer;
 			transition: .2s;
 
+			img {
+				width: 100%;
+				height: 100%;
+			}
+
 			&:hover {
 				transform: scale(1.05);
 			}
@@ -70,9 +75,15 @@
 		<img src="/pingu/pingu-angry.jpeg" alt="pingu-angry">
 	</div>
 	<div class="tool-zone">
-		<button>add</button>
-		<button>block</button>
-		<button>message</button>
+		<button>
+			<img src="/logo-test/add.svg" alt="add"/>
+		</button>
+		<button>
+			<img src="/logo-test/block.svg" alt="add"/>
+		</button>
+		<button>
+			<img src="/logo-test/chat.svg" alt="add"/>
+		</button>
 	</div>
 	<div class="info-zone">
 		info here
