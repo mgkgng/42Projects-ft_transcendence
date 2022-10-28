@@ -39,10 +39,9 @@ export class OAuthStrategy extends PassportStrategy(Strategy, "oauth") {
 				displayname: data.displayname,
 				image_url: data.image_url,
 				campus_name: data.campus[0].name,
-				campus_country: data.campus[0].country
-				// email: data.email,
+				campus_country: data.campus[0].country,
+				email: data.email,
 				// is_42_user: true,
-				// img: data.image_url
 			});
 			console.log("Find:", find);
 			return (find);

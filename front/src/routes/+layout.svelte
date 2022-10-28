@@ -85,6 +85,8 @@
 			console.log("GetConnectionInfo", data);
 			$client.id = data.id;
 			user.set(data.user);
+			console.log("lol", $user);
+			
 		});
 
 		if (!browser || !$client.socket)

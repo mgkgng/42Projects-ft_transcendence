@@ -93,11 +93,13 @@ export class GameGateway {
 		// Should send it only once
 		client.emit("GetConnectionInfo", {
 			id: newClient.id,
-			username: user.username,
-			displayname: user.displayname,
-			image_url: user.image_url,
-			campus_name: user.campus_name,
-			campus_country: user.campus_country
+			user: {
+				username: user.username,
+				displayname: user.displayname,
+				image_url: user.image_url,
+				campus_name: user.campus_name,
+				campus_country: user.campus_country
+			}
 	
 		})
 		console.log("how many: ", this.server.sockets.sockets.keys());

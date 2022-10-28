@@ -2,7 +2,7 @@
 	header {
 		position: absolute;
 		width: 100%;
-		height: 75px;
+		height: 95px;
 
 		z-index: 9999;
 
@@ -17,6 +17,7 @@
 		img {
 			height: 100%;
 			object-fit: contain;
+
 		}
 	}
 
@@ -26,7 +27,9 @@
 		right: 0;
 		float: right;
 
-		width: 50px;
+		// width: 50px;
+		width: 75px;
+		height: 80%;
 		border-radius: 5em;
 
 		cursor: pointer;
@@ -34,7 +37,8 @@
 		img {
 			width: 100%;
 			height: 100%;
-			object-fit: contain;
+			object-fit: cover;
+			border-radius: 1em;
 		}
 	}
 
@@ -43,15 +47,19 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
     import UserProfile from "$lib/modals/UserProfile.svelte";
+    import { user } from "$lib/stores/user";
     import { loginState } from "$lib/stores/var";
     import Modal from "$lib/tools/Modal.svelte";
 
 	let profileModal: any;
 	let login: boolean;
+	let userInfo: any;
 
-	loginState.subscribe(value => {
-		login = value;
-	})
+	$: console.log("This is user:", $user);
+
+
+	loginState.subscribe(value => { login = value; })
+
 </script>
 
 <Modal bind:this={profileModal} closeOnBgClick={true}>
@@ -68,7 +76,11 @@
 	<div class="profile" on:click={() => {
 		profileModal.open();
 	}}>
+		{#if !$user}
 		<img src="/pingu/pingu-coucou.jpeg" alt="pingu-coucou">
+		{:else}
+		<img src={$user.image_url} alt="profile" />
+		{/if}
 	</div>
 </header>
 
