@@ -151,6 +151,7 @@ export class GameGateway {
 		}
 
 		client.emit("RoomInfo", {
+			roomHost: room.host,
 			players: (room.players.length === 2) ? [room.players[0].id, room.players[1].id]
 				: [room.players[0].id],
 			maxpoint: room.maxpoint,
@@ -215,7 +216,7 @@ export class GameGateway {
 		// 	return ;
 
 		let room = new Room([client], data.title, data.maxPoint, data.difficulty, data.privateMode,
-			this.gameRep, this.mainServerService, this.dataSource, data.client);
+			this.gameRep, this.mainServerService, this.dataSource, data.username);
 		this.rooms.set(room.id, room);
 		
 		// TODO should be able to set client's room state

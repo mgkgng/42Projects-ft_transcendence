@@ -76,6 +76,7 @@
 
 <script lang="ts">
 	import { client } from "$lib/stores/client";
+    import { user } from "$lib/stores/user";
 
 	export let itself: any;
 	export let enterGameModal: any;
@@ -126,7 +127,7 @@
 
 		<button class="submit" on:click={()=>{
 			$client.socket.emit("CreateRoom", {
-				client: $client.id,
+				username: $user.username,
 				title: roomTitle,
 				mapType: mapType,
 				maxPoint: maxPoint,
