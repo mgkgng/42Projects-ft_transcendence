@@ -5,7 +5,7 @@
 		gap: 0;
 		margin: 0;
 		width: 550px;
-		background-color: transparentize(#000, 0.2);
+		background-color: transparentize(#000, 0.9);
 		padding: 2em;
 		border-radius: 2em;
 	}
@@ -13,7 +13,8 @@
 	.photo-zone {
 		width: 100%;
 		min-height: 200px;
-
+		background-color: transparentize(#000, 0.2);
+		
 		img {
 			width: 100%;
 		}
@@ -28,7 +29,7 @@
 		padding: 1em;
 		
 		border: 2px solid transparentize(#fff, .6);
-		background-color: transparentize(#fff, .9);
+		background-color: transparentize(#000, 0.45);
 		color: #e6e6e6;
 
 		display: flex;
@@ -39,7 +40,7 @@
 			width: 5em;
 			aspect-ratio: 1 / 1;
 			border-radius: 1em;
-			border: 2px solid transparentize(#fff, .6);
+			border: 2px solid transparentize(#fff, .5);
 			cursor: pointer;
 			transition: .2s;
 
@@ -63,6 +64,7 @@
 		text-align: center;
 
 		border: 2px solid transparentize(#fff, .6);
+		background-color: transparentize(#000, 0.45);
 
 		padding: 2em;
 
@@ -78,6 +80,7 @@
 
 		border: 2px solid transparentize(#fff, .6);
 		padding: 1.2em;
+		background-color: transparentize(#000, 0.45);
 
 		color: #e6e6e6;
 		font-size: 36px;
