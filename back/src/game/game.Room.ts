@@ -20,6 +20,7 @@ export class Room {
 	title: string;
 	maxpoint: number;
 	difficulty: number;
+	host: any;
 
 	/* RoomState */
 	privateMode: boolean;
@@ -38,12 +39,14 @@ export class Room {
 				difficulty : number = 8, privateMode : boolean = true,
 				@InjectRepository(GameEntity) private gameRep: Repository<GameEntity>, 
 				private mainServerService : MainServerService,
-				private dataSource : DataSource) {
+				private dataSource : DataSource,
+				host: any = undefined) {
 		
 		this.id = uid();
 		this.title = title;
 		this.maxpoint = maxpoint;
 		this.difficulty = Difficulty[difficulty];
+		this.host = host;
 
 		this.privateMode = privateMode;
 

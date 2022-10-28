@@ -79,11 +79,11 @@ export class GameGateway {
 
 	@SubscribeMessage("Connection")
 	handleConnexion(@ConnectedSocket() client: Socket, @Request() req) {
-		console.log("Connection!!");
-		// console.log("data", req);
+		console.log("Connection!!", req.handshake.headers.authorization);
+		console.log("data", req.handshake.headers);
 		const user: any = (this.jwtService.decode(req.handshake.headers.authorization.split(' ')[1]));
 		// console.log(user);
-		let newClient = new Client(client, user.username);
+		let newClient = new Client(client, user.username, {});
 		this.clients.set(newClient.id, newClient);
 
 		// console.log(this.clients.keys());
@@ -93,9 +93,12 @@ export class GameGateway {
 		// Should send it only once
 		client.emit("GetConnectionInfo", {
 			id: newClient.id,
-			user: {
-				username: user.username
-			}
+			username: user.username,
+			displayname: user.displayname,
+			image_url: user.image_url,
+			campus_name: user.campus_name,
+			campus_country: user.campus_country
+	
 		})
 		console.log("how many: ", this.server.sockets.sockets.keys());
 		console.log("=================================");
@@ -209,7 +212,8 @@ export class GameGateway {
 		// if (client.room.length)
 		// 	return ;
 
-		let room = new Room([client], data.title, data.maxPoint, data.difficulty, data.privateMode, this.gameRep, this.mainServerService, this.dataSource);
+		let room = new Room([client], data.title, data.maxPoint, data.difficulty, data.privateMode,
+			this.gameRep, this.mainServerService, this.dataSource, data.client);
 		this.rooms.set(room.id, room);
 		
 		// TODO should be able to set client's room state

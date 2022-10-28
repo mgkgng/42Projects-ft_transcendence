@@ -6,7 +6,7 @@ import { UserEntity } from 'src/entity/User.entity';
 import { UserModule } from 'src/user/user.module';
 import { UserService } from 'src/user/user.service';
 import { AuthService } from './auth.service';
-import { LocalStrategy } from './LocalStategy';
+// import { LocalStrategy } from './LocalStategy';
 import { OAuthStrategy } from './OAuthStrategy';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './JwtStrategy';
@@ -26,7 +26,7 @@ import { UserBlockEntity } from 'src/entity/UserBlock.entity';
 	    	signOptions: { expiresIn: '1d' },      
 	    }), 
 	],
-	providers: [AuthService, LocalStrategy, OAuthStrategy, JwtStrategy],
+	providers: [AuthService, OAuthStrategy, JwtStrategy],
 	exports: [AuthService]
 })
 export class AuthModule {}

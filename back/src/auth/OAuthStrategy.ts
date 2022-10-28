@@ -34,7 +34,16 @@ export class OAuthStrategy extends PassportStrategy(Strategy, "oauth") {
 		};
 		if (await this.userService.findOne(res.data.login)) //Check if the user is in db
 		{
-			const find = ({username: data.login, email: data.email, is_42_user: true, img: data.image_url});
+			const find = ({
+				username: data.login,
+				displayname: data.displayname,
+				image_url: data.image_url,
+				campus_name: data.campus[0].name,
+				campus_country: data.campus[0].country
+				// email: data.email,
+				// is_42_user: true,
+				// img: data.image_url
+			});
 			console.log("Find:", find);
 			return (find);
 		}

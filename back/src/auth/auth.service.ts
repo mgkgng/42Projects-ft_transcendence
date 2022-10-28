@@ -29,7 +29,7 @@ export class AuthService {
 			const rep = await lastValueFrom(this.httpService.post("https://api.intra.42.fr/oauth/token", "grant_type=authorization_code&code=" + code + "&client_id=" + iud + "&client_secret=" + secret + "&redirect_uri=http://localhost:3002"));
 			//Get all data of the current user
 			const res = await lastValueFrom(this.httpService.get("https://api.intra.42.fr/v2/me", {headers: {Authorization: "Bearer " + rep.data.access_token}}));
-			console.log(res);
+			// console.log(res);
 			return (res);
 		} catch (error) {	return null;	}
 	//GET USER TOKEN 42
@@ -39,7 +39,13 @@ export class AuthService {
 	//curl  -H "Authorization: Bearer 190792150e933545ee37f7766f00b0b454f6e3c335430a3ab591674c28e1c168" "https://api.intra.42.fr/v2/me"
 	}
 	async login(user: any) {
-		const payload = { username: user.username, sub: "42"};
+		const payload = {
+			username: user.username,
+			displayname: user.displayname,
+			image_url: user.image_url,
+			campus_name: user.campus_name,
+			campus_country: user.campus_country
+		};
 		return {
 		  access_token: this.jwtService.sign(payload, {secret: process.env.SECRET}),
 		};
