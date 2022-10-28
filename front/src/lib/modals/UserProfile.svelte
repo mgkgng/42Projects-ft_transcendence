@@ -22,9 +22,9 @@
 	.tool-zone {
 		width: 100%;
 		height: 80px;
-		border-radius: .2em;
-		margin-top: .2em;
-		margin-bottom: 1em;
+		border-radius: .4em;
+		margin-top: .5em;
+		margin-bottom: .2em;
 		padding: 1em;
 		
 		border: 2px solid transparentize(#fff, .6);
@@ -56,23 +56,48 @@
 
 	.info-zone {
 		width: 100%;
-		max-height: 60px;
-		border-radius: 1em;
+		max-height: 400px;
+		border-radius: .4em;
+		margin-bottom: .2em;
+
+		text-align: center;
+
+		border: 2px solid transparentize(#fff, .6);
+
+		padding: 2em;
+
+		color: #e6e6e6;
 	}
 
 	.history-zone {
 		width: 100%;
 		min-height: 200px;
+		border-radius: .3em;
+
+		text-align: center;
+
+		border: 2px solid transparentize(#fff, .6);
+		padding: 1.2em;
+
+		color: #e6e6e6;
+		font-size: 36px;
 	}
 </style>
 
 <script lang="ts">
 	// export let userInfo;
+
+    import { user } from "$lib/stores/user";
+
 </script>
 
 <div class="container">
 	<div class="photo-zone">
+		{#if !$user}
 		<img src="/pingu/pingu-angry.jpeg" alt="pingu-angry">
+		{:else}
+		<img src={$user.image_url} alt="grosse-tete">
+		{/if}
 	</div>
 	<div class="tool-zone">
 		<button>
@@ -86,9 +111,10 @@
 		</button>
 	</div>
 	<div class="info-zone">
-		info here
+		<p>Username: {$user.username}</p>
+		<p>Campus : {$user.campus_name}, {$user.campus_country}</p>
 	</div>
 	<div class="history-zone">
-		history here
+		No Game History Yet
 	</div>
 </div>
