@@ -46,23 +46,23 @@ export class GameGateway {
 		this.control = new Map<string, any>();
 
 		// Testing rooms
-		this.addRoomsForTest();
+		// this.addRoomsForTest();
 	}
 
 	@WebSocketServer()
 	server: Server;
 
-	addRoomsForTest() {
-		let room1 = new Room(['testPlayer1'], 'TestRoom1', 25, 5, false,
-			this.gameRep, this.mainServerService, this.dataSource);
+	// addRoomsForTest() {
+	// 	let room1 = new Room(['testPlayer1'], 'TestRoom1', 25, 5, false,
+	// 		this.gameRep, this.mainServerService, this.dataSource);
 
-		let room2 = new Room(['testPlayer2'], "Welcome to this map", 18, 3, false,
-			this.gameRep, this.mainServerService, this.dataSource);
+	// 	let room2 = new Room(['testPlayer2'], "Welcome to this map", 18, 3, false,
+	// 		this.gameRep, this.mainServerService, this.dataSource);
 	
-		this.rooms.set(room1.id, room1);
-		this.rooms.set(room2.id, room2);
-		console.log(this.rooms);
-	}
+	// 	this.rooms.set(room1.id, room1);
+	// 	this.rooms.set(room2.id, room2);
+	// 	console.log(this.rooms);
+	// }
 
 
 	@UseGuards(AuthGuard("jwt"))
@@ -89,7 +89,7 @@ export class GameGateway {
 		// console.log(this.clients.keys());
 
 		// console.log("or with socketio", this.server.sockets.sockets);
-		console.log(client.id);
+		console.log(user);
 		// Should send it only once
 		client.emit("GetConnectionInfo", {
 			id: newClient.id,

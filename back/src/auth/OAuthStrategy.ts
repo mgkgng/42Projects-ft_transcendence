@@ -59,7 +59,13 @@ export class OAuthStrategy extends PassportStrategy(Strategy, "oauth") {
 			new_user.img_url = data.image_url;
 			try {
 				const create = await this.userRepository.save([new_user]);
-				return ({username: data.login, email: data.email, is_42_user: true, img: data.image_url});
+				return ({username: data.login,
+					displayname: data.displayname,
+					image_url: data.image_url,
+					campus_name: data.campus[0].name,
+					campus_country: data.campus[0].country,
+					email: data.email
+				});
 			}
 			catch
 			{

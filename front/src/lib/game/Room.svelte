@@ -1,15 +1,22 @@
 <style lang="scss">
 	.container {
+		position: relative;
 		display: flex;
+		flex-direction: column;
 		justify-content: center;
 		align-items: center;
+
+		min-width: 850px;
+		min-height: 850px;
+
+		border: dashed 2px #fff;
 	}
 
 	.pong {
 		position: relative;
 
 		padding: 0;
-		border: dashed 3px white;
+		border: solid 3px white;
 		border-radius: 2.5em;
 
 		background-color: transparentize(#000, .2);
@@ -109,18 +116,27 @@
 		color: #fff;
 	}
 
-	button {
-		width: 50px;
-		height: 20px;
-		background-color: blue;
-		cursor: pointer;
+	.button-container {
+		padding: .2em;
+		button {
+			width: 8em;
+			height: 3em;
+			color: #fff;
+			border: solid 2.5px #fff;
+			border-radius: .5em;
+			background-color: transparentize(#fff, 0.8);
+			cursor: pointer;
+		}
 	}
 
 	.mini-mode {
-		width: 45px;
+		position: absolute;
+		right: 0;
+		top: 0;
+		width: 25px;
 		aspect-ratio: 1 / 1;
 		border-radius: 20%;
-		background-color: transparentize(#fff, 0.7);
+		background-color: transparentize(#fff, 0.2);
 		transition: .4s;
 		font-size: 25px;
 
@@ -141,6 +157,7 @@
     import Modal from '$lib/tools/Modal.svelte';
     import GameOver from '$lib/modals/GameOver.svelte';
     import ConfirmMsg from '$lib/modals/ConfirmMsg.svelte';
+    import { user } from '$lib/stores/user';
 
 	export let roomId: string;
 	export let itself: any;
@@ -292,27 +309,28 @@
 		{/if} -->
 		<!-- <div class="central-line-vertical"></div>
 		<div class="central-line-horizontal"></div>	 -->
-	</div>
-	<div class="pong-score">
+		<div class="pong-score">
 		<!-- solution for now, later it will be an empty score box with question mark -->
-		{#if roomInfo.players.length > 1}
-		<ScoreBox score={scores[opponentIndex]}/>
-		<ScoreBox score={scores[userIndex]}/>
-		{/if}
+			{#if roomInfo.players.length > 1}
+			<ScoreBox score={scores[opponentIndex]}/>
+			<ScoreBox score={scores[userIndex]}/>
+			{/if}
+		</div>
 	</div>
 	{/if}
 	<div class="button-container">
 		<!-- there should be a difference between host-guest mode and random matching mode -->
-		{#if userType == UserType.Player1}
+		{#if $user.username == roomInfo.roomHost}
 		<button>START</button>
 		{:else if userType == UserType.Player2}
 		<button>READY</button>
 		{/if}
+		<button on:click={()=>{ quitConfirmMsgModal.open(); }}>EXIT</button>
 
-		<button on:click={()=>{ quitConfirmMsgModal.open(); }}>QUIT</button>
-
-		<button>MINIMODE-TEST</button>
 	</div>
+	<button class="mini-mode" on:click={()=>{
+		miniMode = true;
+	}}>_</button>
 </div>
 {:else}
 <div class="loading-box">
@@ -320,9 +338,7 @@
 </div>
 {/if}
 {:else}
-<div class="container mini-mode" on:click={()=>{
-	miniMode = true;
-}}>+</div>
+what is this?
 {/if}
 
 <Modal bind:this={gameFinishedModal} closeOnBgClick={false}>
