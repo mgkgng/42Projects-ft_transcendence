@@ -41,17 +41,33 @@
 			border-radius: 1em;
 		}
 	}
+	.chat{
+		position: absolute;
+		top: 75px;
+		right: 0;
+		float: right;
+		background-color: aliceblue;
+
+		// width: 50px;
+		width: 75px;
+		height: 80%;
+		border-radius: 1em;
+
+		cursor: pointer;
+	}
 
 </style>
 
 <script lang="ts">
     import { goto } from "$app/navigation";
     import UserProfile from "$lib/modals/UserProfile.svelte";
+    import ChatModal from "$lib/modals/ChatRoom.svelte";
     import { user } from "$lib/stores/user";
     import { loginState } from "$lib/stores/var";
     import Modal from "$lib/tools/Modal.svelte";
 
 	let profileModal: any;
+	let chatModal: any;
 	let login: boolean;
 	let userInfo: any;
 
@@ -64,6 +80,9 @@
 
 <Modal bind:this={profileModal} closeOnBgClick={true}>
 	<UserProfile />
+</Modal>
+<Modal bind:this={chatModal} closeOnBgClick={true}>
+	<ChatModal />
 </Modal>
 
 <header>
@@ -81,6 +100,11 @@
 		{:else}
 		<img src={$user.image_url} alt="profile" />
 		{/if}
+	</div>
+	<div class="chat" on:click={() => {
+		chatModal.open();
+	}}>
+		<h3>chat</h3>
 	</div>
 </header>
 

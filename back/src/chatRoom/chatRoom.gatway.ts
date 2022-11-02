@@ -64,6 +64,7 @@ export class ChatRoomService {
 	@SubscribeMessage('new_room')
 	async creat_room(@MessageBody() data: any, @Request() req)
 	{
+		console.log("new room");
 		const id_user = await this.mainServer.getIdUser(req);
 		const is_password_protected : boolean = data.is_password_protected;	
 		const password : string = is_password_protected ? data.room_password : "";
@@ -137,7 +138,7 @@ export class ChatRoomService {
 				.innerJoin("messageChatRoomEntity.id_chat_room", "chatRoom")
 				.innerJoin("messageChatRoomEntity.id_user", "user")
 				.select(["messageChatRoomEntity.content_message", "messageChatRoomEntity.date_message", "user.username", "chatRoom.name"])
-				.where("chatRoom.id_g = :id", {id: id_room}).orderBy("messageChatRoomEntity.date_message", "DESC").getMany();
+				.where("chatRoom.id_g = :id", {id: id_room}).orderBy("messageChatRoomEntity.date_message", "ASC").getMany();
 				console.log(res);
 				client.emit('get_message_room', res);
 			} catch (e) {
@@ -150,7 +151,6 @@ export class ChatRoomService {
 			throw new WsException("Bad data");
 		}
 	}
-	//OK
 	//Get a page of messages in room (Error if current socket user is not in the room)
 	//{room_name: string, page_number: number, size_page: number }
 	@SubscribeMessage('get_message_room_page')
@@ -197,6 +197,8 @@ export class ChatRoomService {
 		const id_room = await this.mainServer.getIdRoom(data);
 		const message : any = data.content_message;
 		const date_creation : Date = new Date();
+		const user : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
+		const client_username = user.username;
 		const  querry = this.dataSource.createQueryRunner(); 
 		await querry.connect();
 		await querry.startTransaction();
@@ -215,7 +217,7 @@ export class ChatRoomService {
 			 );
 			// console.log(res_insert_message);
 			await querry.commitTransaction();
-			this.server.to(data.room_name).emit('new_message_room', data);
+			this.server.to(data.room_name).emit('new_message_room', {room_name : data.room_name, content_message: data.content_message, username: client_username});
 		} catch (e) {
 			await querry.rollbackTransaction();
 			console.log("Can't create message");

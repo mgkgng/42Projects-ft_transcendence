@@ -20,6 +20,7 @@
 	import '$lib/scss/app.scss';
 	import { darkMode, loginState } from "$lib/stores/var";
 	import { client } from '$lib/stores/client';
+	import { chatRoom } from '$lib/stores/chatRoom';
     import { onMount } from 'svelte';
 	import jwt_decode from "jwt-decode";
     import { browser } from '$app/environment';
@@ -98,6 +99,7 @@
 			roomModal.open();
 		});
 
+		$chatRoom.LoadMessages($client);
 		// let res = await $client.send42Tok(new URLSearchParams(window.location.search));
 		// if (res) {
 		// 	const val : any = await jwt_decode(localStorage.getItem("transcendence-jwt"));
