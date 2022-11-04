@@ -84,6 +84,7 @@ export class ChatRoomService {
 			const client : Socket = req;
 			client.join(name);
 			console.log("Create room finish");
+			client.emit("new_room", {	room_name: name	});
 		} catch (e) {
 			await querry.rollbackTransaction();
 			console.log("Create room error");

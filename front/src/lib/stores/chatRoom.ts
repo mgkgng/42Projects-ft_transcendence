@@ -15,7 +15,9 @@ class Message
 	}
 }
 
-class ChatRooms{
+let client : any;
+
+export class ChatRooms{
 	rooms: Array<string> = [];
 	messages : Array<Array<Message>> = [];
 	actualRoom : Array<Message> = [];
@@ -44,20 +46,36 @@ class ChatRooms{
 				this.messages.push(inter);
 				console.log(data);
 			});
-			client.socket.on("new_message_room", (data : any) =>
-			{
-				this.messages[this.rooms.indexOf(data.room_name)].push(new Message(data.room_name, data.username, data.content_message));
-				console.log("new_message: ", data);
-			});
+			socket_event_update_front(client);			
 		}
 	}
 	selectRoom(room : any)
 	{
 		this.actualRoom = this.messages[this.rooms.indexOf(room.room)];
-		console.log("actualRoom: ", this.actualRoom)
-		console.log("nameRoom: ", room)
+		this.actualRoomName = room.room;
 		return room.room;
 	}
 }
-
+//Ici les evenements qui changent les attributs de chatRoom qui sont suscribe dans le front
+// (obligation d'utiliser update() )
+function socket_event_update_front(client : any) {
+	client.socket.on("new_message_room", (data : any) =>
+	{
+		chatRoom.update( chat => {
+			chat.messages[chat.rooms.indexOf(data.room_name)].push(new Message(data.room_name, data.username, data.content_message));
+			return (chat);
+		});
+		chatRoom.update( chat => {
+			chat.actualRoom = chat.messages[chat.rooms.indexOf(chat.actualRoomName)];
+			return (chat);
+		});
+	});
+	client.socket.on("new_room", (data : any) =>
+	{
+		chatRoom.update( chat => {
+			chat.rooms.push(data.room_name);
+			return (chat);
+		});
+	});
+}
 export const chatRoom = writable(new ChatRooms());
