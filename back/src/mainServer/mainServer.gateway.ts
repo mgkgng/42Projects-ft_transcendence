@@ -25,6 +25,7 @@ import { GameEntity } from 'src/entity/Game.entity';
 	  origin: '*',
 	},
 })
+//@WebSocketGateway(3001)
 export class MainServerService {
 	constructor(
 		private dataSource : DataSource,
@@ -34,15 +35,15 @@ export class MainServerService {
 	@WebSocketServer() server;
 	userConnectedList = []; // userConnectedList[] = {username : "username", socket : socket, status : "online" | "in game" | "offline"}
 
-	@UseGuards(AuthGuard("jwt"))
+	//@UseGuards(AuthGuard("jwt"))
 	handleConnection(@Request() req)
 	{
-		// console.log("Connect to main");
+		console.log("Connect to main");
 		const user : any = (this.jwtServer.decode(req.handshake?.headers?.authorization.split(' ')[1]));
 		const client_username : string = user?.username;
 		let userConnected = {username: client_username, socket: req, status: "online"};
 		this.userConnectedList.push(userConnected);
-		// console.log(this.userConnectedList);
+		//console.log(this.userConnectedList);
 	}
 
 	handleDisconnect(@Request() req)

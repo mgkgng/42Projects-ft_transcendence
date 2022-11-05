@@ -15,7 +15,7 @@ import { Repository } from 'typeorm';
 @Module({
 	imports :	[TypeOrmModule.forFeature([UserEntity, UserChatRoomEntity, ChatRoomEntity, GameEntity, MessageChatRoomEntity, MessageDirectEntity, UserBlockEntity]),
 	],				
-    providers: [MainServerService, JwtService],
+    providers: [MainServerService, JwtService,],
 	exports : [MainServerService]
 })
 export class MainServerModule {}

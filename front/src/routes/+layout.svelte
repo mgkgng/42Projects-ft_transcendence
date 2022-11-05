@@ -48,7 +48,7 @@
 		{
 			const tok = localStorage.getItem('transcendence-jwt');
 			{
-				$client.socket = io("http://localhost:3000",{
+				$client.socket = io("http://localhost:3001",{
 					extraHeaders: {
 						Authorization: "Bearer " + tok,
 					}
@@ -70,7 +70,7 @@
 				body:JSON.stringify({username: "oui", password: url.get('code')}),
 			});
 			const tok = await res.json();
-			$client.socket = io("http://localhost:3000",{
+			$client.socket = io("http://localhost:3001",{
 				extraHeaders: {
 					Authorization: "Bearer " + tok.access_token,
 				}

@@ -32,7 +32,7 @@ class Client {
 			const tok = localStorage.getItem('transcendence-jwt');
 			try
 			{
-				this.socket = io("http://localhost:3000",{
+				this.socket = io("http://localhost:3001",{
 					extraHeaders: {
 						Authorization: "Bearer " + tok,
 					}
@@ -55,7 +55,7 @@ class Client {
 				});
 				const tok = await res.json();
 				console.log("TOK:", tok);
-				this.socket = io("http://localhost:3000",{
+				this.socket = io("http://localhost:3001",{
 					extraHeaders: {
 						Authorization: "Bearer " + tok.access_token,
 					}

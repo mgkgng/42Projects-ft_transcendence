@@ -16,6 +16,6 @@ import { ChatRoomService } from './chatRoom.gatway';
 @Module({
 	imports :	[TypeOrmModule.forFeature([UserEntity, UserChatRoomEntity, ChatRoomEntity, GameEntity, MessageChatRoomEntity, MessageDirectEntity, UserBlockEntity]),
 	],				
-    providers: [ChatRoomService, MainServerService, JwtService],
+    providers: [ChatRoomService, MainServerService, JwtService,]
 })
 export class ChatRoomModule{}

@@ -67,7 +67,7 @@ export class GameGateway {
 
 	@UseGuards(AuthGuard("jwt"))
 	async handleConnection(client: Socket) { //TODO handle connection here
-		// console.log("New Connection on site.");
+		console.log("New Connection on site.");
 		// i don't know yet how to use well this function
 	}
 

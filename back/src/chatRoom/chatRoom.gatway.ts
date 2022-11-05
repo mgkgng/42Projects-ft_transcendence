@@ -9,6 +9,7 @@ import { DataSource } from "typeorm";
 import { MainServerService } from "../mainServer/mainServer.gateway";
 import { UseGuards, Request, HttpException } from '@nestjs/common';
 import { AuthGuard } from "@nestjs/passport";
+import console from "console";
 	
 @WebSocketGateway({
 	cors: {
@@ -24,11 +25,11 @@ export class ChatRoomService {
 	}
 	@WebSocketServer() server;
 
-	@UseGuards(AuthGuard('jwt'))
+	//@UseGuards(AuthGuard('jwt'))
 	async handleConnection(@Request() req)
 	{
 		const client : Socket = req;
-		console.log('Connect');
+		//console.log('Connect');
 		try {
 			const names = await this.mainServer.getNamesRoomsForUser(req);
 			for (let n of names) //ADD USER TO HIS ROOMS
@@ -237,7 +238,7 @@ export class ChatRoomService {
 	async getMyRoom(@MessageBody() data, @ConnectedSocket() client: Socket)
 	{
 		const res : any = await this.mainServer.getNamesRoomsForUser(client);
-		console.log(res);
+		//console.log(res);
 		let name : string[] = [];
 		for (let n of res)
 		{
