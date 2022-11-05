@@ -71,7 +71,9 @@ export class Room {
 
 	addClients(clients: any) {
 		for (let client of clients)
+		{
 			this.addClient(client);
+		}
 	}
 
 	addMessage(username: string, message: string) {

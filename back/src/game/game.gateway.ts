@@ -110,8 +110,9 @@ export class GameGateway {
 
 	@SubscribeMessage("JoinQueue")
 	joinQueue(@MessageBody() data: any) {
-		console.log("Join Queue", data.data);
-		let client = this.getClient(data.data);
+		console.log(data);
+		console.log("Join Queue", data);
+		let client = this.getClient(data);
 		//TODO: should maybe optimize the algorithm later -- for includes
 		if (client && (client.room.length || this.queue.includes(client)))
 			return ;

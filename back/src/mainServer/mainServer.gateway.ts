@@ -104,6 +104,7 @@ export class MainServerService {
 		const names_rooms : any = await this.dataSource.getRepository(UserChatRoomEntity)
 		.createQueryBuilder("userRooms").innerJoinAndSelect("userRooms.room", "chatRoom")
 		.where("userRooms.id_user = :u", { u: id_user })
+		.andWhere("userRooms.is_visible = TRUE")
 		.andWhere("(userRooms.ban_end < :d OR userRooms.ban_end is null)", { d: new Date() })
 		.select(["userRooms.id", "chatRoom.name"]).getMany();
 		return (names_rooms);

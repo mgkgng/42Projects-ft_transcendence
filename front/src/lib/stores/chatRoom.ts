@@ -31,20 +31,13 @@ export class ChatRooms{
 		{
 			console.log("Try load messages");
 			client.socket.emit("get_my_rooms", {});
-			client.socket.on("get_my_rooms", (data : any) => {
-				for (let rooms of data ){
-					this.rooms.push(rooms);
-					client.socket.emit("get_message_room", {room_name: rooms});
-				}
-				console.log(data);
-				console.log(this.rooms);
+			
+			
+			client.socket.on("set_room_not_visible", (data) => {
+				client.socket.emit("get_my_rooms", {});
 			});
-			client.socket.on("get_message_room", (data: any) => {
-				let inter : Array<Message> = [];
-				for (let message of data)
-					inter.push(new Message(message.id_chat_room.name, message.id_user.username, message.content_message));
-				this.messages.push(inter);
-				console.log(data);
+			client.socket.on("set_room_visible", (data) => {
+				client.socket.emit("get_my_rooms", {});
 			});
 			socket_event_update_front(client);			
 		}
@@ -59,6 +52,30 @@ export class ChatRooms{
 //Ici les evenements qui changent les attributs de chatRoom qui sont suscribe dans le front
 // (obligation d'utiliser update() )
 function socket_event_update_front(client : any) {
+	client.socket.on("get_my_rooms", (data : any) => { //HAVE TO OPTIMIZE : NOT REALOAD ALL MESSAGE WHEN A ROOM IS ADDED OR DELETED
+		chatRoom.update((chatRoom) => {
+			chatRoom.rooms = [];
+			chatRoom.messages = [];
+			chatRoom.actualRoom = [];
+			for (let rooms of data ){
+				chatRoom.rooms.push(rooms);
+				client.socket.emit("get_message_room", {room_name: rooms});
+			}
+			console.log(data);
+			console.log("rooms: ", chatRoom.rooms);
+			return (chatRoom);
+		});
+	});
+	client.socket.on("get_message_room", (data: any) => {
+		chatRoom.update((chatRoom) => {
+			let inter : Array<Message> = [];
+			for (let message of data)
+				inter.push(new Message(message.id_chat_room.name, message.id_user.username, message.content_message));
+			chatRoom.messages.push(inter);
+			console.log("Messages: ", chatRoom);
+			return (chatRoom);
+		});
+	});
 	client.socket.on("new_message_room", (data : any) =>
 	{
 		chatRoom.update( chat => {

@@ -12,7 +12,6 @@
 	
 	.room-zone {
 		width: 25%;
-		//min-height: 500px;
 		background-color: transparentize(#000, 0.2);
 		border: 2px solid transparentize(#fff, .6);
 		border-radius: 0.5em;
@@ -67,8 +66,12 @@
 		width: 100%;
 		color:rgb(255, 255, 255);
 		text-align: center;
-		background-color: rgba(255, 255, 255, 0.5);
+		background-color: rgba(97, 97, 97, 0.5);
 		cursor: pointer;
+	}
+	.choose{
+		background-color: rgba(207, 196, 196, 0.5);
+		text-decoration: underline;
 	}
 	.text-input {
 		background-color: #fff;
@@ -98,6 +101,7 @@
 	chatRoom.subscribe(chat  => { console.log('chat', chat); actualMessages = chat.actualRoom;});
 	chatRoom.subscribe(chat => { actualName = chat.actualRoomName;});
 	chatRoom.subscribe(chat => { rooms = chat.rooms;});
+	chatRoom.subscribe(chat => { actualName = chat.actualRoomName;});
 	onMount (() => {
 	});
 	function  chooseRoom(room : any){
@@ -112,6 +116,19 @@
 		console.log("newMessage");	
 		$client.socket.emit("new_message_room", {room_name: actualName, content_message: newMessage});
 	}
+	function setNotVisible(room : any) {
+		$client.socket.emit("set_room_not_visible", {room_name: room.room });
+	}
+	function createRoom()
+	{
+		console.log("newRoomName: ", newRoomName);
+		console.log("newRoomName: ", newRoomName);
+		if (newRoomPassword != null)
+			is_password_protected = true;
+		if (newRoomPassword == null)
+			newRoomPassword = ""
+		$client.socket.emit("new_room", {room_name: newRoomName, is_password_protected: is_password_protected, room_password: newRoomPassword});
+	}
 </script>
 
 <div class="container">
@@ -119,7 +136,12 @@
 		<ul>
 		{#each (rooms) as room}
 			<li>
-				<button class="btn-room" on:click={chooseRoom({room})}>{room}</button>
+				{#if (room != actualName)}
+					<button class="btn-room" on:click={chooseRoom({room})}>{room}</button>
+				{:else}
+					<button class="btn-room choose" on:click={chooseRoom({room})}>{room}</button>
+				{/if}
+				<button class="btn-room" on:click={setNotVisible({room})}>X</button>
 			<li>
 		{/each}
 		</ul>
@@ -134,14 +156,6 @@
 	<div class="new-chat-room-zone">
 		<input class="text-input" bind:value={newRoomName}>
 		<input class="text-input" bind:value={newRoomPassword}>
-		<input class="btn-new-room" value="+" on:click={() => {
-			console.log("newRoomName: ", newRoomName);
-			console.log("newRoomName: ", newRoomName);
-			if (newRoomPassword != null)
-				is_password_protected = true;
-			if (newRoomPassword == null)
-				newRoomPassword = ""
-			$client.socket.emit("new_room", {room_name: newRoomName, is_password_protected: is_password_protected, room_password: newRoomPassword});
-		}}>
+		<input type="button" value="+" class="btn-new-room" on:click={createRoom}/>
 	</div>
 </div>

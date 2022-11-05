@@ -55,6 +55,20 @@
 
 		cursor: pointer;
 	}
+	.all-chat{
+		position: absolute;
+		top: 150px;
+		right: 0;
+		float: right;
+		background-color: aliceblue;
+
+		// width: 50px;
+		width: 75px;
+		height: 80%;
+		border-radius: 1em;
+
+		cursor: pointer;
+	}
 
 </style>
 
@@ -62,12 +76,14 @@
     import { goto } from "$app/navigation";
     import UserProfile from "$lib/modals/UserProfile.svelte";
     import ChatModal from "$lib/modals/ChatRoom.svelte";
+    import AllChatModal from "$lib/modals/allChatRooms.svelte";
     import { user } from "$lib/stores/user";
     import { loginState } from "$lib/stores/var";
     import Modal from "$lib/tools/Modal.svelte";
 
 	let profileModal: any;
 	let chatModal: any;
+	let allChatModal: any;
 	let login: boolean;
 	let userInfo: any;
 
@@ -83,6 +99,9 @@
 </Modal>
 <Modal bind:this={chatModal} closeOnBgClick={true}>
 	<ChatModal />
+</Modal>
+<Modal bind:this={allChatModal} closeOnBgClick={true}>
+	<AllChatModal />
 </Modal>
 
 <header>
@@ -105,6 +124,11 @@
 		chatModal.open();
 	}}>
 		<h3>chat</h3>
+	</div>
+	<div class="all-chat" on:click={() => {
+		allChatModal.open();
+	}}>
+		<h3>Allchat</h3>
 	</div>
 </header>
 

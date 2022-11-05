@@ -107,11 +107,16 @@ export class ChatRoomService {
 			const is_already_in = await this.dataSource.getRepository(UserChatRoomEntity).createQueryBuilder("userRoom").
 			where("userRoom.room = :id and userRoom.id_user : id_u", {id: id_room, id_u : id_user}).getOne();
 			if (is_already_in != undefined)
-				throw new WsException("Already in room");
-			 const res_user_chat_room = await this.dataSource.createQueryBuilder().insert().into(UserChatRoomEntity).values
-			 ([ 
+			{
+				const res = await this.dataSource.createQueryBuilder().update(UserChatRoomEntity)
+				.where("id_user = :u AND room = :r", {u: id_user, r: id_room})
+				.set({is_visible: true}).execute();
+				return;
+			}
+			const res_user_chat_room = await this.dataSource.createQueryBuilder().insert().into(UserChatRoomEntity).values
+			([ 
 				{id_user: id_user, room: id_room, is_admin: false, is_banned: false, is_muted: false}
-			 ]).execute();
+			]).execute();
 		}
 		catch(e){
 			console.log("getMessage Error: bad data");
@@ -140,7 +145,7 @@ export class ChatRoomService {
 				.innerJoin("messageChatRoomEntity.id_user", "user")
 				.select(["messageChatRoomEntity.content_message", "messageChatRoomEntity.date_message", "user.username", "chatRoom.name"])
 				.where("chatRoom.id_g = :id", {id: id_room}).orderBy("messageChatRoomEntity.date_message", "ASC").getMany();
-				console.log(res);
+				//console.log(res);
 				client.emit('get_message_room', res);
 			} catch (e) {
 				console.log("getMessage Error");
@@ -332,5 +337,29 @@ export class ChatRoomService {
 				console.log(res);
 				client.emit("set_admin", data);
 			}
+	}
+	//Put a room in state "note visible" for a user
+	//{room_name:string}
+	@SubscribeMessage("set_room_not_visible")
+	async setRoomNotVisible(@MessageBody() data, @ConnectedSocket() client: Socket, @Request() req) {
+		const client_username : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
+		const user : any = await this.dataSource.getRepository(UserEntity).find({where: {username: client_username.username}});
+		const room : any = await this.dataSource.getRepository(ChatRoomEntity).find({where: {name: data.room_name}});
+		const res = await this.dataSource.createQueryBuilder().update(UserChatRoomEntity)
+				.where("id_user = :u AND room = :r", {u: user[0].id_g, r: room[0].id_g})
+				.set({is_visible: false}).execute();
+		client.emit("set_room_not_visible", {});
+	}
+	//Put a room in state "visible" for a user
+	//{room_name:string}
+	@SubscribeMessage("set_room_visible")
+	async setRoomVisible(@MessageBody() data, @ConnectedSocket() client: Socket, @Request() req) {
+		const client_username : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
+		const user : any = await this.dataSource.getRepository(UserEntity).find({where: {username: client_username.username}});
+		const room : any = await this.dataSource.getRepository(ChatRoomEntity).find({where: {name: data.room_name}});
+		const res = await this.dataSource.createQueryBuilder().update(UserChatRoomEntity)
+				.where("id_user = :u AND room = :r", {u: user[0].id_g, r: room[0].id_g})
+				.set({is_visible: true}).execute();
+		client.emit("set_room_visible", {});
 	}
 }

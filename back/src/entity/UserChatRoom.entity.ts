@@ -28,4 +28,7 @@ export class UserChatRoomEntity {
 
 	@Column({nullable: true})
 	mute_end?: Date;
+
+	@Column({default: true})
+	is_visible: boolean;
 }
