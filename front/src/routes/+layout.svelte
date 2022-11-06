@@ -88,8 +88,7 @@
 		}
 
 		let url = new URLSearchParams(window.location.search);
-
-		if (!$client.socket.connected && url.has('code'))
+		if ((!$client.socket || !$client.socket.connected) && url.has('code'))
 			await connectWithUrlCode(url);
 
 

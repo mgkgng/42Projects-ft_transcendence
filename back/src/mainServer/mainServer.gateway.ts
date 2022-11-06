@@ -80,6 +80,7 @@ export class MainServerService {
 	{
 		 const user : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
 		 const client_username = user.username;
+		 console.log(client_username);
 		 const id_user : any = await this.dataSource.getRepository(UserEntity)
 		 .createQueryBuilder().where("UserEntity.username = :u", { u: client_username }).getOneOrFail();
 		 return (id_user.id_g);

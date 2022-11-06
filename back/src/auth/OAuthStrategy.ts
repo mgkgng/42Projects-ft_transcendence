@@ -50,6 +50,7 @@ export class OAuthStrategy extends PassportStrategy(Strategy, "oauth") {
 		{
 			let new_user = new UserEntity();
 			new_user.username = user.login;
+			new_user.username_42 = user.login;
 			new_user.email = data.email;
 			new_user.password = "42";
 			new_user.display_name = data.displayname;

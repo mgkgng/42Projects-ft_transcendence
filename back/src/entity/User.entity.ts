@@ -39,6 +39,9 @@ export class UserEntity
 	@Column({ unique: true })
 	username: string;
 
+	@Column({ unique: true })
+	username_42: string;
+
 	@Column()	
 	password: string;
 
