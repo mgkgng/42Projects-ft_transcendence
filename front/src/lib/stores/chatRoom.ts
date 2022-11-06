@@ -18,11 +18,11 @@ class Message
 let client : any;
 
 export class ChatRooms{
-	all_rooms: Map<string, boolean> = new Map();
-	rooms: Array<string> = [];
-	messages : Array<Array<Message>> = [];
-	actualRoom : Array<Message> = [];
-	actualRoomName : string = "";
+	all_rooms: Map<string, boolean> = new Map(); //toutes les rooms (utilisées pour s'ajouter a une room)
+	rooms: Array<string> = [];					//room visibles pour l'utilisateur
+	messages : Map<string, Array<Message>> = new Map();		//les messages de chaques room
+	actualRoom : Array<Message> = [];			//messages de la room de actualRoomName
+	actualRoomName : string = "";				//room selectionnee 
 
 	constructor() {
 	}
@@ -45,13 +45,13 @@ export class ChatRooms{
 	}
 	selectRoom(room : any)
 	{
-		this.actualRoom = this.messages[this.rooms.indexOf(room.room)];
+		this.actualRoom = this.messages.get(room.room);
 		this.actualRoomName = room.room;
 		return room.room;
 	}
 	deleteRoom(room : any)
 	{
-		this.messages.splice(this.rooms.indexOf(room), 1);
+		this.messages.delete(room);
 	}
 }
 //Ici les evenements qui changent les attributs de chatRoom qui sont suscribe dans le front
@@ -67,13 +67,16 @@ function socket_event_update_front(client : any) {
 	client.socket.on("get_my_rooms", (data : any) => { //HAVE TO OPTIMIZE : NOT REALOAD ALL MESSAGE WHEN A ROOM IS ADDED OR DELETED
 		chatRoom.update((chatRoom) => {
 			chatRoom.rooms = [];
-			chatRoom.messages = [];
+			chatRoom.messages = new Map();
 			chatRoom.actualRoom = [];
+			return(chatRoom);
+		});
+		chatRoom.update((chatRoom) => {
 			for (let rooms of data ){
 				chatRoom.rooms.push(rooms);
 				client.socket.emit("get_message_room", {room_name: rooms});
 			}
-			//console.log(data);
+			console.log(data);
 			//console.log("rooms: ", chatRoom.rooms);
 			return (chatRoom);
 		});
@@ -81,22 +84,19 @@ function socket_event_update_front(client : any) {
 	client.socket.on("get_message_room", (data: any) => {
 		chatRoom.update((chatRoom) => {
 			let inter : Array<Message> = [];
-			for (let message of data)
+			for (let message of data.messages)
 				inter.push(new Message(message.id_chat_room.name, message.id_user.username, message.content_message));
-			chatRoom.messages.push(inter);
-			//console.log("Messages: ", chatRoom);
+			console.log("Messages1: ", chatRoom);
+			chatRoom.messages.set(data.room_name, inter);
+			console.log("Message2: ", chatRoom);
 			return (chatRoom);
 		});
 	});
 	client.socket.on("new_message_room", (data : any) =>
 	{
-		//console.log("newMessage(in): ", data);
+		console.log("newMessage(in): ", data);
 		chatRoom.update( chat => {
-			chat.messages[chat.rooms.indexOf(data.room_name)].push(new Message(data.room_name, data.username, data.content_message));
-			return (chat);
-		});
-		chatRoom.update( chat => {
-			chat.actualRoom = chat.messages[chat.rooms.indexOf(data.room_name)];
+			chat.messages.get(data.room_name).push(new Message(data.room_name, data.username, data.content_message));
 			return (chat);
 		});
 	});
@@ -104,7 +104,7 @@ function socket_event_update_front(client : any) {
 	{
 		chatRoom.update( chat => {
 			chat.rooms.push(data.room_name);
-			chat.message.push([]);
+			chat.message.set(data.room_name , []);
 			return (chat);
 		});
 	});

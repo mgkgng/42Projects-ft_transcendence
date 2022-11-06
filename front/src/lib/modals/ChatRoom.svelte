@@ -106,8 +106,10 @@
 	});
 	function  chooseRoom(room : any){
 		chatRoom.update(chat => { 
-			chat.actualRoom = chat.messages[chat.rooms.indexOf(room.room)];
+			chat.actualRoom = chat.messages.get(room.room);
 			chat.actualRoomName = room.room;
+			console.log(chat.rooms);
+			console.log(chat.messages);
 			return (chat);
 		});
 	}
@@ -131,7 +133,7 @@
 <div class="container">
 	<div class="room-zone">
 		<ul>
-		{#each (rooms) as room}
+		{#each ([...$chatRoom.messages.keys()]) as room}
 			<li>
 				{#if (room != actualName)}
 					<button class="btn-room" on:click={chooseRoom({room})}>{room}</button>

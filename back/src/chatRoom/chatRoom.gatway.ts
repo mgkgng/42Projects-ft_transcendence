@@ -110,11 +110,12 @@ export class ChatRoomService {
 			}
 			const is_already_in = await this.dataSource.getRepository(UserChatRoomEntity).createQueryBuilder("userRoom").
 			where("userRoom.room = :id and userRoom.id_user = :id_u", {id: id_room, id_u : id_user}).getOne();
-			if (is_already_in != undefined)
+			if (is_already_in != undefined) //Client already in room => just make this room visible for him
 			{
 				const res = await this.dataSource.createQueryBuilder().update(UserChatRoomEntity)
 				.where("id_user = :u AND room = :r", {u: id_user, r: id_room})
-				.set({is_visible: true}).execute();
+				.set({is_visible: true}).execute(); //UPDATE is_visible
+				client.join(data.room_name); 		//JOIN ROOM (socket.io rooms)
 				client.emit("set_room_visible", {room_name: room.name});
 				return;
 			}
@@ -132,7 +133,7 @@ export class ChatRoomService {
 	//Get all messages in room (Error if current socket user is not in the room)
 	//{room_name: string }
 	@SubscribeMessage('get_message_room')
-	async getMessageRoom(@MessageBody() data: number, @ConnectedSocket() client: Socket, @Request() req) 
+	async getMessageRoom(@MessageBody() data: any, @ConnectedSocket() client: Socket, @Request() req) 
 	{
 		try{
 			const id_user = await this.mainServer.getIdUser(req);
@@ -154,7 +155,7 @@ export class ChatRoomService {
 				.select(["messageChatRoomEntity.content_message", "messageChatRoomEntity.date_message", "user.username", "chatRoom.name"])
 				.where("chatRoom.id_g = :id", {id: id_room}).orderBy("messageChatRoomEntity.date_message", "ASC").getMany();
 				console.log(res);
-				client.emit('get_message_room', res);
+				client.emit('get_message_room', {messages : res, room_name: data.room_name});
 			} catch (e) {
 				console.log("getMessage Error");
 				console.log(e);
@@ -387,6 +388,7 @@ export class ChatRoomService {
 		const res = await this.dataSource.createQueryBuilder().update(UserChatRoomEntity)
 				.where("id_user = :u AND room = :r", {u: user[0].id_g, r: room[0].id_g})
 				.set({is_visible: true}).execute();
+		client.join(data.room_name);
 		client.emit("set_room_visible", {});
 	}
 }
