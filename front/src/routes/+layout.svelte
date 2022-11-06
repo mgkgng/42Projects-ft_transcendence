@@ -48,11 +48,12 @@
 		{
 			const tok = localStorage.getItem('transcendence-jwt');
 			{
-				$client.socket = io("http://localhost:3001",{
+				$client.socket = await io("http://localhost:3001",{
 					extraHeaders: {
 						Authorization: "Bearer " + tok,
 					}
 				});
+				console.log($client.socket);
 				$client.connect();
 				loginState.set(true);
 			}

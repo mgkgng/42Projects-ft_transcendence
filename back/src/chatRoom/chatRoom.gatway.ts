@@ -9,7 +9,6 @@ import { DataSource } from "typeorm";
 import { MainServerService } from "../mainServer/mainServer.gateway";
 import { UseGuards, Request, HttpException } from '@nestjs/common';
 import { AuthGuard } from "@nestjs/passport";
-import console from "console";
 	
 @WebSocketGateway({
 	cors: {
@@ -65,7 +64,7 @@ export class ChatRoomService {
 	@SubscribeMessage('new_room')
 	async creat_room(@MessageBody() data: any, @Request() req)
 	{
-		console.log("new room");
+		//console.log("new room");
 		const id_user = await this.mainServer.getIdUser(req);
 		const is_password_protected : boolean = data.is_password_protected;	
 		const password : string = is_password_protected ? data.room_password : "";
@@ -146,7 +145,7 @@ export class ChatRoomService {
 				.innerJoin("messageChatRoomEntity.id_user", "user")
 				.select(["messageChatRoomEntity.content_message", "messageChatRoomEntity.date_message", "user.username", "chatRoom.name"])
 				.where("chatRoom.id_g = :id", {id: id_room}).orderBy("messageChatRoomEntity.date_message", "ASC").getMany();
-				//console.log(res);
+				console.log(res);
 				client.emit('get_message_room', res);
 			} catch (e) {
 				console.log("getMessage Error");
@@ -222,7 +221,7 @@ export class ChatRoomService {
 			 const res_insert_message = await querry.manager.insert(MessageChatRoomEntity,
 				{ id_user: id_user, id_chat_room: id_room, content_message: message, date_message: date_creation}
 			 );
-			// console.log(res_insert_message);
+			console.log(res_insert_message);
 			await querry.commitTransaction();
 			this.server.to(data.room_name).emit('new_message_room', {room_name : data.room_name, content_message: data.content_message, username: client_username});
 		} catch (e) {
@@ -238,7 +237,7 @@ export class ChatRoomService {
 	async getMyRoom(@MessageBody() data, @ConnectedSocket() client: Socket)
 	{
 		const res : any = await this.mainServer.getNamesRoomsForUser(client);
-		//console.log(res);
+		console.log(res);
 		let name : string[] = [];
 		for (let n of res)
 		{
@@ -256,7 +255,7 @@ export class ChatRoomService {
 		const res = await this.dataSource.getRepository(ChatRoomEntity)
 		.createQueryBuilder("chatRoom")
 		.select(["chatRoom.name", "chatRoom.is_password_protected"]).getMany();
-		console.log(res);
+		//console.log(res);
 		client.emit("get_all_rooms", res);
 	}
 	//Ban a user if current socket user is Admin on the room 

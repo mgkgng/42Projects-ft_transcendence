@@ -113,7 +113,7 @@
 		});
 	}
 	function sendMessage(){
-		console.log("newMessage");	
+		console.log("newMessage(out)",actualName, newMessage);	
 		$client.socket.emit("new_message_room", {room_name: actualName, content_message: newMessage});
 	}
 	function setNotVisible(room : any) {

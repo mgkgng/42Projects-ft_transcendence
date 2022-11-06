@@ -78,12 +78,13 @@ function socket_event_update_front(client : any) {
 	});
 	client.socket.on("new_message_room", (data : any) =>
 	{
+		console.log("newMessage(in): ", data);
 		chatRoom.update( chat => {
 			chat.messages[chat.rooms.indexOf(data.room_name)].push(new Message(data.room_name, data.username, data.content_message));
 			return (chat);
 		});
 		chatRoom.update( chat => {
-			chat.actualRoom = chat.messages[chat.rooms.indexOf(chat.actualRoomName)];
+			chat.actualRoom = chat.messages[chat.rooms.indexOf(data.room_name)];
 			return (chat);
 		});
 	});

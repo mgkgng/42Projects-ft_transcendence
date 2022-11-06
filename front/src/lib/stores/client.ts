@@ -37,6 +37,7 @@ class Client {
 						Authorization: "Bearer " + tok,
 					}
 				});
+				console.log(this.socket);
 				return (true);
 			}catch{
 				console.log("error");
@@ -44,7 +45,6 @@ class Client {
 		}
 		if (url.has('code'))
 		{
-			console.log("ORHERE");
 			try {
 				const res : any = await fetch("http://localhost:3000/auth42",{
 					method: 'POST',

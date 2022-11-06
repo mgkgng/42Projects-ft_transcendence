@@ -48,8 +48,7 @@
 		float: right;
 		background-color: aliceblue;
 
-		// width: 50px;
-		width: 75px;
+		width: 70px;
 		height: 80%;
 		border-radius: 1em;
 
@@ -62,8 +61,7 @@
 		float: right;
 		background-color: aliceblue;
 
-		// width: 50px;
-		width: 75px;
+		width: 70px;
 		height: 80%;
 		border-radius: 1em;
 
@@ -123,12 +121,12 @@
 	<div class="chat" on:click={() => {
 		chatModal.open();
 	}}>
-		<h3>chat</h3>
+		<h4>chat</h4>
 	</div>
 	<div class="all-chat" on:click={() => {
 		allChatModal.open();
 	}}>
-		<h3>Allchat</h3>
+		<h4>Allchat</h4>
 	</div>
 </header>
 
