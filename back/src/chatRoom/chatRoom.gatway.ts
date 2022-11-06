@@ -273,12 +273,25 @@ export class ChatRoomService {
 	//Get all rooms in the databases
 	//{}
 	@SubscribeMessage('get_all_rooms')
-	async getALLRooms(@MessageBody() data, @ConnectedSocket() client: Socket)
+	async getAllRooms(@MessageBody() data, @ConnectedSocket() client: Socket)
 	{
 		const res = await this.dataSource.getRepository(ChatRoomEntity)
 		.createQueryBuilder("chatRoom")
 		.select(["chatRoom.name", "chatRoom.is_password_protected"]).getMany();
 		//console.log(res);
+		client.emit("get_all_rooms", res);
+	}
+	//OK
+	//Get all rooms in the databases
+	//{research: string}
+	@SubscribeMessage('get_all_rooms_begin_by')
+	async getAllRoomsBeginBy(@MessageBody() data, @ConnectedSocket() client: Socket)
+	{
+		const res = await this.dataSource.getRepository(ChatRoomEntity)
+		.createQueryBuilder("chatRoom")
+		.select(["chatRoom.name", "chatRoom.is_password_protected"])
+		.where("substr(chatRoom.name, 1, :l) = :s", {l: data.research.length, s: data.research}).getMany();
+		console.log(res);
 		client.emit("get_all_rooms", res);
 	}
 	//Ban a user if current socket user is Admin on the room 

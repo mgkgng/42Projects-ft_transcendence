@@ -21,11 +21,34 @@
 	}
 	.btn-room{
 		padding: 1em;
-		width: 10%;
+		width: 20%;
+		border-radius: 0.5em;
 		color:rgb(255, 255, 255);
 		text-align: center;
 		background-color: rgba(97, 97, 97, 0.5);
 		cursor: pointer;
+	}
+	.room{
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		padding: 0.2em;
+		margin: 0.5em;
+		border-color: #fff;
+		border-width: 1px;
+		border-style: solid;
+	}
+	.research-zone{
+		display: flex;
+		flex-direction: row;
+		padding: 0.2em;
+		margin: 0.5em;
+		height: 40px;
+	}
+	.text-input{
+		margin : 0.5em;
+		background-color: white;
+		color: black;
 	}
 </style>
 
@@ -40,8 +63,10 @@
 	let all_rooms : Map<string, boolean> = new Map();
 	chatRoom.subscribe(chat => { rooms = chat.rooms;});
 	chatRoom.subscribe(chat => { all_rooms= chat.all_rooms;});
+
+	let research : string = "";
 	onMount(() => {
-		$client.socket.emit("get_all_rooms", {});
+		$client.socket.emit("get_all_rooms_begin_by", {research: research});
 	});
 	function addToTheRoom(room : any)
 	{
@@ -52,15 +77,24 @@
 		}
 		$client.socket.emit("append_user_to_room", {room_name: room, room_password: user_password});				
 	}
+	function researchRooms()
+	{
+		console.log("changed")
+		$client.socket.emit("get_all_rooms_begin_by", {research: research});
+	}
 </script>
 
 <div class="container">
 	<div class="room-zone">
+		<div class="research-zone">
+			<input class="text-input" bind:value={research}>
+			<button class="btn-room" on:click={researchRooms}>Search</button>
+		</div>
 		<ul>
 		{#each ([...all_rooms.keys()]) as room_name}
 			{#if (rooms.includes(room_name)) == false}
-				<li>
-				<p>{room_name}</p>
+				<li class="room">
+					<p>{room_name}</p>
 					<button class="btn-room" on:click={addToTheRoom(room_name)}>Add</button>
 				</li>
 			{/if}

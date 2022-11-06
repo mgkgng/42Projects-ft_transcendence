@@ -59,6 +59,7 @@ export class ChatRooms{
 function socket_event_update_front(client : any) {
 	client.socket.on("get_all_rooms", (data : any) => {
 		chatRoom.update((chatRoom) => {
+			chatRoom.all_rooms = new Map();
 			for (let r of data)
 				chatRoom.all_rooms.set(r.name, r.is_password_protected);
 			return (chatRoom);
