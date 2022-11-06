@@ -111,4 +111,49 @@ export class MainServerService {
 		.select(["userRooms.id", "chatRoom.name"]).getMany();
 		return (names_rooms);
 	}
+	//OK
+	//{}
+	//get email, username, img of current socket user
+	@SubscribeMessage('get_user_info')
+	async get_user_infos(@MessageBody() data: any, @ConnectedSocket() client: Socket, @Request() req)
+	{
+		try{
+			const id_user = await this.getIdUser(req);
+			const res = await this.dataSource.getRepository(UserEntity).createQueryBuilder("user")
+						.where("id_g = :id", {id : id_user})
+						.select(["user.email", "user.username", "user.img_url", "user.display_name", "user.campus_name", "user.campus_country"]).getOne();
+			return (res);
+		}catch(e)
+		{
+			throw new WsException("User not found");
+		}
+	}
+	//OK
+	//{username_search : string}
+	@SubscribeMessage('get_other_user_info')
+	async get_other_user_infos(@MessageBody() data: any, @ConnectedSocket() client: Socket, @Request() req)
+	{
+		try{
+			const id_user = await this.getIdUserByUsername(data.username_search);
+			const res = await this.dataSource.getRepository(UserEntity).createQueryBuilder("user")
+						.where("id_g = :id", {id : id_user})
+						.select(["user.email", "user.username", "user.img_url", "user.display_name", "user.campus_name", "user.campus_country"]).getOne();
+			return (res);
+		}catch(e)
+		{
+			client.emit("error_get_other_user_info", "User not found");
+			throw new WsException("User not found");
+		}
+	}
+	//{research: string}
+	@SubscribeMessage('get_all_username_begin_by')
+	async getAllRoomsBeginBy(@MessageBody() data, @ConnectedSocket() client: Socket)
+	{
+		const res = await this.dataSource.getRepository(UserEntity)
+		.createQueryBuilder("user")
+		.select(["user.username"])
+		.where("substr(user.username, 1, :l) = :s", {l: data.research.length, s: data.research}).getMany();
+		console.log(res);
+		client.emit("get_all_username_begin_by", res);
+	}
 }
