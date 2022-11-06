@@ -62,7 +62,7 @@ export class ChatRoomService {
 	//Create new room with current socker user as admin
 	//{room_name: string, is_password_protected: bool, room_password: string}
 	@SubscribeMessage('new_room')
-	async creat_room(@MessageBody() data: any, @Request() req)
+	async creat_room(@MessageBody() data: any, @Request() req, @ConnectedSocket() client : Socket)
 	{
 		//console.log("new room");
 		const id_user = await this.mainServer.getIdUser(req);
@@ -88,6 +88,7 @@ export class ChatRoomService {
 		} catch (e) {
 			await querry.rollbackTransaction();
 			console.log("Create room error");
+			client.emit("error_new_room", {error: "Room already exist"});
 			throw new WsException("Room already exist");
 		}
 	}
@@ -103,14 +104,18 @@ export class ChatRoomService {
 			const room = await this.dataSource.getRepository(ChatRoomEntity).createQueryBuilder("room").
 			where("room.id_g = :id ", {id: id_room}).getOne();
 			if (room.is_password_protected && room.password != data.room_password)
+			{
+				client.emit("error_append_user_to_room", {error: "Bad password"});
 				throw new WsException("Bad password");
+			}
 			const is_already_in = await this.dataSource.getRepository(UserChatRoomEntity).createQueryBuilder("userRoom").
-			where("userRoom.room = :id and userRoom.id_user : id_u", {id: id_room, id_u : id_user}).getOne();
+			where("userRoom.room = :id and userRoom.id_user = :id_u", {id: id_room, id_u : id_user}).getOne();
 			if (is_already_in != undefined)
 			{
 				const res = await this.dataSource.createQueryBuilder().update(UserChatRoomEntity)
 				.where("id_user = :u AND room = :r", {u: id_user, r: id_room})
 				.set({is_visible: true}).execute();
+				client.emit("set_room_visible", {room_name: room.name});
 				return;
 			}
 			const res_user_chat_room = await this.dataSource.createQueryBuilder().insert().into(UserChatRoomEntity).values
@@ -139,7 +144,10 @@ export class ChatRoomService {
 				if (!res_is_in_room.length)
 					throw new WsException("Not in the room");
 				if (res_is_in_room[0].is_banned && res_is_in_room[0].ban_end > new Date())
+				{
+					client.emit("error_get_message_room", {error: "You are banned"});
 					throw new WsException("Your are ban");
+				}
 				const res = await this.dataSource.getRepository(MessageChatRoomEntity).createQueryBuilder("messageChatRoomEntity")
 				.innerJoin("messageChatRoomEntity.id_chat_room", "chatRoom")
 				.innerJoin("messageChatRoomEntity.id_user", "user")
@@ -172,7 +180,10 @@ export class ChatRoomService {
 				if (!res_is_in_room.length)
 					throw new WsException("Not in the room");
 				if (res_is_in_room[0].is_banned && res_is_in_room[0].ban_end > new Date())
+				{
+					client.emit("error_get_message_room_page", {error: "You are banned"});
 					throw new WsException("Your are ban");
+				}
 				const res = await this.dataSource.getRepository(MessageChatRoomEntity).createQueryBuilder("messageChatRoomEntity")
 				.innerJoin("messageChatRoomEntity.id_chat_room", "chatRoom")
 				.innerJoin("messageChatRoomEntity.id_user", "user")
@@ -215,9 +226,16 @@ export class ChatRoomService {
 			if (!res.length)
 				throw new WsException("Not in the room");
 			if (res[0].is_banned && res[0].ban_end > new Date())
+			{
+
+				client.emit("error_new_message_room", {error: "You are banned"});
 				throw new WsException("You are ban of the room");
+			}
 			if (res[0].is_muted && res[0].mute_end > new Date())
+			{
+				client.emit("error_new_message_room", {error: "You are muted"});
 				throw new WsException("You are mute");
+			}
 			 const res_insert_message = await querry.manager.insert(MessageChatRoomEntity,
 				{ id_user: id_user, id_chat_room: id_room, content_message: message, date_message: date_creation}
 			 );
@@ -275,7 +293,10 @@ export class ChatRoomService {
 			.where("userRoom.id_user = :u AND userRoom.room = :r", {u: user[0].id_g, r: room[0].id_g})
 			.select("userChat.is_admin").getMany();
 			if (!is_admin[0].is_admin)
+			{
+				client.emit("error_ban_user", {error: "You are not admin of the room"});
 				throw new WsException("You are not admin");
+			}
 			else
 			{
 				const res = await this.dataSource.createQueryBuilder().update(UserChatRoomEntity)
@@ -303,7 +324,10 @@ export class ChatRoomService {
 			.where("userRoom.id_user = :u AND userRoom.room = :r", {u: user[0].id_g, r: room[0].id_g})
 			.select("userRoom.is_admin").getMany();
 			if (!is_admin[0].is_admin)
+			{
+				client.emit("error_ban_user", {error: "You are not admin of the room"});
 				throw new WsException("You are not admin");
+			}
 			else
 			{
 				const res = await this.dataSource.createQueryBuilder().update(UserChatRoomEntity)
@@ -328,7 +352,10 @@ export class ChatRoomService {
 			.where("userRoom.id_user = :u AND userRoom.room = :r", {u: user[0].id_g, r: room[0].id_g})
 			.select("userRoom.is_admin").getMany();
 			if (!is_admin[0].is_admin)
+			{
+				client.emit("error_ban_user", {error: "You are not admin of the room"});
 				throw new WsException("You are not admin");
+			}
 			else
 			{
 				const res = await this.dataSource.createQueryBuilder().update(UserChatRoomEntity)

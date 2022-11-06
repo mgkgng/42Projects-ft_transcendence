@@ -98,7 +98,7 @@
 	let actualMessages : any;
 
 	let is_password_protected : boolean = false;
-	chatRoom.subscribe(chat  => { console.log('chat', chat); actualMessages = chat.actualRoom;});
+	chatRoom.subscribe(chat  => { actualMessages = chat.actualRoom;});
 	chatRoom.subscribe(chat => { actualName = chat.actualRoomName;});
 	chatRoom.subscribe(chat => { rooms = chat.rooms;});
 	chatRoom.subscribe(chat => { actualName = chat.actualRoomName;});
@@ -108,21 +108,18 @@
 		chatRoom.update(chat => { 
 			chat.actualRoom = chat.messages[chat.rooms.indexOf(room.room)];
 			chat.actualRoomName = room.room;
-			console.log("End", chat);
 			return (chat);
 		});
 	}
 	function sendMessage(){
-		console.log("newMessage(out)",actualName, newMessage);	
 		$client.socket.emit("new_message_room", {room_name: actualName, content_message: newMessage});
 	}
 	function setNotVisible(room : any) {
 		$client.socket.emit("set_room_not_visible", {room_name: room.room });
+		$chatRoom.deleteRoom(room.room);
 	}
 	function createRoom()
 	{
-		console.log("newRoomName: ", newRoomName);
-		console.log("newRoomName: ", newRoomName);
 		if (newRoomPassword != null)
 			is_password_protected = true;
 		if (newRoomPassword == null)
@@ -142,7 +139,7 @@
 					<button class="btn-room choose" on:click={chooseRoom({room})}>{room}</button>
 				{/if}
 				<button class="btn-room" on:click={setNotVisible({room})}>X</button>
-			<li>
+			</li>
 		{/each}
 		</ul>
 	</div>

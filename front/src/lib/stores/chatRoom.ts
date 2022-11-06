@@ -18,6 +18,7 @@ class Message
 let client : any;
 
 export class ChatRooms{
+	all_rooms: Map<string, boolean> = new Map();
 	rooms: Array<string> = [];
 	messages : Array<Array<Message>> = [];
 	actualRoom : Array<Message> = [];
@@ -48,10 +49,21 @@ export class ChatRooms{
 		this.actualRoomName = room.room;
 		return room.room;
 	}
+	deleteRoom(room : any)
+	{
+		this.messages.splice(this.rooms.indexOf(room), 1);
+	}
 }
 //Ici les evenements qui changent les attributs de chatRoom qui sont suscribe dans le front
 // (obligation d'utiliser update() )
 function socket_event_update_front(client : any) {
+	client.socket.on("get_all_rooms", (data : any) => {
+		chatRoom.update((chatRoom) => {
+			for (let r of data)
+				chatRoom.all_rooms.set(r.name, r.is_password_protected);
+			return (chatRoom);
+		});
+	});
 	client.socket.on("get_my_rooms", (data : any) => { //HAVE TO OPTIMIZE : NOT REALOAD ALL MESSAGE WHEN A ROOM IS ADDED OR DELETED
 		chatRoom.update((chatRoom) => {
 			chatRoom.rooms = [];
@@ -61,8 +73,8 @@ function socket_event_update_front(client : any) {
 				chatRoom.rooms.push(rooms);
 				client.socket.emit("get_message_room", {room_name: rooms});
 			}
-			console.log(data);
-			console.log("rooms: ", chatRoom.rooms);
+			//console.log(data);
+			//console.log("rooms: ", chatRoom.rooms);
 			return (chatRoom);
 		});
 	});
@@ -72,13 +84,13 @@ function socket_event_update_front(client : any) {
 			for (let message of data)
 				inter.push(new Message(message.id_chat_room.name, message.id_user.username, message.content_message));
 			chatRoom.messages.push(inter);
-			console.log("Messages: ", chatRoom);
+			//console.log("Messages: ", chatRoom);
 			return (chatRoom);
 		});
 	});
 	client.socket.on("new_message_room", (data : any) =>
 	{
-		console.log("newMessage(in): ", data);
+		//console.log("newMessage(in): ", data);
 		chatRoom.update( chat => {
 			chat.messages[chat.rooms.indexOf(data.room_name)].push(new Message(data.room_name, data.username, data.content_message));
 			return (chat);
@@ -92,8 +104,12 @@ function socket_event_update_front(client : any) {
 	{
 		chatRoom.update( chat => {
 			chat.rooms.push(data.room_name);
+			chat.message.push([]);
 			return (chat);
 		});
+	});
+	client.socket.on("error_append_user_to_room", (data : any) =>{
+		alert(data.error);
 	});
 }
 export const chatRoom = writable(new ChatRooms());
