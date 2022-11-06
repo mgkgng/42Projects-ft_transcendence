@@ -108,8 +108,6 @@
 		chatRoom.update(chat => { 
 			chat.actualRoom = chat.messages.get(room.room);
 			chat.actualRoomName = room.room;
-			console.log(chat.rooms);
-			console.log(chat.messages);
 			return (chat);
 		});
 	}

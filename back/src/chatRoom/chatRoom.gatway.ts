@@ -9,7 +9,8 @@ import { DataSource } from "typeorm";
 import { MainServerService } from "../mainServer/mainServer.gateway";
 import { UseGuards, Request, HttpException } from '@nestjs/common';
 import { AuthGuard } from "@nestjs/passport";
-	
+import * as bcrypt from 'bcrypt';
+
 @WebSocketGateway({
 	cors: {
 	  origin: '*',
@@ -67,7 +68,9 @@ export class ChatRoomService {
 		//console.log("new room");
 		const id_user = await this.mainServer.getIdUser(req);
 		const is_password_protected : boolean = data.is_password_protected;	
-		const password : string = is_password_protected ? data.room_password : "";
+		const password : string = is_password_protected ? 
+			await bcrypt.hash(data.room_password, 10) 
+			: "";
 		const name : string = data.room_name;
 		const date_creation : Date = new Date();
 		const  querry = this.dataSource.createQueryRunner(); 
@@ -103,7 +106,8 @@ export class ChatRoomService {
 			const id_room = await this.mainServer.getIdRoom(data);
 			const room = await this.dataSource.getRepository(ChatRoomEntity).createQueryBuilder("room").
 			where("room.id_g = :id ", {id: id_room}).getOne();
-			if (room.is_password_protected && room.password != data.room_password)
+			const is_good_password = await bcrypt.compare(data.room_password, room.password);
+			if (room.is_password_protected && !is_good_password) //Test password
 			{
 				client.emit("error_append_user_to_room", {error: "Bad password"});
 				throw new WsException("Bad password");
@@ -122,7 +126,7 @@ export class ChatRoomService {
 			const res_user_chat_room = await this.dataSource.createQueryBuilder().insert().into(UserChatRoomEntity).values
 			([ 
 				{id_user: id_user, room: id_room, is_admin: false, is_banned: false, is_muted: false}
-			]).execute();
+			]).execute(); //Add user to the room
 		}
 		catch(e){
 			console.log("getMessage Error: bad data");
@@ -154,7 +158,7 @@ export class ChatRoomService {
 				.innerJoin("messageChatRoomEntity.id_user", "user")
 				.select(["messageChatRoomEntity.content_message", "messageChatRoomEntity.date_message", "user.username", "chatRoom.name"])
 				.where("chatRoom.id_g = :id", {id: id_room}).orderBy("messageChatRoomEntity.date_message", "ASC").getMany();
-				console.log(res);
+				//console.log(res);
 				client.emit('get_message_room', {messages : res, room_name: data.room_name});
 			} catch (e) {
 				console.log("getMessage Error");

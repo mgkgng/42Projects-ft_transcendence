@@ -76,7 +76,7 @@ function socket_event_update_front(client : any) {
 				chatRoom.rooms.push(rooms);
 				client.socket.emit("get_message_room", {room_name: rooms});
 			}
-			console.log(data);
+			//console.log(data);
 			//console.log("rooms: ", chatRoom.rooms);
 			return (chatRoom);
 		});
@@ -86,15 +86,13 @@ function socket_event_update_front(client : any) {
 			let inter : Array<Message> = [];
 			for (let message of data.messages)
 				inter.push(new Message(message.id_chat_room.name, message.id_user.username, message.content_message));
-			console.log("Messages1: ", chatRoom);
 			chatRoom.messages.set(data.room_name, inter);
-			console.log("Message2: ", chatRoom);
+			//console.log("Message2: ", chatRoom);
 			return (chatRoom);
 		});
 	});
 	client.socket.on("new_message_room", (data : any) =>
 	{
-		console.log("newMessage(in): ", data);
 		chatRoom.update( chat => {
 			chat.messages.get(data.room_name).push(new Message(data.room_name, data.username, data.content_message));
 			return (chat);
