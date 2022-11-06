@@ -24,7 +24,7 @@
     import { onMount } from 'svelte';
 	import jwt_decode from "jwt-decode";
     import { browser } from '$app/environment';
-	import io from "socket.io-client";
+	import io, { Socket } from "socket.io-client";
     import { goto } from "$app/navigation";
     import { user } from '$lib/stores/user';
     import Modal from '$lib/tools/Modal.svelte';
@@ -42,27 +42,9 @@
 	loginState.subscribe(value => { login = value; });
 	darkMode.subscribe(value => { dark = value; });
 
-	onMount(async () => {
-		if (localStorage.getItem('transcendence-jwt') != null
-		&& localStorage.getItem('transcendence-jwt') != undefined)
-		{
-			const tok = localStorage.getItem('transcendence-jwt');
-			{
-				$client.socket = await io("http://localhost:3001",{
-					extraHeaders: {
-						Authorization: "Bearer " + tok,
-					}
-				});
-				console.log($client.socket);
-				$client.connect();
-				loginState.set(true);
-			}
-		}
-
-		let url = new URLSearchParams(window.location.search);
-
-		if (!login && url.has('code'))
-		{
+	async function connectWithUrlCode(url : any)
+	{
+		try{ 
 			const res : any = await fetch("http://localhost:3000/auth42",{
 				method: 'POST',
 				headers: {
@@ -71,6 +53,7 @@
 				body:JSON.stringify({username: "oui", password: url.get('code')}),
 			});
 			const tok = await res.json();
+			console.log("res", tok);
 			$client.socket = io("http://localhost:3001",{
 				extraHeaders: {
 					Authorization: "Bearer " + tok.access_token,
@@ -81,26 +64,59 @@
 			const val : any = await jwt_decode(localStorage.getItem("transcendence-jwt"));
 			loginState.set(true);
 			goto('/');
+		}catch(e){
+			loginState.set(false);
+			localStorage.removeItem('transcendence-jwt');
+		}
+	}
+
+	onMount(async () => {
+		if (localStorage.getItem('transcendence-jwt') != null
+		&& localStorage.getItem('transcendence-jwt') != undefined)
+		{
+			const tok = localStorage.getItem('transcendence-jwt');
+			{
+				$client.socket = await io("http://localhost:3001",{
+					extraHeaders: {
+						Authorization: "Bearer " + tok,
+					},
+					autoConnect: false
+				},);
+				await $client.socket.connect();
+				console.log($client.socket);
+			}
 		}
 
-		$client.socket.on("GetConnectionInfo", (data: any) => {
-			console.log("GetConnectionInfo", data);
-			$client.id = data.id;
-			user.set(data.user);
-			console.log("lol", $user);
-			
-		});
+		let url = new URLSearchParams(window.location.search);
+
+		if (!$client.socket.connected && url.has('code'))
+			await connectWithUrlCode(url);
+
 
 		if (!browser || !$client.socket)
 			return;
-		
-		$client.socket.on("RoomCreated", (data: any) => {
-			console.log("RoomCreated", data);
-			roomId = data;
-			roomModal.open();
-		});
+		if ($client.socket) {
+			$client.socket.on("GetConnectionInfo", (data: any) => {
+				console.log("GetConnectionInfo", data);
+				$client.id = data.id;
+				user.set(data.user);
+				console.log("lol", $user);
+				
+			});	
 
-		$chatRoom.LoadMessages($client);
+			$client.socket.on("RoomCreated", (data: any) => {
+				console.log("RoomCreated", data);
+				roomId = data;
+				roomModal.open();
+			});
+
+			$client.socket.on("connection", (data: any) => {
+				console.log("connection", data);
+				$client.connect();
+				loginState.set(true);
+				$chatRoom.LoadMessages($client);
+			});
+		}
 		// let res = await $client.send42Tok(new URLSearchParams(window.location.search));
 		// if (res) {
 		// 	const val : any = await jwt_decode(localStorage.getItem("transcendence-jwt"));

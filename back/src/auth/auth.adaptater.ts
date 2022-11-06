@@ -29,27 +29,28 @@ import { verify } from 'jsonwebtoken';
 import { HttpException, UnauthorizedException } from '@nestjs/common';
 import { throwError } from 'rxjs';
 
-export interface CustomSocket extends Socket {
-  user: any;
-}
 
 export class WsAdapter extends IoAdapter {
   createIOServer(port: number, options?: any) {
     const server = super.createIOServer(port, options);
-    server.use((socket: Socket, next: any) => {
+    server.use((socket: any, next: any) => {
 	  verify(socket.handshake.headers.authorization.split(' ')[1] as string, process.env.SECRET, (err, decoded : any) => { 
-		//new WsException("Unauthorized");
 		if (err)
 		{
 			console.log("ERROR");
-			throw new HttpException("Unauthorized", 401);
+			socket.emit("errors", {message: "UnauthorizedJwt"});
+			return (null);
 		}
 		else
 		{
 		  if(new Date((decoded.iat + 60 * 60 * 24) * 1000) > (new Date(Date.now())))
+		  {
+			socket.emit("connection", {});
 		  	next();
+		  }
 		  else
-			throw new HttpException("Expired", 401);
+			socket.emit("errors", {message: "UnauthorizedJwt"});
+			return (null);
 		}
 	  });
     });
