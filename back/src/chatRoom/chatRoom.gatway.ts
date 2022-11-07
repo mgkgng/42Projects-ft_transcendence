@@ -20,7 +20,7 @@ export class ChatRoomService {
 	constructor(
 		private dataSource : DataSource,
 		private jwtServer: JwtService, 
-		private mainServer: MainServerService
+		private mainServer: MainServerService,
 	){
 	}
 	@WebSocketServer() server;
@@ -29,16 +29,19 @@ export class ChatRoomService {
 	async handleConnection(@Request() req)
 	{
 		const client : Socket = req;
-		//console.log('Connect');
+		console.log('Connect');
+		console.log('Connect is here');
 		try {
+			console.log("error here");
 			const names = await this.mainServer.getNamesRoomsForUser(req);
+			console.log(names);
 			for (let n of names) //ADD USER TO HIS ROOMS
 			{
 				const name : string = n.room.name;
-				client.join(name);
 				console.log("Join => ", n.room.name);
+				client.join(n.room.name);
 			}
-		} catch (e) { return (e); }
+		} catch (e) { console.log("error"); return (e); }
 		return ("connect");
 	}
 
@@ -58,22 +61,25 @@ export class ChatRoomService {
 		const name : string = data.room_name;
 		const date_creation : Date = new Date();
 		const  querry = this.dataSource.createQueryRunner(); 
-		await querry.connect();
-		await querry.startTransaction();
 		try{
-			const res_chat_room = await querry.manager.insert(ChatRoomEntity,
-				{name: name, date_creation: date_creation, is_password_protected: is_password_protected, password: password}
-			);
-			 const res_user_chat_room = await querry.manager.insert(UserChatRoomEntity, 
-			 	{id_user: id_user, room: res_chat_room.identifiers[0].id_g, is_admin: true, is_banned: false, is_muted: false}
-			);
-			await querry.commitTransaction();
-			const client : Socket = req;
+			const new_chat_room = new ChatRoomEntity();
+			new_chat_room.name = name;
+			new_chat_room.date_creation = date_creation;
+			new_chat_room.is_password_protected = is_password_protected;
+			new_chat_room.password = password;
+			const res_chat_room : any = await this.dataSource.getRepository(ChatRoomEntity).save(new_chat_room);
+			console.log(res_chat_room);
+			const new_user_chat_room = new UserChatRoomEntity();
+			new_user_chat_room.id_user = id_user;
+			new_user_chat_room.room = res_chat_room.id_g;
+			new_user_chat_room.is_admin = true;
+			new_user_chat_room.is_banned = false;
+			new_user_chat_room.is_muted = false;
+			const res_user_chat_room = await this.dataSource.getRepository(UserChatRoomEntity).save(new_user_chat_room);
 			client.join(name);
 			console.log("Create room finish");
 			client.emit("new_room", {	room_name: name	});
 		} catch (e) {
-			await querry.rollbackTransaction();
 			console.log("Create room error");
 			client.emit("error_new_room", {error: "Room already exist"});
 			throw new WsException("Room already exist");
@@ -206,8 +212,6 @@ export class ChatRoomService {
 		const user : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
 		const client_username = user.username;
 		const  querry = this.dataSource.createQueryRunner(); 
-		await querry.connect();
-		await querry.startTransaction();
 		try{
 			const res = await this.dataSource.getRepository(UserChatRoomEntity).createQueryBuilder("userChat")
 			.where("userChat.id_user = :u", {u : id_user})
@@ -225,15 +229,19 @@ export class ChatRoomService {
 				client.emit("error_new_message_room", {error: "You are muted"});
 				throw new WsException("You are mute");
 			}
-			 const res_insert_message = await querry.manager.insert(MessageChatRoomEntity,
-				{ id_user: id_user, id_chat_room: id_room, content_message: message, date_message: date_creation}
-			 );
+			const newMessage = new MessageChatRoomEntity();
+			newMessage.id_user = id_user;
+			newMessage.id_chat_room = id_room;
+			newMessage.content_message = message;
+			newMessage.date_message = date_creation;
+			const res_insert_message = await this.dataSource.getRepository(MessageChatRoomEntity).save(newMessage);
 			console.log(res_insert_message);
-			await querry.commitTransaction();
+			//await querry.commitTransaction();
 			this.server.to(data.room_name).emit('new_message_room', {room_name : data.room_name, content_message: data.content_message, username: client_username});
 		} catch (e) {
-			await querry.rollbackTransaction();
+			//await querry.rollbackTransaction();
 			console.log("Can't create message");
+			client.emit("error_new_message_room", {error: "Can't create message"});
 			throw new WsException("Can't send message");
 		}
 	}
@@ -244,7 +252,7 @@ export class ChatRoomService {
 	async getMyRoom(@MessageBody() data, @ConnectedSocket() client: Socket)
 	{
 		const res : any = await this.mainServer.getNamesRoomsForUser(client);
-		console.log(res);
+		console.log("My rooms:", res);
 		let name : string[] = [];
 		for (let n of res)
 		{
@@ -261,6 +269,7 @@ export class ChatRoomService {
 	{
 		const res = await this.dataSource.getRepository(ChatRoomEntity)
 		.createQueryBuilder("chatRoom")
+		.where("chatRoom.is_private = :p", {p: false})
 		.select(["chatRoom.name", "chatRoom.is_password_protected"]).getMany();
 		//console.log(res);
 		client.emit("get_all_rooms", res);
@@ -274,7 +283,9 @@ export class ChatRoomService {
 		const res = await this.dataSource.getRepository(ChatRoomEntity)
 		.createQueryBuilder("chatRoom")
 		.select(["chatRoom.name", "chatRoom.is_password_protected"])
-		.where("substr(chatRoom.name, 1, :l) = :s", {l: data.research.length, s: data.research}).getMany();
+		.where("substr(chatRoom.name, 1, :l) = :s", {l: data.research.length, s: data.research})
+		.andWhere("chatRoom.is_private = :p", {p: false})
+		.getMany();
 		console.log(res);
 		client.emit("get_all_rooms", res);
 	}

@@ -2,7 +2,7 @@
 	.container {
 		display: flex;
 		flex-direction: row;
-		width: 550px;
+		width: 700px;
 		height: 75%;
 		max-height: 90%;
 		background-color: transparentize(rgb(255, 0, 0), 0.9);
@@ -17,7 +17,7 @@
 		border-radius: 0.5em;
 	}
 	.message-zone {
-		width: 75%;
+		width: 50%;
 		padding-left: 1em;
 		background-color: transparentize(#000, 0.2);
 		border: 2px solid transparentize(#fff, .6);
@@ -30,7 +30,7 @@
 		overflow-y: scroll;
 	}
 	.new-chat-room-zone{
-		width: 15%;
+		width: 25%;
 		padding-left: 1em;
 		min-height: 500px;
 		background-color: transparentize(#000, 0.2);
@@ -88,16 +88,17 @@
 	import { get } from 'svelte/store';
     import ChatRoomMessage from "$lib/tools/chatRoomMessage.svelte";
 	
-	let newRoomName : string;
-	let newMessage : string;
-	let newRoomPassword : string;
+	let newRoomName : string; //Valeur du insert de création de room
+	let newMessage : string;  //Valeur du insert d'envoie de message
+	let newRoomPassword : string; //Valeur du insert, password
 
-	let rooms : string[];
-	let actualRoom : any[];
-	let actualName: string;
-	let actualMessages : any;
+	let rooms : string[]; //Rooms visibles par le user
+	let actualName: string; //Name de la room selectionnee
+	let actualMessages : any; //Messages de la room selectionnee
 
-	let is_password_protected : boolean = false;
+	let is_new_room_password_protected : boolean = false; //Si la room est protege par un mot de passe
+
+	//Liens entre les variables de ce fichier et les variables dans le stores "/src/stores/chatRoom.ts"
 	chatRoom.subscribe(chat  => { actualMessages = chat.actualRoom;});
 	chatRoom.subscribe(chat => { actualName = chat.actualRoomName;});
 	chatRoom.subscribe(chat => { rooms = chat.rooms;});
@@ -114,21 +115,20 @@
 	function sendMessage(){
 		$client.socket.emit("new_message_room", {room_name: actualName, content_message: newMessage});
 	}
-	function setNotVisible(room : any) {
+	function setNotVisible(room : any) { //Supprime un room des rooms visibles
 		$client.socket.emit("set_room_not_visible", {room_name: room.room });
 		$chatRoom.deleteRoom(room.room);
 	}
 	function createRoom()
 	{
-		if (newRoomPassword != null)
-			is_password_protected = true;
 		if (newRoomPassword == null)
 			newRoomPassword = ""
-		$client.socket.emit("new_room", {room_name: newRoomName, is_password_protected: is_password_protected, room_password: newRoomPassword});
+		$client.socket.emit("new_room", {room_name: newRoomName, is_password_protected: is_new_room_password_protected, room_password: newRoomPassword});
 	}
 </script>
 
 <div class="container">
+	<!--Zone de liste des rooms du user-->
 	<div class="room-zone">
 		<ul>
 		{#each ([...$chatRoom.messages.keys()]) as room}
@@ -143,6 +143,7 @@
 		{/each}
 		</ul>
 	</div>
+	<!--Zone de liste des messages de la room selectionne-->
 	<div class="message-zone">
 		{#each (actualMessages) as message}
 			<ChatRoomMessage username={message.username} content_message={message.message}/>
@@ -150,9 +151,18 @@
 		<input class="text-input" bind:value={newMessage}>
 		<input class="submit" value="send" on:click={sendMessage}>
 	</div>
+	<!--Zone de creation de room -->
 	<div class="new-chat-room-zone">
-		<input class="text-input" bind:value={newRoomName}>
-		<input class="text-input" bind:value={newRoomPassword}>
+		<h5 style="color: white">Add new room :</h5><br>
+		<input class="text-input" placeholder="NameRoom" bind:value={newRoomName}>
+		<div style="display: flex; flex-direction: row;">
+			<p style="color: white">password ?</p>
+			<input type="checkbox" id="is_pass_protected" name="scales" bind:checked={is_new_room_password_protected}>
+		</div>
+		{#if (is_new_room_password_protected == true)}
+			<input class="text-input" placeholder="password" bind:value={newRoomPassword}>
+		{/if}
 		<input type="button" value="+" class="btn-new-room" on:click={createRoom}/>
 	</div>
+
 </div>

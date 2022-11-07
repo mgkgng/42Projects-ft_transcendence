@@ -15,6 +15,20 @@ class Message
 	}
 }
 
+class rooms
+{
+	room_name : string = "";
+	is_password_protected : boolean = false;
+	is_private : boolean = false;
+	are_you_admin : boolean = false;
+	constructor(room_name : string, is_password_protected : boolean, is_private : boolean, are_you_admin : boolean)
+	{
+		this.room_name = room_name;
+		this.is_password_protected = is_password_protected;
+		this.is_private = is_private;
+		this.are_you_admin = are_you_admin;
+	}
+}
 let client : any;
 
 export class ChatRooms{
@@ -43,19 +57,13 @@ export class ChatRooms{
 			socket_event_update_front(client);			
 		}
 	}
-	selectRoom(room : any)
-	{
-		this.actualRoom = this.messages.get(room.room);
-		this.actualRoomName = room.room;
-		return room.room;
-	}
 	deleteRoom(room : any)
 	{
 		this.messages.delete(room);
 	}
 }
-//Ici les evenements qui changent les attributs de chatRoom qui sont suscribe dans le front
-// (obligation d'utiliser update() )
+//Ici les evenements qui changent les attributs de chatRoom et qui sont suscribe dans le front
+// (obligation d'utiliser update() pour un rafraichissement du front)
 function socket_event_update_front(client : any) {
 	client.socket.on("get_all_rooms", (data : any) => {
 		chatRoom.update((chatRoom) => {
@@ -77,8 +85,8 @@ function socket_event_update_front(client : any) {
 				chatRoom.rooms.push(rooms);
 				client.socket.emit("get_message_room", {room_name: rooms});
 			}
-			//console.log(data);
-			//console.log("rooms: ", chatRoom.rooms);
+			console.log(data);
+			console.log("rooms: ", chatRoom.rooms);
 			return (chatRoom);
 		});
 	});
@@ -88,13 +96,14 @@ function socket_event_update_front(client : any) {
 			for (let message of data.messages)
 				inter.push(new Message(message.id_chat_room.name, message.id_user.username, message.content_message));
 			chatRoom.messages.set(data.room_name, inter);
-			//console.log("Message2: ", chatRoom);
+			console.log("Message2: ", chatRoom);
 			return (chatRoom);
 		});
 	});
 	client.socket.on("new_message_room", (data : any) =>
 	{
 		chatRoom.update( chat => {
+			console.log("newMessage: ", data, chat);
 			chat.messages.get(data.room_name).push(new Message(data.room_name, data.username, data.content_message));
 			return (chat);
 		});

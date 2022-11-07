@@ -19,9 +19,13 @@ export class ChatRoomEntity {
 	@Column()
 	date_creation: Date;
 
+	@Column({default: false})
+	is_private: boolean;
+
 	@Column()
 	is_password_protected: boolean;
 
 	@Column()
 	password?: string;
+
 }

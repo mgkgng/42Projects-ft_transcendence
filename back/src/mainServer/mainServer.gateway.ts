@@ -80,7 +80,6 @@ export class MainServerService {
 	{
 		 const user : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
 		 const client_username = user.username;
-		 console.log(client_username);
 		 const id_user : any = await this.dataSource.getRepository(UserEntity)
 		 .createQueryBuilder().where("UserEntity.username = :u", { u: client_username }).getOneOrFail();
 		 return (id_user.id_g);
@@ -102,7 +101,9 @@ export class MainServerService {
 
 	async getNamesRoomsForUser(@Request() req) //GET ALL NAMES OF ROOM IN WITH THE CURRENT USER IS IN 
 	{
+		console.log("enter good 1")
 		const id_user = await this.getIdUser(req);	
+		console.log("id_user: ", id_user);
 		const names_rooms : any = await this.dataSource.getRepository(UserChatRoomEntity)
 		.createQueryBuilder("userRooms").innerJoinAndSelect("userRooms.room", "chatRoom")
 		.where("userRooms.id_user = :u", { u: id_user })
