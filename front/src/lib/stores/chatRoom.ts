@@ -49,9 +49,12 @@ export class ChatRooms{
 			console.log("Try load messages");
 			client.socket.emit("get_my_rooms", {});
 			
-			
+			client.socket.off("set_room_not_visible", (data) => {
+			});
 			client.socket.on("set_room_not_visible", (data) => {
 				client.socket.emit("get_my_rooms", {});
+			});
+			client.socket.off("set_room_visible", (data) => {
 			});
 			client.socket.on("set_room_visible", (data) => {
 				client.socket.emit("get_my_rooms", {});
@@ -67,6 +70,8 @@ export class ChatRooms{
 //Ici les evenements qui changent les attributs de chatRoom et qui sont suscribe dans le front
 // (obligation d'utiliser update() pour un rafraichissement du front)
 function socket_event_update_front(client : any) {
+	client.socket.off("get_all_rooms", (data : any) => {
+	});
 	client.socket.on("get_all_rooms", (data : any) => {
 		chatRoom.update((chatRoom) => {
 			chatRoom.all_rooms = new Map();
@@ -74,6 +79,8 @@ function socket_event_update_front(client : any) {
 				chatRoom.all_rooms.set(r.name, r.is_password_protected);
 			return (chatRoom);
 		});
+	});
+	client.socket.off("get_my_rooms", (data : any) => { 
 	});
 	client.socket.on("get_my_rooms", (data : any) => { //HAVE TO OPTIMIZE : NOT REALOAD ALL MESSAGE WHEN A ROOM IS ADDED OR DELETED
 		chatRoom.update((chatRoom) => {
@@ -92,6 +99,8 @@ function socket_event_update_front(client : any) {
 			return (chatRoom);
 		});
 	});
+	client.socket.off("get_message_room", (data: any) => {
+	});
 	client.socket.on("get_message_room", (data: any) => {
 		chatRoom.update((chatRoom) => {
 			let inter : Array<Message> = [];
@@ -102,22 +111,26 @@ function socket_event_update_front(client : any) {
 			return (chatRoom);
 		});
 	});
+	client.socket.off("new_message_room", (data : any) =>{});
 	client.socket.on("new_message_room", (data : any) =>
 	{
 		chatRoom.update( chat => {
 			console.log("newMessage: ", data, chat);
-			chat.messages.get(data.room_name).push(new Message(data.room_name, data.username, data.content_message));
+			chat.messages.get(data.room_name).push(new Message(data.room_name, client.username, data.content_message));
 			return (chat);
 		});
 	});
+	client.socket.off("new_room", (data : any) =>{});
 	client.socket.on("new_room", (data : any) =>
 	{
 		chatRoom.update( chat => {
 			chat.rooms.push(data.room_name);
-			chat.message.set(data.room_name , []);
+			const mess : Message[] = [];
+			chat.messages.set(data.room_name , mess);
 			return (chat);
 		});
 	});
+	client.socket.off("error_append_user_to_room", (data : any) =>{});
 	client.socket.on("error_append_user_to_room", (data : any) =>{
 		alert(data.error);
 	});

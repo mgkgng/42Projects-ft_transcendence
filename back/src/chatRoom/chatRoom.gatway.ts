@@ -298,7 +298,7 @@ export class ChatRoomService {
 			if (ban_end == undefined)
 				ban_end = new Date(2999, 12, 31);
 			const jwt : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
-			const user : any = await this.dataSource.getRepository(UserEntity).find({where: {username: jwt.username}});
+			const user : any = await this.dataSource.getRepository(UserEntity).find({where: {username_42: jwt.username_42}});
 			const user_ban : any = await this.dataSource.getRepository(UserEntity).find({where: {username: data.username_ban}});
 			const room : any = await this.dataSource.getRepository(ChatRoomEntity).find({where: {name: data.room_name}});
 
@@ -329,7 +329,7 @@ export class ChatRoomService {
 			if (mute_end == undefined)
 				mute_end = new Date(2999, 12, 31);
 			const jwt : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
-			const user : any = await this.dataSource.getRepository(UserEntity).find({where: {username: jwt.username}});
+			const user : any = await this.dataSource.getRepository(UserEntity).find({where: {username_42: jwt.username_42}});
 			const user_ban : any = await this.dataSource.getRepository(UserEntity).find({where: {username: data.username_ban}});
 			const room : any = await this.dataSource.getRepository(ChatRoomEntity).find({where: {name: data.room_name}});
 
@@ -357,7 +357,7 @@ export class ChatRoomService {
 	async setAdminUser(@MessageBody() data, @ConnectedSocket() client: Socket, @Request() req)
 	{
 			const client_username : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
-			const user : any = await this.dataSource.getRepository(UserEntity).find({where: {username: client_username.username}});
+			const user : any = await this.dataSource.getRepository(UserEntity).find({where: {username_42: client_username.username_42}});
 			const user_ban : any = await this.dataSource.getRepository(UserEntity).find({where: {username: data.username_new_admin}});
 			const room : any = await this.dataSource.getRepository(ChatRoomEntity).find({where: {name: data.room_name}});
 
@@ -382,11 +382,10 @@ export class ChatRoomService {
 	//{room_name:string}
 	@SubscribeMessage("set_room_not_visible")
 	async setRoomNotVisible(@MessageBody() data, @ConnectedSocket() client: Socket, @Request() req) {
-		const client_username : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
-		const user : any = await this.dataSource.getRepository(UserEntity).find({where: {username: client_username.username}});
+		const user = await this.mainServer.getIdUser(req);
 		const room : any = await this.dataSource.getRepository(ChatRoomEntity).find({where: {name: data.room_name}});
 		const res = await this.dataSource.createQueryBuilder().update(UserChatRoomEntity)
-				.where("id_user = :u AND room = :r", {u: user[0].id_g, r: room[0].id_g})
+				.where("id_user = :u AND room = :r", {u: user, r: room[0].id_g})
 				.set({is_visible: false}).execute();
 		client.emit("set_room_not_visible", {});
 	}
@@ -395,7 +394,7 @@ export class ChatRoomService {
 	@SubscribeMessage("set_room_visible")
 	async setRoomVisible(@MessageBody() data, @ConnectedSocket() client: Socket, @Request() req) {
 		const client_username : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
-		const user : any = await this.dataSource.getRepository(UserEntity).find({where: {username: client_username.username}});
+		const user : any = await this.dataSource.getRepository(UserEntity).find({where: {username: client_username.username_42}});
 		const room : any = await this.dataSource.getRepository(ChatRoomEntity).find({where: {name: data.room_name}});
 		const res = await this.dataSource.createQueryBuilder().update(UserChatRoomEntity)
 				.where("id_user = :u AND room = :r", {u: user[0].id_g, r: room[0].id_g})

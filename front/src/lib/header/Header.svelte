@@ -51,20 +51,7 @@
 		width: 70px;
 		height: 80%;
 		border-radius: 1em;
-
-		cursor: pointer;
-	}
-	.all-chat{
-		position: absolute;
-		top: 150px;
-		right: 0;
-		float: right;
-		background-color: aliceblue;
-
-		width: 70px;
-		height: 80%;
-		border-radius: 1em;
-
+		text-align: center;
 		cursor: pointer;
 	}
 

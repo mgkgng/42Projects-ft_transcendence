@@ -32,16 +32,17 @@ export class OAuthStrategy extends PassportStrategy(Strategy, "oauth") {
 			campus_name: data.campus[0].name,
 			campus_country: data.campus[0].country
 		};
-		if (await this.userService.findOne(res.data.login)) //Check if the user is in db
+		const user_bd = await this.userService.findOne(res.data.login);
+		if (user) //Check if the user is in db
 		{
 			const find = ({
-				username: data.login,
+				username: user_bd.username,
+				username_42: data.login,
 				displayname: data.displayname,
 				image_url: data.image_url,
 				campus_name: data.campus[0].name,
 				campus_country: data.campus[0].country,
 				email: data.email,
-				// is_42_user: true,
 			});
 			console.log("Find:", find);
 			return (find);

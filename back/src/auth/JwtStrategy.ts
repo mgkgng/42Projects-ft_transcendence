@@ -15,7 +15,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     console.log("Payload: ", payload);
     console.log("--------------------------------------------------------------------------------------------------");
     return { 
-      username: payload.login,
+      username: payload.username,
+      username_42: payload.username_42,
       displayname: payload.displayname,
       image_url: payload.image_url,
       campus_name: payload.campus_name,

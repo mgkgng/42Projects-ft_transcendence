@@ -57,6 +57,8 @@
 
 	.info-zone {
 		width: 100%;
+		display: flex;
+		flex-direction: column;
 		max-height: 400px;
 		border-radius: .4em;
 		margin-bottom: .2em;
@@ -86,11 +88,11 @@
 		font-size: 36px;
 	}
 	.btn-room{
-		padding: 1em;
 		width: 20%;
 		border-radius: 0.5em;
 		color:rgb(255, 255, 255);
 		text-align: center;
+		margin-left: 40%;
 		background-color: rgba(97, 97, 97, 0.5);
 		cursor: pointer;
 	}
@@ -111,21 +113,53 @@
 	export let itself : any;
 	export let ChatRoomsModal : any;
 	let username : string = "";
-	chatRoom.subscribe((value) => {
-		username = value.username_search;
-	});
+	let local_username : string;
+	let new_username : any = "";
 	let user_info = null;
-	onMount(async () => {
-		console.log("Here ");
-		$client.socket.emit("get_other_user_info", { username_search: username } );
+
+	client.subscribe(value => {	local_username = value.username;	});
+	chatRoom.subscribe(value => {	username = value.username_search;	});
+	onMount(() => {
+		$client.socket.off("get_other_user_info", (data) => {
+		});
 		$client.socket.on("get_other_user_info", (data) => {
 			user_info = data;
-			console.log("USER PROFILE: ", user_info);
+			console.log("User info: ",user_info);
+		});
+
+		$client.socket.off("error_get_other_user_info", (data) => {
 		});
 		$client.socket.on("error_get_other_user_info", (data) => {
+			itself.close();
+			ChatRoomsModal.open();
 			alert("Error: " + data);	
 		});
+		$client.socket.off("error_change_username", (data) => {
+		});
+		$client.socket.on("error_change_username", (data) => {
+			itself.close();
+			ChatRoomsModal.open();
+			alert("Error: " + data);	
+		});
+		$client.socket.off("change_username", (data) => {
+		});
+		$client.socket.on("change_username", (data) => {
+			$client.socket.emit("get_user_info",{});
+			chatRoom.update((value) => {
+				value.username_search = data.new_username;
+				return value;
+			});
+			console.log("client", $client, $chatRoom);
+			console.log("THIS", username, local_username);
+		});
+
+		$client.socket.emit("get_other_user_info", { username_search: username } );
 	});
+	function sendMessage()
+	{
+		new_username = prompt("Enter new username");
+		$client.socket.emit("change_username", { new_username: new_username });
+	}
 </script>
 
 <div class="container">
@@ -138,18 +172,23 @@
 		<img src={user_info.img_url} alt="grosse-tete">
 	</div>
 	<div class="tool-zone">
-		<button>
-			<img src="/logo-test/add.svg" alt="add"/>
-		</button>
-		<button>
-			<img src="/logo-test/block.svg" alt="add"/>
-		</button>
-		<button>
-			<img src="/logo-test/chat.svg" alt="add"/>
-		</button>
+		{#if local_username != username}
+			<button>
+				<img src="/logo-test/add.svg" alt="add"/>
+			</button>
+			<button>
+				<img src="/logo-test/block.svg" alt="add"/>
+			</button>
+			<button>
+				<img src="/logo-test/chat.svg" alt="add"/>
+			</button>
+		{/if}
 	</div>
 	<div class="info-zone">
 		<p>Username: {user_info.username}</p>
+		{#if local_username == username}
+			<input class="btn-room" type="button" value="Change" on:click={sendMessage} />
+		{/if}
 		<p>Campus : {user_info.campus_name}, {user_info.campus_country}</p>
 	</div>
 	<div class="history-zone">

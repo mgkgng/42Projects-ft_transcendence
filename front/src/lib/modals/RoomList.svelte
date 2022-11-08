@@ -108,6 +108,8 @@
 	onMount(() => {
 		$client.socket.emit("AskRooms", { id: $client.id });
 
+		$client.socket.off("GetAllRooms", (data: any) => {
+		});
 		$client.socket.on("GetAllRooms", (data: any) => {
 			console.log(data);
 			let roomsData = JSON.parse(data.rooms);
@@ -118,7 +120,8 @@
 			roomArray = (seeAvailable) ? [...rooms?.values()].filter(room => room.available == true)
 				: [...rooms.values()];
 		});
-
+		$client.socket.off("UpdateRooms", (data: any) => {
+		});
 		$client.socket.on("UpdateRooms", (data: any) => {
 			if (data.method == "ADD")
 				rooms.set(data.id, data.roomInfo);

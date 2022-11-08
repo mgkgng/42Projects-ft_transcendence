@@ -79,10 +79,9 @@ export class GameGateway {
 
 	@SubscribeMessage("Connection")
 	handleConnexion(@ConnectedSocket() client: Socket, @Request() req) {
-		console.log("Connection!!", req.handshake.headers.authorization);
-		console.log("data", req.handshake.headers);
+		console.log("Connection!!", client.id);
 		const user: any = (this.jwtService.decode(req.handshake.headers.authorization.split(' ')[1]));
-		// console.log(user);
+		console.log(user);
 		let newClient = new Client(client, user.username, {});
 		this.clients.set(newClient.id, newClient);
 

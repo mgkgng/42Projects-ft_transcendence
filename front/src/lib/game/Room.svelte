@@ -206,6 +206,8 @@
 			room: roomId
 		});
 
+		$client.socket.off("RoomInfo", (data: any) => {
+		});
 		$client.socket.on("RoomInfo", (data: any) => {
 			console.log("RoomInfo", data);
 			roomFound = true;
@@ -228,6 +230,8 @@
 
 		scores = roomInfo?.scores;
 		
+		$client.socket.off("PaddleUpdate", (data: any) => {
+		});
 		$client.socket.on("PaddleUpdate", (data: any) => {
 			console.log("PaddleUpdate", data);
 			if ((data.player == UserType.Player1 && userIndex == UserType.Player2) ||
@@ -239,11 +243,15 @@
 			// data.paddlePos;
 		});
 
+		$client.socket.off("LoadBall", (data: any) => {
+		});
 		$client.socket.on("LoadBall", (data: any) => {
 			console.log("LoadBall");
 			puck = new Puck(roomInfo?.mapSize[0], roomInfo?.mapSize[1], data.vectorX, data.vectorY);
 		});
 
+		$client.socket.on("PongStart", (data: any) => {
+		});
 		$client.socket.on("PongStart", (data: any) => {
 			console.log("PongStart", data);
 
@@ -253,16 +261,22 @@
 			}, 20);
 		});
 
+		$client.socket.off("DeathPointUpdate", (data: any) => {
+		});
 		$client.socket.on("DeathPointUpdate", (data: any) => {
 			console.log("DeathPointUpdate");
 			deathPoint = data;
 		});
 
+		$client.socket.off("PuckHit", (data: any) => {
+		});
 		$client.socket.on("PuckHit", (data: any) => {
 			console.log("PuckHit");
 			puck.vectorY *= -1;
 		});
  
+		$client.socket.off("ScoreUpdate", (data: any) => {
+		});
 		$client.socket.on("ScoreUpdate", (data: any) => {
 			console.log("ScoreUpdate", data);
 			clearInterval(puckMoving);
@@ -270,6 +284,8 @@
 			puck = undefined;
 		});
 
+		$client.socket.off("GameFinished", (data: any) => {
+		});
 		$client.socket.on("GameFinished", (data: any) => {
 			console.log("GameFinished");
 			console.log((userType == data) ? "You Win!"

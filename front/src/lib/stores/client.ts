@@ -7,7 +7,8 @@ class Client {
 	socket: any;
 	callbacksOnConnection: Set<Function>;
 	listeners: Map<string, Function>;
-	room: string;
+	room: string
+	username: string;
 
 	constructor() {
 		this.id = "";
@@ -15,6 +16,7 @@ class Client {
 		this.callbacksOnConnection = new Set();
 		this.socket = undefined;
 		this.room = "";
+		this.username = "";
 	}
 
 	connect() {
@@ -23,7 +25,6 @@ class Client {
 			return ;
 		this.socket.emit("Connection");
 	}
-
 	async send42Tok(url: any)
 	{
 		if (localStorage.getItem('transcendence-jwt') != null

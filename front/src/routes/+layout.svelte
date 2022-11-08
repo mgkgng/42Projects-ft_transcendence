@@ -71,6 +71,8 @@
 	}
 
 	onMount(async () => {
+		if ($client.socket)
+			return;
 		if (localStorage.getItem('transcendence-jwt') != null
 		&& localStorage.getItem('transcendence-jwt') != undefined)
 		{
@@ -80,7 +82,7 @@
 					extraHeaders: {
 						Authorization: "Bearer " + tok,
 					},
-					autoConnect: false
+					autoConnect: false,
 				},);
 				await $client.socket.connect();
 				console.log($client.socket);
@@ -91,10 +93,9 @@
 		if ((!$client.socket || !$client.socket.connected) && url.has('code'))
 			await connectWithUrlCode(url);
 
-
-		if (!browser || !$client.socket)
-			return;
 		if ($client.socket) {
+			$client.socket.off("GetConnectionInfo", (data: any) => {
+			});
 			$client.socket.on("GetConnectionInfo", (data: any) => {
 				console.log("GetConnectionInfo", data);
 				$client.id = data.id;
@@ -103,18 +104,32 @@
 				
 			});	
 
+			$client.socket.off("RoomCreated", (data: any) => {
+			});
 			$client.socket.on("RoomCreated", (data: any) => {
 				console.log("RoomCreated", data);
 				roomId = data;
 				roomModal.open();
 			});
 
+			$client.socket.off("connection", (data: any) => {
+			});
 			$client.socket.on("connection", (data: any) => {
 				console.log("connection", data);
 				$client.connect();
 				loginState.set(true);
 				$chatRoom.LoadMessages($client);
 			});
+			$client.socket.off("get_user_info", (data: any) => {
+			});
+			$client.socket.on("get_user_info", (data: any) => {
+				client.update((value) => {
+					value.username = data.username;
+					return value;
+				});
+				console.log("DATA: ", data);
+			});
+			$client.socket.emit("get_user_info", {});
 		}
 		// let res = await $client.send42Tok(new URLSearchParams(window.location.search));
 		// if (res) {

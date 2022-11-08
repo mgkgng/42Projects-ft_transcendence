@@ -40,7 +40,7 @@ export class MainServerService {
 	{
 		console.log("Connect to main");
 		const user : any = (this.jwtServer.decode(req.handshake?.headers?.authorization.split(' ')[1]));
-		const client_username : string = user?.username;
+		const client_username : string = user?.username_42;
 		let userConnected = {username: client_username, socket: req, status: "online"};
 		this.userConnectedList.push(userConnected);
 		//console.log(this.userConnectedList);
@@ -79,9 +79,9 @@ export class MainServerService {
 	async getIdUser(@Request() req) //GET THE UNIQ ID OF A USER
 	{
 		 const user : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
-		 const client_username = user.username;
+		 const client_username = user.username_42;
 		 const id_user : any = await this.dataSource.getRepository(UserEntity)
-		 .createQueryBuilder().where("UserEntity.username = :u", { u: client_username }).getOneOrFail();
+		 .createQueryBuilder().where("UserEntity.username_42 = :u", { u: client_username }).getOneOrFail();
 		 return (id_user.id_g);
 	}
 	async getIdUserByUsername(username : string) //GET THE UNIQ ID OF A USER FIND WITH USER'S USERNAME
@@ -123,6 +123,7 @@ export class MainServerService {
 			const res = await this.dataSource.getRepository(UserEntity).createQueryBuilder("user")
 						.where("id_g = :id", {id : id_user})
 						.select(["user.email", "user.username", "user.img_url", "user.display_name", "user.campus_name", "user.campus_country"]).getOne();
+			client.emit("get_user_info", res);
 			return (res);
 		}catch(e)
 		{
@@ -143,6 +144,7 @@ export class MainServerService {
 			return (res);
 		}catch(e)
 		{
+			console.log("User not found");
 			client.emit("error_get_other_user_info", "User not found");
 			throw new WsException("User not found");
 		}
@@ -157,5 +159,37 @@ export class MainServerService {
 		.where("substr(user.username, 1, :l) = :s", {l: data.research.length, s: data.research}).getMany();
 		console.log(res);
 		client.emit("get_all_username_begin_by", res);
+	}
+	//{new_username: string}
+	@SubscribeMessage('change_username')
+	async newUsername(@MessageBody() data, @ConnectedSocket() client: Socket, @Request() req)
+	{
+		try {
+			const id_user = await this.getIdUser(req);
+			try{
+				const res = await this.dataSource.getRepository(UserEntity)
+				.createQueryBuilder("user")
+				.select(["user.username"])
+				.where("user.username = :u", {u: data.new_username}).getOneOrFail();
+				client.emit("error_change_username", "Username already taken");
+				console.log("Username already taken ", client.id);
+				return;
+			}catch(e){
+				if (data.new_username.length == 0 || data.new_username.length > 20)
+				{
+					client.emit("error_change_username", "Username not in good fromat");
+					return;
+				}
+				const res = await this.dataSource.createQueryBuilder().update(UserEntity)
+				.where("id_g = :u", {u: id_user})
+				.set({username: data.new_username}).execute();
+				client.emit("change_username", {new_username: data.new_username});
+				console.log("Username changed ", client.id);
+				return;
+			}
+		}catch(e){
+			client.emit("error_change_username", "Data error");
+			console.log("Data error ", client.id);
+		}
 	}
 }
