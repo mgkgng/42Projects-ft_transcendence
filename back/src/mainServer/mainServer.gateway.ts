@@ -139,6 +139,7 @@ export class MainServerService {
 			const res = await this.dataSource.getRepository(UserEntity).createQueryBuilder("user")
 						.where("id_g = :id", {id : id_user})
 						.select(["user.email", "user.username", "user.img_url", "user.display_name", "user.campus_name", "user.campus_country"]).getOne();
+			client.emit("get_other_user_info", res);
 			return (res);
 		}catch(e)
 		{

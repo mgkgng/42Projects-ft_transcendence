@@ -16,12 +16,20 @@
 <script lang="ts">
 
     import { user } from "$lib/stores/user";
-	export let	username;
-	export let content_message;
+	import { chatRoom } from "$lib/stores/chatRoom.ts";
+	export let	username : any;
+	export let content_message : any;
+	export let itself : any;
+	export let axelUserProfileModal : any;
 
 	function seeUserProfile()
 	{
-
+		chatRoom.update((value) => {
+			value.username_search = username;
+			return value;
+		});
+		itself.close();
+		axelUserProfileModal.open();
 	}
 </script>
 

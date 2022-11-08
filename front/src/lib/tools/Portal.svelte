@@ -13,6 +13,6 @@
 	}
 </script>
 
-<div use:portal={target}>
+<div use:portal={target} >
 	<slot />
 </div>

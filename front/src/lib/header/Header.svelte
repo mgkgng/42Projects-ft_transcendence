@@ -75,6 +75,7 @@
     import UserProfile from "$lib/modals/UserProfile.svelte";
     import ChatModal from "$lib/modals/ChatRoom.svelte";
     import AllChatModal from "$lib/modals/allChatRooms.svelte";
+    import AxelUserProfile from "$lib/modals/AxelUserProfile.svelte";
     import { user } from "$lib/stores/user";
     import { loginState } from "$lib/stores/var";
     import Modal from "$lib/tools/Modal.svelte";
@@ -84,6 +85,7 @@
 	let allChatModal: any;
 	let login: boolean;
 	let userInfo: any;
+	let axelProfileModal : any;
 
 	$: console.log("This is user:", $user);
 
@@ -96,12 +98,14 @@
 	<UserProfile />
 </Modal>
 <Modal bind:this={chatModal} closeOnBgClick={true}>
-	<ChatModal />
+	<ChatModal itself={chatModal} allChatRoomsModal={allChatModal} axelUserProfileModal={axelProfileModal}/>
 </Modal>
 <Modal bind:this={allChatModal} closeOnBgClick={true}>
-	<AllChatModal />
+	<AllChatModal itself={allChatModal} ChatRoomsModal={chatModal}/>
 </Modal>
-
+<Modal bind:this={axelProfileModal} closeOnBgClick={true}>
+	<AxelUserProfile itself={axelProfileModal} ChatRoomsModal={chatModal}/>
+</Modal>
 <header>
 	<div class="logo" on:click={() => {
 		goto('/');
@@ -122,11 +126,6 @@
 		chatModal.open();
 	}}>
 		<h4>chat</h4>
-	</div>
-	<div class="all-chat" on:click={() => {
-		allChatModal.open();
-	}}>
-		<h4>Allchat</h4>
 	</div>
 </header>
 

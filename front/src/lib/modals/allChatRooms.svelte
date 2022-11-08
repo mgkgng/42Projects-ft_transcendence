@@ -28,6 +28,17 @@
 		background-color: rgba(97, 97, 97, 0.5);
 		cursor: pointer;
 	}
+	.back{
+		padding: 0em;
+		width: 50px;
+		height: 50px;
+		margin-right: 1em;
+		border-radius: 0.5em;
+		color:rgb(255, 255, 255);
+		text-align: center;
+		background-color: rgba(97, 97, 97, 0.5);
+		cursor: pointer;
+	}
 	.room{
 		display: flex;
 		flex-direction: row;
@@ -58,6 +69,8 @@
     import { chatRoom } from "$lib/stores/chatRoom";
 	import { onMount, beforeUpdate } from "svelte";
 	
+	export let itself: any; 
+	export let ChatRoomsModal : any;
 
 	let rooms : string[];
 	let all_rooms : Map<string, boolean> = new Map();
@@ -85,6 +98,10 @@
 </script>
 
 <div class="container">
+	<button class="btn-room back" on:click={() => {
+		itself.close();
+		ChatRoomsModal.open();
+	}}>&lt</button>
 	<div class="room-zone">
 		<div class="research-zone">
 			<input class="text-input" bind:value={research}>

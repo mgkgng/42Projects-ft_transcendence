@@ -38,6 +38,8 @@ export class ChatRooms{
 	actualRoom : Array<Message> = [];			//messages de la room de actualRoomName
 	actualRoomName : string = "";				//room selectionnee 
 
+	username_search : string = "";		//username search profile
+
 	constructor() {
 	}
 	LoadMessages(client : any)

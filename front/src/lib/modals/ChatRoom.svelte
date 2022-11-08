@@ -69,6 +69,16 @@
 		background-color: rgba(97, 97, 97, 0.5);
 		cursor: pointer;
 	}
+	.search{
+		margin-left: 20%;
+		margin-bottom: 1em;
+		margin-top: 1em;
+		width: 60%;
+		border-style: solid;
+		border-color: rgb(255, 255, 255);
+		border-width: 2px;
+		border-radius: 1em;
+	}
 	.choose{
 		background-color: rgba(207, 196, 196, 0.5);
 		text-decoration: underline;
@@ -87,7 +97,11 @@
 	import { onMount } from "svelte";
 	import { get } from 'svelte/store';
     import ChatRoomMessage from "$lib/tools/chatRoomMessage.svelte";
-	
+
+	export let itself: any; 
+	export let allChatRoomsModal : any;
+	export let axelUserProfileModal : any;
+
 	let newRoomName : string; //Valeur du insert de création de room
 	let newMessage : string;  //Valeur du insert d'envoie de message
 	let newRoomPassword : string; //Valeur du insert, password
@@ -130,6 +144,10 @@
 <div class="container">
 	<!--Zone de liste des rooms du user-->
 	<div class="room-zone">
+		<input class="btn-room search" value="search" on:click={() =>{
+			allChatRoomsModal.open();
+			itself.close();	
+		}}>
 		<ul>
 		{#each ([...$chatRoom.messages.keys()]) as room}
 			<li>
@@ -146,7 +164,7 @@
 	<!--Zone de liste des messages de la room selectionne-->
 	<div class="message-zone">
 		{#each (actualMessages) as message}
-			<ChatRoomMessage username={message.username} content_message={message.message}/>
+			<ChatRoomMessage username={message.username} content_message={message.message} itself={ itself } axelUserProfileModal={axelUserProfileModal}/>
 		{/each}
 		<input class="text-input" bind:value={newMessage}>
 		<input class="submit" value="send" on:click={sendMessage}>
