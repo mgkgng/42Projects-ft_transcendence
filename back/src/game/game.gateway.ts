@@ -227,7 +227,7 @@ export class GameGateway {
 
 	static broadcast(clients: any, event: string, data: any) {
 		for (let client of clients)
-			client.socket.emit(event, data);
+			client.emit(event, data);
 	}
 
 	@SubscribeMessage("newChatGameMessage")

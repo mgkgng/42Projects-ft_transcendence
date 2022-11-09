@@ -174,8 +174,8 @@
 	let userIndex: number = UserType.Player1;
 	let opponentIndex: number = UserType.Player2;
 
-	let initPos = (roomInfo?.mapSize[0] + roomInfo?.paddleSize) / 2;
-	let paddlePos: Array<number> = [initPos, initPos];
+	let initPos: number;
+	let paddlePos: Array<number>;
 
 	let quitConfirmMsgModal: any;
 	let resQuitConfirm: boolean;
@@ -191,6 +191,7 @@
 	let miniMode: boolean = false;
 
 	$: quitRoom(resQuitConfirm);
+	$: console.log(roomInfo);
 
 	function quitRoom(res: boolean) {
 		if (res == false)
@@ -205,34 +206,36 @@
 			room: roomId
 		});
 
-		$client.socket.off("RoomInfo", (data: any) => {
-		});
+		// $client.socket.off("RoomInfo", (data: any) => {
+		// });
 		$client.socket.on("RoomInfo", (data: any) => {
 			console.log("RoomInfo", data);
 			roomFound = true;
 			roomInfo = data;
-		});
+			initPos = (roomInfo?.mapSize[0] + roomInfo?.paddleSize) / 2;
+			paddlePos = [initPos, initPos];
 
-		// plus tard je le rends plus beau
-		if (roomInfo?.players.length > 1)
-			userType = UserType.Player1;
-		else
-			userType = ($client.id == roomInfo?.players[0]) ? UserType.Player1 
-				: ($client.id == roomInfo?.players[1]) ? UserType.Player2 
-				: UserType.Watcher;
+			console.log("hello?", roomInfo.players.length)
+			if (roomInfo?.players.length == 1)
+				userType = UserType.Player1;
+			else
+				userType = ($client.id == roomInfo?.players[0]) ? UserType.Player1 
+					: ($client.id == roomInfo?.players[1]) ? UserType.Player2 
+					: UserType.Watcher;
 
-		if (userType == UserType.Player2) {
-			[userIndex, opponentIndex] = [opponentIndex, userIndex];
-			// TODO (this is kinda brut force)
-			paddlePos[0] -= roomInfo?.paddleSize, paddlePos[1] -= roomInfo?.paddleSize;
-		}
+			if (userType == UserType.Player2) {
+				[userIndex, opponentIndex] = [opponentIndex, userIndex];
+				// TODO (this is kinda brut force)
+				paddlePos[0] -= roomInfo?.paddleSize, paddlePos[1] -= roomInfo?.paddleSize;
+			}
 
-		scores = roomInfo?.scores;
+			scores = roomInfo?.scores;
+		});		
 		
 		$client.socket.off("PaddleUpdate", (data: any) => {
 		});
 		$client.socket.on("PaddleUpdate", (data: any) => {
-			console.log("PaddleUpdate", data);
+			// console.log("PaddleUpdate", data);
 			if ((data.player == UserType.Player1 && userIndex == UserType.Player2) ||
 				(data.player == UserType.Player2 && userIndex == UserType.Player2))
 				paddlePos[data.player] = data.paddlePos;
@@ -376,10 +379,12 @@ on:mousemove={(event)=>{
 
 on:keypress={(event) => {
 	if (userType == UserType.Watcher
-	|| (event.code != 'KeyA' && event.code != 'KeyD'))
+	|| (event.code != 'KeyA' && event.code != 'KeyD')) {
+		console.log("allo?", userType, UserType.Watcher)
 		return ;
+	}
 
-	if (moving)
+	if (moving) //* TODO should make movement more fluent
 		return ;
 
 	moving = true;
