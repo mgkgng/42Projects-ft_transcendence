@@ -54,7 +54,6 @@
 		text-align: center;
 		cursor: pointer;
 	}
-
 </style>
 
 <script lang="ts">
@@ -87,10 +86,10 @@
 <Modal bind:this={chatModal} closeOnBgClick={true}>
 	<ChatModal itself={chatModal} allChatRoomsModal={allChatModal} axelUserProfileModal={axelProfileModal}/>
 </Modal>
-<Modal bind:this={allChatModal} closeOnBgClick={true}>
+<Modal bind:this={allChatModal} closeOnBgClick={true} >
 	<AllChatModal itself={allChatModal} ChatRoomsModal={chatModal}/>
 </Modal>
-<Modal bind:this={axelProfileModal} closeOnBgClick={true}>
+<Modal bind:this={axelProfileModal} closeOnBgClick={true} >
 	<AxelUserProfile itself={axelProfileModal} ChatRoomsModal={chatModal}/>
 </Modal>
 <header>

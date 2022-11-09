@@ -2,9 +2,10 @@
 	.container {
 		display: flex;
 		flex-direction: row;
+		margin-top: 3vh;
 		width: 700px;
 		height: 75%;
-		max-height: 90%;
+		max-height: 90vh;
 		background-color: transparentize(rgb(255, 0, 0), 0.9);
 		padding: 2em;
 		border-radius: 2em;
@@ -94,7 +95,7 @@
 
     import { client } from "$lib/stores/client";
     import { chatRoom, ChatRooms } from "$lib/stores/chatRoom";
-	import { onMount } from "svelte";
+	import { onMount, afterUpdate } from "svelte";
 	import { get } from 'svelte/store';
     import ChatRoomMessage from "$lib/tools/chatRoomMessage.svelte";
 
@@ -112,6 +113,15 @@
 
 	let is_new_room_password_protected : boolean = false; //Si la room est protege par un mot de passe
 
+	let message_zone;
+	afterUpdate(() => {
+			message_zone.scrollTo({top: 1000000000});
+	});
+	$: if(actualMessages && message_zone)
+		{
+			message_zone.scrollTo({top: 1000000000});
+		}
+
 	//Liens entre les variables de ce fichier et les variables dans le stores "/src/stores/chatRoom.ts"
 	chatRoom.subscribe(chat  => { actualMessages = chat.actualRoom;});
 	chatRoom.subscribe(chat => { actualName = chat.actualRoomName;});
@@ -123,6 +133,7 @@
 		chatRoom.update(chat => { 
 			chat.actualRoom = chat.messages.get(room.room);
 			chat.actualRoomName = room.room;
+			message_zone.scrollTo({top: 1000000000});
 			return (chat);
 		});
 	}
@@ -162,12 +173,12 @@
 		</ul>
 	</div>
 	<!--Zone de liste des messages de la room selectionne-->
-	<div class="message-zone">
+	<div class="message-zone" bind:this={message_zone}>
 		{#each (actualMessages) as message}
 			<ChatRoomMessage username={message.username} content_message={message.message} itself={ itself } axelUserProfileModal={axelUserProfileModal}/>
 		{/each}
 		<input class="text-input" bind:value={newMessage}>
-		<input class="submit" value="send" on:click={sendMessage}>
+		<input type="button" class="submit" value="send" on:click={sendMessage}>
 	</div>
 	<!--Zone de creation de room -->
 	<div class="new-chat-room-zone">

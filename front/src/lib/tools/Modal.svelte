@@ -34,7 +34,7 @@
 
 {#if state}
 <Portal>
-	<div class="backdrop" tabindex="-1" on:click={handleBgClick}>
+	<div class="backdrop portal" tabindex="-1" on:click={handleBgClick}>
 		<div class={cssClass} on:click={e => {
 			e.stopPropagation();
 		}}>

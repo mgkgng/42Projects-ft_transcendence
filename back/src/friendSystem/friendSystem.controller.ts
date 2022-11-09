@@ -88,6 +88,7 @@ export class friendSystemController {
     @Get('unfriend?')
     async unfriend(@Query() query : {first_username : string, second_username : string})
     {
+        console.log("unfriend", query);
         return this.friendSystemService.unFriend(query.first_username, query.second_username);
     }
 

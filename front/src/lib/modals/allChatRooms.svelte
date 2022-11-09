@@ -4,7 +4,7 @@
 		flex-direction: row;
 		width: 550px;
 		height: 75%;
-		//max-height: 90%;
+		max-height: 90vh;
 		background-color: transparentize(rgb(255, 0, 0), 0.9);
 		padding: 2em;
 		border-radius: 2em;
@@ -80,6 +80,7 @@
 	let research : string = "";
 	onMount(() => {
 		$client.socket.emit("get_all_rooms_begin_by", {research: research});
+
 	});
 	function addToTheRoom(room : any)
 	{
@@ -94,6 +95,7 @@
 	{
 		console.log("changed")
 		$client.socket.emit("get_all_rooms_begin_by", {research: research});
+
 	}
 </script>
 
@@ -108,7 +110,7 @@
 			<button class="btn-room" on:click={researchRooms}>Search</button>
 		</div>
 		<ul>
-		{#each ([...all_rooms.keys()]) as room_name}
+		{#each ([...all_rooms.keys()].sort()) as room_name}
 			{#if (rooms.includes(room_name)) == false}
 				<li class="room">
 					<p>{room_name}</p>
