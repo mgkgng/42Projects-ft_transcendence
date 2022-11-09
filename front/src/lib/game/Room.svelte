@@ -180,7 +180,6 @@
 	let quitConfirmMsgModal: any;
 	let resQuitConfirm: boolean;
 
-
 	let grapped = false;
 	let deathPoint: number;
 	let moving = false;

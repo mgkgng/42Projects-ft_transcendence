@@ -33,7 +33,7 @@ export class OAuthStrategy extends PassportStrategy(Strategy, "oauth") {
 			campus_country: data.campus[0].country
 		};
 		const user_bd = await this.userService.findOne(res.data.login);
-		if (user) //Check if the user is in db
+		if (user_bd) //Check if the user is in db
 		{
 			const find = ({
 				username: user_bd.username,
