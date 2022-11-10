@@ -147,9 +147,7 @@
 		transition: .4s;
 		font-size: 25px;
 
-		&:hover {
-			transform: scale(1.2);
-		}
+		&:hover { transform: scale(1.2); }
 	}
 </style>
 

@@ -62,15 +62,21 @@ h1 { font-size: $h1; font-weight: bold; }
 	src: URL('/fonts/CaviarDreams.ttf') format('truetype');
 }
 
-@font-face {
-	font-family: 'modernism-narrow';
-	src: URL('/fonts/Modernism-Narrow.ttf') format('truetype');
-}
+// @font-face {
+// 	font-family: 'modernism-narrow';
+// 	src: URL('/fonts/Modernism-Narrow.ttf') format('truetype');
+// }
+
+// @font-face {
+// 	font-family: 'modernism';
+// 	src: URL('/fonts/Modernism.ttf') format('truetype');
+// }
 
 @font-face {
-	font-family: 'modernism';
-	src: URL('/fonts/Modernism.ttf') format('truetype');
+	font-family: 'fake-receipt';
+	src: URL('/fonts/fake_receipt.ttf') format('truetype');
 }
+
 
 .loading {
 	color: #000;
