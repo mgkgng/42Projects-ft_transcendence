@@ -45,7 +45,7 @@
 		border-radius: 2em;
 		width: 15em;
 		aspect-ratio: 2 / 3;
-		transition: .5s;
+		transition: .3s;
 		cursor: pointer;
 		padding: 2em 0;
 		background-color: rgb(33, 33, 33);
@@ -128,7 +128,6 @@
 		}
 
 		&:hover {
-			// background-color: transparentize($main2, 0.5);
 			// opacity: 0.9;
 
 			.cover {
@@ -170,10 +169,16 @@
 
 <script lang="ts">
 	import { onMount } from "svelte";
+    import Modal from '$lib/tools/Modal.svelte';
+	import Room from "$lib/game/Room.svelte";
 	import { client } from "$lib/stores/client";
+    import { user } from "$lib/stores/user";
 
 	export let itself: any;
 	export let enterGameModal: any;
+
+	let roomModal: any;
+	let roomId: string = "";
 
 	let rooms: Map<string, any> = new Map();
 	let roomArray: Array<any>;
@@ -190,6 +195,13 @@
 			roomPage--;
 		else if (!left && (roomPage + 1) * perPage < roomArray.length)
 			roomPage++;
+	}
+
+	function joinRoom(roomId: string) {
+		$client.socket.emit("JoinRoom", {
+			username: $user.username,
+			roomId: roomId
+		})
 	}
 
 	onMount(() => {
@@ -214,8 +226,23 @@
 				rooms.delete(data.id);
 			rooms = rooms;
 		});
+
+		$client.socket.on("JoinRoomRes", (data: any) => {
+			if (data.allowed) {
+				roomId = data.roomId;
+				roomModal.open();
+				itself.close();
+				return ;
+			}
+			// If couldn't join the game, there should be an error message
+			// and also ask for roomsDataUpdate
+		});
 	});
 </script>
+
+<Modal bind:this={roomModal} closeOnBgClick={false}>
+	<Room itself={roomModal} roomId={roomId}/>
+</Modal>
 
 <div class="container">
 	<div class="button-box">
@@ -231,9 +258,9 @@
 		</label>
 	</div>
 	<div class="room-container">
-		<button class="left icon-button" on:click={() => movePage(false)}>&lt;</button>
+		<button class="left icon-button" on:click={()=>movePage(false)}>&lt;</button>
 		{#each roomsOnPage as room}
-		<div class="room-card">
+		<div class="room-card" on:click={()=>joinRoom(room.id)}>
 			<div class="title">
 				{room.title}
 			</div>

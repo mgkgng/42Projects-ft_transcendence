@@ -220,6 +220,21 @@ export class GameGateway {
 		client.emit("RoomCreated", room.id);
 	}
 
+	@SubscribeMessage("JoinRoom")
+	joinRoom(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
+		let room = this.getRoom(data.roomId);
+		if (room.players.length == 1) { // is it really safe?
+			room.players[1] = data.username;
+			client.emit("JoinRoomRes", {
+				allowed: true,
+				roomId: data.roomId
+			})
+		}
+		client.emit("JoinRoomRes", {
+			allowed: false
+		});
+	}
+
 	static broadcast(clients: any, event: string, data: any) {
 		for (let client of clients)
 			client.emit(event, data);
