@@ -46,5 +46,5 @@ services:
       - net
     volumes:
       - ./bd:/var/lib/postgresql/data 
-    ports:
-      - "5432:5432"
+    #ports:
+      #- "5432:5432"

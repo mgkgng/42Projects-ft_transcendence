@@ -23,8 +23,7 @@ import { UserBlockEntity } from 'src/entity/UserBlock.entity'
 		UserModule, PassportModule, HttpModule,
 	    JwtModule.register({
 			secret: process.env.SECRET,
-	    	//signOptions: { expiresIn: '1d' },      
-	    	signOptions: { expiresIn: '1m' },      
+	    	signOptions: { expiresIn: '1d' },      
 	    }), 
 	],
 	providers: [AuthService, OAuthStrategy, JwtStrategy],

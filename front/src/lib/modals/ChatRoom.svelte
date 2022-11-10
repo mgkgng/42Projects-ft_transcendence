@@ -114,12 +114,12 @@
 	let is_new_room_password_protected : boolean = false; //Si la room est protege par un mot de passe
 
 	let message_zone;
-	afterUpdate(() => {
-			message_zone.scrollTo({top: 1000000000});
-	});
+	//afterUpdate(() => {
+			//message_zone.scroll({top: 1000000000});
+	//});
 	$: if(actualMessages && message_zone)
 		{
-			message_zone.scrollTo({top: 1000000000});
+			message_zone.scroll({top: 1000000000});
 		}
 
 	//Liens entre les variables de ce fichier et les variables dans le stores "/src/stores/chatRoom.ts"
