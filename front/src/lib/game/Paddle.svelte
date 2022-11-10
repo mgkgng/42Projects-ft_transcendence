@@ -3,12 +3,18 @@
 		position: absolute;
 		margin: 0;
 		height: 12px;
+		background-color: #fff;
 
 		border-radius: 2em;
 
 		z-index: 2;
 
 		box-shadow: 0px 0px 20px 8px $yellow;
+	}
+
+	.absent {
+		background-color: rgb(90, 84, 84);
+		box-shadow: none;
 	}
 
 	.user {
@@ -36,6 +42,7 @@
 	export let paddleWidth : number;
 
 	export let pos : number;
+	export let userPresent: boolean;
 
 	let deadZoneHeight = 50;
 
@@ -43,10 +50,8 @@
 
 </script>
 
-<div class="paddle {(user) ? "user" : ""}"
-	style="{(dark) ? "background-color: #fff" : "background-color: #000"};
-		top: {(!user) ? deadZoneHeight: gameHeight - deadZoneHeight}px;
+<div class="paddle {(user) ? "user" : ""} {(!userPresent) ? "absent" : ""}"
+	style="top: {(!user) ? deadZoneHeight: gameHeight - deadZoneHeight}px;
 		left: {((user && !userIndex) || (!userIndex && !user)) ? pos - paddleWidth : pos}px;
 		width: {paddleWidth}px">
 </div>
-

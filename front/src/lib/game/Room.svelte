@@ -304,11 +304,9 @@
 <div class="container">
 	{#if roomInfo}
 	<div class="pong" style="min-width: {roomInfo?.mapSize[0]}px; min-height: {roomInfo?.mapSize[1]}px;">
-		{#if roomInfo.players.length > 1}
 		<Paddle pos={paddlePos[opponentIndex]} paddleWidth={roomInfo?.paddleSize}
 			gameWidth={roomInfo?.mapSize[0]} gameHeight={roomInfo?.mapSize[1]}
-			user={false} userIndex={userIndex}/>
-		{/if}
+			user={false} userIndex={userIndex} userPresent={(roomInfo.players.length > 1) ? true : false}/>
 		<!-- <div class="test" style="left: {paddlePos[opponentIndex]}px; top: 50px;"></div> -->
 		{#if puck}
 		<PongPuck posX={(userIndex == UserType.Player1) ? roomInfo?.mapSize[0] - puck.posX : puck.posX}
@@ -316,7 +314,7 @@
 		{/if}
 		<Paddle pos={paddlePos[userIndex]} paddleWidth={roomInfo?.paddleSize}
 			gameWidth={roomInfo?.mapSize[0]} gameHeight={roomInfo?.mapSize[1]}
-			user={true} userIndex={userIndex}/>
+			user={true} userIndex={userIndex} userPresent={true}/>
 		<!-- <div class="test" style="left: {paddlePos[userIndex]}px; top: {roomInfo?.mapSize[1] - 50}px;
 		"></div> -->
 <!-- 
