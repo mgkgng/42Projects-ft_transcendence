@@ -1,4 +1,5 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { ChatDirectMessageEntity } from "./ChatDirectMessage.entity";
 import { GameEntity } from "./Game.entity";
 import { MessageChatRoomEntity } from "./MessageChatRoom.entity";
 import { MessageDirectEntity } from "./MessageDirect.entity";
@@ -32,6 +33,11 @@ export class UserEntity
 	relation_friend_requested: UserFriendEntity[];
 	@OneToMany(() => UserFriendEntity, (user: UserFriendEntity) => user.id_second_user)
 	relation_friend_accepted: UserFriendEntity[];
+	@OneToMany(() => ChatDirectMessageEntity, (user: ChatDirectMessageEntity) => user.message_sender)
+	user_message_send: ChatDirectMessageEntity[];
+	@OneToMany(() => ChatDirectMessageEntity, (user: ChatDirectMessageEntity) => user.message_recipient)
+	user_message_receive: ChatDirectMessageEntity[];
+
 
 	@Column()	
 	email: string;
