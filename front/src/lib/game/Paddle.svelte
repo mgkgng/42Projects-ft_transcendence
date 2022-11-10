@@ -9,7 +9,7 @@
 
 		z-index: 2;
 
-		box-shadow: 0px 0px 20px 8px $yellow;
+		box-shadow: 0px 0px 20px 8px $red;
 	}
 
 	.absent {
@@ -19,10 +19,8 @@
 
 	.user {
 		margin: 0;
-		box-shadow: 0px 0px 20px 8px $red;
+		box-shadow: 0px 0px 20px 8px $blue;
 	}
-
-
 </style>
 
 <script lang="ts">
@@ -47,7 +45,6 @@
 	let deadZoneHeight = 50;
 
 	$: console.log(paddleWidth);
-
 </script>
 
 <div class="paddle {(user) ? "user" : ""} {(!userPresent) ? "absent" : ""}"

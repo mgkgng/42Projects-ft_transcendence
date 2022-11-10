@@ -23,6 +23,7 @@ import { GameEntity } from "src/entity/Game.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository, DataSource } from "typeorm";
 import { replacer } from "./game.utils";
+import { UserService } from "src/user/user.service";
 
 @WebSocketGateway({
 	cors: {
@@ -39,6 +40,7 @@ export class GameGateway {
 	constructor(private mainServerService : MainServerService, private jwtService: JwtService, 
 				@InjectRepository(GameEntity) private gameRep: Repository<GameEntity>,
 				private dataSource : DataSource,
+				private userService : UserService
 	) {
 		this.clients = new Map<string, Client>();
 		this.rooms = new Map<string, Room>();
@@ -81,13 +83,9 @@ export class GameGateway {
 	handleConnexion(@ConnectedSocket() client: Socket, @Request() req) {
 		console.log("Connection!!", client.id);
 		const user: any = (this.jwtService.decode(req.handshake.headers.authorization.split(' ')[1]));
-		console.log(user);
-		let newClient = new Client(client, user.username, {});
+  		let newClient = new Client(client, user.username, {});
 		this.clients.set(newClient.id, newClient);
 
-		// console.log(this.clients.keys());
-
-		// console.log("or with socketio", this.server.sockets.sockets);
 		console.log(user);
 		// Should send it only once
 		client.emit("GetConnectionInfo", {
@@ -99,11 +97,7 @@ export class GameGateway {
 				campus_name: user.campus_name,
 				campus_country: user.campus_country
 			}
-	
 		})
-		console.log("how many: ", this.server.sockets.sockets.keys());
-		console.log("=================================");
-
 		// Here maybe should be db check - if user is already registered.
 	}
 
@@ -118,8 +112,9 @@ export class GameGateway {
 
 		this.queue.push(client);
 
+		// TODO plus tard
 		if (this.queue.length > 1) {
-			let room = new Room([this.queue[0], this.queue[1]], "test", 25, 8, true, this.gameRep, this.mainServerService, this.dataSource);
+			let room = new Room([this.queue[0], this.queue[1]], [], "test", 25, 8, true, this.gameRep, this.mainServerService, this.dataSource, this.userService);
 			// TODO: think about it: if i just join a match randomlmy like this, it could be by default a private game
 			this.queue[0].room = room.id;
 			this.queue[1].room = room.id;
@@ -150,10 +145,12 @@ export class GameGateway {
 			return ;
 		}
 
+		console.log("once again!", room.players);
+
 		client.emit("RoomInfo", {
 			roomHost: room.host,
-			players: (room.players.length === 2) ? [room.players[0].id, room.players[1].id]
-				: [room.players[0].id],
+			players: (room.players.length === 2) ? [room.players[0], room.players[1]]
+				: [room.players[0]],
 			maxpoint: room.maxpoint,
 			scores: room.scores,
 			mapSize: [room.pong.gameMap.width, room.pong.gameMap.height],
@@ -200,8 +197,6 @@ export class GameGateway {
 		// and then if the game is going on...
 		// score...
 		
-		console.log();
-
 		client.emit("GetAllRooms", {
 			rooms: JSON.stringify([...this.rooms].filter(room => !room[1].privateMode), replacer())
 		});
@@ -215,10 +210,10 @@ export class GameGateway {
 		// if (client.room.length)
 		// 	return ;
 
-		let room = new Room([client], data.title, data.maxPoint, data.difficulty, data.privateMode,
-			this.gameRep, this.mainServerService, this.dataSource, data.username);
+		let room = new Room([data.username], [client], data.title, data.maxPoint, data.difficulty, data.privateMode,
+			this.gameRep, this.mainServerService, this.dataSource, this.userService, data.username);
 		this.rooms.set(room.id, room);
-		
+
 		// TODO should be able to set client's room state
 		// client.room = room.id;
 

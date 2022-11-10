@@ -12,7 +12,6 @@
 		width: 5em;
 		height: 3em;
 	}
-	
 </style>
 
 <script lang="ts">

@@ -33,6 +33,8 @@
 	export let userInfo: any;
 	export let score: any;
 	export let left: boolean;
+
+	console.log(userInfo);
 </script>
 
 <div class="container {(left) ? "left" : ""}">

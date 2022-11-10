@@ -6,6 +6,8 @@ import { GameEntity } from "src/entity/Game.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { MainServerService } from "src/mainServer/mainServer.gateway";
+import { UserService } from "src/user/user.service";
+import { ConsoleLogger } from "@nestjs/common";
 
 const Difficulty = {
 	0 : 3,
@@ -35,13 +37,13 @@ export class Room {
 	clients: Map<string, any>;
 	chat: Map<string, string>
 		
-	constructor(players: any, title:string, maxpoint: number = 25,
+	constructor(players: any, clients: any, title:string, maxpoint: number = 25,
 				difficulty : number = 8, privateMode : boolean = true,
 				@InjectRepository(GameEntity) private gameRep: Repository<GameEntity>, 
 				private mainServerService : MainServerService,
 				private dataSource : DataSource,
-				host: any = undefined) {
-		
+				private userService : UserService,
+			 	host: any = undefined) {
 		this.id = uid();
 		this.title = title;
 		this.maxpoint = maxpoint;
@@ -53,16 +55,33 @@ export class Room {
 		this.available = (players.length < 2) ? true : false;
 	
 		this.clients = new Map();
-		this.addClients(players);
+		this.addClients(clients);
 
 		this.pong = new Pong(this.difficulty);
-		this.players = players;
+		this.players = [];
+		this.getPlayerInfo(players[0]).then((res)=>{
+			this.players.push(res);
+		});
+
+		console.log("player!", this.players[0]);
 
 		// TODO HOST-GUEST MODE / RANDOM MODE
 		// if (randomMode)
 			// this.startPong();
-		
 	}
+
+	async getPlayerInfo(player: any) {
+		const userdata = await this.userService.findOne(player)
+		return ({
+			username: userdata.username,
+			username_42: userdata.username_42,
+			displayname: userdata.display_name,
+			image_url: userdata.img_url,
+			campus_name: userdata.campus_name,
+			campus_country: userdata.campus_country,
+		});
+	}
+
 	/**
 	 * Use the static server method to broadcast,
 	 * pass the clients as parameters

@@ -6,6 +6,7 @@ import { JwtService } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { GameEntity } from 'src/entity/Game.entity';
 import { MainServerModule } from 'src/mainServer/mainServer.module';
+import { UserModule } from 'src/user/user.module';
 //import { JwtAuthGuard } from 'src/auth/auth.adaptater';
 //import { APP_GUARD } from '@nestjs/core';
 
@@ -15,6 +16,6 @@ import { MainServerModule } from 'src/mainServer/mainServer.module';
 			//provide: APP_GUARD,
 			//useClass: JwtAuthGuard,
 		//  }],
-	imports :	[TypeOrmModule.forFeature([GameEntity]), MainServerModule]
+	imports :	[TypeOrmModule.forFeature([GameEntity]), MainServerModule, UserModule]
 })
 export class GameModule {}

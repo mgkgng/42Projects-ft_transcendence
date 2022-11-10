@@ -373,10 +373,8 @@ on:mousemove={(event)=>{
 
 on:keypress={(event) => {
 	if (userType == UserType.Watcher
-	|| (event.code != 'KeyA' && event.code != 'KeyD')) {
-		console.log("allo?", userType, UserType.Watcher)
+	|| (event.code != 'KeyA' && event.code != 'KeyD'))
 		return ;
-	}
 
 	if (moving) //* TODO should make movement more fluent
 		return ;
