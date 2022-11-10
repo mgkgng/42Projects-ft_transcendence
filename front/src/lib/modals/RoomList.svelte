@@ -3,6 +3,8 @@
 		position: relative;
 		width: 100%;
 		height: 100%;
+
+		min-width: 1050px;
 		display: flex;
 		flex-direction: column;
 
@@ -40,13 +42,83 @@
 	.room-card {
 		border: 2px solid #fff;
 		border-radius: 2em;
-		width: 12em;
+		width: 15em;
 		aspect-ratio: 2 / 3;
 		transition: .2s;
 		cursor: pointer;
+		padding: 2em 0;
+		background-color: transparentize(#000, .7);
+
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+
+		.title {
+			background-color: transparentize(#000, .5);
+			padding: .5em 1em;
+			border: 2.5px solid transparentize(#fff, .6);
+			width: 80%;
+			height: 2.7em;
+		}
+
+		.players {
+			margin-top: 2em;
+			display: flex;
+			flex-direction: row;
+			gap: .6em;
+
+			img {
+				width: 100px;
+				height: 100px;
+				object-fit: cover;
+				border: 2.5px solid transparentize(#fff, .6);
+			}
+
+			.grey-box {
+				width: 100px;
+				height: 100px;
+				background-color: #000;
+				border: 2.5px solid transparentize(#fff, .6);
+				font-family: 'fake-receipt';
+				font-size: 80px;
+				text-align: center;
+				color: transparentize(#fff, .6);
+			}
+		}
+
+		.info {
+			margin-top: 1em;
+			display: flex;
+			flex-direction: row;
+			border: 2.5px solid transparentize(#fff, .6);
+			
+			div {
+				padding: 1em;
+				border-right: 2.5px solid transparentize(#fff, .6);
+
+				&:nth-child(1) {
+					background-color: $red;
+				}
+
+				&:nth-child(2) {
+					background-color: $green;
+				}
+			}
+		}
+
+		.join {
+			display: none;
+			font-family: "fake-receipt";
+			font-size: 35px;
+		}
 
 		&:hover {
-			background-color: transparentize($red, 0.5);
+			background-color: transparentize($main2, 0.5);
+			opacity: 0.9;
+
+			.join {
+				display: block;
+			}
 		}
 	}
 
@@ -75,7 +147,7 @@
 
 		&:hover {
 			display: block;
-			background-color: transparentize($main2, 0.8);
+			background-color: transparentize($main2, 0.5);
 		}
 	}
 
@@ -111,14 +183,12 @@
 		$client.socket.off("GetAllRooms", (data: any) => {
 		});
 		$client.socket.on("GetAllRooms", (data: any) => {
-			console.log(data);
 			let roomsData = JSON.parse(data.rooms);
-			console.log("after", roomsData);
 			for (let roomData of roomsData)
 				rooms.set(roomData[0], roomData[1]);
-			console.log("GetAllRooms", rooms);
 			roomArray = (seeAvailable) ? [...rooms?.values()].filter(room => room.available == true)
 				: [...rooms.values()];
+			console.log(roomArray[0]);
 		});
 		$client.socket.off("UpdateRooms", (data: any) => {
 		});
@@ -149,7 +219,24 @@
 		<button class="left icon-button" on:click={() => movePage(false)}>&lt;</button>
 		{#each roomsOnPage as room}
 		<div class="room-card">
-			{room.title}
+			<div class="title">
+				{room.title}
+			</div>
+			<div class="players">
+				<img src={room.players[0].image_url} alt="player1" />
+				{#if room.players.length > 1}
+				{:else}
+				<div class="grey-box">?</div>
+				{/if}
+			</div>
+			<div class="info">
+				<div>{room.maxpoint}</div>
+				<div>{room.difficulty}</div>
+				<div>{room.width}</div>
+			</div>
+			<div class="join">
+				JOIN
+			</div>
 		</div>
 		{/each}
 		<!-- if less than perPage, gray card -->

@@ -60,11 +60,12 @@ export class Room {
 		this.pong = new Pong(this.difficulty);
 		this.players = [];
 		for (let player of players)
-			this.getPlayerInfo(players[0]).then((res)=>{ this.players.push(res); });
+			this.getPlayerInfo(player).then((res)=>{ this.players.push(res); });
 
-		// TODO HOST-GUEST MODE / RANDOM MODE
-		// if (randomMode)
-			// this.startPong();
+		console.log("coucou", this.players);
+
+		if (!host)
+			this.startPong();
 	}
 
 	async getPlayerInfo(player: any) {
