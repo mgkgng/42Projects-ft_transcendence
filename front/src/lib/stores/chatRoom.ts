@@ -6,12 +6,14 @@ class Message
 	room: string = "";
 	username : string = "";
 	message : string = "";
+	date : Date = new Date();
 
-	constructor(room : string, username : string, message : string)
+	constructor(room : string, username : string, message : string, date : Date)
 	{
 		this.room = room;
 		this.username = username;
 		this.message = message;
+		this.date = date;
 	}
 }
 
@@ -66,6 +68,19 @@ export class ChatRooms{
 	{
 		this.messages.delete(room);
 	}
+	sortRoomsKeys(keys : string[])
+	{
+		keys.sort((a: string, b: string) => 
+		{
+			let res : number = 0;
+			if (this.messages.get(a)[this.messages.get(a).length - 1].date > this.messages.get(b)[this.messages.get(b).length - 1].date)
+				res = -1;
+			else if (this.messages.get(a)[this.messages.get(a).length - 1].date < this.messages.get(b)[this.messages.get(b).length - 1].date)
+				res = 1;
+			return (res);
+		});
+		return(keys);
+	}
 }
 //Ici les evenements qui changent les attributs de chatRoom et qui sont suscribe dans le front
 // (obligation d'utiliser update() pour un rafraichissement du front)
@@ -105,7 +120,7 @@ function socket_event_update_front(client : any) {
 		chatRoom.update((chatRoom) => {
 			let inter : Array<Message> = [];
 			for (let message of data.messages)
-				inter.push(new Message(message.id_chat_room.name, message.id_user.username, message.content_message));
+				inter.push(new Message(message.id_chat_room.name, message.id_user.username, message.content_message, message.date_message));
 			chatRoom.messages.set(data.room_name, inter);
 			console.log("Message2: ", chatRoom);
 			return (chatRoom);
@@ -116,7 +131,7 @@ function socket_event_update_front(client : any) {
 	{
 		chatRoom.update( chat => {
 			console.log("newMessage: ", data, chat);
-			chat.messages.get(data.room_name).push(new Message(data.room_name, client.username, data.content_message));
+			chat.messages.get(data.room_name).push(new Message(data.room_name, client.username, data.content_message, data.date_message));
 			return (chat);
 		});
 	});

@@ -160,7 +160,7 @@
 			itself.close();	
 		}}>
 		<ul>
-		{#each ([...$chatRoom.messages.keys()]) as room}
+		{#each ($chatRoom.sortRoomsKeys([...$chatRoom.messages.keys()])) as room}
 			<li>
 				{#if (room != actualName)}
 					<button class="btn-room" on:click={chooseRoom({room})}>{room}</button>

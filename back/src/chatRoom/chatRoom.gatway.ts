@@ -237,7 +237,7 @@ export class ChatRoomService {
 			const res_insert_message = await this.dataSource.getRepository(MessageChatRoomEntity).save(newMessage);
 			console.log(res_insert_message);
 			//await querry.commitTransaction();
-			this.server.to(data.room_name).emit('new_message_room', {room_name : data.room_name, content_message: data.content_message, username: client_username});
+			this.server.to(data.room_name).emit('new_message_room', {room_name : data.room_name, content_message: data.content_message, username: client_username, date_message: date_creation});
 		} catch (e) {
 			//await querry.rollbackTransaction();
 			console.log("Can't create message");
