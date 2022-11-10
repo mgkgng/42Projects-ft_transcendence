@@ -31,6 +31,19 @@ export class ChatDirectMessageController {
         return this.chatDirectMessageRepository.save([newDirectMessage]);
     }
 
+    //Get message history between 2 users
+    @Get('/getDirectMessageHistory?')
+    async handleGetDirectMessageHistory(@Query() query: {username_sender: string, username_receiver: string})
+    {
+        const qb = this.chatDirectMessageRepository.createQueryBuilder('u');
+        const qbu = this.userRepository.createQueryBuilder('u');
+
+        return await this.chatDirectMessageRepository.find({relations: ['message_sender', 'message_recipient'], where: [
+            {message_sender: await qbu.select().where(`u.username = :username_sender`, {username_sender: query.username_sender}).getOneOrFail(), message_recipient: await qbu.select().where(`u.username = :username_receiver`, {username_receiver: query.username_receiver}).getOneOrFail()},
+            {message_sender: await qbu.select().where(`u.username = :username_receiver`, {username_receiver: query.username_receiver}).getOneOrFail(), message_recipient: await qbu.select().where(`u.username = :username_sender`, {username_sender: query.username_sender}).getOneOrFail()}
+        ], order: {date: "ASC"}});
+    }
+
     @Get('/debugMessage')
     async handleGetHistory()
     {
