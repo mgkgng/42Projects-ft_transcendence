@@ -40,14 +40,15 @@
 	}
 
 	.room-card {
+		position: relative;
 		border: 2px solid #fff;
 		border-radius: 2em;
 		width: 15em;
 		aspect-ratio: 2 / 3;
-		transition: .2s;
+		transition: .5s;
 		cursor: pointer;
 		padding: 2em 0;
-		background-color: transparentize(#000, .7);
+		background-color: rgb(33, 33, 33);
 
 		display: flex;
 		flex-direction: column;
@@ -62,7 +63,8 @@
 		}
 
 		.players {
-			margin-top: 2em;
+			margin-top: 1em;
+			margin-bottom: 1em;
 			display: flex;
 			flex-direction: row;
 			gap: .6em;
@@ -87,7 +89,7 @@
 		}
 
 		.info {
-			margin-top: 1em;
+			margin-top: .5em;
 			display: flex;
 			flex-direction: row;
 			border: 2.5px solid transparentize(#fff, .6);
@@ -96,28 +98,41 @@
 				padding: 1em;
 				border-right: 2.5px solid transparentize(#fff, .6);
 
-				&:nth-child(1) {
-					background-color: $red;
-				}
+				// &:nth-child(1) {
+				// 	background-color: $red;
+				// }
 
-				&:nth-child(2) {
-					background-color: $green;
-				}
+				// &:nth-child(2) {
+				// 	background-color: $red;
+				// }
 			}
 		}
 
 		.join {
-			display: none;
-			font-family: "fake-receipt";
+			margin-top: .5em;
+			width: 80%;
+			z-index: 1;
+			background-color: $green;
+			// font-family: "fake-receipt";
 			font-size: 35px;
 		}
 
-		&:hover {
-			background-color: transparentize($main2, 0.5);
-			opacity: 0.9;
+		.cover {
+			position: absolute;
+			bottom: 1em;
+			width: 80%;
+			height: 4em;
+			z-index: 2;
+			background-color: #212121;
+			transition: .3s ease-out;
+		}
 
-			.join {
-				display: block;
+		&:hover {
+			// background-color: transparentize($main2, 0.5);
+			// opacity: 0.9;
+
+			.cover {
+				opacity: 0.3;
 			}
 		}
 	}
@@ -237,6 +252,7 @@
 			<div class="join">
 				JOIN
 			</div>
+			<div class="cover"></div>
 		</div>
 		{/each}
 		<!-- if less than perPage, gray card -->
