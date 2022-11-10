@@ -124,6 +124,44 @@ export class ChatRoomService {
 		}
 	}
 	//OK
+	//Get all user for a room
+	//{room_name: string}
+	@SubscribeMessage('get_users_room')
+	async get_users_room(@MessageBody() data: any, @ConnectedSocket() client: Socket, @Request() req)
+	{
+		try{
+			const id_user = await this.mainServer.getIdUser(req);
+			const id_room = await this.mainServer.getIdRoom(data);
+			try{
+				const res_is_in_room = await this.dataSource.getRepository(UserChatRoomEntity).createQueryBuilder("userChat")
+				.where("userChat.id_user = :u", {u : id_user})
+				.andWhere("userChat.room = :r", {r: id_room}).getMany();
+				if (!res_is_in_room.length)
+				{
+					client.emit("error_get_users_room", {error: "You are not in this room"});
+					throw new WsException("Not in the room");
+				}
+				if (res_is_in_room[0].is_banned && res_is_in_room[0].ban_end > new Date())
+				{
+					client.emit("error_get_users_room", {error: "You are banned"});
+					throw new WsException("Your are ban");
+				}
+				const res = await this.dataSource.getRepository(MessageChatRoomEntity).createQueryBuilder("userChatRoomEntity")
+				.innerJoin("userChatRoomEntity.room", "chatRoom")
+				.innerJoin("userChatRoomEntity.id_user", "user")
+				.select(["user.username"])
+				.where("chatRoom.id_g = :id", {id: id_room}).getMany();
+				//console.log(res);
+				client.emit('get_message_room', {messages : res, room_name: data.room_name});
+			} catch (e) {
+				client.emit("error_get_users_room", {error: "Error data"});
+			}
+		}catch(e){
+			console.log("getMessage Error: bad data");
+			throw new WsException("Bad data");
+		}
+	}
+	//OK
 	//Get all messages in room (Error if current socket user is not in the room)
 	//{room_name: string }
 	@SubscribeMessage('get_message_room')
@@ -137,7 +175,10 @@ export class ChatRoomService {
 				.where("userChat.id_user = :u", {u : id_user})
 				.andWhere("userChat.room = :r", {r: id_room}).getMany();
 				if (!res_is_in_room.length)
+				{
+					client.emit("error_get_message_room", {error: "You are not in this room"});
 					throw new WsException("Not in the room");
+				}
 				if (res_is_in_room[0].is_banned && res_is_in_room[0].ban_end > new Date())
 				{
 					client.emit("error_get_message_room", {error: "You are banned"});
