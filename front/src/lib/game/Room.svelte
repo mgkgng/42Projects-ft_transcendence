@@ -6,13 +6,21 @@
 		justify-content: center;
 		align-items: center;
 
-		min-width: 850px;
+		min-width: 1150px;
 		min-height: 850px;
 
 		border: dashed 2px #fff;
 	}
 
 	.pong {
+		position: relative;
+		padding: 0;
+
+		display: flex;
+		justify-content: center;
+	}
+	
+	.pong-game {
 		position: relative;
 
 		padding: 0;
@@ -61,7 +69,6 @@
 		height: 0;
 		border: dashed 3px aqua;
 	}
-
 
 	.beyond-above {
 		background-color: transparentize($main, 0.2);
@@ -158,6 +165,7 @@
     import GameOver from '$lib/modals/GameOver.svelte';
     import ConfirmMsg from '$lib/modals/ConfirmMsg.svelte';
     import { user } from '$lib/stores/user';
+    import Player from './Player.svelte';
 
 	export let roomId: string;
 	export let itself: any;
@@ -303,35 +311,23 @@
 {#if roomFound}
 <div class="container">
 	{#if roomInfo}
-	<div class="pong" style="min-width: {roomInfo?.mapSize[0]}px; min-height: {roomInfo?.mapSize[1]}px;">
-		<Paddle pos={paddlePos[opponentIndex]} paddleWidth={roomInfo?.paddleSize}
-			gameWidth={roomInfo?.mapSize[0]} gameHeight={roomInfo?.mapSize[1]}
-			user={false} userIndex={userIndex} userPresent={(roomInfo.players.length > 1) ? true : false}/>
-		<!-- <div class="test" style="left: {paddlePos[opponentIndex]}px; top: 50px;"></div> -->
-		{#if puck}
-		<PongPuck posX={(userIndex == UserType.Player1) ? roomInfo?.mapSize[0] - puck.posX : puck.posX}
-			posY={(userIndex == UserType.Player1) ? roomInfo?.mapSize[1] - puck.posY : puck.posY} />
-		{/if}
-		<Paddle pos={paddlePos[userIndex]} paddleWidth={roomInfo?.paddleSize}
-			gameWidth={roomInfo?.mapSize[0]} gameHeight={roomInfo?.mapSize[1]}
-			user={true} userIndex={userIndex} userPresent={true}/>
-		<!-- <div class="test" style="left: {paddlePos[userIndex]}px; top: {roomInfo?.mapSize[1] - 50}px;
-		"></div> -->
-<!-- 
-		{#if deathPoint && puck}
-		<div class="deathPoint"
-			style="left: {deathPoint}px;
-			top: {(puck.vectorY < 0 && userIndex || puck.vectorY > 0 && !userIndex) ? 50 : roomInfo?.mapSize[1] - 50}px;"></div>
-		{/if} -->
-		<!-- <div class="central-line-vertical"></div>
-		<div class="central-line-horizontal"></div>	 -->
-		<div class="pong-score">
-		<!-- solution for now, later it will be an empty score box with question mark -->
-			{#if roomInfo.players.length > 1}
-			<ScoreBox score={scores[opponentIndex]}/>
-			<ScoreBox score={scores[userIndex]}/>
+	<div class="pong" style="width: {roomInfo.mapSize[0] + 200}px; height: {roomInfo.mapSize[1]}px;">
+		<Player userInfo={(roomInfo.players.length > 1) ? roomInfo.player[opponentIndex] : undefined} score={undefined} left={true}/>	
+		<div class="pong-game" style="min-width: {roomInfo.mapSize[0]}px; min-height: {roomInfo.mapSize[1]}px;">
+			<Paddle pos={paddlePos[opponentIndex]} paddleWidth={roomInfo.paddleSize}
+				gameWidth={roomInfo.mapSize[0]} gameHeight={roomInfo.mapSize[1]}
+				user={false} userIndex={userIndex} userPresent={(roomInfo.players.length > 1) ? true : false}/>
+			{#if puck}
+			<PongPuck posX={(userIndex == UserType.Player1) ? roomInfo.mapSize[0] - puck.posX : puck.posX}
+				posY={(userIndex == UserType.Player1) ? roomInfo.mapSize[1] - puck.posY : puck.posY} />
 			{/if}
+			<Paddle pos={paddlePos[userIndex]} paddleWidth={roomInfo.paddleSize}
+				gameWidth={roomInfo.mapSize[0]} gameHeight={roomInfo.mapSize[1]}
+				user={true} userIndex={userIndex} userPresent={true}/>
+			<!-- <div class="central-line-vertical"></div>
+			<div class="central-line-horizontal"></div>	 -->
 		</div>
+		<Player userInfo={roomInfo.players[userIndex]} score={undefined} left={false}/>
 	</div>
 	{/if}
 	<div class="button-container">
