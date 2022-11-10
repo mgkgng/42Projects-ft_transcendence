@@ -57,7 +57,34 @@ export class friendSystemService {
         });
         return parsedList;
     }
+    // Do a request to this route to ask for the friendList of a user, and his status
+    async getAskList(username : string )
+    {
+        const qb = this.userFriendRepository.createQueryBuilder('u');
+        let unparsedQuery = await qb
+        .leftJoinAndSelect("u.id_first_user", "friendrequester")
+        .leftJoinAndSelect("u.id_second_user", "friendrequested")
+        .where(`friendrequester.username = :username OR friendrequested.username = :username`, {username: username})
+        .andWhere(`u.is_user_friend = false`)
+        .getMany();
 
+        let i : number = 0;
+        let parsedList : UserEntity[] = [];
+        unparsedQuery.forEach(element => {
+            if (element.id_first_user.username == username)
+            {
+                let newUserEntStatus = {...element.id_second_user, status: this.mainServerService.getUserStatus(element.id_second_user.username)};
+                parsedList.push(newUserEntStatus);
+            }
+            if (element.id_second_user.username == username)
+            {
+                let newUserEntStatus = {...element.id_first_user, status: this.mainServerService.getUserStatus(element.id_first_user.username)};
+                parsedList.push(newUserEntStatus);
+            }
+            i++;
+        });
+        return parsedList;
+    }
     // If first_username have already asked second_username no request is send
     // If second_username have already asked first_username the field is_user_friend
     // of the request from second_username become true.
