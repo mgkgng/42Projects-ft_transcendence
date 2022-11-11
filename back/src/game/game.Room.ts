@@ -49,6 +49,7 @@ export class Room {
 		this.maxpoint = maxpoint;
 		this.difficulty = Difficulty[difficulty];
 		this.host = host;
+		this.scores = [0, 0];
 
 		this.privateMode = privateMode;
 
@@ -103,6 +104,11 @@ export class Room {
 		//console.log('Room -> addClient', this.clients.size);
 		/* TODO IMPORTANT TO REMOVE THE CLIENT */
 		// client.onDisconnect(() => this.removeClient(client));
+	}
+
+	addPlayer(client: any, player: any) {
+		this.players.push(player);
+		this.addClient(client);
 	}
 
 	removeClient(client: any) { this.clients.delete(client.username); }

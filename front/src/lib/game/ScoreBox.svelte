@@ -1,26 +1,30 @@
 <style lang="scss">
 	.score-box {
-		display: flex;
-		flex-direction: row;
+		width: 100%;
+		height: 5em;
+		position: absolute;
+
+		top: 30%;
+	}
+	.score {
+		width: 1.5em;
+		height: 100%;
 
 		color: #fff;
-		font-size: 128px;
-
-		border: 5px dashed #fff;
-
-		max-width: 150px;
-		height: 5em;
-
-		align-items: center;
-		justify-content: center;
+		font-size: 65px;
+		text-align: center;
 	}
+
+	.right {
+		float: right;
+	} 
 </style>
 
 <script lang="ts">
-	export let score: number;
+	export let score1: any, score2: any;
 </script>
 
 <div class="score-box">
-	<div class="score">{score}</div>
+	<div class="score">{score1}</div>
+	<div class="score right">{score2}</div>
 </div>
-

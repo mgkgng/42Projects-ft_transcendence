@@ -121,7 +121,12 @@ function socket_event_update_front(client : any) {
 				chatRoom.messages.set(rooms.room.name, new Room(rooms.room.name, rooms.room.is_password_protected, rooms.room.is_private, rooms.is_admin))
 				client.socket.emit("get_message_room", {room_name: rooms.room.name});
 			}
+<<<<<<< HEAD
 			console.log("rooms: ", chatRoom.rooms);
+=======
+			// console.log(data);
+			// console.log("rooms: ", chatRoom.rooms);
+>>>>>>> c5042a878ed93d96da132b9b7cc2b7762e7851e1
 			return (chatRoom);
 		});
 	});

@@ -93,7 +93,7 @@
 	}
 	function researchRooms()
 	{
-		console.log("changed")
+		// console.log("changed")
 		$client.socket.emit("get_all_rooms_begin_by", {research: research});
 
 	}

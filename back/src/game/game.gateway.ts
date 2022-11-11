@@ -154,7 +154,6 @@ export class GameGateway {
 			mapSize: [room.pong.gameMap.width, room.pong.gameMap.height],
 			paddleSize: room.pong.gameMap.paddleSize
 		});
-
 	}
 
 	@SubscribeMessage("PaddleMove")
@@ -220,12 +219,15 @@ export class GameGateway {
 
 	@SubscribeMessage("JoinRoom")
 	joinRoom(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
-		console.log("JoinRoom", data);
-		console.log("roomlist: ", this.rooms)
 		let room = this.getRoom(data.roomId);
-		console.log("suspicieux", room);
 		if (room && room.players.length == 1) { // is it really safe?
-			this.getPlayerInfo(data.username).then((res)=>{ room.players.push(res); });
+			this.getPlayerInfo(data.username).then((res)=>{
+				room.broadcast("PlayerUpdate", {
+					join: true,
+					userInfo: res
+				});
+				room.addPlayer(client, res);
+			});
 			client.emit("JoinRoomRes", {
 				allowed: true,
 				roomId: data.roomId
