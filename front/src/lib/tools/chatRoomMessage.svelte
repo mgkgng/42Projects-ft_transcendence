@@ -16,11 +16,13 @@
 <script lang="ts">
 
     import { user } from "$lib/stores/user";
+    import { client } from "$lib/stores/client";
 	import { chatRoom } from "$lib/stores/chatRoom.ts";
 	export let	username : any;
 	export let content_message : any;
 	export let itself : any;
 	export let axelUserProfileModal : any;
+	export let is_admin : boolean;
 
 	function seeUserProfile()
 	{
@@ -31,10 +33,40 @@
 		itself.close();
 		axelUserProfileModal.open();
 	}
+	function banUser()
+	{
+		let date : any = prompt("Date: ")
+		let res : Date;
+		if (date)
+		{
+			res = new Date(date);
+			console.log(res);
+			if (isNaN(res.getTime()))
+				alert("Bad date");
+			else 
+				$client.socket.emit("ban_user", { room_name : $chatRoom.actualRoomName, username_ban: username, ban_end: res});
+		}
+	}
+	function muteUser()
+	{
+		let date : any = prompt("Date: ")
+		let res : Date;
+		if (date)
+		{
+			res = new Date(date);
+			console.log(res);
+			if (isNaN(res.getTime()))
+				alert("Bad date");
+			else 
+				$client.socket.emit("mute_user", { room_name : $chatRoom.actualRoomName, username_ban: username, mute_end: res});
+		}
+	}
 </script>
 
 <div class=container>
 	<p class="username" on:click={seeUserProfile}>{username}</p>
+	<input type="button" value="ban" on:click={banUser} />
+	<input type="button" value="mute" on:click={muteUser} />
 	{#if $user.username == username}
 		<p class="content_my_message">{content_message}</p>
 	{:else}
