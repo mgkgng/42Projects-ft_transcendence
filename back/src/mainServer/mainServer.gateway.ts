@@ -35,6 +35,25 @@ export class MainServerService {
 	@WebSocketServer() server;
 	userConnectedList = []; // userConnectedList[] = {username : "username", socket : socket, status : "online" | "in game" | "offline"}
 
+	// Function that will return the userConnectList entry by socketId if found
+	getUserConnectedBySocketId(socketId : string) : any {
+		for (let i = 0; i < this.userConnectedList.length; i++) {
+			if (this.userConnectedList[i].socket.id == socketId)
+				return this.userConnectedList[i];
+		}
+		return null;
+	}
+
+	// Function that will return the userConnectList entry by username if found
+	getUserConnectedByUsername(username : string) : any {
+		for (let i = 0; i < this.userConnectedList.length; i++) {
+			if (this.userConnectedList[i].username == username)
+				return this.userConnectedList[i];
+		}
+		return null;
+	}
+	
+
 	//@UseGuards(AuthGuard("jwt"))
 	handleConnection(@Request() req)
 	{
