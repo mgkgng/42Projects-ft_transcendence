@@ -165,6 +165,11 @@
 		}
 	}
 
+	.page {
+		position: absolute;
+		bottom: 1em;
+	}
+
 </style>
 
 <script lang="ts">
@@ -267,6 +272,7 @@
 			<div class="players">
 				<img src={room.players[0].image_url} alt="player1" />
 				{#if room.players.length > 1}
+				<img src={room.players[1].image_url} alt="player2" />
 				{:else}
 				<div class="grey-box">?</div>
 				{/if}
@@ -285,15 +291,7 @@
 		<!-- if less than perPage, gray card -->
 		<button class="right icon-button" on:click={() => movePage(true)}>&gt;</button>
 	</div>
-	<span class="middle icon-button">{roomPage + 1} / {Math.ceil(roomArray?.length / perPage)}</span>
-
-	<!-- maybe grid version
-	<div class="flex pagination">
-		<button class="left-end icon-button" on:click={() => {roomPage = 0}}></button>
-		<button class="left icon-button" on:click={() => movePage(false)}>&lt;</button>
+	<div class="page">
 		<span class="middle icon-button">{roomPage + 1} / {Math.ceil(roomArray?.length / perPage)}</span>
-		<button class="right icon-button" on:click={() => movePage(true)}>&gt;</button>
-		<button class="right-end icon-button" on:click={() => {roomPage = Math.ceil(roomArray?.length / perPage) - 1}}></button>
-	</div> -->
-
+	</div>
 </div>

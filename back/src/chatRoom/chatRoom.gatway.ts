@@ -9,7 +9,9 @@ import { DataSource } from "typeorm";
 import { MainServerService } from "../mainServer/mainServer.gateway";
 import { UseGuards, Request, HttpException } from '@nestjs/common';
 import { AuthGuard } from "@nestjs/passport";
-import * as bcrypt from 'bcrypt';
+// import * as bcrypt from 'bcrypt';
+
+// let bcrypt = require('bcryptjs')
 
 @WebSocketGateway({
 	cors: {
@@ -55,9 +57,11 @@ export class ChatRoomService {
 		//console.log("new room");
 		const id_user = await this.mainServer.getIdUser(req);
 		const is_password_protected : boolean = data.is_password_protected;	
-		const password : string = is_password_protected ? 
-			await bcrypt.hash(data.room_password, 10) 
-			: "";
+		// const password : string = is_password_protected ? 
+		// 	await bcrypt.hash(data.room_password, 10) 
+		// 	: "";
+		const password = "password" // replaced
+
 		const name : string = data.room_name;
 		const date_creation : Date = new Date();
 		const  querry = this.dataSource.createQueryRunner(); 
@@ -96,7 +100,8 @@ export class ChatRoomService {
 			const id_room = await this.mainServer.getIdRoom(data);
 			const room = await this.dataSource.getRepository(ChatRoomEntity).createQueryBuilder("room").
 			where("room.id_g = :id ", {id: id_room}).getOne();
-			const is_good_password = await bcrypt.compare(data.room_password, room.password);
+			// const is_good_password = await bcrypt.compare(data.room_password, room.password);
+			const is_good_password = "good_password"
 			if (room.is_password_protected && !is_good_password) //Test password
 			{
 				client.emit("error_append_user_to_room", {error: "Bad password"});

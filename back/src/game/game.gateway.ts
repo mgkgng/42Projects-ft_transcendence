@@ -230,9 +230,7 @@ export class GameGateway {
 				roomId: data.roomId
 			})
 		}
-		client.emit("JoinRoomRes", {
-			allowed: false
-		});
+		client.emit("JoinRoomRes", { allowed: false });
 	}
 
 	static broadcast(clients: any, event: string, data: any) {
