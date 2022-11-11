@@ -66,7 +66,6 @@ export class GameGateway {
 	// 	console.log(this.rooms);
 	// }
 
-
 	@UseGuards(AuthGuard("jwt"))
 	async handleConnection(client: Socket) { //TODO handle connection here
 		console.log("New Connection on site.");
@@ -76,7 +75,6 @@ export class GameGateway {
 	async handleDisconnect(@ConnectedSocket() client: Socket) { //TODO handle connection here
 		console.log("Disconnection...", client.id);
 		this.clients.delete(client.id);
-
 	}
 
 	@SubscribeMessage("Connection")
