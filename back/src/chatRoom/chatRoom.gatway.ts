@@ -102,7 +102,7 @@ export class ChatRoomService {
 			const room = await this.dataSource.getRepository(ChatRoomEntity).createQueryBuilder("room").
 			where("room.id_g = :id ", {id: id_room}).getOne();
 			// const is_good_password = await bcrypt.compare(data.room_password, room.password);
-			const is_good_password = "good_password"
+			const is_good_password = true;
 			if (room.is_password_protected && !is_good_password) //Test password
 			{
 				client.emit("error_append_user_to_room", {error: "Bad password"});
@@ -112,6 +112,11 @@ export class ChatRoomService {
 			where("userRoom.room = :id and userRoom.id_user = :id_u", {id: id_room, id_u : id_user}).getOne();
 			if (is_already_in != undefined) //Client already in room => just make this room visible for him
 			{
+				if (is_already_in.is_banned && is_already_in.ban_end > new Date())
+				{
+					client.emit("error_append_user_to_room", {error : "You are ban of this room"});
+					return ;
+				}
 				const res = await this.dataSource.createQueryBuilder().update(UserChatRoomEntity)
 				.where("id_user = :u AND room = :r", {u: id_user, r: id_room})
 				.set({is_visible: true}).execute(); //UPDATE is_visible
@@ -123,6 +128,7 @@ export class ChatRoomService {
 			([ 
 				{id_user: id_user, room: id_room, is_admin: false, is_banned: false, is_muted: false}
 			]).execute(); //Add user to the room
+			client.emit("set_room_visible", {room_name: room.name});
 		}
 		catch(e){
 			console.log("getMessage Error: bad data");

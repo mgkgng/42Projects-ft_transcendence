@@ -143,7 +143,7 @@ function socket_event_update_front(client : any) {
 	{
 		chatRoom.update( chat => {
 			console.log("newMessage: ", data, chat);
-			chat.messages.get(data.room_name).messages.push(new Message(data.room_name, client.username, data.content_message, data.date_message));
+			chat.messages.get(data.room_name).messages.push(new Message(data.room_name, data.username, data.content_message, data.date_message));
 			return (chat);
 		});
 	});
@@ -159,6 +159,10 @@ function socket_event_update_front(client : any) {
 	});
 	client.socket.off("error_new_message_room", (data : any) =>{});
 	client.socket.on("error_new_message_room", (data : any) =>{
+		alert(data.error);
+	});
+	client.socket.off("error_append_user_to_room", (data : any) =>{});
+	client.socket.on("error_append_user_to_room", (data : any) =>{
 		alert(data.error);
 	});
 }
