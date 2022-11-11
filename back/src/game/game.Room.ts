@@ -62,8 +62,6 @@ export class Room {
 		for (let player of players)
 			this.getPlayerInfo(player).then((res)=>{ this.players.push(res); });
 
-		console.log("coucou", this.players);
-
 		if (!host)
 			this.startPong();
 	}

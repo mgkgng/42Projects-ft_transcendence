@@ -22,17 +22,42 @@
 	}
 
 	.tools {
-		position: relative;
-		left: 30%;
-		align-items: right;
-		height: 20%;
-		// border: 2px solid #fff;
+		position: absolute;
+		top: 1.5em;
+		right: 8em;
+		width: 12em;
+		height: 2.5em;
 
-		background-color: #212121;
 		border: 2px solid transparentize(#fff, .6);
 		border-radius: .2em;
+		background-color: #212121;
 
-	
+		display: flex;
+		flex-direction: row;
+
+		label {
+			width: 50%;
+			height: 100%;
+			font-size: 15px;
+
+			&:nth-child(2) {
+				border-left: 2px solid transparentize(#fff, .6); 
+			}
+			.wrapper {
+				position: absolute;
+				width: 50%;
+				height: 100%;
+				padding-top: .7em;
+			}
+
+			input {
+				display: none;	
+			}
+
+			input:checked + .wrapper {
+				background-color: $main;
+			}
+		}
 	}
 
 	.room-container {
@@ -222,16 +247,14 @@
 	export let itself: any;
 	export let enterGameModal: any;
 
-	let roomModal: any;
-	let roomId: string = "";
-
 	let rooms: Map<string, any> = new Map();
 	let roomArray: Array<any>;
-	let seeAvailable: boolean = true;
+	let showAvailable: boolean = true;
+	let showGrid: boolean = false;
 	let roomPage: number = 0;
 	let perPage: number = 3;
 
-	$: roomArray = (seeAvailable) ? [...rooms?.values()].filter(room => room.available == true)
+	$: roomArray = (showAvailable) ? [...rooms?.values()].filter(room => room.available == true)
 		: [...rooms.values()];
 	$: roomsOnPage = roomArray.slice(roomPage * perPage, roomPage * perPage + perPage);
 	$: roomPageNb = Math.ceil(roomArray?.length / perPage);
@@ -244,6 +267,7 @@
 	}
 
 	function joinRoom(roomId: string) {
+		console.log("join room");
 		$client.socket.emit("JoinRoom", {
 			username: $user.username,
 			roomId: roomId
@@ -259,7 +283,7 @@
 			let roomsData = JSON.parse(data.rooms);
 			for (let roomData of roomsData)
 				rooms.set(roomData[0], roomData[1]);
-			roomArray = (seeAvailable) ? [...rooms?.values()].filter(room => room.available == true)
+			roomArray = (showAvailable) ? [...rooms?.values()].filter(room => room.available == true)
 				: [...rooms.values()];
 			console.log(roomArray[0]);
 		});
@@ -274,21 +298,20 @@
 		});
 
 		$client.socket.on("JoinRoomRes", (data: any) => {
+			
 			if (data.allowed) {
-				roomId = data.roomId;
-				roomModal.open();
 				itself.close();
 				return ;
 			}
 			// If couldn't join the game, there should be an error message
 			// and also ask for roomsDataUpdate
 		});
+
+		return (() => {
+			// maybe remove listeners here?
+		});
 	});
 </script>
-
-<Modal bind:this={roomModal} closeOnBgClick={false}>
-	<Room itself={roomModal} roomId={roomId}/>
-</Modal>
 
 <div class="container">
 	<div class="button-box">
@@ -299,8 +322,12 @@
 	</div>
 	<div class="tools">
 		<label class="form">
-			<input type="checkbox" bind:checked={seeAvailable} />
-			Available
+			<input type="checkbox" bind:checked={showAvailable} />
+			<div class="wrapper">Available</div>
+		</label>
+		<label class="form">
+			<input type="checkbox" bind:checked={showGrid} />
+			<div class="wrapper">Grid</div>
 		</label>
 	</div>
 	<div class="room-container">
