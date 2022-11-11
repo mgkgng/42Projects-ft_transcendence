@@ -7,11 +7,12 @@ import { UserEntity } from 'src/entity/User.entity';
 import { UserFriendEntity } from 'src/entity/UserFriend.entity';
 import { MainServerService } from 'src/mainServer/mainServer.gateway';
 import { JwtService } from '@nestjs/jwt';
+import { ChatDirectMessageGateway } from './chatDirectMessage.gateway';
 
 @Module({
     imports: [TypeOrmModule.forFeature([UserEntity, ChatDirectMessageEntity, UserFriendEntity])],
     exports: [ChatDirectMessageService],
     controllers: [ChatDirectMessageController],
-    providers: [ChatDirectMessageService, JwtService, MainServerService]
+    providers: [ChatDirectMessageService, JwtService, MainServerService, ChatDirectMessageGateway]
 })
 export class ChatDirectMessageModule {}
