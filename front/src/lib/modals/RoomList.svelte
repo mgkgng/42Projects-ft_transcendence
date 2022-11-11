@@ -16,7 +16,7 @@
 
 		color: #fff;
 		border: 2px solid #fff;
-		border-radius: 5em;
+		border-radius: .5em;
 
 		text-align: center;
 	}
@@ -25,9 +25,14 @@
 		position: relative;
 		left: 30%;
 		align-items: right;
-		width: 100%;
 		height: 20%;
 		// border: 2px solid #fff;
+
+		background-color: #212121;
+		border: 2px solid transparentize(#fff, .6);
+		border-radius: .2em;
+
+	
 	}
 
 	.room-container {
@@ -42,7 +47,7 @@
 	.room-card {
 		position: relative;
 		border: 2px solid transparentize(#fff, .6);
-		border-radius: 2em;
+		border-radius: .5em;
 		width: 15em;
 		aspect-ratio: 2 / 3;
 		transition: .3s;
@@ -96,15 +101,16 @@
 			
 			div {
 				padding: 1em;
-				border-right: 2.5px solid transparentize(#fff, .6);
 
 				// &:nth-child(1) {
 				// 	background-color: $red;
 				// }
 
-				// &:nth-child(2) {
-				// 	background-color: $red;
-				// }
+				&:nth-child(2) {
+					height: 100%;
+					border-left: 2.5px solid transparentize(#fff, .6);
+					border-right: 2.5px solid transparentize(#fff, .6);
+				}
 			}
 		}
 
@@ -204,18 +210,6 @@
 			color: transparentize(#fff, .3);
 		}
 	}
-
-	.page-button {
-		background-color: #212121;
-		width: 3em;
-		height: 2em;
-		transition: .4s;
-
-		&:hover {
-			transform: scale(1.2);
-		}
-	}
-
 </style>
 
 <script lang="ts">
