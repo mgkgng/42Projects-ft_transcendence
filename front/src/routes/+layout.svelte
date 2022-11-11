@@ -112,6 +112,17 @@
 				roomModal.open();
 			});
 
+			$client.socket.on("JoinRoomRes", (data: any) => {
+				console.log("coucou?", data);
+				if (data.allowed) {
+					roomId = data.roomId;
+					roomModal.open();
+					return ;
+				}
+				// If couldn't join the game, there should be an error message
+				// and also ask for roomsDataUpdate
+			});
+
 			$client.socket.off("connection", (data: any) => {
 			});
 			$client.socket.on("connection", (data: any) => {

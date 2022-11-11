@@ -220,9 +220,12 @@ export class GameGateway {
 
 	@SubscribeMessage("JoinRoom")
 	joinRoom(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
+		console.log("JoinRoom", data);
+		console.log("roomlist: ", this.rooms)
 		let room = this.getRoom(data.roomId);
-		if (room.players.length == 1) { // is it really safe?
-			room.players[1] = data.username;
+		console.log("suspicieux", room);
+		if (room && room.players.length == 1) { // is it really safe?
+			this.getPlayerInfo(data.username).then((res)=>{ room.players.push(res); });
 			client.emit("JoinRoomRes", {
 				allowed: true,
 				roomId: data.roomId
@@ -254,4 +257,16 @@ export class GameGateway {
 
 	getClient(id: string) { return (this.clients.get(id)); }
 	getRoom(id: string) { return (this.rooms.get(id)); }
+
+	async getPlayerInfo(player: any) {
+		const userdata = await this.userService.findOne(player)
+		return ({
+			username: userdata.username,
+			username_42: userdata.username_42,
+			displayname: userdata.display_name,
+			image_url: userdata.img_url,
+			campus_name: userdata.campus_name,
+			campus_country: userdata.campus_country,
+		});
+	}
 }

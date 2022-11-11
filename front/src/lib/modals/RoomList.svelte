@@ -247,9 +247,6 @@
 	export let itself: any;
 	export let enterGameModal: any;
 
-	let roomModal: any;
-	let roomId: string = "";
-
 	let rooms: Map<string, any> = new Map();
 	let roomArray: Array<any>;
 	let showAvailable: boolean = true;
@@ -270,6 +267,7 @@
 	}
 
 	function joinRoom(roomId: string) {
+		console.log("join room");
 		$client.socket.emit("JoinRoom", {
 			username: $user.username,
 			roomId: roomId
@@ -300,21 +298,20 @@
 		});
 
 		$client.socket.on("JoinRoomRes", (data: any) => {
+			
 			if (data.allowed) {
-				roomId = data.roomId;
-				roomModal.open();
 				itself.close();
 				return ;
 			}
 			// If couldn't join the game, there should be an error message
 			// and also ask for roomsDataUpdate
 		});
+
+		return (() => {
+			// maybe remove listeners here?
+		});
 	});
 </script>
-
-<Modal bind:this={roomModal} closeOnBgClick={false}>
-	<Room itself={roomModal} roomId={roomId}/>
-</Modal>
 
 <div class="container">
 	<div class="button-box">

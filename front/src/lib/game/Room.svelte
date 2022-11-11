@@ -170,9 +170,6 @@
 
 	let roomInfo: any;
 
-	// let gameMap = new GameMap(mapWidth.Small, mapHeight.Small, PaddleSize.Medium);
-
-	// TODO GameMap info should go into the pong's constructor
 	let puck: any = undefined;
 	let scores: Array<number> = [0, 0];
 
@@ -212,21 +209,20 @@
 			room: roomId
 		});
 
-		// $client.socket.off("RoomInfo", (data: any) => {
-		// });
+		$client.socket.off("RoomInfo", (data: any) => {
+		});
 		$client.socket.on("RoomInfo", (data: any) => {
 			console.log("RoomInfo", data);
 			roomFound = true;
-			roomInfo = data;
+			roomInfo = data; // maybe need some protection?
 			initPos = (roomInfo?.mapSize[0] + roomInfo?.paddleSize) / 2;
 			paddlePos = [initPos, initPos];
 
-			console.log("hello?", roomInfo.players.length)
 			if (roomInfo?.players.length == 1)
 				userType = UserType.Player1;
 			else
-				userType = ($client.id == roomInfo?.players[0]) ? UserType.Player1 
-					: ($client.id == roomInfo?.players[1]) ? UserType.Player2 
+				userType = ($user.username == roomInfo.players[0].username) ? UserType.Player1 
+					: ($user.username == roomInfo.players[1].username) ? UserType.Player2 
 					: UserType.Watcher;
 
 			if (userType == UserType.Player2) {
