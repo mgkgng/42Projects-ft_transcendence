@@ -340,9 +340,10 @@ export class ChatRoomService {
 	@SubscribeMessage('ban_user')
 	async setBanUser(@MessageBody() data, @ConnectedSocket() client: Socket, @Request() req)
 	{
-			let ban_end = data.mute_end;
+			let ban_end = data.ban_end;
 			if (ban_end == undefined)
 				ban_end = new Date(2999, 12, 31);
+			console.log(data)
 			const jwt : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
 			const user : any = await this.dataSource.getRepository(UserEntity).find({where: {username_42: jwt.username_42}});
 			const user_ban : any = await this.dataSource.getRepository(UserEntity).find({where: {username: data.username_ban}});
@@ -350,7 +351,7 @@ export class ChatRoomService {
 
 			const is_admin = await this.dataSource.getRepository(UserChatRoomEntity).createQueryBuilder("userRoom")
 			.where("userRoom.id_user = :u AND userRoom.room = :r", {u: user[0].id_g, r: room[0].id_g})
-			.select("userChat.is_admin").getMany();
+			.select("userRoom.is_admin").getMany();
 			if (!is_admin[0].is_admin)
 			{
 				client.emit("error_ban_user", {error: "You are not admin of the room"});

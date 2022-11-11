@@ -39,7 +39,7 @@ export class ChatRooms{
 	messages : Map<string, Array<Message>> = new Map();		//les messages de chaques room
 	actualRoom : Array<Message> = [];			//messages de la room de actualRoomName
 	actualRoomName : string = "";				//room selectionnee 
-
+	is_admin : boolean = false;
 	username_search : string = "";		//username search profile
 
 	constructor() {
@@ -70,9 +70,18 @@ export class ChatRooms{
 	}
 	sortRoomsKeys(keys : string[])
 	{
+
 		keys.sort((a: string, b: string) => 
 		{
 			let res : number = 0;
+			console.log(a, b);
+			console.log(this.messages);
+			if (!this.messages.get(a).length && this.messages.get(b).length)
+				return (-1);
+			else if (this.messages.get(a).length && !this.messages.get(b).length)
+				return (1);
+			else if (!this.messages.get(a).length && !this.messages.get(b).length)
+				return (0);
 			if (this.messages.get(a)[this.messages.get(a).length - 1].date > this.messages.get(b)[this.messages.get(b).length - 1].date)
 				res = -1;
 			else if (this.messages.get(a)[this.messages.get(a).length - 1].date < this.messages.get(b)[this.messages.get(b).length - 1].date)
@@ -145,8 +154,8 @@ function socket_event_update_front(client : any) {
 			return (chat);
 		});
 	});
-	client.socket.off("error_append_user_to_room", (data : any) =>{});
-	client.socket.on("error_append_user_to_room", (data : any) =>{
+	client.socket.off("error_new_message_room", (data : any) =>{});
+	client.socket.on("error_new_message_room", (data : any) =>{
 		alert(data.error);
 	});
 }
