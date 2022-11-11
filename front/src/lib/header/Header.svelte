@@ -16,7 +16,7 @@
 
 		img {
 			height: 100%;
-			object-fit: contain;
+			object-fit: cover;
 
 		}
 	}
@@ -35,10 +35,10 @@
 		cursor: pointer;
 
 		img {
-			width: 100%;
-			height: 100%;
+			width: 75px;
+			height: 75px;
 			object-fit: cover;
-			border-radius: 1em;
+			border-radius: .4em;
 		}
 	}
 	.chat{
@@ -50,7 +50,7 @@
 
 		width: 70px;
 		height: 80%;
-		border-radius: 1em;
+		border-radius: .4em;
 		text-align: center;
 		cursor: pointer;
 	}
@@ -114,5 +114,3 @@
 		<h4>chat</h4>
 	</div>
 </header>
-
-

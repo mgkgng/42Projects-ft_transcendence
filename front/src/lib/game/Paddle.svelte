@@ -5,11 +5,12 @@
 		height: 12px;
 		background-color: #fff;
 
-		border-radius: 2em;
+		border-radius: .2em;
 
 		z-index: 2;
 
-		box-shadow: 0px 0px 20px 8px $red;
+		// border: 5px solid $red;
+		box-shadow: 0px 0px 5px 5px $red;
 	}
 
 	.absent {
@@ -19,7 +20,7 @@
 
 	.user {
 		margin: 0;
-		box-shadow: 0px 0px 20px 8px $blue;
+		box-shadow: 0px 0px 5px 5px $blue;
 	}
 </style>
 

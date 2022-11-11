@@ -49,6 +49,7 @@ export class Room {
 		this.maxpoint = maxpoint;
 		this.difficulty = Difficulty[difficulty];
 		this.host = host;
+		this.scores = [0, 0];
 
 		this.privateMode = privateMode;
 

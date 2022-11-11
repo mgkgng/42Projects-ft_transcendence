@@ -6,10 +6,12 @@
 		justify-content: center;
 		align-items: center;
 
-		min-width: 1150px;
-		min-height: 850px;
+		min-width: 950px;
+		height: 750px;
 
-		border: dashed 2px #fff;
+		border: solid 2px transparentize(#fff, 0.65);
+		background-color: transparentize(#313131, 0.15);
+		border-radius: .5em;
 	}
 
 	.pong {
@@ -24,13 +26,9 @@
 		position: relative;
 
 		padding: 0;
-		border: solid 3px white;
-		border-radius: 2.5em;
+		border-radius: .5em;
 
-		background-color: transparentize(#000, .2);
-		// display: flex;
-		// justify-content: center;
-		// align-items: center;
+		background-color: #212121;
 	}
 
 	.test {
@@ -53,21 +51,6 @@
 		position: relative;
 		display: flex;
 		align-items: center;
-	}
-
-	.central-line-vertical {
-		position: absolute;
-		left: 50%;
-		height: 100%;
-		border: dashed 3px aqua;
-	}
-
-	.central-line-horizontal {
-		position: absolute;
-		top: 50%;
-		width: 100%;
-		height: 0;
-		border: dashed 3px aqua;
 	}
 
 	.beyond-above {
@@ -138,16 +121,22 @@
 
 	.mini-mode {
 		position: absolute;
-		right: 0;
+		right: .5em;
 		top: 0;
 		width: 25px;
+		height: 30px;
 		aspect-ratio: 1 / 1;
-		border-radius: 20%;
-		background-color: transparentize(#fff, 0.2);
+		border-radius: 0 0 .2em .2em;
 		transition: .4s;
 		font-size: 25px;
+		padding-bottom: .5em;
+		text-align: center;
+		cursor: pointer;
 
-		&:hover { transform: scale(1.2); }
+		&:hover {
+			color: #fff;
+			background-color: transparentize(#fff, 0.8);
+		}
 	}
 </style>
 
@@ -316,7 +305,7 @@
 <div class="container">
 	{#if roomInfo}
 	<div class="pong" style="width: {roomInfo.mapSize[0] + 200}px; height: {roomInfo.mapSize[1]}px;">
-		<Player userInfo={(roomInfo.players.length > 1) ? roomInfo.players[opponentIndex] : undefined} score={undefined} left={true}/>	
+		<Player userInfo={(roomInfo.players.length > 1) ? roomInfo.players[opponentIndex] : undefined} left={true}/>	
 		<div class="pong-game" style="min-width: {roomInfo.mapSize[0]}px; min-height: {roomInfo.mapSize[1]}px;">
 			<Paddle pos={paddlePos[opponentIndex]} paddleWidth={roomInfo.paddleSize}
 				gameWidth={roomInfo.mapSize[0]} gameHeight={roomInfo.mapSize[1]}
@@ -328,25 +317,32 @@
 			<Paddle pos={paddlePos[userIndex]} paddleWidth={roomInfo.paddleSize}
 				gameWidth={roomInfo.mapSize[0]} gameHeight={roomInfo.mapSize[1]}
 				user={true} userIndex={userIndex} userPresent={true}/>
-			<!-- <div class="central-line-vertical"></div>
-			<div class="central-line-horizontal"></div>	 -->
 		</div>
-		<Player userInfo={roomInfo.players[userIndex]} score={undefined} left={false}/>
+		<Player userInfo={roomInfo.players[userIndex]} left={false}/>
+		<ScoreBox score1={(roomInfo.players.length > 1) ? scores?.[opponentIndex] : "-"} score2={scores?.[userIndex]}/>
 	</div>
 	{/if}
 	<div class="button-container">
 		<!-- there should be a difference between host-guest mode and random matching mode -->
 		{#if $user.username == roomInfo.roomHost}
-		<button>START</button>
+		<button on:click={()=>{
+			$client.socket.emit("StartGame", {
+				roomId: roomInfo.id
+			})
+		}}>START</button>
 		{:else if userType == UserType.Player2}
-		<button>READY</button>
+		<button on:click={()=>{
+			$client.socket.emit("Ready", {
+
+			})
+		}}>READY</button>
 		{/if}
 		<button on:click={()=>{ quitConfirmMsgModal.open(); }}>EXIT</button>
 
 	</div>
-	<button class="mini-mode" on:click={()=>{
+	<div class="mini-mode" on:click={()=>{
 		miniMode = true;
-	}}>_</button>
+	}}>_</div>
 </div>
 {:else}
 <div class="loading-box">

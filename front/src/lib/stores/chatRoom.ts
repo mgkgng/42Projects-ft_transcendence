@@ -118,8 +118,8 @@ function socket_event_update_front(client : any) {
 				chatRoom.rooms.push(rooms);
 				client.socket.emit("get_message_room", {room_name: rooms});
 			}
-			console.log(data);
-			console.log("rooms: ", chatRoom.rooms);
+			// console.log(data);
+			// console.log("rooms: ", chatRoom.rooms);
 			return (chatRoom);
 		});
 	});
