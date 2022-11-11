@@ -71,6 +71,7 @@ export class ChatRoomService {
 			new_chat_room.date_creation = date_creation;
 			new_chat_room.is_password_protected = is_password_protected;
 			new_chat_room.password = password;
+			new_chat_room.is_private = data.is_private;
 			const res_chat_room : any = await this.dataSource.getRepository(ChatRoomEntity).save(new_chat_room);
 			console.log(res_chat_room);
 			const new_user_chat_room = new UserChatRoomEntity();
@@ -82,7 +83,7 @@ export class ChatRoomService {
 			const res_user_chat_room = await this.dataSource.getRepository(UserChatRoomEntity).save(new_user_chat_room);
 			client.join(name);
 			console.log("Create room finish");
-			client.emit("new_room", {	room_name: name	});
+			client.emit("new_room", {	room_name: name, is_password_protected: is_password_protected, is_admin: true, is_private: data.is_private	});
 		} catch (e) {
 			console.log("Create room error");
 			client.emit("error_new_room", {error: "Room already exist"});
@@ -299,13 +300,7 @@ export class ChatRoomService {
 	{
 		const res : any = await this.mainServer.getNamesRoomsForUser(client);
 		console.log("My rooms:", res);
-		let name : string[] = [];
-		for (let n of res)
-		{
-			const inter : string = (n.room.name);
-			name.push(inter);
-		}
-		client.emit("get_my_rooms", name);
+		client.emit("get_my_rooms", res);
 	}
 	//OK
 	//Get all rooms in the databases

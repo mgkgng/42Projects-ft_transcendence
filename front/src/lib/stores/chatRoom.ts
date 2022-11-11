@@ -17,18 +17,20 @@ class Message
 	}
 }
 
-class rooms
+export class Room
 {
 	room_name : string = "";
 	is_password_protected : boolean = false;
 	is_private : boolean = false;
-	are_you_admin : boolean = false;
+	is_admin : boolean = false;
+	messages : Array<Message>;
 	constructor(room_name : string, is_password_protected : boolean, is_private : boolean, are_you_admin : boolean)
 	{
 		this.room_name = room_name;
 		this.is_password_protected = is_password_protected;
 		this.is_private = is_private;
-		this.are_you_admin = are_you_admin;
+		this.is_admin = are_you_admin;
+		this.messages = [];	
 	}
 }
 let client : any;
@@ -36,10 +38,10 @@ let client : any;
 export class ChatRooms{
 	all_rooms: Map<string, boolean> = new Map(); //toutes les rooms (utilisées pour s'ajouter a une room)
 	rooms: Array<string> = [];					//room visibles pour l'utilisateur
-	messages : Map<string, Array<Message>> = new Map();		//les messages de chaques room
-	actualRoom : Array<Message> = [];			//messages de la room de actualRoomName
+	messages : Map<string, Room> = new Map();		//les messages de chaques room
+	actualRoom : any;
 	actualRoomName : string = "";				//room selectionnee 
-	is_admin : boolean = false;
+
 	username_search : string = "";		//username search profile
 
 	constructor() {
@@ -76,15 +78,15 @@ export class ChatRooms{
 			let res : number = 0;
 			console.log(a, b);
 			console.log(this.messages);
-			if (!this.messages.get(a).length && this.messages.get(b).length)
+			if (!this.messages.get(a).messages.length && this.messages.get(b).messages.length)
 				return (-1);
-			else if (this.messages.get(a).length && !this.messages.get(b).length)
+			else if (this.messages.get(a).messages.length && !this.messages.get(b).messages.length)
 				return (1);
-			else if (!this.messages.get(a).length && !this.messages.get(b).length)
+			else if (!this.messages.get(a).messages.length && !this.messages.get(b).messages.length)
 				return (0);
-			if (this.messages.get(a)[this.messages.get(a).length - 1].date > this.messages.get(b)[this.messages.get(b).length - 1].date)
+			if (this.messages.get(a).messages[this.messages.get(a).messages.length - 1].date > this.messages.get(b).messages[this.messages.get(b).messages.length - 1].date)
 				res = -1;
-			else if (this.messages.get(a)[this.messages.get(a).length - 1].date < this.messages.get(b)[this.messages.get(b).length - 1].date)
+			else if (this.messages.get(a).messages[this.messages.get(a).messages.length - 1].date < this.messages.get(b).messages[this.messages.get(b).messages.length - 1].date)
 				res = 1;
 			return (res);
 		});
@@ -115,10 +117,10 @@ function socket_event_update_front(client : any) {
 		});
 		chatRoom.update((chatRoom) => {
 			for (let rooms of data ){
-				chatRoom.rooms.push(rooms);
-				client.socket.emit("get_message_room", {room_name: rooms});
+				chatRoom.rooms.push(rooms.room.name);
+				chatRoom.messages.set(rooms.room.name, new Room(rooms.room.name, rooms.room.is_password_protected, rooms.room.is_private, rooms.is_admin))
+				client.socket.emit("get_message_room", {room_name: rooms.room.name});
 			}
-			console.log(data);
 			console.log("rooms: ", chatRoom.rooms);
 			return (chatRoom);
 		});
@@ -130,7 +132,7 @@ function socket_event_update_front(client : any) {
 			let inter : Array<Message> = [];
 			for (let message of data.messages)
 				inter.push(new Message(message.id_chat_room.name, message.id_user.username, message.content_message, message.date_message));
-			chatRoom.messages.set(data.room_name, inter);
+			chatRoom.messages.get(data.room_name).messages = inter;
 			console.log("Message2: ", chatRoom);
 			return (chatRoom);
 		});
@@ -140,7 +142,7 @@ function socket_event_update_front(client : any) {
 	{
 		chatRoom.update( chat => {
 			console.log("newMessage: ", data, chat);
-			chat.messages.get(data.room_name).push(new Message(data.room_name, client.username, data.content_message, data.date_message));
+			chat.messages.get(data.room_name).messages.push(new Message(data.room_name, client.username, data.content_message, data.date_message));
 			return (chat);
 		});
 	});
@@ -150,7 +152,7 @@ function socket_event_update_front(client : any) {
 		chatRoom.update( chat => {
 			chat.rooms.push(data.room_name);
 			const mess : Message[] = [];
-			chat.messages.set(data.room_name , mess);
+			chat.messages.set(data.room_name, new Room(data.room_name, data.is_password_protected, data.is_private, data.is_admin))
 			return (chat);
 		});
 	});

@@ -64,9 +64,13 @@
 </script>
 
 <div class=container>
-	<p class="username" on:click={seeUserProfile}>{username}</p>
-	<input type="button" value="ban" on:click={banUser} />
-	<input type="button" value="mute" on:click={muteUser} />
+	<div style="display: flex; flex-direction: row">
+		<p class="username" on:click={seeUserProfile}>{username}</p>
+		{#if is_admin == true}
+			<input type="button" value="ban" on:click={banUser} />
+			<input type="button" value="mute" on:click={muteUser} />
+		{/if}
+	</div>
 	{#if $user.username == username}
 		<p class="content_my_message">{content_message}</p>
 	{:else}

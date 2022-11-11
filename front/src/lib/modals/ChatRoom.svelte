@@ -94,7 +94,7 @@
 	// export let userInfo;
 
     import { client } from "$lib/stores/client";
-    import { chatRoom, ChatRooms } from "$lib/stores/chatRoom";
+    import { chatRoom, ChatRooms, Room } from "$lib/stores/chatRoom";
 	import { onMount, afterUpdate } from "svelte";
 	import { get } from 'svelte/store';
     import ChatRoomMessage from "$lib/tools/chatRoomMessage.svelte";
@@ -109,7 +109,7 @@
 
 	let rooms : string[]; //Rooms visibles par le user
 	let actualName: string; //Name de la room selectionnee
-	let actualMessages : any; //Messages de la room selectionnee
+	let actualMessages : Room = new Room("", false, false, false);
 
 	let is_new_room_password_protected : boolean = false; //Si la room est protege par un mot de passe
 
@@ -117,10 +117,10 @@
 	//afterUpdate(() => {
 			//message_zone.scroll({top: 1000000000});
 	//});
-	$: if(actualMessages && message_zone)
-		{
-			message_zone.scroll({top: 1000000000});
-		}
+	//$: if(actualMessages && message_zone)
+	//	{
+	//		message_zone.scroll({top: 1000000000});
+	//	}
 
 	//Liens entre les variables de ce fichier et les variables dans le stores "/src/stores/chatRoom.ts"
 	chatRoom.subscribe(chat  => { actualMessages = chat.actualRoom;});
@@ -148,7 +148,7 @@
 	{
 		if (newRoomPassword == null)
 			newRoomPassword = ""
-		$client.socket.emit("new_room", {room_name: newRoomName, is_password_protected: is_new_room_password_protected, room_password: newRoomPassword});
+		$client.socket.emit("new_room", {room_name: newRoomName, is_password_protected: is_new_room_password_protected, room_password: newRoomPassword, is_private: false});
 	}
 </script>
 
@@ -174,11 +174,15 @@
 	</div>
 	<!--Zone de liste des messages de la room selectionne-->
 	<div class="message-zone" bind:this={message_zone}>
-		{#each (actualMessages) as message}
-			<ChatRoomMessage username={message.username} content_message={message.message} itself={ itself } axelUserProfileModal={axelUserProfileModal}/>
-		{/each}
-		<input class="text-input" bind:value={newMessage}>
-		<input type="button" class="submit" value="send" on:click={sendMessage}>
+		{#if ($chatRoom.actualRoomName !== "")}
+			{#each actualMessages?.messages as message}
+				<ChatRoomMessage username={message.username} content_message={message.message} itself={ itself } axelUserProfileModal={axelUserProfileModal} is_admin={actualMessages.is_admin}/>
+			{/each}
+			<input class="text-input" bind:value={newMessage}>
+			<input type="button" class="submit" value="send" on:click={sendMessage}>
+		{:else}
+			choose a room 
+		{/if}
 	</div>
 	<!--Zone de creation de room -->
 	<div class="new-chat-room-zone">
