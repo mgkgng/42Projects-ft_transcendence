@@ -41,14 +41,14 @@
 
 	.room-card {
 		position: relative;
-		border: 2px solid #fff;
+		border: 2px solid transparentize(#fff, .6);
 		border-radius: 2em;
 		width: 15em;
 		aspect-ratio: 2 / 3;
 		transition: .3s;
 		cursor: pointer;
 		padding: 2em 0;
-		background-color: rgb(33, 33, 33);
+		background-color: #313131;
 
 		display: flex;
 		flex-direction: column;
@@ -123,7 +123,7 @@
 			width: 80%;
 			height: 4em;
 			z-index: 2;
-			background-color: #212121;
+			background-color: #313131;
 			transition: .3s ease-out;
 		}
 
@@ -133,6 +133,16 @@
 			.cover {
 				opacity: 0.3;
 			}
+		}
+	}
+
+	.empty {
+		justify-content: center;
+		background-color: #212121;
+		h1 {
+			font-family: "fake-receipt";
+			font-size: 255px;
+			color: transparentize(#fff, .6);
 		}
 	}
 
@@ -167,7 +177,43 @@
 
 	.page {
 		position: absolute;
-		bottom: 1em;
+		bottom: 2em;
+		height: 2em;
+		background-color: #212121;
+		border: 2px solid transparentize(#fff, .6);
+
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+		align-items: center;
+
+		.info {
+			border-left: 2px solid transparentize(#fff, .6);
+			border-right: 2px solid transparentize(#fff, .6);
+			height: 100%;
+			padding: 0 1em;
+			padding-top: .3em;
+		}
+
+		button {
+			height: 100%;
+			cursor: pointer;
+			padding: 0 .6em;
+			padding-bottom: .2em;
+			background-color: #313131;
+			color: transparentize(#fff, .3);
+		}
+	}
+
+	.page-button {
+		background-color: #212121;
+		width: 3em;
+		height: 2em;
+		transition: .4s;
+
+		&:hover {
+			transform: scale(1.2);
+		}
 	}
 
 </style>
@@ -194,6 +240,7 @@
 	$: roomArray = (seeAvailable) ? [...rooms?.values()].filter(room => room.available == true)
 		: [...rooms.values()];
 	$: roomsOnPage = roomArray.slice(roomPage * perPage, roomPage * perPage + perPage);
+	$: roomPageNb = Math.ceil(roomArray?.length / perPage);
 
 	function movePage(left: boolean){
 		if (left && (roomPage - 1) * perPage >= 0)
@@ -263,7 +310,6 @@
 		</label>
 	</div>
 	<div class="room-container">
-		<button class="left icon-button" on:click={()=>movePage(false)}>&lt;</button>
 		{#each roomsOnPage as room}
 		<div class="room-card" on:click={()=>joinRoom(room.id)}>
 			<div class="title">
@@ -288,10 +334,18 @@
 			<div class="cover"></div>
 		</div>
 		{/each}
+		{#if roomsOnPage.length < 3}
+		{#each Array(3 - roomsOnPage.length) as _}
+		<div class="room-card empty">
+			<h1>X</h1>
+		</div>
+		{/each}
+		{/if}
 		<!-- if less than perPage, gray card -->
-		<button class="right icon-button" on:click={() => movePage(true)}>&gt;</button>
 	</div>
 	<div class="page">
-		<span class="middle icon-button">{roomPage + 1} / {Math.ceil(roomArray?.length / perPage)}</span>
+		<button on:click={()=>movePage(false)}>&lt;</button>
+		<span class="info">{roomPage + 1} / {(roomPageNb) ? roomPageNb : 1}</span>
+		<button on:click={() => movePage(true)}>&gt;</button>
 	</div>
 </div>
