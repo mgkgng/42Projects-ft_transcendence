@@ -232,7 +232,17 @@
 			}
 
 			scores = roomInfo?.scores;
-		});		
+		});
+
+		$client.socket.on("PlayerUpdate", (data: any) => {
+			console.log("PlayerUpdate", data);
+			if (data.join) {
+				roomInfo.players.push(data.userInfo);
+				roomInfo = roomInfo;
+			} else {
+				// leaving
+			}
+		})
 		
 		$client.socket.off("PaddleUpdate", (data: any) => {
 		});
@@ -306,7 +316,7 @@
 <div class="container">
 	{#if roomInfo}
 	<div class="pong" style="width: {roomInfo.mapSize[0] + 200}px; height: {roomInfo.mapSize[1]}px;">
-		<Player userInfo={(roomInfo.players.length > 1) ? roomInfo.player[opponentIndex] : undefined} score={undefined} left={true}/>	
+		<Player userInfo={(roomInfo.players.length > 1) ? roomInfo.players[opponentIndex] : undefined} score={undefined} left={true}/>	
 		<div class="pong-game" style="min-width: {roomInfo.mapSize[0]}px; min-height: {roomInfo.mapSize[1]}px;">
 			<Paddle pos={paddlePos[opponentIndex]} paddleWidth={roomInfo.paddleSize}
 				gameWidth={roomInfo.mapSize[0]} gameHeight={roomInfo.mapSize[1]}

@@ -105,6 +105,11 @@ export class Room {
 		// client.onDisconnect(() => this.removeClient(client));
 	}
 
+	addPlayer(client: any, player: any) {
+		this.players.push(player);
+		this.addClient(client);
+	}
+
 	removeClient(client: any) { this.clients.delete(client.username); }
 
 	getClients() { return (Array.from(this.clients.values())); }
