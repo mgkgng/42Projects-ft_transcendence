@@ -9,6 +9,7 @@ import { AuthService } from "./auth.service";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { authenticator } from "otplib";
+import { isBuffer } from "util";
 
 @Injectable()
 export class OAuthStrategy extends PassportStrategy(Strategy, "oauth") {
@@ -19,7 +20,7 @@ export class OAuthStrategy extends PassportStrategy(Strategy, "oauth") {
 	//super();
   }
 
-  async validate(@MessageBody() username: string, @MessageBody() code : string): Promise<any> {
+  async validate(@MessageBody() code_2fa: string, @MessageBody() code : string): Promise<any> {
 	const res = await this.authService.validateUser42(code);
 	console.log("Get token : ", code);
 	console.log(res);
@@ -45,6 +46,12 @@ export class OAuthStrategy extends PassportStrategy(Strategy, "oauth") {
 				campus_country: data.campus[0].country,
 				email: data.email,
 			});
+			if (user_bd.is_2fa && !authenticator.check(code_2fa, user_bd.secret_2fa))
+			{
+				console.log("2FA", code, code_2fa);
+				console.log(authenticator.check(code_2fa, user_bd.secret_2fa))
+				return ({error: "2FA code is not valid", user: find});
+			}
 			return (find);
 		}
 		else //else create the user in db
@@ -61,7 +68,7 @@ export class OAuthStrategy extends PassportStrategy(Strategy, "oauth") {
 			new_user.img_url = data.image_url;
 			new_user.is_2fa = false;
 			new_user.secret_2fa = authenticator.generateSecret();
-			new_user.otpauthUrl_2fa = authenticator.keyuri(new_user.email, 'AUTH_APP_NAME', new_user.secret_2fa);
+			new_user.otpauthUrl_2fa = authenticator.keyuri(new_user.email, 'Tanscendence', new_user.secret_2fa);
 			try {
 				const create = await this.userRepository.save([new_user]);
 				return ({username: data.login,

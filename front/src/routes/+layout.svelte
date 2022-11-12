@@ -52,7 +52,24 @@
 				},
 				body:JSON.stringify({username: "oui", password: url.get('code')}),
 			});
-			const tok = await res.json();
+			let tok = await res.json();
+			console.log("tok1", tok);
+			while (tok.get_code != null)
+			{
+				console.log("waiting for code");
+				let ufa_code : any = prompt("Your code is : ");
+				console.log(ufa_code);
+				const res_ufa : any = await fetch("http://localhost:3000/auth42",{
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body:JSON.stringify({username: "oui", password: url.get('code')}),
+					//body:JSON.stringify({username: ufa_code, password: url.get('code')}),
+				});
+				tok = await res_ufa.json();
+				console.log("tok2", tok);
+			}
 			console.log("res", tok);
 			$client.socket = io("http://localhost:3001",{
 				extraHeaders: {

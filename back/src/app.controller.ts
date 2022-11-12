@@ -28,7 +28,10 @@ export class AppController {
   @Post("/auth42")
   async login42(@Request() req)
   {
-      return (this.authService.login(req.user));
+      if (req.user.error)
+          return ({get_code : req.user.error});
+      else
+        return (this.authService.login(req.user));
   }
 }
 

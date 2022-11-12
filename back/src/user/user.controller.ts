@@ -2,6 +2,7 @@ import { Controller, ForbiddenException, Get, Post, UnauthorizedException} from 
 import { UserService } from "./user.service";
 import { authenticator } from "otplib";
 import { toDataURL } from "qrcode";
+import { AuthGuard } from "@nestjs/passport";
 
 @Controller()
 export class UserController 
@@ -19,12 +20,13 @@ export class UserController
         }
         return (user);
     }
+
     @Get("/2FA")
     async post_2FA()
     {
         const secret = authenticator.generateSecret();
         const otpauthUrl = authenticator.keyuri("email@email.com", 'AUTH_APP_NAME', secret);
-        const url = await toDataURL(otpauthUrl);
-        return ({a: otpauthUrl, b: secret, c: url});
+        const url = await toDataURL("otpauth://totp/Tanscendence:abittel%40student.42nice.fr?secret=JUKQQXBUCV6GMJRR&period=30&digits=6&algorithm=SHA1&issuer=Tanscendence");
+        return ({c: url});
     }
 }

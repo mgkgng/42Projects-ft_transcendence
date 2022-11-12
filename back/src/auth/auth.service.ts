@@ -49,4 +49,7 @@ export class AuthService {
 		  access_token: this.jwtService.sign(payload, {secret: process.env.SECRET}),
 		};
  	}
+	async sign_tmp_jwt(user: any) {
+		return (this.jwtService.sign(user, {secret: process.env.SECRET}));
+	}
 }
