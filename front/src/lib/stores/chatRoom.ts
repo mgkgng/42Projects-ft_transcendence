@@ -112,7 +112,7 @@ function socket_event_update_front(client : any) {
 		chatRoom.update((chatRoom) => {
 			chatRoom.rooms = [];
 			chatRoom.messages = new Map();
-			chatRoom.actualRoom = [];
+			chatRoom.actualRoom = new Room("", false, false, false);
 			return(chatRoom);
 		});
 		chatRoom.update((chatRoom) => {

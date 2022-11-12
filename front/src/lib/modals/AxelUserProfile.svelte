@@ -109,6 +109,7 @@
 	import { chatRoom } from "$lib/stores/chatRoom.ts";
 	import { client } from "$lib/stores/client.ts";
 	import { onMount } from "svelte";
+    import { browser } from '$app/environment';
 
 	export let itself : any;
 	export let ChatRoomsModal : any;
@@ -120,11 +121,10 @@
 	client.subscribe(value => {	local_username = value.username;	});
 	chatRoom.subscribe(value => {	username = value.username_search;	});
 	onMount(() => {
-		$client.socket.off("get_other_user_info", (data) => {
-		});
-		$client.socket.on("get_other_user_info", (data) => {
+		$client.socket.off("get_other_user_info", (data) => {});
+		$client.socket.on("get_other_user_info", (data) =>
+		{
 			user_info = data;
-			console.log("User info: ",user_info);
 		});
 
 		$client.socket.off("error_get_other_user_info", (data) => {
@@ -149,6 +149,7 @@
 				value.username_search = data.new_username;
 				return value;
 			});
+			$client.socket.emit("get_other_user_info", { username_search: username } );
 			console.log("client", $client, $chatRoom);
 			console.log("THIS", username, local_username);
 		});

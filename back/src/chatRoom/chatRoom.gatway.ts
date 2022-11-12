@@ -34,7 +34,6 @@ export class ChatRoomService {
 		console.log('Connect');
 		console.log('Connect is here');
 		try {
-			console.log("error here");
 			const names = await this.mainServer.getNamesRoomsForUser(req);
 			console.log(names);
 			for (let n of names) //ADD USER TO HIS ROOMS
@@ -449,5 +448,86 @@ export class ChatRoomService {
 				.set({is_visible: true}).execute();
 		client.join(data.room_name);
 		client.emit("set_room_visible", {});
+	}
+	//OK
+	//{}
+	//get email, username, img of current socket user
+	@SubscribeMessage('get_user_info')
+	async get_user_infos(@MessageBody() data: any, @ConnectedSocket() client: Socket, @Request() req)
+	{
+		try{
+			const id_user = await this.mainServer.getIdUser(req);
+			const res = await this.dataSource.getRepository(UserEntity).createQueryBuilder("user")
+						.where("id_g = :id", {id : id_user})
+						.select(["user.email", "user.username", "user.img_url", "user.display_name", "user.campus_name", "user.campus_country"]).getOne();
+			console.log("UserInfo");
+			client.emit("get_user_info", res);
+		}catch(e)
+		{
+			client.emit("error_get_user_info", "User not found");
+			throw new WsException("User not found");
+		}
+	}
+	//OK
+	//{username_search : string}
+	@SubscribeMessage('get_other_user_info')
+	async get_other_user_infos(@MessageBody() data: any, @ConnectedSocket() client: Socket, @Request() req)
+	{
+		try{
+			const id_user = await this.mainServer.getIdUserByUsername(data.username_search);
+			const res = await this.dataSource.getRepository(UserEntity).createQueryBuilder("user")
+						.where("id_g = :id", {id : id_user})
+						.select(["user.email", "user.username", "user.img_url", "user.display_name", "user.campus_name", "user.campus_country"]).getOne();
+			client.emit("get_other_user_info", res);
+			return (res);
+		}catch(e)
+		{
+			console.log("User not found");
+			client.emit("error_get_other_user_info", "User not found");
+			throw new WsException("User not found");
+		}
+	}
+	//{research: string}
+	@SubscribeMessage('get_all_username_begin_by')
+	async getAllUsernameBeginBy(@MessageBody() data, @ConnectedSocket() client: Socket)
+	{
+		const res = await this.dataSource.getRepository(UserEntity)
+		.createQueryBuilder("user")
+		.select(["user.username"])
+		.where("substr(user.username, 1, :l) = :s", {l: data.research.length, s: data.research}).getMany();
+		console.log(res);
+		client.emit("get_all_username_begin_by", res);
+	}
+	//{new_username: string}
+	@SubscribeMessage('change_username')
+	async newUsername(@MessageBody() data, @ConnectedSocket() client: Socket, @Request() req)
+	{
+		try {
+			const id_user = await this.mainServer.getIdUser(req);
+			try{
+				const res = await this.dataSource.getRepository(UserEntity)
+				.createQueryBuilder("user")
+				.select(["user.username"])
+				.where("user.username = :u", {u: data.new_username}).getOneOrFail();
+				client.emit("error_change_username", "Username already taken");
+				console.log("Username already taken ", client.id);
+				return;
+			}catch(e){
+				if (data.new_username.length == 0 || data.new_username.length > 20)
+				{
+					client.emit("error_change_username", "Username not in good fromat");
+					return;
+				}
+				const res = await this.dataSource.createQueryBuilder().update(UserEntity)
+				.where("id_g = :u", {u: id_user})
+				.set({username: data.new_username}).execute();
+				client.emit("change_username", {new_username: data.new_username});
+				console.log("Username changed ", client.id);
+				return;
+			}
+		}catch(e){
+			client.emit("error_change_username", "Data error");
+			console.log("Data error ", client.id);
+		}
 	}
 }

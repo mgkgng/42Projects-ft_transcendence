@@ -71,7 +71,7 @@
 	}
 
 	onMount(async () => {
-		if ($client.socket)
+		if ($client.socket || !browser)
 			return;
 		if (localStorage.getItem('transcendence-jwt') != null
 		&& localStorage.getItem('transcendence-jwt') != undefined)
