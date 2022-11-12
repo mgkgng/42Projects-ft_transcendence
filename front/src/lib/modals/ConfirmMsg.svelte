@@ -4,6 +4,7 @@
 		height: 8em;
 
 		background-color: transparentize(grey, 0.5);
+		border: solid 2px transparentize(#fff, 0.65);
 
 		color: #fff;
 

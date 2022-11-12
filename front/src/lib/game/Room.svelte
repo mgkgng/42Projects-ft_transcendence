@@ -13,6 +13,8 @@
 		border: solid 2px transparentize(#fff, 0.65);
 		background-color: transparentize(#313131, 0.15);
 		border-radius: .5em;
+
+		gap: 1em;
 	}
 
 	.pong {
@@ -109,6 +111,7 @@
 
 	.button-container {
 		padding: .2em;
+
 		button {
 			width: 8em;
 			height: 3em;
@@ -117,6 +120,18 @@
 			border-radius: .5em;
 			background-color: transparentize(#fff, 0.8);
 			cursor: pointer;
+
+			&:hover {
+				filter: brightness(70%);
+			}
+		}
+
+		.start {
+			transition: .2s;
+			&:hover {
+				border-color: $red;
+				color: $red;
+			}
 		}
 	}
 

@@ -39,6 +39,7 @@
 			width: 50%;
 			height: 100%;
 			font-size: 15px;
+			cursor: pointer;
 
 			&:nth-child(2) {
 				border-left: 2px solid transparentize(#fff, .6); 
@@ -77,8 +78,10 @@
 		aspect-ratio: 2 / 3;
 		transition: .3s;
 		cursor: pointer;
-		padding: 2em 0;
+		padding-top: 1.5em;
+		padding-bottom: 1em;
 		background-color: #313131;
+		justify-content: space-around;
 
 		display: flex;
 		flex-direction: column;
@@ -93,8 +96,8 @@
 		}
 
 		.players {
-			margin-top: 1em;
-			margin-bottom: 1em;
+			// margin-top: 1em;
+			// margin-bottom: 1em;
 			display: flex;
 			flex-direction: row;
 			gap: .6em;
@@ -104,6 +107,7 @@
 				height: 100px;
 				object-fit: cover;
 				border: 2.5px solid transparentize(#fff, .6);
+				border-radius: .4em;
 			}
 
 			.grey-box {
@@ -119,10 +123,10 @@
 		}
 
 		.info {
-			margin-top: .5em;
 			display: flex;
 			flex-direction: row;
 			border: 2.5px solid transparentize(#fff, .6);
+			border-radius: .3em;
 			
 			div {
 				padding: 1em;
@@ -139,31 +143,24 @@
 			}
 		}
 
-		.join {
-			margin-top: .5em;
-			width: 80%;
-			z-index: 1;
-			background-color: $green;
-			// font-family: "fake-receipt";
-			font-size: 35px;
-		}
+		.buttons {
+			// margin-top: .5em;
+			display: flex;
+			flex-direction: row;
+			gap: .5em;
 
-		.cover {
-			position: absolute;
-			bottom: 1em;
-			width: 80%;
-			height: 4em;
-			z-index: 2;
-			background-color: #313131;
-			transition: .3s ease-out;
-		}
+			font-size: 25px;
 
-		&:hover {
-			// opacity: 0.9;
-
-			.cover {
-				opacity: 0.3;
+			button {
+				border: 2px solid transparentize(#fff, .6);
+				border-radius: .5em;
+				padding: .5em;
+				cursor: pointer;
+				transition: .2s;
 			}
+
+			.watch:hover { background-color: $main-bright; }
+			.play:hover { background-color: $submain-blue; }
 		}
 	}
 
@@ -266,11 +263,12 @@
 			roomPage++;
 	}
 
-	function joinRoom(roomId: string) {
+	function joinRoom(roomId: string, playMode: boolean) {
 		console.log("join room");
 		$client.socket.emit("JoinRoom", {
 			username: $user.username,
-			roomId: roomId
+			roomId: roomId,
+			play: playMode
 		})
 	}
 
@@ -332,7 +330,7 @@
 	</div>
 	<div class="room-container">
 		{#each roomsOnPage as room}
-		<div class="room-card" on:click={()=>joinRoom(room.id)}>
+		<div class="room-card">
 			<div class="title">
 				{room.title}
 			</div>
@@ -349,10 +347,10 @@
 				<div>{room.difficulty}</div>
 				<div>{room.width}</div>
 			</div>
-			<div class="join">
-				JOIN
+			<div class="buttons">
+				<button class="watch" on:click={()=>joinRoom(room.id, false)}>WATCH</button>
+				<button class="play" on:click={()=>joinRoom(room.id, true)}>PLAY</button>
 			</div>
-			<div class="cover"></div>
 		</div>
 		{/each}
 		{#if roomsOnPage.length < 3}
