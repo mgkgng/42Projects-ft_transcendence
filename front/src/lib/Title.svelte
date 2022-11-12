@@ -47,9 +47,9 @@
 		width: var(--size);
 		aspect-ratio: 1 / 1;
 		border-radius: 50%;
-		background-color: transparentize($main2, .0);
+		background-color: transparentize($submain, .0);
 		border: none;
-		box-shadow: 0px 0px 5px 5px rgb(49, 211, 240); //maybe?
+		box-shadow: 0px 0px 5px 5px $submain; //maybe?
 
 		animation-name: rotate-rev;
 		animation-duration: var(--duration);
@@ -101,7 +101,7 @@
 		width: 10.5em;
 		height: 3.5em;
 		border-radius: 2.5em;
-		background: linear-gradient(90deg, $main 0%, #5610c6 60%, $main2 100%);
+		background: linear-gradient(90deg, $main 0%, #5610c6 60%, $submain 100%);
 	}
 	
 	.click {

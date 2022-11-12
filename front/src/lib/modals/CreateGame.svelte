@@ -33,7 +33,7 @@
 		padding: 2em;
 		border-radius: 2em;
 		border: solid #fff;
-		background-color: transparentize($main2, 0.8);
+		background-color: transparentize($submain, 0.8);
 		color: #fff;
 		cursor: pointer;
 	}
@@ -68,7 +68,7 @@
 
 		&:hover {
 			display: block;
-			background-color: transparentize($main2, 0.8);
+			background-color: transparentize($submain, 0.8);
 		}
 	}
 

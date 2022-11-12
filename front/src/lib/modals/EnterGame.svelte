@@ -11,7 +11,7 @@
 		overflow: hidden;
 		cursor: pointer;
 		color: #e6e6e6;
-		background-color: transparentize($main2, 0.9);
+		background-color: transparentize($submain, 0.9);
 		backdrop-filter: blur(6px);
 		border: 2px solid;
 		text-align: center;

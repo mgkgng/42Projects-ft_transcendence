@@ -93,11 +93,11 @@
 	<AxelUserProfile itself={axelProfileModal} ChatRoomsModal={chatModal}/>
 </Modal>
 <header>
-	<div class="logo" on:click={() => {
+	<!-- <div class="logo" on:click={() => {
 		goto('/');
 	}}>
 		<img src="/logot.svg" alt="logo">
-	</div>
+	</div> -->
 
 	<div class="profile" on:click={() => {
 		profileModal.open();

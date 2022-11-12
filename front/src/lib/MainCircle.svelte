@@ -24,7 +24,7 @@
 
 		left: 41%;
 		width: var(--width);
-		background-color: rgb(49, 211, 240);
+		background-color: $submain;
 		aspect-ratio: 1 / 1;
 		border-radius: 50%;
 
@@ -35,7 +35,7 @@
 		// box-shadow: 0px 0px 240px 30px $main;
 		// box-shadow: 0px 0px 550px 50px $main;
 		// box-shadow: 0px 0px 750px 100px $main;
-		box-shadow: 5px -5px 5px 5px rgb(49, 211, 240); //maybe?
+		box-shadow: 5px -5px 5px 5px $submain; //maybe?
 		box-shadow: 0px 0px 750px 100px $main;
 	}
 </style>

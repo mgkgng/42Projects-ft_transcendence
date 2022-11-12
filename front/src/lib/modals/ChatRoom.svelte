@@ -48,7 +48,7 @@
 		padding: 1em;
 		border-radius: 1em;
 		border: solid #fff;
-		background-color: transparentize($main2, 0.8);
+		background-color: transparentize($submain, 0.8);
 		color: #fff;
 		cursor: pointer;
 	}
@@ -58,7 +58,7 @@
 		width: 50%;
 		border: solid #fff;
 		text-align: center;
-		background-color: transparentize($main2, 0.8);
+		background-color: transparentize($submain, 0.8);
 		color: #fff;
 		cursor: pointer;
 	}

@@ -55,7 +55,7 @@
 			}
 
 			input:checked + .wrapper {
-				background-color: $main;
+				background-color: $main-lowshade;
 			}
 		}
 	}
@@ -202,7 +202,7 @@
 
 		&:hover {
 			display: block;
-			background-color: transparentize($main2, 0.5);
+			background-color: transparentize($submain-bluegreen, 0.5);
 		}
 	}
 

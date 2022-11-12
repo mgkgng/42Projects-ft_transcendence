@@ -3,16 +3,31 @@ $card: grey;
 $border: grey;
 $grey: grey;
 $text: black;
-// $main: rgb(172, 124, 221);
-// $main: rgb(90, 39, 141);
+
+
+/* main */
 $main: #3B1187;
-$main2: #31D3F0;
-// $main: rgb(168, 65, 14);
-// $main: rgb(29, 73, 185);
+
+/* main-monochromatic */
+$main-light: #855BD4;
+$main-lowshade: #62439B;
+$main-bright: #5B1BD1;
+$main-dark: #250B54;
+
+/* submain */
+$submain: #31D3F0;
+
+/* submain analogous */
+$submain-blue: #256AF8;
+$submain-lowshadeblue: #218DD9;
+$submain-bluegreen: #21D9C2;
+$submain-lightgreen: #25F8A3;
 
 /* Colors */
-$yellow: #D2A532;
+$yellow: #D1C700;
 $green: #279459;
+$newgreen-light: #66CC06;
+$newgreen-dark: #46850B;
 $red: #D23258;
 $blue: blue;
 $purple: purple;
