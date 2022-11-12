@@ -54,6 +54,7 @@
 		.menu {
 			// display: none;
 			position: absolute;
+			top: 85px;
 			right: 0;
 			border: 2px solid #fff;
 			border-radius: .3em;
@@ -64,7 +65,7 @@
 	
 			&::before {
 				content: "";
-				top: -16px;
+				top: -20px;
 				right: 9px;
 				left: auto;
 				border: 8px solid transparent;
@@ -76,11 +77,15 @@
 	
 			button {
 				width: 100%;
-				padding: 1em 1.5em;
+				padding: 1em 1.2em;
 				cursor: pointer;
 				display: flex;
-				align-items: center;
-				gap: 10px;
+				text-align: center;
+				transition: .1s;
+
+				&:hover {
+					background-color: transparentize(#fff, .6); //TODO color decide
+				}
 			}
 		}
 		&:focus-within .menu {
@@ -158,7 +163,7 @@
 			{/if}
 		</div>
 		<div class="menu">
-			<button>Profile</button>
+			<button on:click={()=>{profileModal.open();}}>Profile</button>
 			<button>Friends</button>
 			<button>Setting</button>
 			<button>Logout</button>
