@@ -65,4 +65,13 @@ export class UserEntity
 
 	@Column({default: ""})
 	img_url?: string;
+
+	@Column({default: false})
+	is_2fa?: boolean;	
+
+	@Column({default: ""})
+	secret_2fa?: string;
+
+	@Column({default: ""})
+	otpauthUrl_2fa?: string;
 }

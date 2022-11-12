@@ -8,6 +8,7 @@ import { UserService } from "src/user/user.service";
 import { AuthService } from "./auth.service";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
+import { authenticator } from "otplib";
 
 @Injectable()
 export class OAuthStrategy extends PassportStrategy(Strategy, "oauth") {
@@ -44,7 +45,6 @@ export class OAuthStrategy extends PassportStrategy(Strategy, "oauth") {
 				campus_country: data.campus[0].country,
 				email: data.email,
 			});
-			console.log("Find:", find);
 			return (find);
 		}
 		else //else create the user in db
@@ -59,6 +59,9 @@ export class OAuthStrategy extends PassportStrategy(Strategy, "oauth") {
 			new_user.campus_country = data.campus[0].country;
 			new_user.is_42_user = true;
 			new_user.img_url = data.image_url;
+			new_user.is_2fa = false;
+			new_user.secret_2fa = authenticator.generateSecret();
+			new_user.otpauthUrl_2fa = authenticator.keyuri(new_user.email, 'AUTH_APP_NAME', new_user.secret_2fa);
 			try {
 				const create = await this.userRepository.save([new_user]);
 				return ({username: data.login,
