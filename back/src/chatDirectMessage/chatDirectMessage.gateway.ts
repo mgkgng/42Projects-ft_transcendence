@@ -21,8 +21,7 @@ export class ChatDirectMessageGateway {
         private userRepository : Repository<UserEntity>
     ) {}
 
-    // Subscribe to the event 'receiveMessage' from the client
-    // and call the method 'receiveMessage' of the service
+
     @SubscribeMessage('newDirectMessage')
     async receiveMessage(@MessageBody() data: any, @ConnectedSocket() client: any) {
         const user = await this.userRepository.findOne({where: {username: data.username}, relations: ['relation_userBlocked']});
