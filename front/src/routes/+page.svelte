@@ -45,4 +45,3 @@
 
 <Header />
 <Title title={"TRANSCENDENCE"} mainPage={true} />
-<DarkMode/>

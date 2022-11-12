@@ -40,16 +40,72 @@
 			object-fit: cover;
 			border-radius: .4em;
 		}
+
+		@keyframes grow {
+			0% {
+				transform: scaleY(0);
+				opacity: 0;
+			}
+			to {
+				transform: scaleY(1);
+				opacity: 1;
+			}
+		}
+		.menu {
+			// display: none;
+			position: absolute;
+			top: 85px;
+			right: 0;
+			border: 2px solid #fff;
+			border-radius: .3em;
+
+			color: #fff;
+			z-index: 9999;
+			transform-origin: top;
+	
+			&::before {
+				content: "";
+				top: -20px;
+				right: 9px;
+				left: auto;
+				border: 8px solid transparent;
+				border-bottom-color: transparent;
+				border-bottom-color: #fff;
+				position: absolute;
+				display: inline-block;
+			}
+	
+			button {
+				width: 100%;
+				padding: 1em 1.2em;
+				cursor: pointer;
+				display: flex;
+				text-align: center;
+				transition: .1s;
+
+				&:hover {
+					background-color: transparentize(#fff, .6); //TODO color decide
+				}
+			}
+		}
+		&:focus-within .menu {
+			display: block;
+			animation: grow .2s ease-in-out;
+		}
 	}
+
 	.chat{
 		position: absolute;
-		top: 75px;
-		right: 0;
+		top: 0;
+		left: 0;
 		float: right;
-		background-color: aliceblue;
+		border: 2px solid transparentize(#fff, .5);
+		color: transparentize(#fff, .5);
+		font-size: 15px;
+		padding: .2em;
 
-		width: 70px;
-		height: 80%;
+		width: 45px;
+		height: 45px;
 		border-radius: .4em;
 		text-align: center;
 		cursor: pointer;
@@ -73,8 +129,7 @@
 	let userInfo: any;
 	let axelProfileModal : any;
 
-	$: console.log("This is user:", $user);
-
+	let openMenu: boolean;
 
 	loginState.subscribe(value => { login = value; })
 
@@ -99,18 +154,24 @@
 		<img src="/logot.svg" alt="logo">
 	</div> -->
 
-	<div class="profile" on:click={() => {
-		profileModal.open();
-	}}>
-		{#if !$user}
-		<img src="/pingu/pingu-coucou.jpeg" alt="pingu-coucou">
-		{:else}
-		<img src={$user.image_url} alt="profile" />
-		{/if}
+	<div class="profile">
+		<div class="summary">
+			{#if !$user}
+			<img src="/pingu/pingu-coucou.jpeg" alt="pingu-coucou">
+			{:else}
+			<img src={$user.image_url} alt="profile" />
+			{/if}
+		</div>
+		<div class="menu">
+			<button on:click={()=>{profileModal.open();}}>Profile</button>
+			<button>Friends</button>
+			<button>Setting</button>
+			<button>Logout</button>
+		</div>
 	</div>
 	<div class="chat" on:click={() => {
 		chatModal.open();
 	}}>
-		<h4>chat</h4>
+		<p>chat test</p>
 	</div>
 </header>

@@ -7,11 +7,14 @@
 		align-items: center;
 
 		min-width: 950px;
-		height: 750px;
+		padding: 2em 0;
+		//height: 750px;
 
 		border: solid 2px transparentize(#fff, 0.65);
 		background-color: transparentize(#313131, 0.15);
 		border-radius: .5em;
+
+		gap: 1em;
 	}
 
 	.pong {
@@ -108,6 +111,7 @@
 
 	.button-container {
 		padding: .2em;
+
 		button {
 			width: 8em;
 			height: 3em;
@@ -116,6 +120,18 @@
 			border-radius: .5em;
 			background-color: transparentize(#fff, 0.8);
 			cursor: pointer;
+
+			&:hover {
+				filter: brightness(70%);
+			}
+		}
+
+		.start {
+			transition: .2s;
+			&:hover {
+				border-color: $red;
+				color: $red;
+			}
 		}
 	}
 
@@ -181,6 +197,8 @@
 
 	let roomFound: boolean;
 	let miniMode: boolean = false;
+
+	let quitConfirm: boolean; // only activate when game is on going
 
 	$: quitRoom(resQuitConfirm);
 	$: console.log(roomInfo);
@@ -325,13 +343,13 @@
 	<div class="button-container">
 		<!-- there should be a difference between host-guest mode and random matching mode -->
 		{#if $user.username == roomInfo.roomHost}
-		<button on:click={()=>{
+		<button class="start" on:click={()=>{
 			$client.socket.emit("StartGame", {
 				roomId: roomInfo.id
 			})
 		}}>START</button>
 		{:else if userType == UserType.Player2}
-		<button on:click={()=>{
+		<button class="ready" on:click={()=>{
 			$client.socket.emit("Ready", {
 
 			})
@@ -358,7 +376,7 @@ what is this?
 </Modal>
 
 <Modal bind:this={quitConfirmMsgModal} closeOnBgClick={false}>
-	<ConfirmMsg msg={""} result={resQuitConfirm}/>
+	<ConfirmMsg msg={"Are you sure you want to quit?"} bind:result={resQuitConfirm} itself={quitConfirmMsgModal}/>
 </Modal>
 
 <svelte:window

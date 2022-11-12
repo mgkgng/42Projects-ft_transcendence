@@ -100,7 +100,7 @@
 		left: 46%;
 		width: 10.5em;
 		height: 3.5em;
-		border-radius: 2.5em;
+		border-radius: .5em;
 		background: linear-gradient(90deg, $main 0%, #5610c6 60%, $submain 100%);
 	}
 	
@@ -115,7 +115,7 @@
 
 		width: 6em;
 		height: 2em;
-		border-radius: 2.5em;
+		border-radius: .3em;
 
 		color: #e6e6e6;
 		letter-spacing: 4px;
