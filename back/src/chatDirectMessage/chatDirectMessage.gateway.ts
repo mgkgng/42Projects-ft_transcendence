@@ -29,6 +29,7 @@ export class ChatDirectMessageGateway {
         const userConnected = this.mainServerService.getUserConnectedByUsername(data.username);
         if (userConnected && user.relation_userBlocked.includes(client.username) == false)
             userConnected.socket.emit('newDirectMessage', data.message);
+        // Commented for test purpose
         // this.chatDirectMessageService.handleSendDirectMessage(this.mainServerService.getUserConnectedBySocketId(client.id).username, data.username, data.message);
     }
 }
