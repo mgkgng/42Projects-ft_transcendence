@@ -113,11 +113,7 @@
 </style>
 
 <script lang="ts">
-    import { goto } from "$app/navigation";
     import UserProfile from "$lib/modals/UserProfile.svelte";
-    import ChatModal from "$lib/modals/ChatRoom.svelte";
-    import AllChatModal from "$lib/modals/allChatRooms.svelte";
-    import AxelUserProfile from "$lib/modals/AxelUserProfile.svelte";
     import { user } from "$lib/stores/user";
     import { loginState } from "$lib/stores/var";
     import Modal from "$lib/tools/Modal.svelte";
@@ -126,13 +122,7 @@
 
 	let profileModal: any;
 	let chatModal: any;
-	let allChatModal: any;
-	let login: boolean;
-	let userInfo: any;
-	let axelProfileModal : any;
 	let settingModal: any;
-
-	let openMenu: boolean;
 
 	loginState.subscribe(value => { login = value; })
 
@@ -141,25 +131,10 @@
 <Modal bind:this={profileModal} closeOnBgClick={true}>
 	<UserProfile />
 </Modal>
-<Modal bind:this={chatModal} closeOnBgClick={true}>
-	<ChatModal itself={chatModal} allChatRoomsModal={allChatModal} axelUserProfileModal={axelProfileModal}/>
-</Modal>
-<Modal bind:this={allChatModal} closeOnBgClick={true} >
-	<AllChatModal itself={allChatModal} ChatRoomsModal={chatModal}/>
-</Modal>
-<Modal bind:this={axelProfileModal} closeOnBgClick={true} >
-	<AxelUserProfile itself={axelProfileModal} ChatRoomsModal={chatModal}/>
-</Modal>
 <Modal bind:this={settingModal} closeOnBgClick={true} >
 	<Setting itself={settingModal}/>
 </Modal>
 <header>
-	<!-- <div class="logo" on:click={() => {
-		goto('/');
-	}}>
-		<img src="/logot.svg" alt="logo">
-	</div> -->
-
 	<div class="profile">
 		<div class="summary">
 			{#if !$user}
@@ -174,10 +149,5 @@
 			<button on:click={()=>{ settingModal.open(); }}>Setting</button>
 			<button>Logout</button>
 		</div>
-	</div>
-	<div class="chat" on:click={() => {
-		chatModal.open();
-	}}>
-		<p>chat test</p>
 	</div>
 </header>

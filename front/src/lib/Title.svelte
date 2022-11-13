@@ -153,10 +153,7 @@
     import { goto } from "$app/navigation";
 	import Modal from "$lib/tools/Modal.svelte";
 	import MainCircle from '$lib/MainCircle.svelte';
-    import EnterGame from "$lib/modals/EnterGame.svelte";
-    import CreateGame from "$lib/modals/CreateGame.svelte";
-    import RoomList from "$lib/modals/RoomList.svelte";
-    import { client } from "./stores/client";
+    import PlayOrChat from "$lib/modals/PlayOrChat.svelte";
 
 
 	type Circle = {
@@ -165,29 +162,21 @@
 		angle: number;
 	};
 
-	export let darkMode = false;
+	let enterModal: any;
+
 	export let title: string;
 	export let mainPage: boolean;
-
-	let createGameModal: any;
-	let roomListModal: any;
-	let enterGameModal: any;
 
 	let circlesAround: Array<Circle> = [];
 	let circleRadius = 250;
 
 	let blues: Array<Circle> = [];
 
-	let showMessage = false;
 	let message = "";
-
-	let showMenu: boolean;
 
 	let login: boolean;
 
-	loginState.subscribe(value => {
-		login = value;
-	})
+	loginState.subscribe(value => { login = value; })
 
 
 	function createCircles() {
@@ -228,16 +217,8 @@
 
 </script>
 
-<Modal bind:this={enterGameModal} closeOnBgClick={true}>
-	<EnterGame itself={enterGameModal} createGameModal={createGameModal} roomListModal={roomListModal}/>
-</Modal>
-
-<Modal bind:this={createGameModal} closeOnBgClick={true}>
-	<CreateGame itself={createGameModal} enterGameModal={enterGameModal}/>
-</Modal>
-
-<Modal bind:this={roomListModal} closeOnBgClick={true}>
-	<RoomList itself={roomListModal} enterGameModal={enterGameModal}/>
+<Modal bind:this={enterModal} closeOnBgClick={true}>
+	<PlayOrChat itself={enterModal} />
 </Modal>
 
 <div class="container">
@@ -258,8 +239,8 @@
 	}}>Login</div>
 	{:else}
 	<div class="click" on:click={() => {
-		enterGameModal.open();
-	}}>Play</div>
+		enterModal.open();
+	}}>Enter</div>
 	{/if}
 	
 	<div class="msg">{message}</div>
