@@ -19,7 +19,6 @@ export function replacer() {
     });
 }
 
-
 export const PaddleSize = {
 	Small : 40,
 	Medium : 80,

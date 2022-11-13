@@ -1,25 +1,17 @@
-//* brainstorming here */
-// 1. mode de jeu : basic mode, advanced mode
-// 2. map : complication of maps (walls for example)
-// 3. items
-
-// paddle / puck
-
-/* puck { vectorVelocity, } */
-
 import { Puck } from "./Puck";
-import { GameMap } from "./GameMap";
 
 export class Pong {
-	gameMap: GameMap;
+	size: Array<number>;
+	paddleSize: number;
 	puck: Puck;
 	paddlePos: Array<number>;
 
-	constructor() {
-		this.gameMap = new GameMap();
-		this.puck = new Puck(this.gameMap.width, this.gameMap.height);
+	constructor(size: Array<number>) {
+		this.size = size;
+		this.puck = new Puck(this.size[0], this.size[1]);
 
-		let initPos = (this.gameMap.width - this.gameMap.paddleSize) / 2;
+		this.paddleSize = 80; //TODO automize it
+		let initPos = (this.size[0] - this.paddleSize) / 2;
 		this.paddlePos = [initPos, initPos];
 	}
 }

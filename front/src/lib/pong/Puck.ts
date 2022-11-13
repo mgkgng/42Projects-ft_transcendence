@@ -22,8 +22,6 @@ export class Puck {
 
 		this.posX += this.vectorX;
 		this.posY += this.vectorY;
-		//* here should check if it hits any wall */
-		//* then here we should find the vector value */
 	}
 
 	getHit(vectorX: number, vectorY: number) {
