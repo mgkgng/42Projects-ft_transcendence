@@ -113,7 +113,11 @@
 </style>
 
 <script lang="ts">
+    import { goto } from "$app/navigation";
     import UserProfile from "$lib/modals/UserProfile.svelte";
+    import ChatModal from "$lib/modals/ChatRoom.svelte";
+    import AllChatModal from "$lib/modals/allChatRooms.svelte";
+    import AxelUserProfile from "$lib/modals/AxelUserProfile.svelte";
     import { user } from "$lib/stores/user";
     import { loginState } from "$lib/stores/var";
     import Modal from "$lib/tools/Modal.svelte";
@@ -122,7 +126,9 @@
 
 	let profileModal: any;
 	let chatModal: any;
+	let login: boolean;
 	let settingModal: any;
+
 
 	loginState.subscribe(value => { login = value; })
 
