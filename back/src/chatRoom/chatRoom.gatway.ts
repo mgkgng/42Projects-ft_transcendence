@@ -451,6 +451,26 @@ export class ChatRoomService {
 		client.join(data.room_name);
 		client.emit("set_room_visible", {});
 	}
+	//Put a room private
+	//{room_name:string}
+	@SubscribeMessage("set_room_private")
+	async setRoomPrivate(@MessageBody() data, @ConnectedSocket() client: Socket, @Request() req) {
+		const client_username : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
+		const user : any = await this.mainServer.getIdUser(client_username.username);
+		const room : any = await  this.mainServer.getIdRoom( data.room_name);
+		const is_owner = await this.dataSource.getRepository(UserChatRoomEntity).createQueryBuilder("u")
+				.where("u.id_user = :u AND u.room = :r", {u: user[0].id_g, r: room[0].id_g})
+				.select(["u.is_owner"]).getOne();
+		if (is_owner.is_owner == false)
+		{
+			client.emit("error_ser_room_private", {error: "You are not owner of the room."});
+			return ;
+		}
+		const res = await this.dataSource.createQueryBuilder().update(ChatRoomEntity)
+				.where("room = :r", {r: room})
+				.set({is_private: true}).execute();
+		client.emit("set_room_private", {room_name : data.room_name});
+	}
 	//OK
 	//{}
 	//get email, username, img of current socket user
