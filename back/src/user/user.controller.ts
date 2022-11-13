@@ -2,7 +2,6 @@ import { Controller, ForbiddenException, Get, Post, UnauthorizedException} from 
 import { UserService } from "./user.service";
 import { authenticator } from "otplib";
 import { toDataURL } from "qrcode";
-import { AuthGuard } from "@nestjs/passport";
 
 @Controller()
 export class UserController 

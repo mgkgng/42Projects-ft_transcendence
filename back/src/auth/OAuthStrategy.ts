@@ -1,7 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { PassportStrategy } from "@nestjs/passport";
 import { MessageBody } from "@nestjs/websockets";
-import { Passport } from "passport";
 import { Strategy } from "passport-local";
 import { UserEntity } from "src/entity/User.entity";
 import { UserService } from "src/user/user.service";
@@ -9,7 +8,6 @@ import { AuthService } from "./auth.service";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { authenticator } from "otplib";
-import { isBuffer } from "util";
 import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
