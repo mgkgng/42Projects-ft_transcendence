@@ -9,6 +9,7 @@ class Client {
 	listeners: Map<string, Function>;
 	room: string
 	username: string;
+	user_info : any;
 
 	constructor() {
 		this.id = "";

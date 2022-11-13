@@ -110,6 +110,9 @@
 	import { client } from "$lib/stores/client.ts";
 	import { onMount } from "svelte";
     import { browser } from '$app/environment';
+	import QrcodeModal from "$lib/modals/qrcodeModal.svelte"
+    import Modal from "$lib/tools/Modal.svelte";
+    import { user } from "../stores/user";
 
 	export let itself : any;
 	export let ChatRoomsModal : any;
@@ -117,6 +120,7 @@
 	let local_username : string;
 	let new_username : any = "";
 	let user_info = null;
+	let qrcode_modal : any;
 
 	client.subscribe(value => {	local_username = value.username;	});
 	chatRoom.subscribe(value => {	username = value.username_search;	});
@@ -125,6 +129,7 @@
 		$client.socket.on("get_other_user_info", (data) =>
 		{
 			user_info = data;
+			console.log(user_info);
 		});
 
 		$client.socket.off("error_get_other_user_info", (data) => {
@@ -153,15 +158,42 @@
 			console.log("client", $client, $chatRoom);
 			console.log("THIS", username, local_username);
 		});
-
-		$client.socket.emit("get_other_user_info", { username_search: username } );
+		$client.socket.on("active_double_auth", (data) => {
+			user_info.is_2fa = true; 
+		});
+		$client.socket.on("disable_double_auth", (data) => {
+			user_info.is_2fa = false; 
+		});
+		if (username == $client.username)
+		{
+			user_info = $client.user_info;
+			console.log("userInfo: ", user_info)
+		}
+		else
+			$client.socket.emit("get_other_user_info", { username_search: username } );
 	});
-	function sendMessage()
+	function changeUsername()
 	{
 		new_username = prompt("Enter new username");
 		$client.socket.emit("change_username", { new_username: new_username });
 	}
+	function seeQrcode()
+	{
+		qrcode_modal.open();
+	}
+	function active2FA()
+	{
+		$client.socket.emit("active_double_auth");
+	}
+	function disable2FA()
+	{
+		$client.socket.emit("disable_double_auth");
+	}
 </script>
+
+<Modal bind:this={qrcode_modal} closeOnBgClick={true}>
+	<QrcodeModal src_img={user_info.otpauthUrl_2fa}/>
+</Modal>
 
 <div class="container">
 	<button class="btn-room back" on:click={() => {
@@ -188,9 +220,17 @@
 	<div class="info-zone">
 		<p>Username: {user_info.username}</p>
 		{#if local_username == username}
-			<input class="btn-room" type="button" value="Change" on:click={sendMessage} />
+			<input class="btn-room" type="button" value="Change" on:click={changeUsername} />
 		{/if}
 		<p>Campus : {user_info.campus_name}, {user_info.campus_country}</p>
+		{#if user_info.is_2fa == false}
+			<p>Double authentification:</p>
+			<input type="button" name="scales" value="active" on:click={active2FA}>
+		{:else}
+			<p>Double authentification:</p>
+			<input on:click={seeQrcode} class="btn-room" type="button" value="qrcode">
+			<input type="button" name="scales" value="disable" on:click={disable2FA}>
+		{/if}
 	</div>
 	<div class="history-zone">
 		No Game History Yet

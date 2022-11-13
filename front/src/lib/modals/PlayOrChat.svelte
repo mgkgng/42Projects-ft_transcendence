@@ -43,6 +43,9 @@
     import EnterGame from "$lib/modals/EnterGame.svelte";
     import RoomList from "$lib/modals/RoomList.svelte";
     import ChatRoom from "$lib/modals/ChatRoom.svelte";
+	import AllChatRooms from "./allChatRooms.svelte";
+    import AxelUserProfile from "./AxelUserProfile.svelte";
+	
 
 	export let itself: any;
 
@@ -51,6 +54,8 @@
 	let roomListModal: any;
 
 	let chatModal: any;
+	let axelUserProfileModal : any;
+	let allChatModal : any;
 	
 </script>
 
@@ -67,7 +72,13 @@
 </Modal>
 
 <Modal bind:this={chatModal} closeOnBgClick={true}>
-	<ChatRoom itself={chatModal} />
+	<ChatRoom itself={chatModal} axelUserProfileModal={axelUserProfileModal} allChatModal={allChatModal} />
+</Modal>
+<Modal bind:this={allChatModal} closeOnBgClick={true} >
+	<AllChatRooms itself={allChatModal} ChatRoomsModal={chatModal}/>
+</Modal>
+<Modal bind:this={axelUserProfileModal} closeOnBgClick={true} >
+	<AxelUserProfile itself={axelUserProfileModal} ChatRoomsModal={chatModal}/>
 </Modal>
 
 <div class="container">
