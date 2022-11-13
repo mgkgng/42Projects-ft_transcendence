@@ -3,6 +3,7 @@ import { HttpService } from '@nestjs/axios';
 import { UserService } from 'src/user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { lastValueFrom } from 'rxjs';
+import { verify } from 'jsonwebtoken';
 
 @Injectable()
 export class AuthService {
@@ -43,13 +44,36 @@ export class AuthService {
 			displayname: user.displayname,
 			image_url: user.image_url,
 			campus_name: user.campus_name,
-			campus_country: user.campus_country
+			campus_country: user.campus_country,
+			double_auth_ok : true
 		};
 		return {
 		  access_token: this.jwtService.sign(payload, {secret: process.env.SECRET}),
 		};
  	}
 	async sign_tmp_jwt(user: any) {
-		return (this.jwtService.sign(user, {secret: process.env.SECRET}));
+		const payload = {
+			username: user.username,
+			username_42: user.username_42,
+			displayname: user.displayname,
+			image_url: user.image_url,
+			campus_name: user.campus_name,
+			campus_country: user.campus_country,
+		};
+		console.log(payload);
+		return (this.jwtService.sign(payload, {secret: process.env.SECRET}));
+	}
+	async verify_tmp_jwt(token: string) {
+		verify(token, process.env.SECRET, (err, decoded : any) => { 
+		if (err)
+			return (false);
+		else
+		{
+		  if(new Date((decoded.iat + 60 * 60 * 24) * 1000) > (new Date(Date.now())))
+		  	return (true)
+		  else
+			return (false);
+		}
+	  });
 	}
 }

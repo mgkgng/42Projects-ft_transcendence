@@ -10,25 +10,39 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { authenticator } from "otplib";
 import { isBuffer } from "util";
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class OAuthStrategy extends PassportStrategy(Strategy, "oauth") {
   constructor(private authService: AuthService, private userService: UserService,
 		@InjectRepository(UserEntity)
-        private userRepository : Repository<UserEntity>) {
+        private userRepository : Repository<UserEntity>,
+		private jwtServer: JwtService 
+		) {
 	super({username: "username", password: "password" , code: "code"});
 	//super();
   }
 
   async validate(@MessageBody() code_2fa: string, @MessageBody() code : string): Promise<any> {
-	const res = await this.authService.validateUser42(code);
-	console.log("Get token : ", code);
-	console.log(res);
+	let res : any;
+	if (code_2fa == "oui")
+	{
+		res = await this.authService.validateUser42(code);
+		res.data.username_42 = res.data.login;
+		console.log("Get token : ", code);
+		console.log(res);
+	}else
+	{
+		res = {data: (this.jwtServer.decode(code))};
+		res.data.campus = [];
+		res.data.campus.push({name: res.data.campus_name, country: res.data.campus_country});
+		console.log("Res : ", res, code);
+	}
 	if (res)
 	{
 		let data = res.data;
 		const user : any = {
-			login: data.login,
+			login: data.username_42,
 			displayname: data.displayname,
 			image_url: data.image_url,
 			campus_name: data.campus[0].name,
@@ -46,11 +60,14 @@ export class OAuthStrategy extends PassportStrategy(Strategy, "oauth") {
 				campus_country: data.campus[0].country,
 				email: data.email,
 			});
-			if (user_bd.is_2fa && !authenticator.check(code_2fa, user_bd.secret_2fa))
+			if (user_bd.is_2fa)
 			{
-				console.log("2FA", code, code_2fa);
-				console.log(authenticator.check(code_2fa, user_bd.secret_2fa))
-				return ({error: "2FA code is not valid", user: find});
+				if (!this.authService.verify_tmp_jwt(code) || !authenticator.check(code_2fa, user_bd.secret_2fa))
+				{
+					console.log("2FA", code, code_2fa);
+					console.log(authenticator.check(code_2fa, user_bd.secret_2fa))
+					return ({error: "2FA code is not valid", user: find});
+				}
 			}
 			return (find);
 		}

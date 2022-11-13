@@ -64,8 +64,8 @@
 					headers: {
 						'Content-Type': 'application/json'
 					},
-					body:JSON.stringify({username: "oui", password: url.get('code')}),
-					//body:JSON.stringify({username: ufa_code, password: url.get('code')}),
+					//body:JSON.stringify({username: "oui", password: url.get('code')}),
+					body:JSON.stringify({username: ufa_code, password: tok.tmp_jwt}),
 				});
 				tok = await res_ufa.json();
 				console.log("tok2", tok);
