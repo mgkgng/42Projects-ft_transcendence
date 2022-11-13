@@ -23,13 +23,15 @@ export class Room
 	is_password_protected : boolean = false;
 	is_private : boolean = false;
 	is_admin : boolean = false;
+	is_owner : boolean = false;
 	messages : Array<Message>;
-	constructor(room_name : string, is_password_protected : boolean, is_private : boolean, are_you_admin : boolean)
+	constructor(room_name : string, is_password_protected : boolean, is_private : boolean, are_you_admin : boolean, are_you_owner : boolean)
 	{
 		this.room_name = room_name;
 		this.is_password_protected = is_password_protected;
 		this.is_private = is_private;
 		this.is_admin = are_you_admin;
+		this.is_owner = are_you_owner;
 		this.messages = [];	
 	}
 }
@@ -112,13 +114,13 @@ function socket_event_update_front(client : any) {
 		chatRoom.update((chatRoom) => {
 			chatRoom.rooms = [];
 			chatRoom.messages = new Map();
-			chatRoom.actualRoom = new Room("", false, false, false);
+			chatRoom.actualRoom = new Room("", false, false, false, false);
 			return(chatRoom);
 		});
 		chatRoom.update((chatRoom) => {
 			for (let rooms of data ){
 				chatRoom.rooms.push(rooms.room.name);
-				chatRoom.messages.set(rooms.room.name, new Room(rooms.room.name, rooms.room.is_password_protected, rooms.room.is_private, rooms.is_admin))
+				chatRoom.messages.set(rooms.room.name, new Room(rooms.room.name, rooms.room.is_password_protected, rooms.room.is_private, rooms.is_admin, rooms.is_owner))
 				client.socket.emit("get_message_room", {room_name: rooms.room.name});
 			}
 			// console.log(data);
@@ -153,7 +155,7 @@ function socket_event_update_front(client : any) {
 		chatRoom.update( chat => {
 			chat.rooms.push(data.room_name);
 			const mess : Message[] = [];
-			chat.messages.set(data.room_name, new Room(data.room_name, data.is_password_protected, data.is_private, data.is_admin))
+			chat.messages.set(data.room_name, new Room(data.room_name, data.is_password_protected, data.is_private, data.is_admin, true));
 			return (chat);
 		});
 	});

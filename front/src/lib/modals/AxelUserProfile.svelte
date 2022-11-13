@@ -122,52 +122,46 @@
 	let user_info = null;
 	let qrcode_modal : any;
 
-	client.subscribe(value => {	local_username = value.username;	});
 	chatRoom.subscribe(value => {	username = value.username_search;	});
+	client.subscribe(value => {	local_username = value.username;	});
 	onMount(() => {
-		$client.socket.off("get_other_user_info", (data) => {});
-		$client.socket.on("get_other_user_info", (data) =>
-		{
+		const test = function(data){
 			user_info = data;
-			console.log(user_info);
-		});
-
-		$client.socket.off("error_get_other_user_info", (data) => {
-		});
-		$client.socket.on("error_get_other_user_info", (data) => {
-			itself.close();
-			ChatRoomsModal.open();
-			alert("Error: " + data);	
-		});
-		$client.socket.off("error_change_username", (data) => {
-		});
-		$client.socket.on("error_change_username", (data) => {
-			itself.close();
-			ChatRoomsModal.open();
-			alert("Error: " + data);	
-		});
-		$client.socket.off("change_username", (data) => {
-		});
-		$client.socket.on("change_username", (data) => {
-			$client.socket.emit("get_user_info",{});
-			chatRoom.update((value) => {
-				value.username_search = data.new_username;
-				return value;
+			console.log("User info: ", user_info, $client.socket);
+		}
+		if ($client.socket._callbacks.$get_other_user_info == null) {
+			$client.socket.on("get_other_user_info", (data) => {
 			});
-			$client.socket.emit("get_other_user_info", { username_search: username } );
-			console.log("client", $client, $chatRoom);
-			console.log("THIS", username, local_username);
-		});
-		$client.socket.on("active_double_auth", (data) => {
-			user_info.is_2fa = true; 
-		});
-		$client.socket.on("disable_double_auth", (data) => {
-			user_info.is_2fa = false; 
-		});
+
+			$client.socket.on("error_get_other_user_info", (data) => {
+				itself.close();
+				ChatRoomsModal.open();
+				alert("Error: " + data);	
+			});
+			$client.socket.on("error_change_username", (data) => {
+				itself.close();
+				ChatRoomsModal.open();
+				alert("Error: " + data);	
+			});
+			$client.socket.on("change_username", (data) => {
+				$client.socket.emit("get_user_info",{});
+				chatRoom.update((value) => {
+					value.username_search = data.new_username;
+					return value;
+				});
+				$client.socket.emit("get_user_info", { } );
+			});
+			$client.socket.on("active_double_auth", (data) => {
+				user_info.is_2fa = true; 
+			});
+			$client.socket.on("disable_double_auth", (data) => {
+				user_info.is_2fa = false; 
+			});
+		}
 		if (username == $client.username)
 		{
 			user_info = $client.user_info;
-			console.log("userInfo: ", user_info)
+			client.subscribe(value => {	user_info = value.user_info;	});
 		}
 		else
 			$client.socket.emit("get_other_user_info", { username_search: username } );
@@ -225,11 +219,11 @@
 		<p>Campus : {user_info.campus_name}, {user_info.campus_country}</p>
 		{#if user_info.is_2fa == false}
 			<p>Double authentification:</p>
-			<input type="button" name="scales" value="active" on:click={active2FA}>
+			<input type="button" class="btn-room" name="scales" value="active" on:click={active2FA}>
 		{:else}
 			<p>Double authentification:</p>
 			<input on:click={seeQrcode} class="btn-room" type="button" value="qrcode">
-			<input type="button" name="scales" value="disable" on:click={disable2FA}>
+			<input type="button" name="scales" class="btn-room" value="disable" on:click={disable2FA}>
 		{/if}
 	</div>
 	<div class="history-zone">

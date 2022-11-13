@@ -113,7 +113,6 @@ export class MainServerService {
 	}
 	async getIdRoom (@MessageBody() name) //GET THE UNIQ ID OF A ROOM FIND WITH THE ROOM'S NAME 
 	{
-		console.log(name);
 		const id_user : any = await this.dataSource.getRepository(ChatRoomEntity)
 		.createQueryBuilder().where("ChatRoomEntity.name = :u", { u: name.room_name}).getOneOrFail();
 		return (id_user.id_g);

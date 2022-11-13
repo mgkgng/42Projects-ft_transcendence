@@ -111,7 +111,7 @@
 
 	let rooms : string[]; //Rooms visibles par le user
 	let actualName: string; //Name de la room selectionnee
-	let actualMessages : Room = new Room("", false, false, false);
+	let actualMessages : Room = new Room("", false, false, false, false);
 
 	let is_new_room_password_protected : boolean = false; //Si la room est protege par un mot de passe
 
@@ -152,6 +152,23 @@
 			newRoomPassword = ""
 		$client.socket.emit("new_room", {room_name: newRoomName, is_password_protected: is_new_room_password_protected, room_password: newRoomPassword, is_private: false});
 	}
+	function set_private_room()
+	{
+		$client.socket.emit("set_room_private", {room_name: $chatRoom.actualRoomName});
+	}
+	function unset_private_room()
+	{
+		$client.socket.emit("unset_room_private", {room_name: $chatRoom.actualRoomName});
+	}
+	function set_password_room()
+	{
+		let password = prompt("Enter the new passwod's room: ");
+		$client.socket.emit("set_password_room", {room_name: $chatRoom.actualRoomName, password: password});
+	}
+	function unset_password_room()
+	{
+		$client.socket.emit("unset_password_room", {room_name: actualName});
+	}
 </script>
 
 <div class="container">
@@ -177,6 +194,20 @@
 	<!--Zone de liste des messages de la room selectionne-->
 	<div class="message-zone" bind:this={message_zone}>
 		{#if ($chatRoom.actualRoomName !== "")}
+			{#if actualMessages.is_owner}
+				{#if actualMessages.is_private}
+					<input class="button" value="Set private" on:click={unset_private_room}>
+				{:else}
+					<input class="button" value="Set private" on:click={set_private_room}>
+				{/if}
+				{#if actualMessages.is_password_protected}
+					<input class="button" value="delete password" on:click={unset_password_room}>
+					<input class="button" value="Change password" on:click={set_password_room}>
+				{:else}
+					<input class="button" value="add password" on:click={set_password_room}>
+				{/if}
+
+			{/if}
 			{#each actualMessages?.messages as message}
 				<ChatRoomMessage username={message.username} content_message={message.message} itself={ itself } axelUserProfileModal={axelUserProfileModal} is_admin={actualMessages.is_admin}/>
 			{/each}
