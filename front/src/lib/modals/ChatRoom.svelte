@@ -92,16 +92,19 @@
 
 <script lang="ts">
 	// export let userInfo;
-
+	import Modal from "$lib/tools/Modal.svelte";
     import { client } from "$lib/stores/client";
     import { chatRoom, ChatRooms, Room } from "$lib/stores/chatRoom";
 	import { onMount, afterUpdate } from "svelte";
 	import { get } from 'svelte/store';
     import ChatRoomMessage from "$lib/tools/chatRoomMessage.svelte";
-
+    import AllChatRooms from "./allChatRooms.svelte";
+    import AxelUserProfile from "./AxelUserProfile.svelte";
+	
 	export let itself: any; 
-	export let allChatRoomsModal : any;
-	export let axelUserProfileModal : any;
+
+	let allChatModal : any;
+	let axelUserProfileModal : any;
 
 	let newRoomName : string; //Valeur du insert de création de room
 	let newMessage : string;  //Valeur du insert d'envoie de message
@@ -151,6 +154,14 @@
 		$client.socket.emit("new_room", {room_name: newRoomName, is_password_protected: is_new_room_password_protected, room_password: newRoomPassword, is_private: false});
 	}
 </script>
+
+<Modal bind:this={allChatModal} closeOnBgClick={true} >
+	<AllChatRooms itself={allChatModal} ChatRoomsModal={chatModal}/>
+</Modal>
+<Modal bind:this={axelUserProfileModal} closeOnBgClick={true} >
+	<AxelUserProfile itself={axelUserProfileModal} ChatRoomsModal={chatModal}/>
+</Modal>
+
 
 <div class="container">
 	<!--Zone de liste des rooms du user-->

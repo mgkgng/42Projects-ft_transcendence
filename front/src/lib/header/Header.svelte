@@ -83,32 +83,15 @@
 				text-align: center;
 				transition: .1s;
 
-				&:hover {
-					background-color: transparentize(#fff, .6); //TODO color decide
-				}
+				&:hover { filter: brightness(80%); }
+				&:nth-child(odd):hover { background-color: transparentize($main-light, .2); }
+				&:nth-child(even):hover { background-color: transparentize($submain, .2); }
 			}
 		}
 		&:focus-within .menu {
 			display: block;
 			animation: grow .2s ease-in-out;
 		}
-	}
-
-	.chat{
-		position: absolute;
-		top: 0;
-		left: 0;
-		float: right;
-		border: 2px solid transparentize(#fff, .5);
-		color: transparentize(#fff, .5);
-		font-size: 15px;
-		padding: .2em;
-
-		width: 45px;
-		height: 45px;
-		border-radius: .4em;
-		text-align: center;
-		cursor: pointer;
 	}
 </style>
 
@@ -121,15 +104,14 @@
     import { user } from "$lib/stores/user";
     import { loginState } from "$lib/stores/var";
     import Modal from "$lib/tools/Modal.svelte";
+    import Setting from "../modals/Setting.svelte";
+
 
 	let profileModal: any;
 	let chatModal: any;
-	let allChatModal: any;
 	let login: boolean;
-	let userInfo: any;
-	let axelProfileModal : any;
+	let settingModal: any;
 
-	let openMenu: boolean;
 
 	loginState.subscribe(value => { login = value; })
 
@@ -138,22 +120,10 @@
 <Modal bind:this={profileModal} closeOnBgClick={true}>
 	<UserProfile />
 </Modal>
-<Modal bind:this={chatModal} closeOnBgClick={true}>
-	<ChatModal itself={chatModal} allChatRoomsModal={allChatModal} axelUserProfileModal={axelProfileModal}/>
-</Modal>
-<Modal bind:this={allChatModal} closeOnBgClick={true} >
-	<AllChatModal itself={allChatModal} ChatRoomsModal={chatModal}/>
-</Modal>
-<Modal bind:this={axelProfileModal} closeOnBgClick={true} >
-	<AxelUserProfile itself={axelProfileModal} ChatRoomsModal={chatModal}/>
+<Modal bind:this={settingModal} closeOnBgClick={true} >
+	<Setting itself={settingModal}/>
 </Modal>
 <header>
-	<!-- <div class="logo" on:click={() => {
-		goto('/');
-	}}>
-		<img src="/logot.svg" alt="logo">
-	</div> -->
-
 	<div class="profile">
 		<div class="summary">
 			{#if !$user}
@@ -163,15 +133,10 @@
 			{/if}
 		</div>
 		<div class="menu">
-			<button on:click={()=>{profileModal.open();}}>Profile</button>
+			<button on:click={()=>{ profileModal.open(); }}>Profile</button>
 			<button>Friends</button>
-			<button>Setting</button>
+			<button on:click={()=>{ settingModal.open(); }}>Setting</button>
 			<button>Logout</button>
 		</div>
-	</div>
-	<div class="chat" on:click={() => {
-		chatModal.open();
-	}}>
-		<p>chat test</p>
 	</div>
 </header>
