@@ -2,7 +2,7 @@
 	.paddle {
 		position: absolute;
 		margin: 0;
-		height: 12px;
+		width: 12px;
 		background-color: #fff;
 
 		border-radius: .2em;
@@ -49,7 +49,7 @@
 </script>
 
 <div class="paddle {(user) ? "user" : ""} {(!userPresent) ? "absent" : ""}"
-	style="top: {(!user) ? deadZoneHeight: gameHeight - deadZoneHeight}px;
-		left: {((user && !userIndex) || (!userIndex && !user)) ? pos - paddleWidth : pos}px;
-		width: {paddleWidth}px">
+	style="left: {(!user) ? deadZoneHeight: gameWidth - deadZoneHeight}px;
+		top: {((user && !userIndex) || (!userIndex && !user)) ? pos - paddleWidth : pos}px;
+		height: {paddleWidth}px">
 </div>

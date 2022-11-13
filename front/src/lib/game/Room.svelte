@@ -200,9 +200,6 @@
 
 	let quitConfirm: boolean; // only activate when game is on going
 
-	$: quitRoom(resQuitConfirm);
-	$: console.log(roomInfo);
-
 	function quitRoom(res: boolean) {
 		if (res == false)
 			quitConfirmMsgModal.close();
@@ -254,14 +251,12 @@
 		$client.socket.off("PaddleUpdate", (data: any) => {
 		});
 		$client.socket.on("PaddleUpdate", (data: any) => {
-			// console.log("PaddleUpdate", data);
+			console.log("PaddleUpdate", data);
 			if ((data.player == UserType.Player1 && userIndex == UserType.Player2) ||
 				(data.player == UserType.Player2 && userIndex == UserType.Player2))
 				paddlePos[data.player] = data.paddlePos;
 			else
 				paddlePos[data.player] = roomInfo?.mapSize[0] - data.paddlePos;
-
-			// data.paddlePos;
 		});
 
 		$client.socket.off("LoadBall", (data: any) => {

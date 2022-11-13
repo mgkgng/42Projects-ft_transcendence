@@ -139,8 +139,6 @@ export class GameGateway {
 			return ;
 		}
 
-		console.log("once again!", room.players);
-
 		client.emit("RoomInfo", {
 			roomHost: room.hostname,
 			players: (room.players.length === 2) ? [room.players[0], room.players[1]]

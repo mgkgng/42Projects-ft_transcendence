@@ -20,9 +20,9 @@ export function replacer() {
 }
 
 export const PaddleSize = {
-	Small : 40,
-	Medium : 80,
-	Large : 130
+	0 : 40,
+	1 : 80,
+	2 : 130
 }
 
 export const MapSize = {

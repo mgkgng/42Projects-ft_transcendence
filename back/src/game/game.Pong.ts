@@ -11,13 +11,16 @@ export class Pong {
 	scores: Array<number>;
 
 	constructor(size: Array<number>, difficulty: number) {
+		
 		this.size = size;
 		this.puck = new Puck(this.size[0], this.size[1],
 			difficulty * ((Math.floor(Math.random() * 2)) ? 1 : -1));
 
+		this.paddleSize = PaddleSize[1] // TODO put it into createGame
 		let initPos = (this.size[0] - this.paddleSize) / 2;
 		this.paddlePos = [initPos, initPos];
-		this.paddleSize = PaddleSize.Medium // TODO put it into createGame
+
+		console.log("this is the paddlepos: ", this.paddlePos);
 
 		this.moveMin = 0;
 		this.moveMax = this.size[0] - this.paddleSize;
