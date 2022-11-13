@@ -14,8 +14,11 @@ export class UserChatRoomEntity {
 	@ManyToOne(() => ChatRoomEntity, (room: ChatRoomEntity) => room.relation_userChatRoom)
 	room: ChatRoomEntity;
 
-	@Column()
+	@Column({default: false})
 	is_admin: boolean;
+
+	@Column({default: false})
+	is_owner: boolean;
 
 	@Column()
 	is_banned: boolean;

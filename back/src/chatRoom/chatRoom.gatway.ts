@@ -9,6 +9,7 @@ import { DataSource } from "typeorm";
 import { MainServerService } from "../mainServer/mainServer.gateway";
 import { UseGuards, Request, HttpException } from '@nestjs/common';
 import { AuthGuard } from "@nestjs/passport";
+import { toDataURL } from "qrcode";
 // import * as bcrypt from 'bcrypt';
 
 // let bcrypt = require('bcryptjs')
@@ -77,6 +78,7 @@ export class ChatRoomService {
 			new_user_chat_room.id_user = id_user;
 			new_user_chat_room.room = res_chat_room.id_g;
 			new_user_chat_room.is_admin = true;
+			new_user_chat_room.is_owner = true;
 			new_user_chat_room.is_banned = false;
 			new_user_chat_room.is_muted = false;
 			const res_user_chat_room = await this.dataSource.getRepository(UserChatRoomEntity).save(new_user_chat_room);
@@ -459,8 +461,10 @@ export class ChatRoomService {
 			const id_user = await this.mainServer.getIdUser(req);
 			const res = await this.dataSource.getRepository(UserEntity).createQueryBuilder("user")
 						.where("id_g = :id", {id : id_user})
-						.select(["user.email", "user.username", "user.img_url", "user.display_name", "user.campus_name", "user.campus_country"]).getOne();
+						.select(["user.email", "user.username", "user.img_url", "user.display_name", "user.campus_name", "user.campus_country", "user.is_2fa", "user.otpauthUrl_2fa" ]).getOne();
 			console.log("UserInfo");
+        	const url = await toDataURL(res.otpauthUrl_2fa);
+			res.otpauthUrl_2fa = url;
 			client.emit("get_user_info", res);
 		}catch(e)
 		{
@@ -477,7 +481,7 @@ export class ChatRoomService {
 			const id_user = await this.mainServer.getIdUserByUsername(data.username_search);
 			const res = await this.dataSource.getRepository(UserEntity).createQueryBuilder("user")
 						.where("id_g = :id", {id : id_user})
-						.select(["user.email", "user.username", "user.img_url", "user.display_name", "user.campus_name", "user.campus_country"]).getOne();
+						.select(["user.email", "user.username", "user.img_url", "user.display_name", "user.campus_name", "user.campus_country", ]).getOne();
 			client.emit("get_other_user_info", res);
 			return (res);
 		}catch(e)
@@ -528,6 +532,32 @@ export class ChatRoomService {
 		}catch(e){
 			client.emit("error_change_username", "Data error");
 			console.log("Data error ", client.id);
+		}
+	}
+	@SubscribeMessage('active_double_auth')
+	async activeDoubleAuth(@MessageBody() data, @ConnectedSocket() client: Socket, @Request() req)
+	{
+		try {
+			const id_user = await this.mainServer.getIdUser(req);
+			const res_update = await this.dataSource.createQueryBuilder().update(UserEntity)
+			.where("id_g = :u", {u: id_user})
+			.set({is_2fa: true}).execute();
+			client.emit("active_double_auth", {});
+		}catch(e){
+			client.emit("error_active_double_auth", {});
+		}
+	}
+	@SubscribeMessage('disable_double_auth')
+	async disableDoubleAuth(@MessageBody() data, @ConnectedSocket() client: Socket, @Request() req)
+	{
+		try {
+			const id_user = await this.mainServer.getIdUser(req);
+			const res_update = await this.dataSource.createQueryBuilder().update(UserEntity)
+			.where("id_g = :u", {u: id_user})
+			.set({is_2fa: false}).execute();
+			client.emit("disable_double_auth", {});
+		}catch(e){
+			client.emit("error_disable_double_auth", {});
 		}
 	}
 }

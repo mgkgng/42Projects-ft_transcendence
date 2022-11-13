@@ -102,9 +102,8 @@
     import AxelUserProfile from "./AxelUserProfile.svelte";
 	
 	export let itself: any; 
-
-	let allChatModal : any;
-	let axelUserProfileModal : any;
+	export let axelUserProfileModal : any;
+	export let allChatModal: any;
 
 	let newRoomName : string; //Valeur du insert de création de room
 	let newMessage : string;  //Valeur du insert d'envoie de message
@@ -155,19 +154,11 @@
 	}
 </script>
 
-<Modal bind:this={allChatModal} closeOnBgClick={true} >
-	<AllChatRooms itself={allChatModal} ChatRoomsModal={chatModal}/>
-</Modal>
-<Modal bind:this={axelUserProfileModal} closeOnBgClick={true} >
-	<AxelUserProfile itself={axelUserProfileModal} ChatRoomsModal={chatModal}/>
-</Modal>
-
-
 <div class="container">
 	<!--Zone de liste des rooms du user-->
 	<div class="room-zone">
 		<input class="btn-room search" value="search" on:click={() =>{
-			allChatRoomsModal.open();
+			allChatModal.open();
 			itself.close();	
 		}}>
 		<ul>

@@ -98,6 +98,7 @@ export class MainServerService {
 	async getIdUser(@Request() req) //GET THE UNIQ ID OF A USER
 	{
 		 const user : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
+		 console.log("USER: ", user)
 		 const client_username = user.username_42;
 		 const id_user : any = await this.dataSource.getRepository(UserEntity)
 		 .createQueryBuilder().where("UserEntity.username_42 = :u", { u: client_username }).getOneOrFail();
@@ -126,7 +127,7 @@ export class MainServerService {
 		.where("userRooms.id_user = :u", { u: id_user })
 		.andWhere("userRooms.is_visible = TRUE")
 		.andWhere("(userRooms.ban_end < :d OR userRooms.ban_end is null)", { d: new Date() })
-		.select(["userRooms.id", "chatRoom.name", "userRooms.is_admin", "chatRoom.is_password_protected", "chatRoom.is_private"]).getMany();
+		.select(["userRooms.id", "chatRoom.name", "userRooms.is_admin", "userRooms.is_owner", "chatRoom.is_password_protected", "chatRoom.is_private"]).getMany();
 		return (names_rooms);
 	}
 	

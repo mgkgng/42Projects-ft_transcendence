@@ -153,6 +153,7 @@
 			$client.socket.on("get_user_info", (data: any) => {
 				client.update((value) => {
 					value.username = data.username;
+					value.user_info = data;
 					return value;
 				});
 				console.log("DATA: ", data);
