@@ -34,11 +34,6 @@ export class Puck {
 		let timeOut = frameNb * frameDuration;
 		let deathPointX = this.calculPosX(frameNb);
 
-		// room.broadcast(JSON.stringify({
-		// 	event: "DeathPointUpdate",
-		// 	data: deathPointX
-		// }));
-
 		setTimeout(() => {
 			
 			// checking if the paddle hits the puck...

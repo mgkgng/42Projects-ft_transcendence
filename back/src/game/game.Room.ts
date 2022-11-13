@@ -7,22 +7,17 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { MainServerService } from "src/mainServer/mainServer.gateway";
 import { UserService } from "src/user/user.service";
-import { ConsoleLogger } from "@nestjs/common";
+import { MapSize, Difficulty } from "./game.utils";
 
-const Difficulty = {
-	0 : 3,
-	1 : 5,
-	2 : 8,
-	3 : 15
-}
 
 export class Room {
 	/* RoomInfo */
 	id: string;
 	title: string;
+	size: number;
 	maxpoint: number;
 	difficulty: number;
-	host: any;
+	hostname: string;
 
 	/* RoomState */
 	privateMode: boolean;
@@ -37,33 +32,30 @@ export class Room {
 	clients: Map<string, any>;
 	chat: Map<string, string>
 		
-	constructor(players: any, clients: any, title:string, maxpoint: number = 25,
-				difficulty : number = 8, privateMode : boolean = true,
+	constructor(players: any, clients: any, title:string, size: number, maxpoint: number = 25,
+				difficulty : number = 8, privateMode : boolean = true, hostname: string = "",
 				@InjectRepository(GameEntity) private gameRep: Repository<GameEntity>, 
 				private mainServerService : MainServerService,
 				private dataSource : DataSource,
-				private userService : UserService,
-			 	host: any = undefined) {
+				private userService : UserService) {
 		this.id = uid();
 		this.title = title;
 		this.maxpoint = maxpoint;
-		this.difficulty = Difficulty[difficulty];
-		this.host = host;
+		this.hostname = hostname;
 		this.scores = [0, 0];
 
 		this.privateMode = privateMode;
-
 		this.available = (players.length < 2) ? true : false;
 	
 		this.clients = new Map();
 		this.addClients(clients);
 
-		this.pong = new Pong(this.difficulty);
+		this.pong = new Pong(MapSize[size], Difficulty[difficulty]);
 		this.players = [];
 		for (let player of players)
 			this.getPlayerInfo(player).then((res)=>{ this.players.push(res); });
 
-		if (!host)
+		if (!this.hostname.length)
 			this.startPong();
 	}
 

@@ -21,20 +21,20 @@ export function replacer() {
 
 
 export const PaddleSize = {
-	XSmall: 20,
 	Small : 40,
 	Medium : 80,
 	Large : 130
 }
 
-export const MapWidth = {
-	Small: 400,
-	Medium: 700,
-	Large: 1000
+export const MapSize = {
+	0: [400, 200],
+	1: [700, 400],
+	2: [1000, 600]
 }
 
-export const MapHeight = {
-	Small: 200,
-	Medium: 400,
-	Large: 600
+export const Difficulty = {
+	0 : 3,
+	1 : 5,
+	2 : 8,
+	3 : 15
 }

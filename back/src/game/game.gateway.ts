@@ -7,12 +7,8 @@ import {
 	WebSocketGateway, 
 	WebSocketServer
 } from "@nestjs/websockets";
-import { runInThisContext } from "vm";
-import { threadId } from "worker_threads";
 import { Server, Socket } from "socket.io";
 import {Client} from './game.Client'
-import {Block} from "./game.Block"
-import {Puck} from "./game.Puck"
 import {Room} from "./game.Room"
 import { UseGuards, Request, HttpException } from '@nestjs/common';
 import { AuthGuard } from "@nestjs/passport";
@@ -112,7 +108,7 @@ export class GameGateway {
 
 		// TODO plus tard
 		if (this.queue.length > 1) {
-			let room = new Room([this.queue[0], this.queue[1]], [], "test", 25, 8, true, this.gameRep, this.mainServerService, this.dataSource, this.userService);
+			let room = new Room([this.queue[0], this.queue[1]], [], "", 1, 10, 1, true, "", this.gameRep, this.mainServerService, this.dataSource, this.userService);
 			// TODO: think about it: if i just join a match randomlmy like this, it could be by default a private game
 			this.queue[0].room = room.id;
 			this.queue[1].room = room.id;
@@ -146,13 +142,13 @@ export class GameGateway {
 		console.log("once again!", room.players);
 
 		client.emit("RoomInfo", {
-			roomHost: room.host,
+			roomHost: room.hostname,
 			players: (room.players.length === 2) ? [room.players[0], room.players[1]]
 				: [room.players[0]],
 			maxpoint: room.maxpoint,
 			scores: room.scores,
-			mapSize: [room.pong.gameMap.width, room.pong.gameMap.height],
-			paddleSize: room.pong.gameMap.paddleSize
+			mapSize: [room.pong.size[0], room.pong.size[1]],
+			paddleSize: room.pong.paddleSize
 		});
 	}
 
@@ -207,8 +203,8 @@ export class GameGateway {
 		// if (client.room.length)
 		// 	return ;
 
-		let room = new Room([data.username], [client], data.title, data.maxPoint, data.difficulty, data.privateMode,
-			this.gameRep, this.mainServerService, this.dataSource, this.userService, data.username);
+		let room = new Room([data.username], [client], data.title, data.mapSize, data.maxPoint, data.difficulty, data.privateMode, data.username,
+			this.gameRep, this.mainServerService, this.dataSource, this.userService);
 		this.rooms.set(room.id, room);
 
 		// TODO should be able to set client's room state
