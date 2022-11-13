@@ -10,7 +10,7 @@ import { MainServerService } from "../mainServer/mainServer.gateway";
 import { UseGuards, Request, HttpException } from '@nestjs/common';
 import { AuthGuard } from "@nestjs/passport";
 import { toDataURL } from "qrcode";
-// import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcrypt';
 
 // let bcrypt = require('bcryptjs')
 
@@ -57,10 +57,9 @@ export class ChatRoomService {
 		//console.log("new room");
 		const id_user = await this.mainServer.getIdUser(req);
 		const is_password_protected : boolean = data.is_password_protected;	
-		// const password : string = is_password_protected ? 
-		// 	await bcrypt.hash(data.room_password, 10) 
-		// 	: "";
-		const password = "password" // replaced
+		const password : string = is_password_protected ? 
+		await bcrypt.hash(data.room_password, 10) 
+		 	: "";
 
 		const name : string = data.room_name;
 		const date_creation : Date = new Date();
@@ -463,13 +462,34 @@ export class ChatRoomService {
 				.select(["u.is_owner"]).getOne();
 		if (is_owner.is_owner == false)
 		{
-			client.emit("error_ser_room_private", {error: "You are not owner of the room."});
+			client.emit("error_set_room_private", {error: "You are not owner of the room."});
 			return ;
 		}
 		const res = await this.dataSource.createQueryBuilder().update(ChatRoomEntity)
 				.where("room = :r", {r: room})
 				.set({is_private: true}).execute();
 		client.emit("set_room_private", {room_name : data.room_name});
+	}
+	//Unset password room
+	//{room_name:string}
+	@SubscribeMessage("unset_password_room")
+	async unsetRoomPassword(@MessageBody() data, @ConnectedSocket() client: Socket, @Request() req) {
+		const client_username : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
+		const user : any = await this.mainServer.getIdUser(client_username.username);
+		const room : any = await  this.mainServer.getIdRoom( data.room_name);
+		const is_owner = await this.dataSource.getRepository(UserChatRoomEntity).createQueryBuilder("u")
+				.where("u.id_user = :u AND u.room = :r", {u: user[0].id_g, r: room[0].id_g})
+				.select(["u.is_owner"]).getOne();
+		if (is_owner.is_owner == false)
+		{
+			client.emit("error_unset_password_room", {error: "You are not owner of the room."});
+			return ;
+		}
+
+		const res = await this.dataSource.createQueryBuilder().update(ChatRoomEntity)
+				.where("room = :r", {r: room})
+				.set({is_password_protected: false}).execute();
+		client.emit("unset_password_room", {room_name : data.room_name});
 	}
 	//OK
 	//{}
