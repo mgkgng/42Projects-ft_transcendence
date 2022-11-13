@@ -121,6 +121,8 @@
     import { user } from "$lib/stores/user";
     import { loginState } from "$lib/stores/var";
     import Modal from "$lib/tools/Modal.svelte";
+    import Setting from "../modals/Setting.svelte";
+
 
 	let profileModal: any;
 	let chatModal: any;
@@ -128,6 +130,7 @@
 	let login: boolean;
 	let userInfo: any;
 	let axelProfileModal : any;
+	let settingModal: any;
 
 	let openMenu: boolean;
 
@@ -147,6 +150,9 @@
 <Modal bind:this={axelProfileModal} closeOnBgClick={true} >
 	<AxelUserProfile itself={axelProfileModal} ChatRoomsModal={chatModal}/>
 </Modal>
+<Modal bind:this={settingModal} closeOnBgClick={true} >
+	<Setting itself={settingModal}/>
+</Modal>
 <header>
 	<!-- <div class="logo" on:click={() => {
 		goto('/');
@@ -163,9 +169,9 @@
 			{/if}
 		</div>
 		<div class="menu">
-			<button on:click={()=>{profileModal.open();}}>Profile</button>
+			<button on:click={()=>{ profileModal.open(); }}>Profile</button>
 			<button>Friends</button>
-			<button>Setting</button>
+			<button on:click={()=>{ settingModal.open(); }}>Setting</button>
 			<button>Logout</button>
 		</div>
 	</div>

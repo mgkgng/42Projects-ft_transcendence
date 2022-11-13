@@ -8,6 +8,8 @@
 		background-color: transparentize(#000, 0.9);
 		padding: 2em;
 		border-radius: 2em;
+
+		overflow: scroll;
 	}
 	
 	.photo-zone {
@@ -69,6 +71,9 @@
 		padding: 2em;
 
 		color: #e6e6e6;
+
+		display: flex;
+		flex-direction: row;
 	}
 
 	.history-zone {
@@ -95,28 +100,23 @@
 </script>
 
 <div class="container">
-	<div class="photo-zone">
-		{#if !$user}
-		<img src="/pingu/pingu-angry.jpeg" alt="pingu-angry">
-		{:else}
-		<img src={$user.image_url} alt="grosse-tete">
-		{/if}
-	</div>
-	<div class="tool-zone">
-		<button>
-			<img src="/logo-test/add.svg" alt="add"/>
-		</button>
-		<button>
-			<img src="/logo-test/block.svg" alt="add"/>
-		</button>
-		<button>
-			<img src="/logo-test/chat.svg" alt="add"/>
-		</button>
-	</div>
 	<div class="info-zone">
+		<div class="photo-zone">
+			{#if !$user}
+			<img src="/pingu/pingu-angry.jpeg" alt="pingu-angry">
+			{:else}
+			<img src={$user.image_url} alt="grosse-tete">
+			{/if}
+		</div>
 		<p>Username: {$user.username}</p>
 		<p>Campus : {$user.campus_name}, {$user.campus_country}</p>
 	</div>
+	<div class="tool-zone">
+		<button>Add</button>
+		<button>Block</button>
+		<button>Message</button>
+	</div>
+	
 	<div class="history-zone">
 		No Game History Yet
 	</div>
