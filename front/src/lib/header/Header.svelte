@@ -83,32 +83,15 @@
 				text-align: center;
 				transition: .1s;
 
-				&:hover {
-					background-color: transparentize(#fff, .6); //TODO color decide
-				}
+				&:hover { filter: brightness(80%); }
+				&:nth-child(odd):hover { background-color: transparentize($main-light, .2); }
+				&:nth-child(even):hover { background-color: transparentize($submain, .2); }
 			}
 		}
 		&:focus-within .menu {
 			display: block;
 			animation: grow .2s ease-in-out;
 		}
-	}
-
-	.chat{
-		position: absolute;
-		top: 0;
-		left: 0;
-		float: right;
-		border: 2px solid transparentize(#fff, .5);
-		color: transparentize(#fff, .5);
-		font-size: 15px;
-		padding: .2em;
-
-		width: 45px;
-		height: 45px;
-		border-radius: .4em;
-		text-align: center;
-		cursor: pointer;
 	}
 </style>
 
