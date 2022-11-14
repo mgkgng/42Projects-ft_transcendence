@@ -28,7 +28,6 @@ export class AppController {
   @Post("/auth42")
   async login42(@Request() req)
   {
-    console.log(req.user);
       if (req.user.error)
           return ({get_code : req.user.error, tmp_jwt: await this.authService.sign_tmp_jwt(req.user.user)});
       else

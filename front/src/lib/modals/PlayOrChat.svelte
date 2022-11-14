@@ -1,7 +1,5 @@
 <style lang="scss">
 	.container {
-		display: flex;
-		flex-direction: row;
 		gap: 3em;
 	}
 
@@ -81,7 +79,7 @@
 	<AxelUserProfile itself={axelUserProfileModal} ChatRoomsModal={chatModal}/>
 </Modal>
 
-<div class="container">
+<div class="flex container">
 	<button class="play" on:click={()=>{
 		enterGameModal.open();
 		// itself.close();

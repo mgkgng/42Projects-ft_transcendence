@@ -44,60 +44,6 @@
 		z-index: 4;
 	}
 
-	.bar-container-above {
-		position: relative;
-		display: flex;
-		align-items: center;
-	}
-
-	.bar-container-below {
-		position: relative;
-		display: flex;
-		align-items: center;
-	}
-
-	.beyond-above {
-		background-color: transparentize($main, 0.2);
-		border-radius: 5em 5em 0 0;
-	}
-
-	.beyond-below {
-		background-color: transparentize($main, 0.2);
-		border-radius: 0 0 5em 5em;
-	}
-
-	.map {
-		display: flex;
-		background-color: transparentize($main, 0.9);
-	}
-
-	.main-circle {
-		width: 50%;
-		height: 50%;
-		aspect-ratio: 1 / 1;
-		border-radius: 50%;
-		background-color: transparentize($main, 0.2)
-	}
-
-	.pong-score {
-		display: flex;
-		flex-direction: column;
-
-		justify-content: center;
-		height: 100%;
-
-		gap: 1em;
-	}
-
-	.deathPoint {
-		position: absolute;
-		width: 12px;
-		aspect-ratio: 1 / 1;
-		border-radius: 50%;
-		background-color: peru;
-		z-index: 10;
-	}
-
 	.loading-box {
 		height: 100%;
 		display: flex;
@@ -198,7 +144,7 @@
 	let roomFound: boolean;
 	let miniMode: boolean = false;
 
-	let quitConfirm: boolean; // only activate when game is on going
+	$: quitRoom(resQuitConfirm);
 
 	function quitRoom(res: boolean) {
 		if (res == false)
@@ -213,8 +159,6 @@
 			room: roomId
 		});
 
-		$client.socket.off("RoomInfo", (data: any) => {
-		});
 		$client.socket.on("RoomInfo", (data: any) => {
 			console.log("RoomInfo", data);
 			roomFound = true;
@@ -248,10 +192,7 @@
 			}
 		})
 		
-		$client.socket.off("PaddleUpdate", (data: any) => {
-		});
 		$client.socket.on("PaddleUpdate", (data: any) => {
-			console.log("PaddleUpdate", data);
 			if ((data.player == UserType.Player1 && userIndex == UserType.Player2) ||
 				(data.player == UserType.Player2 && userIndex == UserType.Player2))
 				paddlePos[data.player] = data.paddlePos;
@@ -317,9 +258,9 @@
 {#if roomFound}
 <div class="container">
 	{#if roomInfo}
-	<div class="pong" style="width: {roomInfo.mapSize[0] + 200}px; height: {roomInfo.mapSize[1]}px;">
+	<div class="pong" style="width: {roomInfo.mapSize[1] + 200}px; height: {roomInfo.mapSize[0]}px;">
 		<Player userInfo={(roomInfo.players.length > 1) ? roomInfo.players[opponentIndex] : undefined} left={true}/>	
-		<div class="pong-game" style="min-width: {roomInfo.mapSize[0]}px; min-height: {roomInfo.mapSize[1]}px;">
+		<div class="pong-game" style="min-width: {roomInfo.mapSize[1]}px; min-height: {roomInfo.mapSize[0]}px;">
 			<Paddle pos={paddlePos[opponentIndex]} paddleWidth={roomInfo.paddleSize}
 				gameWidth={roomInfo.mapSize[0]} gameHeight={roomInfo.mapSize[1]}
 				user={false} userIndex={userIndex} userPresent={(roomInfo.players.length > 1) ? true : false}/>

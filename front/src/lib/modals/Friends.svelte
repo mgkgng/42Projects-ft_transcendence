@@ -1,16 +1,62 @@
 <style lang="scss">
 	.friends {
 		width: 360px;
-		height: 540px;
+		height: 480px;
+		padding-bottom: .2em;
+		padding-right: .5em;
+		justify-content: space-between;
 
 		.friends-list {
-			overflow: scroll;
-			display: flex;
-			flex-direction: column;
+			margin-top: 1em;
+			padding-left: .2em;
+			gap: .8em;
+			overflow-y: scroll;
 
 			width: 100%;
 			height: 80%;
 			border: none;
+
+			.line {
+				position: relative;
+
+				.friend {
+					width: 60%;
+					cursor: pointer;
+					border-radius: .2em .2em 3em .2em;
+					transition: .3s;
+					padding: 1em;
+
+					&:hover {
+						background-color: transparentize($main-light, .3);
+						filter: saturate(50%);
+					}
+				}
+				.tools {
+					position: absolute;
+					right: 2em;
+					width: 7em;
+					float: right;
+					justify-content: flex-end;
+					gap: 2em;
+
+					padding: 1em;
+					border-radius: 3em .2em .2em .2em;
+					cursor: pointer;
+
+					img {
+						height: 1.2em;
+					}
+
+					button {
+						cursor: pointer;
+					}
+
+					&:hover {
+						background-color: transparentize($submain-lowshadeblue, .3);
+						filter: saturate(50%);
+					}
+				}
+			}
 		}
 
 		.no-friend {
@@ -32,9 +78,12 @@
 
 	let friends: Array<any>
 
-	onMount(() => {
-		$client.socket.emit();
+	onMount(async () => {
+		await fetch('http://localhost:3000/getfriendlist?username=min-kang').then(data => {
+			return data.json();
+		}).then(post => { friends = post; });
 
+		$client.socket.emit();
 		$client.socket.on();
 	});
 </script>
@@ -42,9 +91,15 @@
 <div class="window friends">
 	<h2>Friends</h2>
 	{#if friends}
-	<div class="friends-list">
+	<div class="vflex friends-list">
 		{#each friends as friend}
-		<div class="friend">friend.username</div>
+		<div class="flex line">
+			<div class="friend">{friend.username}</div>
+			<div class="flex tools">
+				<button><img src="/icon-mail.png" alt="mail"></button>
+				<button>-</button>
+			</div>
+		</div>
 		{/each}
 	</div>
 	{:else}

@@ -26,9 +26,9 @@ export const PaddleSize = {
 }
 
 export const MapSize = {
-	0: [400, 200],
-	1: [700, 400],
-	2: [1000, 600]
+	0: [200, 300],
+	1: [300, 500],
+	2: [400, 700]
 }
 
 export const Difficulty = {
