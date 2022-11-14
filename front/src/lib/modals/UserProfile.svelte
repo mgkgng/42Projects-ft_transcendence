@@ -1,21 +1,30 @@
 <style lang="scss">
-	.container {
-		display: flex;
-		flex-direction: column;
-		gap: 0;
-		margin: 0;
+	.profile {
 		width: 550px;
-		background-color: transparentize(#000, 0.9);
-		padding: 2em;
-		border-radius: 2em;
 
 		overflow: scroll;
 	}
 	
+	.info-zone {
+		width: 100%;
+		max-height: 400px;
+		border-radius: .4em;
+		margin-bottom: .2em;
+
+		text-align: center;
+
+
+		padding: 2em;
+
+		color: #e6e6e6;
+
+		display: flex;
+		flex-direction: row;
+	}
+
 	.photo-zone {
 		width: 100%;
 		min-height: 200px;
-		background-color: transparentize(#000, 0.2);
 		
 		img {
 			width: 100%;
@@ -30,10 +39,6 @@
 		margin-bottom: .2em;
 		padding: 1em;
 		
-		border: 2px solid transparentize(#fff, .6);
-		background-color: transparentize(#000, 0.45);
-		color: #e6e6e6;
-
 		display: flex;
 		flex-direction: row;
 		gap: .5em;
@@ -57,24 +62,7 @@
 		}
 	}
 
-	.info-zone {
-		width: 100%;
-		max-height: 400px;
-		border-radius: .4em;
-		margin-bottom: .2em;
 
-		text-align: center;
-
-		border: 2px solid transparentize(#fff, .6);
-		background-color: transparentize(#000, 0.45);
-
-		padding: 2em;
-
-		color: #e6e6e6;
-
-		display: flex;
-		flex-direction: row;
-	}
 
 	.history-zone {
 		width: 100%;
@@ -96,21 +84,28 @@
 	// export let userInfo;
 
     import { user } from "$lib/stores/user";
+    import { onMount } from "svelte";
 
+	let profileUser: any;
+
+	onMount(() => {
+
+	});
 </script>
 
-<div class="container">
+<div class="window profile">
 	<div class="info-zone">
-		<div class="photo-zone">
-			{#if !$user}
+		<!-- <div class="photo-zone">
+			{#if !profileUser}
 			<img src="/pingu/pingu-angry.jpeg" alt="pingu-angry">
 			{:else}
-			<img src={$user.image_url} alt="grosse-tete">
+			<img src={profileUser.image_url} alt="grosse-tete">
 			{/if}
 		</div>
-		<p>Username: {$user.username}</p>
-		<p>Campus : {$user.campus_name}, {$user.campus_country}</p>
+		<p>Username: {profileUser.username}</p>
+		<p>Campus : {profileUser.campus_name}, {profileUser.campus_country}</p> -->
 	</div>
+	<!-- {#if $user.username != } -->
 	<div class="tool-zone">
 		<button>Add</button>
 		<button>Block</button>
