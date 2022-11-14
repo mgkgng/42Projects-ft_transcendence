@@ -1,11 +1,11 @@
 <style lang="scss">
-	body {
-		font-family: 'alpha-prota';
-		height: 100%;
-		color: $text;
-		padding: 0;
-		margin: 0;
-	}
+	// body {
+	// 	font-family: 'alpha-prota';
+	// 	height: 100%;
+	// 	color: $text;
+	// 	padding: 0;
+	// 	margin: 0;
+	// }
 
 	main {
 		padding: 0;
