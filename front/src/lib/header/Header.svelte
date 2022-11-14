@@ -107,6 +107,12 @@
 
 	loginState.subscribe(value => { login = value; })
 
+	function handleLogout() {
+		localStorage.removeItem("transcendence-jwt");
+		loginState.set(false);
+		window.location.reload();
+	}
+
 </script>
 
 <Modal bind:this={profileModal} closeOnBgClick={true}>
@@ -136,7 +142,7 @@
 			<button on:click={()=>{ friendsModal.open(); }}>Friends</button>
 			<button on:click={()=>{ chatDirectModal.open(); }}>ChatDirect</button>
 			<button on:click={()=>{ settingModal.open(); }}>Setting</button>
-			<button>Logout</button>
+			<button on:click={handleLogout}>Logout</button>
 		</div>
 	</div>
 </header>
