@@ -257,13 +257,13 @@ export class GameGateway {
 	startGame(@ConnectedSocket() client: Socket, @MessageBody() data: any, @Request() req) {
 		const user : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
 		let room = this.getRoom(data.roomId);
-		if (!room)
+		if (!room || user.username != room.players[0])
 			return ;
 
-		// if (user.username != room.players[0])
-		// 	client.
-
-		
+		if (!room.ready)
+			client.emit("StartGameFail");
+		else
+			room.startPong();
 	}
 
 	static broadcast(clients: any, event: string, data: any) {
