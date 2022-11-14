@@ -4,13 +4,29 @@
 		height: 540px;
 
 		.friends-list {
+			padding-top: 2em;
+			padding-left: .5em;
+			gap: 1em;
 			overflow: scroll;
 			display: flex;
 			flex-direction: column;
 
+
 			width: 100%;
 			height: 80%;
 			border: none;
+
+			.friend {
+				width: 60%;
+				cursor: pointer;
+				border-radius: .2em .2em 3em .2em;
+				transition: .3s;
+				padding: 1em;
+
+				&:hover {
+					background-color: transparentize(#fff, .6);
+				}
+			}
 		}
 
 		.no-friend {
@@ -32,9 +48,12 @@
 
 	let friends: Array<any>
 
-	onMount(() => {
-		$client.socket.emit();
+	onMount(async () => {
+		await fetch('http://localhost:3000/getfriendlist?username=min-kang').then(data => {
+			return data.json();
+		}).then(post => { friends = post; });
 
+		$client.socket.emit();
 		$client.socket.on();
 	});
 </script>
@@ -44,7 +63,7 @@
 	{#if friends}
 	<div class="friends-list">
 		{#each friends as friend}
-		<div class="friend">friend.username</div>
+		<div class="friend">{friend.username}</div>
 		{/each}
 	</div>
 	{:else}
