@@ -12,13 +12,15 @@
 		width: 100vw;
 		height: 100vh;
 		overflow: hidden;
+
+		background-color: #000;
 	}
 </style>
 
 <script lang="ts">
 	import '$lib/stores/client';
 	import '$lib/scss/app.scss';
-	import { darkMode, loginState } from "$lib/stores/var";
+	import { loginState } from "$lib/stores/var";
 	import { client } from '$lib/stores/client';
 	import { chatRoom } from '$lib/stores/chatRoom';
     import { onMount } from 'svelte';
@@ -32,7 +34,6 @@
 
 
 	let login: boolean;
-	let dark : boolean;
 
 	let roomModal: any;
 
@@ -40,7 +41,6 @@
 
 
 	loginState.subscribe(value => { login = value; });
-	darkMode.subscribe(value => { dark = value; });
 
 	async function connectWithUrlCode(url : any)
 	{
@@ -169,7 +169,7 @@
 	})
 </script>
 
-<main style="{(dark) ? "background-color: #000" : "background-color: #fff"}">
+<main>
 	<slot />
 </main>
 

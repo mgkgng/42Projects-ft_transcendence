@@ -13,13 +13,9 @@
 
 		text-align: center;
 
-
 		padding: 2em;
 
 		color: #e6e6e6;
-
-		display: flex;
-		flex-direction: row;
 	}
 
 	.photo-zone {
@@ -39,8 +35,6 @@
 		margin-bottom: .2em;
 		padding: 1em;
 		
-		display: flex;
-		flex-direction: row;
 		gap: .5em;
 
 		button {
@@ -94,7 +88,7 @@
 </script>
 
 <div class="window profile">
-	<div class="info-zone">
+	<div class="flex info-zone">
 		<!-- <div class="photo-zone">
 			{#if !profileUser}
 			<img src="/pingu/pingu-angry.jpeg" alt="pingu-angry">
@@ -106,7 +100,7 @@
 		<p>Campus : {profileUser.campus_name}, {profileUser.campus_country}</p> -->
 	</div>
 	<!-- {#if $user.username != } -->
-	<div class="tool-zone">
+	<div class="flex tool-zone">
 		<button>Add</button>
 		<button>Block</button>
 		<button>Message</button>

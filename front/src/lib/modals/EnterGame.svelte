@@ -1,7 +1,5 @@
 <style lang="scss">
 	.container {
-		display: flex;
-		flex-direction: row;
 		gap: 3em;
 	}
 	.button {
@@ -38,7 +36,7 @@
 	let loading = false;
 </script>
 
-<div class="container">
+<div class="flex container">
 	<div class="button" on:click={()=>{
 		roomListModal.open();
 		itself.close();

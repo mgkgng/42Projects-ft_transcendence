@@ -21,7 +21,6 @@
 		to { transform: rotate(var(--angle)) translateX(var(--dist)) rotate(var(--angle))}
 	}
 
-
 	.circle-around {
 		position: absolute;
 		// z-index: 88;
@@ -76,22 +75,6 @@
 		0% { color: #000 }
 		50% { transform: #fff }
 		100% { transform: #000 }
-	}
-
-	.msg {
-		background-color:rgba(0, 0, 0, 0);
-
-		animation-play-state: paused;
-		animation-name: show-msg;
-		animation-duration: 3s;
-
-		// for play
-		// animation-iteration-count: infinite;
-		// animation-timing-function: linear;
-
-		// for login required
-		// animation-iterator-count: 1;
-		// animation-timinig-function: ease-out;
 	}
 
 	.click-bg {
@@ -155,7 +138,6 @@
 	import MainCircle from '$lib/MainCircle.svelte';
     import PlayOrChat from "$lib/modals/PlayOrChat.svelte";
 
-
 	type Circle = {
 		size: number;
 		duration: number;
@@ -177,7 +159,6 @@
 	let login: boolean;
 
 	loginState.subscribe(value => { login = value; })
-
 
 	function createCircles() {
 		let res = [];
@@ -242,14 +223,5 @@
 		enterModal.open();
 	}}>Enter</div>
 	{/if}
-	
-	<div class="msg">{message}</div>
 	<h1 class="title">{title}</h1>
-
-	<!-- /* if you want to test logout */
-	<div class="test" on:click={()=>{
-		loginState.set(false);
-		localStorage.removeItem("transcendence-jwt");
-		goto('/');
-	}}>LOGOUT-test</div> -->
 </div>

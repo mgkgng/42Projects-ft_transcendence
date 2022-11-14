@@ -5,8 +5,6 @@
 		height: 100%;
 
 		min-width: 1050px;
-		display: flex;
-		flex-direction: column;
 
 		justify-content: center;
 		align-items: center;
@@ -31,9 +29,6 @@
 		border: 2px solid transparentize(#fff, .6);
 		border-radius: .2em;
 		background-color: #212121;
-
-		display: flex;
-		flex-direction: row;
 
 		label {
 			width: 50%;
@@ -65,8 +60,6 @@
 		width: 100%;
 		height: 100%;
 
-		display: flex;
-		flex-direction: row;
 		gap: 2em;
 	}
 
@@ -83,8 +76,6 @@
 		background-color: #313131;
 		justify-content: space-around;
 
-		display: flex;
-		flex-direction: column;
 		align-items: center;
 
 		.title {
@@ -96,10 +87,6 @@
 		}
 
 		.players {
-			// margin-top: 1em;
-			// margin-bottom: 1em;
-			display: flex;
-			flex-direction: row;
 			gap: .6em;
 
 			img {
@@ -123,8 +110,6 @@
 		}
 
 		.info {
-			display: flex;
-			flex-direction: row;
 			border: 2.5px solid transparentize(#fff, .6);
 			border-radius: .3em;
 			
@@ -145,8 +130,6 @@
 
 		.buttons {
 			// margin-top: .5em;
-			display: flex;
-			flex-direction: row;
 			gap: .5em;
 
 			font-size: 25px;
@@ -210,8 +193,6 @@
 		background-color: #212121;
 		border: 2px solid transparentize(#fff, .6);
 
-		display: flex;
-		flex-direction: row;
 		justify-content: center;
 		align-items: center;
 
@@ -236,8 +217,6 @@
 
 <script lang="ts">
 	import { onMount } from "svelte";
-    import Modal from '$lib/tools/Modal.svelte';
-	import Room from "$lib/game/Room.svelte";
 	import { client } from "$lib/stores/client";
     import { user } from "$lib/stores/user";
 
@@ -311,14 +290,14 @@
 	});
 </script>
 
-<div class="container">
+<div class="vflex container">
 	<div class="button-box">
 		<button class="button-back" on:click={()=>{
 			itself.close();
 			enterGameModal.open();
 		}}>&lt</button>
 	</div>
-	<div class="tools">
+	<div class="flex tools">
 		<label class="form">
 			<input type="checkbox" bind:checked={showAvailable} />
 			<div class="wrapper">Available</div>
@@ -328,13 +307,13 @@
 			<div class="wrapper">Grid</div>
 		</label>
 	</div>
-	<div class="room-container">
+	<div class="flex room-container">
 		{#each roomsOnPage as room}
-		<div class="room-card">
+		<div class="vflex room-card">
 			<div class="title">
 				{room.title}
 			</div>
-			<div class="players">
+			<div class="flex players">
 				<img src={room.players[0].image_url} alt="player1" />
 				{#if room.players.length > 1}
 				<img src={room.players[1].image_url} alt="player2" />
@@ -342,12 +321,12 @@
 				<div class="grey-box">?</div>
 				{/if}
 			</div>
-			<div class="info">
+			<div class="flex info">
 				<div>{room.maxpoint}</div>
 				<div>{room.difficulty}</div>
 				<div>{room.width}</div>
 			</div>
-			<div class="buttons">
+			<div class="flex buttons">
 				<button class="watch" on:click={()=>joinRoom(room.id, false)}>WATCH</button>
 				<button class="play" on:click={()=>joinRoom(room.id, true)}>PLAY</button>
 			</div>
@@ -362,7 +341,7 @@
 		{/if}
 		<!-- if less than perPage, gray card -->
 	</div>
-	<div class="page">
+	<div class="flex page">
 		<button on:click={()=>movePage(false)}>&lt;</button>
 		<span class="info">{roomPage + 1} / {(roomPageNb) ? roomPageNb : 1}</span>
 		<button on:click={() => movePage(true)}>&gt;</button>
