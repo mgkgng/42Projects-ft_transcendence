@@ -242,18 +242,27 @@ export class GameGateway {
 
 	@SubscribeMessage("isReady")
 	setReady(@MessageBody() data: any, @Request() req) {
-		console.log("i recevied this: ", data);
 
 		const user : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
-		console.log(user);
 		let room = this.getRoom(data.roomId);
-		console.log("room: ", room);
 
 		if (!room || user.username != room.players[1])//for example
 			return ;
 
 		room.ready = data.ready;
 		room.broadcast("ReadyUpdate", { ready: room.ready })
+	}
+
+	@SubscribeMessage("StartGame")
+	startGame(@ConnectedSocket() client: Socket, @MessageBody() data: any, @Request() req) {
+		const user : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
+		let room = this.getRoom(data.roomId);
+		if (!room)
+			return ;
+
+		// if (user.username != room.players[0])
+		// 	client.
+
 		
 	}
 
