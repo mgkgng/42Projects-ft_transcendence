@@ -116,25 +116,20 @@ export class Room {
 		if (!room)
 			return ;
 
-		room.broadcast(JSON.stringify({
-			event: "LoadBall",
-			data: {
-				vectorX: room.pong.puck.vectorX,
-				vectorY: room.pong.puck.vectorY,
-				posX: room.pong.puck.posX,
-				posY: room.pong.puck.posY
-			}
-		}));
+		room.broadcast("LoadBall", {
+			vectorX: room.pong.puck.vectorX,
+			vectorY: room.pong.puck.vectorY,
+			posX: room.pong.puck.posX,
+			posY: room.pong.puck.posY
+		});
 		
 		setTimeout(() => {
-			room.broadcast(JSON.stringify({
-				event: "PongStart"
-			}))
+			room.broadcast("PongStart", { undefined });
 			room.pong.puck.setCheckPuck(room);
 		}, 2000);
 	}
 
-	startPong() { setTimeout(Room.startPong, 2000, this); }
+	startPong() { setTimeout(Room.startPong, 1000, this); }
 
 	putScore() {
 

@@ -39,14 +39,12 @@ export class Puck {
 			// checking if the paddle hits the puck...
 			// let paddlePos = (this.vectorY > 0) ? room.pong.paddlePos[1] : this.gameWidth - room.pong.paddlePos[0];
 			let paddlePos = (this.vectorY > 0) ? room.pong.paddlePos[1] : room.pong.paddlePos[0];
-			if (deathPointX > paddlePos && deathPointX < paddlePos + room.pong.gameMap.paddleSize) {
+			if (deathPointX > paddlePos && deathPointX < paddlePos + room.pong.paddleSize) {
 			// line below is to make the puck bounce permantly
 			// if (this.vectorY) {
 				console.log("Puck Hit.");
-				
-				room.broadcast(JSON.stringify({
-					event: "PuckHit"
-				}));
+				room.broadcast("PuckHit", undefined);
+
 				this.posX = deathPointX;
 				this.posY = (this.vectorY > 0) ? (this.gameHeight - deadZoneHeight - paddleHeight) : deadZoneHeight + paddleHeight;
 				this.vectorY *= -1;
@@ -56,25 +54,19 @@ export class Puck {
 				console.log("ScoreUpdate");
 	
 				let winner = (this.vectorY > 0) ? 0 : 1;
-				room.broadcast(JSON.stringify({
-					event: "ScoreUpdate",
-					data: (this.vectorY > 0) ? 0 : 1
-				}));
+				room.broadcast("ScoreUpdate", { scoreTo: (this.vectorY > 0) ? 0 : 1 });
 				room.scores[winner]++;
 
 				console.log("Actual score: ", room.scores[0], ":", room.scores[1]);
 				if (room.scores[0] == room.maxpoint || room.scores[1] == room.maxpoint) {
-					room.broadcast(JSON.stringify({
-						event: "GameFinished",
-						data: (room.scores[0] > room.scores[1]) ? 0 : 1
-					}));
+					room.broadcast("GameFinished", { win: (room.scores[0] > room.scores[1]) ? 0 : 1 });
 
 					// TODO Save the game to the database
 					room.putScore();
 					return ;
 				}
 
-				room.pong.puck = new Puck(room.pong.gameMap.width, room.pong.gameMap.height, room.difficulty);
+				room.pong.puck = new Puck(room.pong.size[0], room.pong.size[1], room.difficulty);
 				setTimeout(() => {
 					Room.startPong(room);
 				}, 1000);
