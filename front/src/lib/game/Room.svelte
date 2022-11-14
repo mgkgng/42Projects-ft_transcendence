@@ -257,7 +257,7 @@
 <div class="container">
 	{#if roomInfo}
 	<div class="pong" style="width: {roomInfo.mapSize[1] + 200}px; height: {roomInfo.mapSize[0]}px;">
-		<Player userInfo={(roomInfo.players.length > 1) ? roomInfo.players[opponentIndex] : undefined} left={true}/>	
+		<Player userInfo={(roomInfo.players.length > 1) ? roomInfo.players[opponentIndex] : undefined} left={true} host={($user.username == roomInfo.roomHost) ? true : false}/>	
 		<div class="pong-game" style="min-width: {roomInfo.mapSize[1]}px; min-height: {roomInfo.mapSize[0]}px;">
 			<Paddle pos={paddlePos[opponentIndex]} paddleWidth={roomInfo.paddleSize}
 				gameWidth={roomInfo.mapSize[0]} gameHeight={roomInfo.mapSize[1]}
@@ -270,7 +270,7 @@
 				gameWidth={roomInfo.mapSize[0]} gameHeight={roomInfo.mapSize[1]}
 				user={true} userIndex={userIndex} userPresent={true}/>
 		</div>
-		<Player userInfo={roomInfo.players[userIndex]} left={false}/>
+		<Player userInfo={roomInfo.players[userIndex]} left={false} host={($user.username == roomInfo.roomHost) ? true : false}/>
 		<ScoreBox score1={(roomInfo.players.length > 1) ? scores?.[opponentIndex] : "-"} score2={scores?.[userIndex]}/>
 	</div>
 	{/if}
