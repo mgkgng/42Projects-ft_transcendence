@@ -96,7 +96,7 @@
     import Setting from "../modals/Setting.svelte";
     import ChatDirectBox from "$lib/modals/ChatDirectBox.svelte";
 	import Friends from "$lib/modals/Friends.svelte"
-
+    import NewChatRoom from "$lib/modals/NewChatRoom.svelte";
 
 	let profileModal: any;
 	let chatModal: any;
@@ -104,6 +104,8 @@
 	let settingModal: any;
 	let chatDirectModal : any;
 	let friendsModal: any;
+
+	let lol: any;
 
 	loginState.subscribe(value => { login = value; })
 
@@ -127,6 +129,10 @@
 <Modal bind:this={friendsModal} closeOnBgClick={true}>
 	<Friends itself={friendsModal} />
 </Modal>
+<Modal bind:this={lol} closeOnBgClick={true}>
+	<NewChatRoom itself={lol} />
+</Modal>
+
 
 <header>
 	<div class="profile">
@@ -140,7 +146,7 @@
 		<div class="menu">
 			<button on:click={()=>{ profileModal.open(); }}>Profile</button>
 			<button on:click={()=>{ friendsModal.open(); }}>Friends</button>
-			<button on:click={()=>{ chatDirectModal.open(); }}>ChatDirect</button>
+			<button on:click={()=>{ lol.open(); }}>ChatDirect</button>
 			<button on:click={()=>{ settingModal.open(); }}>Setting</button>
 			<button on:click={handleLogout}>Logout</button>
 		</div>
