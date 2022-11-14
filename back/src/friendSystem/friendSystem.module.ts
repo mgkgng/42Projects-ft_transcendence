@@ -6,11 +6,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserFriendEntity } from 'src/entity/UserFriend.entity';
 import { MainServerService } from 'src/mainServer/mainServer.gateway';
 import { JwtService } from '@nestjs/jwt';
+import { friendSystemGateway } from './friendSystem.gateway';
 
 @Module({
     imports: [TypeOrmModule.forFeature([UserEntity, UserFriendEntity])],
     exports: [friendSystemService],
     controllers: [friendSystemController],
-    providers: [friendSystemService, JwtService, MainServerService]
+    providers: [friendSystemService, JwtService, MainServerService, friendSystemGateway]
 })
 export class friendSystemModule {}
