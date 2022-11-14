@@ -1,17 +1,9 @@
 <style lang="scss">
-	.container {
-		position: relative; 
-		background-color: #212121;
-		border: 2px solid transparentize(#fff, .6);
-		border-radius: .2em;
-
+	.friends {
 		width: 360px;
 		height: 540px;
-		padding: 2em;
-		
-		color: #fff;
 
-		.friends {
+		.friends-list {
 			overflow: scroll;
 			display: flex;
 			flex-direction: column;
@@ -47,10 +39,10 @@
 	});
 </script>
 
-<div class="container">
+<div class="window friends">
 	<h2>Friends</h2>
 	{#if friends}
-	<div class="friends">
+	<div class="friends-list">
 		{#each friends as friend}
 		<div class="friend">friend.username</div>
 		{/each}

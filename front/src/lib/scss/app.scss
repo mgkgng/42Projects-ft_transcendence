@@ -44,12 +44,14 @@ h1 { font-size: $h1; font-weight: bold; }
 	text-align: center;
 }
 
-.tag {
-	background: $blue;
-	color: $background;
-	border-radius: $border-radius;
-	padding: .2em .5em;
-	position: relative;
+.window {
+	position: relative; 
+	background-color: #212121;
+	border: 2px solid transparentize(#fff, .6);
+	border-radius: .2em;
+
+	padding: 2em;
+	color: #fff;
 }
 
 @font-face {

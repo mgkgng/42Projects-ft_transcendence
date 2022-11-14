@@ -1,16 +1,11 @@
 <style lang="scss">
-	.container {
+	.setting {
 		width: 440px;
 		height: 520px;
-
-		background-color: transparentize(#313131, .5);
-		border: 2px solid transparentize(#fff, .4);
-		border-radius: .2em;
 
 		display: flex;
 		flex-direction: column;
 		justify-content: space-between;
-		align-items: center;
 
 		padding: 2em;
 
@@ -38,7 +33,7 @@
 	export let itself: any;
 </script>
 
-<div class="container">
+<div class="window setting">
 	<h2>Setting here</h2>
 	<button on:click={()=>{itself.close();}}>Close</button>
 </div>
