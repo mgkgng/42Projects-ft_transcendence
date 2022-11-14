@@ -32,8 +32,6 @@ export class ChatRoomService {
 	async handleConnection(@Request() req)
 	{
 		const client : Socket = req;
-		console.log('Connect');
-		console.log('Connect is here');
 		try {
 			const names = await this.mainServer.getNamesRoomsForUser(req);
 			console.log(names);
@@ -72,7 +70,6 @@ export class ChatRoomService {
 			new_chat_room.password = password;
 			new_chat_room.is_private = data.is_private;
 			const res_chat_room : any = await this.dataSource.getRepository(ChatRoomEntity).save(new_chat_room);
-			console.log(res_chat_room);
 			const new_user_chat_room = new UserChatRoomEntity();
 			new_user_chat_room.id_user = id_user;
 			new_user_chat_room.room = res_chat_room.id_g;
@@ -240,7 +237,6 @@ export class ChatRoomService {
 				.offset((parseInt(data.page_number) - 1) * parseInt(data.size_page))
 				.limit(parseInt(data.size_page))
 				.getMany();
-				console.log(res);
 				client.emit('get_message_room', res);
 			} catch (e) {
 				console.log("getMessage Error");
@@ -288,7 +284,6 @@ export class ChatRoomService {
 			newMessage.content_message = message;
 			newMessage.date_message = date_creation;
 			const res_insert_message = await this.dataSource.getRepository(MessageChatRoomEntity).save(newMessage);
-			console.log(res_insert_message);
 			//await querry.commitTransaction();
 			this.server.to(data.room_name).emit('new_message_room', {room_name : data.room_name, content_message: data.content_message, username: client_username, date_message: date_creation});
 		} catch (e) {
@@ -318,7 +313,6 @@ export class ChatRoomService {
 		.createQueryBuilder("chatRoom")
 		.where("chatRoom.is_private = :p", {p: false})
 		.select(["chatRoom.name", "chatRoom.is_password_protected"]).getMany();
-		//console.log(res);
 		client.emit("get_all_rooms", res);
 	}
 	//OK
@@ -333,7 +327,6 @@ export class ChatRoomService {
 		.where("substr(chatRoom.name, 1, :l) = :s", {l: data.research.length, s: data.research})
 		.andWhere("chatRoom.is_private = :p", {p: false})
 		.getMany();
-		console.log(res);
 		client.emit("get_all_rooms", res);
 	}
 	//Ban a user if current socket user is Admin on the room 
@@ -344,7 +337,6 @@ export class ChatRoomService {
 			let ban_end = data.ban_end;
 			if (ban_end == undefined)
 				ban_end = new Date(2999, 12, 31);
-			console.log(data)
 			const jwt : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
 			const user : any = await this.dataSource.getRepository(UserEntity).find({where: {username_42: jwt.username_42}});
 			const user_ban : any = await this.dataSource.getRepository(UserEntity).find({where: {username: data.username_ban}});
@@ -422,7 +414,6 @@ export class ChatRoomService {
 				const res = await this.dataSource.createQueryBuilder().update(UserChatRoomEntity)
 				.where("id_user = :u AND room = :r", {u: user_ban[0].id_g, r: room[0].id_g})
 				.set({is_admin: true, is_banned: false, is_muted: false}).execute();
-				console.log(res);
 				client.emit("set_admin", data);
 			}
 	}
@@ -455,7 +446,6 @@ export class ChatRoomService {
 	@SubscribeMessage("set_room_private")
 	async setRoomPrivate(@MessageBody() data, @ConnectedSocket() client: Socket, @Request() req) {
 		const user : any = await this.mainServer.getIdUser(req);
-		console.log(data);
 		const room : any = await  this.mainServer.getIdRoom(data);
 		const is_owner = await this.dataSource.getRepository(UserChatRoomEntity).createQueryBuilder("u")
 				.where("u.id_user = :u AND u.room = :r", {u: user, r: room})
@@ -508,7 +498,6 @@ export class ChatRoomService {
 		const res = await this.dataSource.createQueryBuilder().update(ChatRoomEntity)
 				.where("id_g = :r", {r: room})
 				.set({password: password, is_password_protected: true}).execute();
-		console.log("ok");
 		client.emit("set_password_room", {room_name : data.room_name});
 	}
 	//Unset password room
@@ -543,7 +532,6 @@ export class ChatRoomService {
 			const res = await this.dataSource.getRepository(UserEntity).createQueryBuilder("user")
 						.where("id_g = :id", {id : id_user})
 						.select(["user.email", "user.username", "user.img_url", "user.display_name", "user.campus_name", "user.campus_country", "user.is_2fa", "user.otpauthUrl_2fa" ]).getOne();
-			console.log("UserInfo");
         	const url = await toDataURL(res.otpauthUrl_2fa);
 			res.otpauthUrl_2fa = url;
 			client.emit("get_user_info", res);
@@ -567,7 +555,6 @@ export class ChatRoomService {
 			return (res);
 		}catch(e)
 		{
-			console.log("User not found");
 			client.emit("error_get_other_user_info", "User not found");
 			throw new WsException("User not found");
 		}
@@ -580,7 +567,6 @@ export class ChatRoomService {
 		.createQueryBuilder("user")
 		.select(["user.username"])
 		.where("substr(user.username, 1, :l) = :s", {l: data.research.length, s: data.research}).getMany();
-		console.log(res);
 		client.emit("get_all_username_begin_by", res);
 	}
 	//{new_username: string}

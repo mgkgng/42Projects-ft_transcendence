@@ -141,9 +141,9 @@
 		<div class="option">
 			<p>Difficulty</p>
 			<label>
-				<input type=radio bind:group={difficulty} name="mapSize" value={1}>Easy
-				<input type=radio bind:group={difficulty} name="mapSize" value={2}>Normal
-				<input type=radio bind:group={difficulty} name="mapSize" value={3}>Hard
+				<input type=radio bind:group={difficulty} name="difficulty" value={1}>Easy
+				<input type=radio bind:group={difficulty} name="difficulty" value={2}>Normal
+				<input type=radio bind:group={difficulty} name="difficulty" value={3}>Hard
 			</label>
 		</div>
 		<div class="option">

@@ -198,7 +198,7 @@
 	let roomFound: boolean;
 	let miniMode: boolean = false;
 
-	let quitConfirm: boolean; // only activate when game is on going
+	$: quitRoom(resQuitConfirm);
 
 	function quitRoom(res: boolean) {
 		if (res == false)
@@ -213,8 +213,6 @@
 			room: roomId
 		});
 
-		$client.socket.off("RoomInfo", (data: any) => {
-		});
 		$client.socket.on("RoomInfo", (data: any) => {
 			console.log("RoomInfo", data);
 			roomFound = true;
@@ -248,10 +246,7 @@
 			}
 		})
 		
-		$client.socket.off("PaddleUpdate", (data: any) => {
-		});
 		$client.socket.on("PaddleUpdate", (data: any) => {
-			console.log("PaddleUpdate", data);
 			if ((data.player == UserType.Player1 && userIndex == UserType.Player2) ||
 				(data.player == UserType.Player2 && userIndex == UserType.Player2))
 				paddlePos[data.player] = data.paddlePos;
@@ -317,9 +312,9 @@
 {#if roomFound}
 <div class="container">
 	{#if roomInfo}
-	<div class="pong" style="width: {roomInfo.mapSize[0] + 200}px; height: {roomInfo.mapSize[1]}px;">
+	<div class="pong" style="width: {roomInfo.mapSize[1] + 200}px; height: {roomInfo.mapSize[0]}px;">
 		<Player userInfo={(roomInfo.players.length > 1) ? roomInfo.players[opponentIndex] : undefined} left={true}/>	
-		<div class="pong-game" style="min-width: {roomInfo.mapSize[0]}px; min-height: {roomInfo.mapSize[1]}px;">
+		<div class="pong-game" style="min-width: {roomInfo.mapSize[1]}px; min-height: {roomInfo.mapSize[0]}px;">
 			<Paddle pos={paddlePos[opponentIndex]} paddleWidth={roomInfo.paddleSize}
 				gameWidth={roomInfo.mapSize[0]} gameHeight={roomInfo.mapSize[1]}
 				user={false} userIndex={userIndex} userPresent={(roomInfo.players.length > 1) ? true : false}/>

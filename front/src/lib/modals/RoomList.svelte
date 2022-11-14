@@ -243,7 +243,6 @@
 	}
 
 	function joinRoom(roomId: string, playMode: boolean) {
-		console.log("join room");
 		$client.socket.emit("JoinRoom", {
 			username: $user.username,
 			roomId: roomId,

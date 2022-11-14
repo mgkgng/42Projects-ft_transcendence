@@ -98,7 +98,6 @@ export class MainServerService {
 	async getIdUser(@Request() req) //GET THE UNIQ ID OF A USER
 	{
 		 const user : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
-		 console.log("USER: ", user)
 		 const client_username = user.username_42;
 		 const id_user : any = await this.dataSource.getRepository(UserEntity)
 		 .createQueryBuilder().where("UserEntity.username_42 = :u", { u: client_username }).getOneOrFail();

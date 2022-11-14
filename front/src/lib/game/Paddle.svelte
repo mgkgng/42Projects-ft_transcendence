@@ -25,14 +25,6 @@
 </style>
 
 <script lang="ts">
-	import { darkMode } from "$lib/stores/var";
-
-	let dark : boolean;
-
-	darkMode.subscribe(value => {
-		dark = value;
-	});
-
 	export let user: boolean;
 	export let userIndex: number;
 
@@ -49,7 +41,7 @@
 </script>
 
 <div class="paddle {(user) ? "user" : ""} {(!userPresent) ? "absent" : ""}"
-	style="left: {(!user) ? deadZoneHeight: gameWidth - deadZoneHeight}px;
+	style="left: {(!user) ? deadZoneHeight: gameHeight - deadZoneHeight}px;
 		top: {((user && !userIndex) || (!userIndex && !user)) ? pos - paddleWidth : pos}px;
 		height: {paddleWidth}px">
 </div>

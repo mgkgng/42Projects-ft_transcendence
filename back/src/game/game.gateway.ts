@@ -80,7 +80,6 @@ export class GameGateway {
   		let newClient = new Client(client, user.username, {});
 		this.clients.set(newClient.id, newClient);
 
-		console.log(user);
 		// Should send it only once
 		client.emit("GetConnectionInfo", {
 			id: newClient.id,
@@ -141,8 +140,7 @@ export class GameGateway {
 
 		client.emit("RoomInfo", {
 			roomHost: room.hostname,
-			players: (room.players.length === 2) ? [room.players[0], room.players[1]]
-				: [room.players[0]],
+			players: room.players,
 			maxpoint: room.maxpoint,
 			scores: room.scores,
 			mapSize: [room.pong.size[0], room.pong.size[1]],
@@ -194,7 +192,7 @@ export class GameGateway {
 	}
 
 	@SubscribeMessage("CreateRoom")
-	createRoom(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
+	async createRoom(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
 		console.log("CreateRoom", data);
 		
 		// TODO should be able to have client's room state
@@ -214,7 +212,10 @@ export class GameGateway {
 	@SubscribeMessage("JoinRoom")
 	joinRoom(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
 		let room = this.getRoom(data.roomId);
-		if (room && room.players.length == 1) { // is it really safe?
+		if (!room || (room.players.length > 1 && data.play)) {
+			client.emit("JoinRoomRes", { allowed: false });
+			return ;
+		} else if (data.play) {
 			this.getPlayerInfo(data.username).then((res)=>{
 				room.broadcast("PlayerUpdate", {
 					join: true,
@@ -222,12 +223,17 @@ export class GameGateway {
 				});
 				room.addPlayer(client, res);
 			});
-			client.emit("JoinRoomRes", {
-				allowed: true,
-				roomId: data.roomId
+		} else {
+			room.broadcast("WatcherUpdate", { //TODO potentiellement
+				join: true
 			})
+			room.addClient(client);
 		}
-		client.emit("JoinRoomRes", { allowed: false });
+
+		client.emit("JoinRoomRes", {
+			allowed: true,
+			roomId: data.roomId
+		});
 	}
 
 	static broadcast(clients: any, event: string, data: any) {

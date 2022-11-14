@@ -32,6 +32,5 @@ export class ChatDirectMessageGateway {
         if (userConnected && user.relation_userBlocked.includes(client.username) == false)
             userConnected.socket.emit('newDirectMessage', data.message);
         let ret = await this.chatDirectMessageService.handleSendDirectMessage(this.mainServerService.getUserConnectedBySocketId(client.id).username, data.username, data.message);
-        console.log(ret);
     }
 }

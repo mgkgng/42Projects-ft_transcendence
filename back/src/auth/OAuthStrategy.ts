@@ -27,15 +27,12 @@ export class OAuthStrategy extends PassportStrategy(Strategy, "oauth") {
 	{
 		res = await this.authService.validateUser42(code);
 		res.data.username_42 = res.data.login;
-		console.log("Get token : ", code);
-		console.log(res);
 	}else
 	{
 		res = {data: (this.jwtServer.decode(code))};
 		res.data.campus = [];
 		res.data.campus.push({name: res.data.campus_name, country: res.data.campus_country});
 		res.data.login = res.data.username_42;
-		console.log("Res : ", res, code);
 	}
 	if (res)
 	{
