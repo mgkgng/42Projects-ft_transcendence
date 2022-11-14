@@ -1,5 +1,6 @@
 <style lang="scss">
 	.container {
+		position: relative; 
 		background-color: #212121;
 		border: 2px solid transparentize(#fff, .6);
 		border-radius: .2em;
@@ -31,8 +32,11 @@
 </style>
 
 <script lang="ts">
-    import { client } from "$lib/stores/client";
+    import CloseButton from "$lib/items/CloseButton.svelte";
+	import { client } from "$lib/stores/client";
     import { onMount } from "svelte";
+
+	export let itself: any;
 
 	let friends: Array<any>
 
@@ -56,4 +60,5 @@
 		<p>You don't have friends yet</p>
 	</div>
 	{/if}
+	<CloseButton window={itself} />
 </div>
