@@ -105,12 +105,14 @@
     import { loginState } from "$lib/stores/var";
     import Modal from "$lib/tools/Modal.svelte";
     import Setting from "../modals/Setting.svelte";
+    import ChatDirectBox from "../modals/ChatDirectBox.svelte";
 
 
 	let profileModal: any;
 	let chatModal: any;
 	let login: boolean;
 	let settingModal: any;
+	let chatDirectModal : any;
 
 
 	loginState.subscribe(value => { login = value; })
@@ -122,6 +124,9 @@
 </Modal>
 <Modal bind:this={settingModal} closeOnBgClick={true} >
 	<Setting itself={settingModal}/>
+</Modal>
+<Modal bind:this={chatDirectModal} closeOnBgClick={true}>
+	<ChatDirectBox />
 </Modal>
 <header>
 	<div class="profile">
@@ -135,6 +140,7 @@
 		<div class="menu">
 			<button on:click={()=>{ profileModal.open(); }}>Profile</button>
 			<button>Friends</button>
+			<button on:click={()=>{ chatDirectModal.open(); }}>ChatDirect</button>
 			<button on:click={()=>{ settingModal.open(); }}>Setting</button>
 			<button>Logout</button>
 		</div>

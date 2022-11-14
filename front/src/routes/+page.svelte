@@ -27,6 +27,7 @@
     import { loginState } from "$lib/stores/var";
     import { browser } from "$app/environment";
     import Header from "$lib/header/Header.svelte";
+    import ChatDirectBox from '../lib/modals/ChatDirectBox.svelte';
 
 	let roomId: string = "";
 
