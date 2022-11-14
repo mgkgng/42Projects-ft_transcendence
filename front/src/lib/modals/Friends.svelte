@@ -78,13 +78,16 @@
 
 	let friends: Array<any>
 
-	onMount(async () => {
-		await fetch('http://localhost:3000/getfriendlist?username=min-kang').then(data => {
-			return data.json();
-		}).then(post => { friends = post; });
+	onMount(() => {
+		$client.socket.emit("getFriendList");
 
-		$client.socket.emit();
-		$client.socket.on();
+		$client.socket.on("error_getFriendList", (data: any) => {
+			console.log("Error!");
+		});
+
+		$client.socket.on("success_getFriendList", (data: any) => {
+			console.log(data);
+		})
 	});
 </script>
 

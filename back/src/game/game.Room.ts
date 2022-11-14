@@ -22,6 +22,7 @@ export class Room {
 	/* RoomState */
 	privateMode: boolean;
 	available: boolean;
+	ready: boolean;
 
 	/* RoomGame */
 	pong: Pong;
@@ -46,25 +47,26 @@ export class Room {
 
 		this.privateMode = privateMode;
 		this.available = (players.length < 2) ? true : false;
+		this.ready = false;
 	
 		this.clients = new Map();
 		this.addClients(clients);
 
 		this.pong = new Pong(MapSize[size], Difficulty[difficulty]);
-		this.players = [];
-		for (let player of players)
-			this.getPlayerInfo(player).then((res)=>{ this.players.push(res); });
+		this.players = players;
+		// for (let player of players)
+		// 	this.getPlayerInfo(player).then((res)=>{ this.players.push(res); });
 
-		console.log("haha", this.players);
 		if (!this.hostname.length)
 			this.startPong();
 	}
 
 	async getPlayerInfo(player: any) {
-		const userdata = await this.userService.findOne(player)
+		console.log("getplayerinfo: ", player);
+		const userdata = await this.userService.findOne(player);
+		console.log("userdata: ", userdata);
 		return ({
 			username: userdata.username,
-			username_42: userdata.username_42,
 			displayname: userdata.display_name,
 			image_url: userdata.img_url,
 			campus_name: userdata.campus_name,

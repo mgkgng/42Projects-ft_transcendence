@@ -34,16 +34,6 @@
 		background-color: #212121;
 	}
 
-	.test {
-		position: absolute;
-		width: 10px;
-		aspect-ratio: 1 / 1;
-		border-radius: 50%;
-		background-color: blue;
-
-		z-index: 4;
-	}
-
 	.loading-box {
 		height: 100%;
 		display: flex;
@@ -144,6 +134,8 @@
 	let roomFound: boolean;
 	let miniMode: boolean = false;
 
+	let ready: boolean = false;
+
 	$: quitRoom(resQuitConfirm);
 
 	function quitRoom(res: boolean) {
@@ -170,15 +162,13 @@
 				userType = UserType.Player1;
 			else
 				userType = ($user.username == roomInfo.players[0].username) ? UserType.Player1 
-					: ($user.username == roomInfo.players[1].username) ? UserType.Player2 
+					: ($user.username == roomInfo.players?.[1].username) ? UserType.Player2 
 					: UserType.Watcher;
 
 			if (userType == UserType.Player2) {
 				[userIndex, opponentIndex] = [opponentIndex, userIndex];
-				// TODO (this is kinda brut force)
 				paddlePos[0] -= roomInfo?.paddleSize, paddlePos[1] -= roomInfo?.paddleSize;
 			}
-
 			scores = roomInfo?.scores;
 		});
 
@@ -200,15 +190,11 @@
 				paddlePos[data.player] = roomInfo?.mapSize[0] - data.paddlePos;
 		});
 
-		$client.socket.off("LoadBall", (data: any) => {
-		});
 		$client.socket.on("LoadBall", (data: any) => {
 			console.log("LoadBall");
 			puck = new Puck(roomInfo?.mapSize[0], roomInfo?.mapSize[1], data.vectorX, data.vectorY);
 		});
 
-		$client.socket.on("PongStart", (data: any) => {
-		});
 		$client.socket.on("PongStart", (data: any) => {
 			console.log("PongStart", data);
 
@@ -218,22 +204,16 @@
 			}, 20);
 		});
 
-		$client.socket.off("DeathPointUpdate", (data: any) => {
-		});
 		$client.socket.on("DeathPointUpdate", (data: any) => {
 			console.log("DeathPointUpdate");
 			deathPoint = data;
 		});
 
-		$client.socket.off("PuckHit", (data: any) => {
-		});
 		$client.socket.on("PuckHit", (data: any) => {
 			console.log("PuckHit");
 			puck.vectorY *= -1;
 		});
- 
-		$client.socket.off("ScoreUpdate", (data: any) => {
-		});
+
 		$client.socket.on("ScoreUpdate", (data: any) => {
 			console.log("ScoreUpdate", data);
 			clearInterval(puckMoving);
@@ -241,8 +221,10 @@
 			puck = undefined;
 		});
 
-		$client.socket.off("GameFinished", (data: any) => {
-		});
+		$client.socket.on("ReadyUpdate", (data: any) => {
+			ready = data.ready;
+		})
+
 		$client.socket.on("GameFinished", (data: any) => {
 			console.log("GameFinished");
 			console.log((userType == data) ? "You Win!"
@@ -259,7 +241,7 @@
 <div class="container">
 	{#if roomInfo}
 	<div class="pong" style="width: {roomInfo.mapSize[1] + 200}px; height: {roomInfo.mapSize[0]}px;">
-		<Player userInfo={(roomInfo.players.length > 1) ? roomInfo.players[opponentIndex] : undefined} left={true}/>	
+		<Player userInfo={(roomInfo.players.length > 1) ? roomInfo.players[opponentIndex] : undefined} left={true} host={(roomInfo.players[opponentIndex]?.username == roomInfo.roomHost) ? true : false} ready={ready}/>	
 		<div class="pong-game" style="min-width: {roomInfo.mapSize[1]}px; min-height: {roomInfo.mapSize[0]}px;">
 			<Paddle pos={paddlePos[opponentIndex]} paddleWidth={roomInfo.paddleSize}
 				gameWidth={roomInfo.mapSize[0]} gameHeight={roomInfo.mapSize[1]}
@@ -272,7 +254,7 @@
 				gameWidth={roomInfo.mapSize[0]} gameHeight={roomInfo.mapSize[1]}
 				user={true} userIndex={userIndex} userPresent={true}/>
 		</div>
-		<Player userInfo={roomInfo.players[userIndex]} left={false}/>
+		<Player userInfo={roomInfo.players[userIndex]} left={false} host={(roomInfo.players[userIndex]?.username == roomInfo.roomHost) ? true : false} ready={ready}/>
 		<ScoreBox score1={(roomInfo.players.length > 1) ? scores?.[opponentIndex] : "-"} score2={scores?.[userIndex]}/>
 	</div>
 	{/if}
@@ -281,14 +263,15 @@
 		{#if $user.username == roomInfo.roomHost}
 		<button class="start" on:click={()=>{
 			$client.socket.emit("StartGame", {
-				roomId: roomInfo.id
+				roomId: roomId
 			})
 		}}>START</button>
 		{:else if userType == UserType.Player2}
 		<button class="ready" on:click={()=>{
-			$client.socket.emit("Ready", {
-
-			})
+			$client.socket.emit("isReady", {
+				roomId: roomId,
+				ready: !ready,
+			});
 		}}>READY</button>
 		{/if}
 		<button on:click={()=>{ quitConfirmMsgModal.open(); }}>EXIT</button>

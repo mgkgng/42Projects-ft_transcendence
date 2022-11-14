@@ -19,4 +19,4 @@
 </script>
 
 <Header />
-<Title title={"TRANSCENDENCE"} mainPage={true} />
+<Title title={"TRANSCENDENCE"} />
