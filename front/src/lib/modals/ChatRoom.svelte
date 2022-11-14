@@ -3,16 +3,21 @@
 		display: flex;
 		flex-direction: row;
 		margin-top: 3vh;
-		width: 700px;
+		width: 75vw;
 		height: 75%;
 		max-height: 90vh;
 		background-color: transparentize(rgb(255, 0, 0), 0.9);
 		padding: 2em;
 		border-radius: 2em;
 	}
-	
-	.room-zone {
+	.userRoom-zone{
 		width: 25%;
+		background-color: transparentize(#000, 0.2);
+		border: 2px solid transparentize(#fff, .6);
+		border-radius: 0.5em;
+	}	
+	.room-zone {
+		width: 15%;
 		background-color: transparentize(#000, 0.2);
 		border: 2px solid transparentize(#fff, .6);
 		border-radius: 0.5em;
@@ -31,7 +36,7 @@
 		overflow-y: scroll;
 	}
 	.new-chat-room-zone{
-		width: 25%;
+		width: 10%;
 		padding-left: 1em;
 		min-height: 500px;
 		background-color: transparentize(#000, 0.2);
@@ -130,6 +135,34 @@
 	chatRoom.subscribe(chat => { rooms = chat.rooms;});
 	chatRoom.subscribe(chat => { actualName = chat.actualRoomName;});
 	onMount (() => {
+		$client.socket.on("set_room_private", (data) =>
+		{
+			chatRoom.update((chat) =>{
+				chat.messages.get(data.room_name).is_private = true;
+				return (chat);
+			})
+		});
+		$client.socket.on("unset_room_private", (data) =>
+		{
+			chatRoom.update((chat) =>{
+				chat.messages.get(data.room_name).is_private = false;
+				return (chat);
+			})
+		});
+		$client.socket.on("set_password_room", (data) =>
+		{
+			chatRoom.update((chat) =>{
+				chat.messages.get(data.room_name).is_password_protected = true;
+				return (chat);
+			})
+		});
+		$client.socket.on("unset_password_room", (data) =>
+		{
+			chatRoom.update((chat) =>{
+				chat.messages.get(data.room_name).is_password_protected = false;
+				return (chat);
+			})
+		});
 	});
 	function  chooseRoom(room : any){
 		chatRoom.update(chat => { 
@@ -169,6 +202,38 @@
 	{
 		$client.socket.emit("unset_password_room", {room_name: actualName});
 	}
+	function banUser(username)
+	{
+		let date : any = prompt("Date: ")
+		let res : Date;
+		if (date)
+		{
+			res = new Date(date);
+			console.log(res);
+			if (isNaN(res.getTime()))
+				alert("Bad date");
+			else 
+				$client.socket.emit("ban_user", { room_name : $chatRoom.actualRoomName, username_ban: username, ban_end: res});
+		}
+	}
+	function setAdmin(username)
+	{
+		$client.socket.emit("set_admin", { room_name : $chatRoom.actualRoomName, username_new_admin: username});
+	}
+	function muteUser(username)
+	{
+		let date : any = prompt("Date: ")
+		let res : Date;
+		if (date)
+		{
+			res = new Date(date);
+			console.log(res);
+			if (isNaN(res.getTime()))
+				alert("Bad date");
+			else 
+				$client.socket.emit("mute_user", { room_name : $chatRoom.actualRoomName, username_ban: username, mute_end: res});
+		}
+	}
 </script>
 
 <div class="container">
@@ -190,6 +255,14 @@
 			</li>
 		{/each}
 		</ul>
+	</div>
+	<div class="userRoom-zone">
+		{#each actualMessages?.usersRoom as actual_user}
+			<input type="button" class="btn-room" value={actual_user.username} />
+			<input type="button" class="btn-room" value="mute" on:click={muteUser(actual_user.username)}/>
+			<input type="button" class="btn-room" value="ban" on:click={banUser(actual_user.username)}/>
+			<input type="button" class="btn-room" value="set Admin" on:click={setAdmin(actual_user.username)}/>
+		{/each}
 	</div>
 	<!--Zone de liste des messages de la room selectionne-->
 	<div class="message-zone" bind:this={message_zone}>

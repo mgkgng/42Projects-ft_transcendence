@@ -16,7 +16,19 @@ class Message
 		this.date = date;
 	}
 }
-
+class userRoom{
+	is_admin : boolean = false;
+	is_owner: boolean = false;
+	is_login: boolean = false;
+	username : string = "";
+	constructor(username : string, is_admin : boolean, is_owner : boolean, is_login : boolean)
+	{
+		this.is_admin = is_admin;
+		this.username = username;
+		this.is_owner = is_owner;
+		this.is_login = is_login;
+	}
+};
 export class Room
 {
 	room_name : string = "";
@@ -25,6 +37,7 @@ export class Room
 	is_admin : boolean = false;
 	is_owner : boolean = false;
 	messages : Array<Message>;
+	usersRoom : any[];
 	constructor(room_name : string, is_password_protected : boolean, is_private : boolean, are_you_admin : boolean, are_you_owner : boolean)
 	{
 		this.room_name = room_name;
@@ -33,6 +46,7 @@ export class Room
 		this.is_admin = are_you_admin;
 		this.is_owner = are_you_owner;
 		this.messages = [];	
+		this.usersRoom = [];
 	}
 }
 let client : any;
@@ -45,7 +59,6 @@ export class ChatRooms{
 	actualRoomName : string = "";				//room selectionnee 
 
 	username_search : string = "";		//username search profile
-
 	constructor() {
 	}
 	LoadMessages(client : any)
@@ -98,8 +111,6 @@ export class ChatRooms{
 //Ici les evenements qui changent les attributs de chatRoom et qui sont suscribe dans le front
 // (obligation d'utiliser update() pour un rafraichissement du front)
 function socket_event_update_front(client : any) {
-	client.socket.off("get_all_rooms", (data : any) => {
-	});
 	client.socket.on("get_all_rooms", (data : any) => {
 		chatRoom.update((chatRoom) => {
 			chatRoom.all_rooms = new Map();
@@ -107,8 +118,6 @@ function socket_event_update_front(client : any) {
 				chatRoom.all_rooms.set(r.name, r.is_password_protected);
 			return (chatRoom);
 		});
-	});
-	client.socket.off("get_my_rooms", (data : any) => { 
 	});
 	client.socket.on("get_my_rooms", (data : any) => { //HAVE TO OPTIMIZE : NOT REALOAD ALL MESSAGE WHEN A ROOM IS ADDED OR DELETED
 		chatRoom.update((chatRoom) => {
@@ -122,6 +131,7 @@ function socket_event_update_front(client : any) {
 				chatRoom.rooms.push(rooms.room.name);
 				chatRoom.messages.set(rooms.room.name, new Room(rooms.room.name, rooms.room.is_password_protected, rooms.room.is_private, rooms.is_admin, rooms.is_owner))
 				client.socket.emit("get_message_room", {room_name: rooms.room.name});
+				client.socket.emit("get_users_room", {room_name: rooms.room.name});
 			}
 			// console.log(data);
 			// console.log("rooms: ", chatRoom.rooms);
@@ -140,7 +150,16 @@ function socket_event_update_front(client : any) {
 			return (chatRoom);
 		});
 	});
-	client.socket.off("new_message_room", (data : any) =>{});
+	client.socket.on("get_users_room", (data: any) =>
+	{
+		chatRoom.update((chatRoom) => {
+			let inter : Array<userRoom> = new Array<userRoom>;
+			for (let users of data.users)
+				inter.push(new userRoom(users.id_user.username, users.is_admin, users.is_owner, users.is_login))
+			chatRoom.messages.get(data.room_name).usersRoom = inter;
+			return (chatRoom);
+		});
+	})
 	client.socket.on("new_message_room", (data : any) =>
 	{
 		chatRoom.update( chat => {
@@ -149,7 +168,6 @@ function socket_event_update_front(client : any) {
 			return (chat);
 		});
 	});
-	client.socket.off("new_room", (data : any) =>{});
 	client.socket.on("new_room", (data : any) =>
 	{
 		chatRoom.update( chat => {
@@ -159,11 +177,9 @@ function socket_event_update_front(client : any) {
 			return (chat);
 		});
 	});
-	client.socket.off("error_new_message_room", (data : any) =>{});
 	client.socket.on("error_new_message_room", (data : any) =>{
 		alert(data.error);
 	});
-	client.socket.off("error_append_user_to_room", (data : any) =>{});
 	client.socket.on("error_append_user_to_room", (data : any) =>{
 		alert(data.error);
 	});

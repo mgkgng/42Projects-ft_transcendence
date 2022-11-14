@@ -158,18 +158,27 @@ export class ChatRoomService {
 					client.emit("error_get_users_room", {error: "You are banned"});
 					throw new WsException("Your are ban");
 				}
-				const res = await this.dataSource.getRepository(MessageChatRoomEntity).createQueryBuilder("userChatRoomEntity")
+				const res = await this.dataSource.getRepository(UserChatRoomEntity).createQueryBuilder("userChatRoomEntity")
 				.innerJoin("userChatRoomEntity.room", "chatRoom")
 				.innerJoin("userChatRoomEntity.id_user", "user")
-				.select(["user.username"])
+				.select(["user.username", "userChatRoomEntity.is_admin","userChatRoomEntity.is_owner"])
 				.where("chatRoom.id_g = :id", {id: id_room}).getMany();
-				//console.log(res);
-				client.emit('get_message_room', {messages : res, room_name: data.room_name});
+				let end : any = [];
+				for (let user of res)
+				{
+					let inter : any = user;
+					inter.is_login = false; 
+					if (this.mainServer.getUserConnectedByUsername(inter.username) != null)
+						inter.is_login = true; 
+					end.push(inter);
+				}
+				client.emit('get_users_room', {users: end, room_name: data.room_name});
 			} catch (e) {
+				console.log("get_users Error: bad data", e);
 				client.emit("error_get_users_room", {error: "Error data"});
 			}
 		}catch(e){
-			console.log("getMessage Error: bad data");
+			console.log("get_users Error: bad data");
 			throw new WsException("Bad data");
 		}
 	}
