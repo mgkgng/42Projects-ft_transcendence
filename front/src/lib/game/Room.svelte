@@ -41,10 +41,6 @@
 		align-items: center;
 	}
 
-	.msg {
-		color: #fff;
-	}
-
 	.button-container {
 		padding: .2em;
 
@@ -133,7 +129,8 @@
 	let miniMode: boolean = false;
 
 	let ready: boolean = false;
-	let started: boolean = false;
+	let tryStart: boolean = false;
+	let gameStart: boolean = false;
 
 	$: quitRoom(resQuitConfirm);
 
@@ -232,7 +229,8 @@
 			gameFinishedModal.open();
 		});
 
-		$client.socket.on("GameStartFail", () => { started = false; })
+		$client.socket.on("GameStartFail", () => { tryStart = false; });
+		$client.socket.on("GameStart", () => { gameStart = true });
 	});
 
 </script>
@@ -261,14 +259,15 @@
 	{/if}
 	<div class="button-container">
 		<!-- there should be a difference between host-guest mode and random matching mode -->
+		{#if !gameStart}
 		{#if $user.username == roomInfo.roomHost}
-		{#if !started}
+		{#if !tryStart}
 		<button class="start" on:click={()=>{
 			if (!ready) {
 				// TODO message appear
 				return ;
 			}
-			started = true;
+			tryStart = true;
 			$client.socket.emit("StartGame", {
 				roomId: roomId
 			})
@@ -283,6 +282,7 @@
 				ready: !ready,
 			});
 		}}>{(!ready) ? "READY" : "CANCEL"}</button>
+		{/if}
 		{/if}
 		<button class="exit" on:click={()=>{ quitConfirmMsgModal.open(); }}>EXIT</button>
 

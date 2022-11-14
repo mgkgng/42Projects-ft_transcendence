@@ -260,10 +260,12 @@ export class GameGateway {
 		if (!room || user.username != room.players[0])
 			return ;
 
-		if (!room.ready)
+		if (!room.ready) {
 			client.emit("StartGameFail");
-		else
-			room.startPong();
+			return ;
+		}
+		room.broadcast("GameStart", undefined);
+		room.startPong();
 	}
 
 	static broadcast(clients: any, event: string, data: any) {

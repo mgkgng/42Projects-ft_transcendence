@@ -35,7 +35,6 @@ export class Puck {
 		let deathPointX = this.calculPosX(frameNb);
 
 		setTimeout(() => {
-			
 			// checking if the paddle hits the puck...
 			// let paddlePos = (this.vectorY > 0) ? room.pong.paddlePos[1] : this.gameWidth - room.pong.paddlePos[0];
 			let paddlePos = (this.vectorY > 0) ? room.pong.paddlePos[1] : room.pong.paddlePos[0];
