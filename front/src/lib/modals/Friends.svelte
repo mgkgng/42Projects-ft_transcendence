@@ -1,16 +1,9 @@
 <style lang="scss">
-	.container {
-		background-color: #212121;
-		border: 2px solid transparentize(#fff, .6);
-		border-radius: .2em;
-
+	.friends {
 		width: 360px;
 		height: 540px;
-		padding: 2em;
-		
-		color: #fff;
 
-		.friends {
+		.friends-list {
 			overflow: scroll;
 			display: flex;
 			flex-direction: column;
@@ -31,8 +24,11 @@
 </style>
 
 <script lang="ts">
-    import { client } from "$lib/stores/client";
+    import CloseButton from "$lib/items/CloseButton.svelte";
+	import { client } from "$lib/stores/client";
     import { onMount } from "svelte";
+
+	export let itself: any;
 
 	let friends: Array<any>
 
@@ -43,10 +39,10 @@
 	});
 </script>
 
-<div class="container">
+<div class="window friends">
 	<h2>Friends</h2>
 	{#if friends}
-	<div class="friends">
+	<div class="friends-list">
 		{#each friends as friend}
 		<div class="friend">friend.username</div>
 		{/each}
@@ -56,4 +52,5 @@
 		<p>You don't have friends yet</p>
 	</div>
 	{/if}
+	<CloseButton window={itself} />
 </div>

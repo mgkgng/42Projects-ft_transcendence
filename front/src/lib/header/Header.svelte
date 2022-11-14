@@ -119,7 +119,7 @@
 	<ChatDirectBox />
 </Modal>
 <Modal bind:this={friendsModal} closeOnBgClick={true}>
-	<Friends />
+	<Friends itself={friendsModal} />
 </Modal>
 
 <header>
