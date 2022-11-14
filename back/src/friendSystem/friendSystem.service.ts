@@ -112,6 +112,10 @@ export class friendSystemService {
             newUserRel.is_user_friend = false;
             return await this.userFriendRepository.save(newUserRel);
         }
+		else
+		{
+			return null;
+		}
         return firstHaveAlreadyRequestedEntity;
     }
 
