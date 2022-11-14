@@ -56,19 +56,17 @@
 			border-radius: .5em;
 			background-color: transparentize(#fff, 0.8);
 			cursor: pointer;
+			transition: .2s;
 
 			&:hover {
 				filter: brightness(70%);
+				border-color: transparentize(#fff, .4);
 			}
 		}
 
-		.start {
-			transition: .2s;
-			&:hover {
-				border-color: $red;
-				color: $red;
-			}
-		}
+		.start:hover { background-color: $submain-blue; }
+		.ready:hover { background-color: $yellow; }
+		.exit:hover { background-color: $main-dark; }
 	}
 
 	.mini-mode {
@@ -104,7 +102,7 @@
     import GameOver from '$lib/modals/GameOver.svelte';
     import ConfirmMsg from '$lib/modals/ConfirmMsg.svelte';
     import { user } from '$lib/stores/user';
-    import Player from './Player.svelte';
+    import Player from '$lib/game/Player.svelte';
 
 	export let roomId: string;
 	export let itself: any;
@@ -135,6 +133,7 @@
 	let miniMode: boolean = false;
 
 	let ready: boolean = false;
+	let started: boolean = false;
 
 	$: quitRoom(resQuitConfirm);
 
@@ -232,6 +231,8 @@
 				: ".");
 			gameFinishedModal.open();
 		});
+
+		$client.socket.on("GameStartFail", () => { started = false; })
 	});
 
 </script>
@@ -261,20 +262,29 @@
 	<div class="button-container">
 		<!-- there should be a difference between host-guest mode and random matching mode -->
 		{#if $user.username == roomInfo.roomHost}
+		{#if !started}
 		<button class="start" on:click={()=>{
+			if (!ready) {
+				// TODO message appear
+				return ;
+			}
+			started = true;
 			$client.socket.emit("StartGame", {
 				roomId: roomId
 			})
 		}}>START</button>
+		{:else}
+		<button class="start loading"></button>
+		{/if}
 		{:else if userType == UserType.Player2}
 		<button class="ready" on:click={()=>{
 			$client.socket.emit("isReady", {
 				roomId: roomId,
 				ready: !ready,
 			});
-		}}>READY</button>
+		}}>{(!ready) ? "READY" : "CANCEL"}</button>
 		{/if}
-		<button on:click={()=>{ quitConfirmMsgModal.open(); }}>EXIT</button>
+		<button class="exit" on:click={()=>{ quitConfirmMsgModal.open(); }}>EXIT</button>
 
 	</div>
 	<div class="mini-mode" on:click={()=>{
