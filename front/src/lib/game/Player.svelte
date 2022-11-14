@@ -22,16 +22,22 @@
 				object-fit: cover;
 			}
 
-			.host {
+			span {
 				position: absolute;
-				
 				width: 3em;
 				text-align: center;
 				font-size: 12px;
-				border: 1.5px solid $red;
 				border-radius: .1em;
+			}
+			.host {
+				border: 1.5px solid $red;
 				color: $red;
 				background-color: transparentize($red, .8);
+			}
+			.ready {
+				border: 1.5px solid $main-dark;
+				color: $main-dark;
+				background-color: transparentize($main-dark, .8);
 			}
 		}
 
@@ -58,13 +64,16 @@
 	export let userInfo: any;
 	export let left: boolean;
 	export let host: boolean;
+	export let ready: boolean;
 </script>
 
 <div class="container {(left) ? "left" : ""}">
 	{#if userInfo}
 	<div class="img-box">
 		{#if host}
-		<div class="host">HOST</div>
+		<span class="host">HOST</span>
+		{:else if ready}
+		<span class="ready">READY</span>
 		{/if}
 		<img src={userInfo.image_url} alt="profile"/>
 	</div>

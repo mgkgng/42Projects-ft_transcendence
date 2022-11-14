@@ -56,6 +56,8 @@ export class ChatRoomService {
 
 	@SubscribeMessage('getFriendList')
 	async getFriendList(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
+		
+		console.log("coucou");
 		const user = await this.userRepository.findOne({where: {username: this.mainServerService.getUserConnectedBySocketId(client.id).username}});
 		if (!user)
 		{

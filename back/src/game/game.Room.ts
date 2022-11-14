@@ -22,6 +22,7 @@ export class Room {
 	/* RoomState */
 	privateMode: boolean;
 	available: boolean;
+	ready: boolean;
 
 	/* RoomGame */
 	pong: Pong;
@@ -46,6 +47,7 @@ export class Room {
 
 		this.privateMode = privateMode;
 		this.available = (players.length < 2) ? true : false;
+		this.ready = false;
 	
 		this.clients = new Map();
 		this.addClients(clients);

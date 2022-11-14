@@ -36,7 +36,8 @@ export class GameGateway {
 	constructor(private mainServerService : MainServerService, private jwtService: JwtService, 
 				@InjectRepository(GameEntity) private gameRep: Repository<GameEntity>,
 				private dataSource : DataSource,
-				private userService : UserService
+				private userService : UserService,
+				private jwtServer: JwtService
 	) {
 		this.clients = new Map<string, Client>();
 		this.rooms = new Map<string, Room>();
@@ -237,6 +238,23 @@ export class GameGateway {
 			allowed: true,
 			roomId: data.roomId
 		});
+	}
+
+	@SubscribeMessage("isReady")
+	setReady(@MessageBody() data: any, @Request() req) {
+		console.log("i recevied this: ", data);
+
+		const user : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
+		console.log(user);
+		let room = this.getRoom(data.roomId);
+		console.log("room: ", room);
+
+		if (!room || user.username != room.players[1])//for example
+			return ;
+
+		room.ready = data.ready;
+		room.broadcast("ReadyUpdate", { ready: room.ready })
+		
 	}
 
 	static broadcast(clients: any, event: string, data: any) {

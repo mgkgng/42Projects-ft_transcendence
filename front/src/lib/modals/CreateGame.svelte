@@ -89,9 +89,6 @@
 			filter: brightness(80%);
 		}
 	}
-
-
-
 </style>
 
 <script lang="ts">
