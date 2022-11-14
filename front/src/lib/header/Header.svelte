@@ -10,17 +10,6 @@
 		flex-direction: row;
 	}
 
-	.logo {
-		cursor: pointer;
-		padding-left: 5px;
-
-		img {
-			height: 100%;
-			object-fit: cover;
-
-		}
-	}
-
 	.profile {
 		position: absolute;
 		top: 0;
@@ -105,7 +94,8 @@
     import { loginState } from "$lib/stores/var";
     import Modal from "$lib/tools/Modal.svelte";
     import Setting from "../modals/Setting.svelte";
-    import ChatDirectBox from "../modals/ChatDirectBox.svelte";
+    import ChatDirectBox from "$lib/modals/ChatDirectBox.svelte";
+	import Friends from "$lib/modals/Friends.svelte"
 
 
 	let profileModal: any;
@@ -113,7 +103,7 @@
 	let login: boolean;
 	let settingModal: any;
 	let chatDirectModal : any;
-
+	let friendsModal: any;
 
 	loginState.subscribe(value => { login = value; })
 
@@ -128,6 +118,10 @@
 <Modal bind:this={chatDirectModal} closeOnBgClick={true}>
 	<ChatDirectBox />
 </Modal>
+<Modal bind:this={friendsModal} closeOnBgClick={true}>
+	<Friends />
+</Modal>
+
 <header>
 	<div class="profile">
 		<div class="summary">
@@ -139,7 +133,7 @@
 		</div>
 		<div class="menu">
 			<button on:click={()=>{ profileModal.open(); }}>Profile</button>
-			<button>Friends</button>
+			<button on:click={()=>{ friendsModal.open(); }}>Friends</button>
 			<button on:click={()=>{ chatDirectModal.open(); }}>ChatDirect</button>
 			<button on:click={()=>{ settingModal.open(); }}>Setting</button>
 			<button>Logout</button>

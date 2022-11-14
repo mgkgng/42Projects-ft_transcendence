@@ -10,7 +10,7 @@ import { MainServerService } from "../mainServer/mainServer.gateway";
 import { UseGuards, Request, HttpException } from '@nestjs/common';
 import { AuthGuard } from "@nestjs/passport";
 import { toDataURL } from "qrcode";
-import * as bcrypt from 'bcrypt';
+// import * as bcrypt from 'bcrypt';
 
 // let bcrypt = require('bcryptjs')
 
@@ -57,9 +57,10 @@ export class ChatRoomService {
 		//console.log("new room");
 		const id_user = await this.mainServer.getIdUser(req);
 		const is_password_protected : boolean = data.is_password_protected;	
-		const password : string = is_password_protected ? 
-		await bcrypt.hash(data.room_password, 10) 
-		  	: "";
+		// const password : string = is_password_protected ? 
+		// await bcrypt.hash(data.room_password, 10) 
+		//   	: "";
+		const password = "non"
 		const name : string = data.room_name;
 		const date_creation : Date = new Date();
 		const  querry = this.dataSource.createQueryRunner(); 
@@ -502,7 +503,8 @@ export class ChatRoomService {
 			client.emit("error_unset_password_room", {error: "You are not owner of the room."});
 			return ;
 		}
-		const password = await bcrypt.hash(data.password, 10);
+		const password = "bcryptnemarchepas"
+		// const password = await bcrypt.hash(data.password, 10);
 		const res = await this.dataSource.createQueryBuilder().update(ChatRoomEntity)
 				.where("id_g = :r", {r: room})
 				.set({password: password, is_password_protected: true}).execute();
