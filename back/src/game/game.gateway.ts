@@ -128,7 +128,7 @@ export class GameGateway {
 	}
 
 	@SubscribeMessage("RoomCheck")
-	roomCheck(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
+	async roomCheck(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
 		console.log("RoomCheck", data);
 
 		let room = this.getRoom(data.room);
@@ -138,9 +138,15 @@ export class GameGateway {
 			return ;
 		}
 
+		let players = []
+		for (let player of room.players) {
+			const x = await this.getPlayerInfo(player);
+			players.push(x);
+		}
+
 		client.emit("RoomInfo", {
 			roomHost: room.hostname,
-			players: room.players,
+			players: players,
 			maxpoint: room.maxpoint,
 			scores: room.scores,
 			mapSize: [room.pong.size[0], room.pong.size[1]],
@@ -150,8 +156,6 @@ export class GameGateway {
 
 	@SubscribeMessage("PaddleMove")
 	paddleMove(@MessageBody() data: any) {
-		// console.log("PaddleMove", data);
-
 		let room = this.getRoom(data.room);
 
 		// calcul algorithm launched here
@@ -192,7 +196,7 @@ export class GameGateway {
 	}
 
 	@SubscribeMessage("CreateRoom")
-	async createRoom(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
+	createRoom(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
 		console.log("CreateRoom", data);
 		
 		// TODO should be able to have client's room state
@@ -210,18 +214,17 @@ export class GameGateway {
 	}
 
 	@SubscribeMessage("JoinRoom")
-	joinRoom(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
+	async joinRoom(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
 		let room = this.getRoom(data.roomId);
 		if (!room || (room.players.length > 1 && data.play)) {
 			client.emit("JoinRoomRes", { allowed: false });
 			return ;
 		} else if (data.play) {
-			this.getPlayerInfo(data.username).then((res)=>{
-				room.broadcast("PlayerUpdate", {
-					join: true,
-					userInfo: res
-				});
-				room.addPlayer(client, res);
+			room.addPlayer(client, data.username);
+			const newPlayer = await this.getPlayerInfo(data.username);
+			room.broadcast("PlayerUpdate", {
+				join: true,
+				userInfo: newPlayer
 			});
 		} else {
 			room.broadcast("WatcherUpdate", { //TODO potentiellement

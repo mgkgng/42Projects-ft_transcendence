@@ -116,9 +116,7 @@
 			$client.socket.on("GetConnectionInfo", (data: any) => {
 				console.log("GetConnectionInfo", data);
 				$client.id = data.id;
-				user.set(data.user);
-				console.log("lol", $user);
-				
+				user.set(data.user);				
 			});	
 
 			$client.socket.off("RoomCreated", (data: any) => {

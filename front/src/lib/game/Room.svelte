@@ -170,15 +170,13 @@
 				userType = UserType.Player1;
 			else
 				userType = ($user.username == roomInfo.players[0].username) ? UserType.Player1 
-					: ($user.username == roomInfo.players[1].username) ? UserType.Player2 
+					: ($user.username == roomInfo.players?.[1].username) ? UserType.Player2 
 					: UserType.Watcher;
 
 			if (userType == UserType.Player2) {
 				[userIndex, opponentIndex] = [opponentIndex, userIndex];
-				// TODO (this is kinda brut force)
 				paddlePos[0] -= roomInfo?.paddleSize, paddlePos[1] -= roomInfo?.paddleSize;
 			}
-
 			scores = roomInfo?.scores;
 		});
 
