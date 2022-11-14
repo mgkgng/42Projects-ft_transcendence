@@ -36,7 +36,8 @@ export class GameGateway {
 	constructor(private mainServerService : MainServerService, private jwtService: JwtService, 
 				@InjectRepository(GameEntity) private gameRep: Repository<GameEntity>,
 				private dataSource : DataSource,
-				private userService : UserService
+				private userService : UserService,
+				private jwtServer: JwtService
 	) {
 		this.clients = new Map<string, Client>();
 		this.rooms = new Map<string, Room>();
@@ -80,7 +81,6 @@ export class GameGateway {
   		let newClient = new Client(client, user.username, {});
 		this.clients.set(newClient.id, newClient);
 
-		console.log(user);
 		// Should send it only once
 		client.emit("GetConnectionInfo", {
 			id: newClient.id,
@@ -129,7 +129,7 @@ export class GameGateway {
 	}
 
 	@SubscribeMessage("RoomCheck")
-	roomCheck(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
+	async roomCheck(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
 		console.log("RoomCheck", data);
 
 		let room = this.getRoom(data.room);
@@ -139,10 +139,15 @@ export class GameGateway {
 			return ;
 		}
 
+		let players = []
+		for (let player of room.players) {
+			const x = await this.getPlayerInfo(player);
+			players.push(x);
+		}
+
 		client.emit("RoomInfo", {
 			roomHost: room.hostname,
-			players: (room.players.length === 2) ? [room.players[0], room.players[1]]
-				: [room.players[0]],
+			players: players,
 			maxpoint: room.maxpoint,
 			scores: room.scores,
 			mapSize: [room.pong.size[0], room.pong.size[1]],
@@ -152,8 +157,6 @@ export class GameGateway {
 
 	@SubscribeMessage("PaddleMove")
 	paddleMove(@MessageBody() data: any) {
-		// console.log("PaddleMove", data);
-
 		let room = this.getRoom(data.room);
 
 		// calcul algorithm launched here
@@ -212,22 +215,55 @@ export class GameGateway {
 	}
 
 	@SubscribeMessage("JoinRoom")
-	joinRoom(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
+	async joinRoom(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
 		let room = this.getRoom(data.roomId);
-		if (room && room.players.length == 1) { // is it really safe?
-			this.getPlayerInfo(data.username).then((res)=>{
-				room.broadcast("PlayerUpdate", {
-					join: true,
-					userInfo: res
-				});
-				room.addPlayer(client, res);
+		if (!room || (room.players.length > 1 && data.play)) {
+			client.emit("JoinRoomRes", { allowed: false });
+			return ;
+		} else if (data.play) {
+			room.addPlayer(client, data.username);
+			const newPlayer = await this.getPlayerInfo(data.username);
+			room.broadcast("PlayerUpdate", {
+				join: true,
+				userInfo: newPlayer
 			});
-			client.emit("JoinRoomRes", {
-				allowed: true,
-				roomId: data.roomId
+		} else {
+			room.broadcast("WatcherUpdate", { //TODO potentiellement
+				join: true
 			})
+			room.addClient(client);
 		}
-		client.emit("JoinRoomRes", { allowed: false });
+
+		client.emit("JoinRoomRes", {
+			allowed: true,
+			roomId: data.roomId
+		});
+	}
+
+	@SubscribeMessage("isReady")
+	setReady(@MessageBody() data: any, @Request() req) {
+
+		const user : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
+		let room = this.getRoom(data.roomId);
+
+		if (!room || user.username != room.players[1])//for example
+			return ;
+
+		room.ready = data.ready;
+		room.broadcast("ReadyUpdate", { ready: room.ready })
+	}
+
+	@SubscribeMessage("StartGame")
+	startGame(@ConnectedSocket() client: Socket, @MessageBody() data: any, @Request() req) {
+		const user : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
+		let room = this.getRoom(data.roomId);
+		if (!room || user.username != room.players[0])
+			return ;
+
+		if (!room.ready)
+			client.emit("StartGameFail");
+		else
+			room.startPong();
 	}
 
 	static broadcast(clients: any, event: string, data: any) {

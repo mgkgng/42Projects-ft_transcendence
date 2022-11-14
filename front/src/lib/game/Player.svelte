@@ -12,11 +12,33 @@
 
 		margin: 8px;
 
-		img {
-			border-radius: .2em;
-			width: 80px;
-			height: 80px;
-			object-fit: cover;
+		.img-box {
+			position: relative; 
+
+			img {
+				border-radius: .2em;
+				width: 80px;
+				height: 80px;
+				object-fit: cover;
+			}
+
+			span {
+				position: absolute;
+				width: 3em;
+				text-align: center;
+				font-size: 12px;
+				border-radius: .1em;
+			}
+			.host {
+				border: 1.5px solid $red;
+				color: $red;
+				background-color: transparentize($red, .8);
+			}
+			.ready {
+				border: 1.5px solid $main-dark;
+				color: $main-dark;
+				background-color: transparentize($main-dark, .8);
+			}
 		}
 
 		div {
@@ -41,11 +63,20 @@
 <script lang="ts">
 	export let userInfo: any;
 	export let left: boolean;
+	export let host: boolean;
+	export let ready: boolean;
 </script>
 
 <div class="container {(left) ? "left" : ""}">
 	{#if userInfo}
-	<img src={userInfo.image_url} alt="profile"/>
+	<div class="img-box">
+		{#if host}
+		<span class="host">HOST</span>
+		{:else if ready}
+		<span class="ready">READY</span>
+		{/if}
+		<img src={userInfo.image_url} alt="profile"/>
+	</div>
 	<div>{userInfo.username}</div>
 	{:else}
 	<img src="/pingu/pingu-coucou.jpeg" alt="pingu" />

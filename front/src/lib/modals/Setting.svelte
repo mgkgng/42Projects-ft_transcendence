@@ -3,8 +3,6 @@
 		width: 440px;
 		height: 520px;
 
-		display: flex;
-		flex-direction: column;
 		justify-content: space-between;
 
 		padding: 2em;
@@ -33,7 +31,7 @@
 	export let itself: any;
 </script>
 
-<div class="window setting">
+<div class="vflex window setting">
 	<h2>Setting here</h2>
 	<button on:click={()=>{itself.close();}}>Close</button>
 </div>

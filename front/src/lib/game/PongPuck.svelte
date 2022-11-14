@@ -19,5 +19,5 @@
 </script>
 
 <div class="puck"
-	style="top: {posY}px; left: {posX}px;">
+	style="top: {posX}px; left: {posY}px;">
 </div>

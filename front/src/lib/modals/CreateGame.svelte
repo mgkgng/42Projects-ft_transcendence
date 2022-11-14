@@ -15,14 +15,10 @@
 		border: 2px solid transparentize(#fff, .6);
 		border-radius: .5em;
 
-		display: flex;
-		flex-direction: column;
 		justify-content: space-evenly;
 	}
 
 	.box {
-		display: flex;
-		flex-direction: column;
 		gap: 2em;
 		width: 100%;
 
@@ -93,9 +89,6 @@
 			filter: brightness(80%);
 		}
 	}
-
-
-
 </style>
 
 <script lang="ts">
@@ -113,14 +106,14 @@
 
 </script>
 
-<div class="container">
+<div class="vflex container">
 	<div class="button-box">
 		<button class="button-back" on:click={()=>{
 			itself.close();
 			enterGameModal.open();
 		}}>&lt</button>
 	</div>
-	<div class="box">
+	<div class="vflex box">
 		<div class="option">
 			<p>Title</p>
 			<label>				
@@ -145,9 +138,9 @@
 		<div class="option">
 			<p>Difficulty</p>
 			<label>
-				<input type=radio bind:group={difficulty} name="mapSize" value={1}>Easy
-				<input type=radio bind:group={difficulty} name="mapSize" value={2}>Normal
-				<input type=radio bind:group={difficulty} name="mapSize" value={3}>Hard
+				<input type=radio bind:group={difficulty} name="difficulty" value={1}>Easy
+				<input type=radio bind:group={difficulty} name="difficulty" value={2}>Normal
+				<input type=radio bind:group={difficulty} name="difficulty" value={3}>Hard
 			</label>
 		</div>
 		<div class="option">

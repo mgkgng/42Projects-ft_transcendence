@@ -29,8 +29,8 @@ h3 { font-size: $h3 }
 h2 { font-size: $h2; font-weight: bold; }
 h1 { font-size: $h1; font-weight: bold; }
 
-.vflex, .flex {
-	display: flex;
+.flex, .vflex {
+	display: flex; 
 	gap: 1em;
 }
 .vflex { flex-direction: column }

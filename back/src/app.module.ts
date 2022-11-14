@@ -13,7 +13,6 @@ import { UserFriendEntity } from './entity/UserFriend.entity';
 import { ChatRoomEntity } from './entity/ChatRoom.entity';
 import { GameEntity } from './entity/Game.entity';
 import { MessageChatRoomEntity } from './entity/MessageChatRoom.entity';
-import { MessageDirectEntity } from './entity/MessageDirect.entity';
 import { UserBlockEntity } from './entity/UserBlock.entity';
 import { MainServerService } from './mainServer/mainServer.gateway';
 import { MainServerModule } from './mainServer/mainServer.module';

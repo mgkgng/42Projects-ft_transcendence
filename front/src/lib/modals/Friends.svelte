@@ -11,8 +11,6 @@
 			padding-left: .2em;
 			gap: .8em;
 			overflow-y: scroll;
-			display: flex;
-			flex-direction: column;
 
 			width: 100%;
 			height: 80%;
@@ -20,9 +18,6 @@
 
 			.line {
 				position: relative;
-				display: flex;
-				flex-direction: row;
-				gap: 0;
 
 				.friend {
 					width: 60%;
@@ -41,8 +36,6 @@
 					right: 2em;
 					width: 7em;
 					float: right;
-					display: flex;
-					flex-direction: row;
 					justify-content: flex-end;
 					gap: 2em;
 
@@ -85,24 +78,27 @@
 
 	let friends: Array<any>
 
-	onMount(async () => {
-		await fetch('http://localhost:3000/getfriendlist?username=min-kang').then(data => {
-			return data.json();
-		}).then(post => { friends = post; });
+	onMount(() => {
+		$client.socket.emit("getFriendList");
 
-		$client.socket.emit();
-		$client.socket.on();
+		$client.socket.on("error_getFriendList", (data: any) => {
+			console.log("Error!");
+		});
+
+		$client.socket.on("success_getFriendList", (data: any) => {
+			console.log(data);
+		})
 	});
 </script>
 
 <div class="window friends">
 	<h2>Friends</h2>
 	{#if friends}
-	<div class="friends-list">
+	<div class="vflex friends-list">
 		{#each friends as friend}
-		<div class="line">
+		<div class="flex line">
 			<div class="friend">{friend.username}</div>
-			<div class="tools">
+			<div class="flex tools">
 				<button><img src="/icon-mail.png" alt="mail"></button>
 				<button>-</button>
 			</div>

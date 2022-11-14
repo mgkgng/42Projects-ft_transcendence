@@ -2,7 +2,6 @@ import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { ChatDirectMessageEntity } from "./ChatDirectMessage.entity";
 import { GameEntity } from "./Game.entity";
 import { MessageChatRoomEntity } from "./MessageChatRoom.entity";
-import { MessageDirectEntity } from "./MessageDirect.entity";
 import { UserBlockEntity } from "./UserBlock.entity";
 import { UserChatRoomEntity } from "./UserChatRoom.entity";
 import { UserFriendEntity } from "./UserFriend.entity";
@@ -17,10 +16,6 @@ export class UserEntity
 	relation_userChatRoom: UserChatRoomEntity[];
 	@OneToMany(() => MessageChatRoomEntity, (user: MessageChatRoomEntity) => user.id_user)
 	relation_messageChatRoom: MessageChatRoomEntity[];
-	@OneToMany(() => MessageDirectEntity, (user: MessageDirectEntity) => user.id_sender)
-	relation_chatRoom: MessageChatRoomEntity[];
-	@OneToMany(() => MessageDirectEntity, (user: MessageDirectEntity) => user.id_recipient)
-	relation_messageDirect: MessageDirectEntity[];
 	@OneToMany(() => GameEntity, (user: GameEntity) => user.player1)
 	relation_gamePlayerOne: GameEntity[];
 	@OneToMany(() => GameEntity, (user: GameEntity) => user.player2)

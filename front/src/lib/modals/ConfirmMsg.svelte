@@ -8,35 +8,30 @@
 
 		color: #fff;
 
-		display: flex;
-		flex-direction: column;
 		justify-content: center;
 		align-items: center;
 
-		gap: 1em;
 		border-radius: .3em;
-	}
 
-	.buttons {
-		display: flex;
-		flex-direction: row;
-
-		gap: .5em;
-	}
-
-	button {
-		width: 5em;
-		height: 3em;
-		border-radius: .2em;
-		cursor: pointer;
-
-		&:hover {
-			filter: brightness(80%);
+		.buttons {
+			gap: .5em;
+	
+			button {
+				width: 5em;
+				height: 3em;
+				border-radius: .2em;
+				cursor: pointer;
+		
+				&:hover {
+					filter: brightness(80%);
+				}
+			}
+			
+			.cancel { background-color: $green; }
+			.quit { background-color: $red; }
 		}
 	}
 
-	.cancel { background-color: $green; }
-	.quit { background-color: $red; }
 
 </style>
 
@@ -46,9 +41,9 @@
 	export let itself: any;
 </script>
 
-<div class="container">
+<div class="vflex container">
 	<p>{msg}</p>
-	<div class="buttons">
+	<div class="flex buttons">
 		<button class="cancel" on:click={()=>{
 			result = false;
 			itself.close();

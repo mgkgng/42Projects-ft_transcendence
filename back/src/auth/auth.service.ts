@@ -60,7 +60,6 @@ export class AuthService {
 			campus_name: user.campus_name,
 			campus_country: user.campus_country,
 		};
-		console.log(payload);
 		return (this.jwtService.sign(payload, {secret: process.env.SECRET}));
 	}
 	async verify_tmp_jwt(token: string) {
