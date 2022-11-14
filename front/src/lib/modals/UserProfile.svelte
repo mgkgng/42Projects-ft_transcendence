@@ -18,15 +18,6 @@
 		color: #e6e6e6;
 	}
 
-	.photo-zone {
-		width: 100%;
-		min-height: 200px;
-		
-		img {
-			width: 100%;
-		}
-	}
-
 	.tool-zone {
 		width: 100%;
 		height: 80px;
@@ -45,18 +36,11 @@
 			cursor: pointer;
 			transition: .2s;
 
-			img {
-				width: 100%;
-				height: 100%;
-			}
-
 			&:hover {
 				transform: scale(1.05);
 			}
 		}
 	}
-
-
 
 	.history-zone {
 		width: 100%;

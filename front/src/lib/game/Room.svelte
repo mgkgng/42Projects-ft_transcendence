@@ -44,60 +44,6 @@
 		z-index: 4;
 	}
 
-	.bar-container-above {
-		position: relative;
-		display: flex;
-		align-items: center;
-	}
-
-	.bar-container-below {
-		position: relative;
-		display: flex;
-		align-items: center;
-	}
-
-	.beyond-above {
-		background-color: transparentize($main, 0.2);
-		border-radius: 5em 5em 0 0;
-	}
-
-	.beyond-below {
-		background-color: transparentize($main, 0.2);
-		border-radius: 0 0 5em 5em;
-	}
-
-	.map {
-		display: flex;
-		background-color: transparentize($main, 0.9);
-	}
-
-	.main-circle {
-		width: 50%;
-		height: 50%;
-		aspect-ratio: 1 / 1;
-		border-radius: 50%;
-		background-color: transparentize($main, 0.2)
-	}
-
-	.pong-score {
-		display: flex;
-		flex-direction: column;
-
-		justify-content: center;
-		height: 100%;
-
-		gap: 1em;
-	}
-
-	.deathPoint {
-		position: absolute;
-		width: 12px;
-		aspect-ratio: 1 / 1;
-		border-radius: 50%;
-		background-color: peru;
-		z-index: 10;
-	}
-
 	.loading-box {
 		height: 100%;
 		display: flex;

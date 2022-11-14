@@ -117,17 +117,6 @@
 			background-color: transparentize(#000, .75);
 		}
 	}
-
-	.test {
-		position: absolute;
-		top: 200px;
-		left: 200px;
-
-		width: 100px;
-		height: 100px;
-		background-color: #fff;
-		color:#000;
-	}
 </style>
 
 <script lang="ts">
@@ -147,7 +136,6 @@
 	let enterModal: any;
 
 	export let title: string;
-	export let mainPage: boolean;
 
 	let circlesAround: Array<Circle> = [];
 	let circleRadius = 250;

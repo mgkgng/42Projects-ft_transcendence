@@ -25,14 +25,6 @@
 </style>
 
 <script lang="ts">
-	import { darkMode } from "$lib/stores/var";
-
-	let dark : boolean;
-
-	darkMode.subscribe(value => {
-		dark = value;
-	});
-
 	export let user: boolean;
 	export let userIndex: number;
 

@@ -1,18 +1,5 @@
 <style lang="scss">
-	.container {
-		width: 100%;
-		height: 100%;
-		max-height: 100%;
-		background-color: rgba(0, 0, 0, 0);
-		gap: 0;
-		padding: 0;
-	}
 
-	@keyframes size-change {
-		0% { transform: scale(1) }
-		50% { transform: scale(1.3) }
-		100% { transform: scale(1) }
-	}
 </style>
 
 <script lang="ts">
