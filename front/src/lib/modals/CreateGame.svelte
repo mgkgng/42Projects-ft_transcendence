@@ -1,8 +1,8 @@
 <style lang="scss">
 	.container {
 		position: relative;
-		width: 420px;
-		height: 400px;
+		width: 520px;
+		height: 480px;
 		font-size: 19px;
 
 		padding-left: 3em;
@@ -37,9 +37,23 @@
 			display: grid;
 			grid-template-columns: 25% 75%;
 
-			label {
-				padding: 0 1em;
+			.text-input {
+				padding-left: .5em;
+				width: 95%;
+				height: 1.8em;
+				border-radius: .2em;
+				background-color: #fff;
+				color: #000;
 			}
+
+			label {
+				padding: 0 1em; 
+			
+				input[type='radio']:checked::after { //TODO
+					background-color: $main-bright;
+				}
+			}
+
 		}
 	}
 
@@ -66,26 +80,23 @@
 			font-size: 18px;
 			cursor: pointer;
 
-	
-			&:hover {
-				background-color: transparentize($submain-lowshadeblue, 0.4);
-			}
+			&:hover { background-color: transparentize($main-bright, 0.4); }
 		}
 	}
 
 	.submit {
 		position: absolute;
-		left: 30%;
+		left: 35%;
 		bottom: 1.2em;
 		padding: 1em;
 		border-radius: .5em;
-		border: 2px solid transparentize(#fff, .6);
-		background-color: #313131;
+		border: $border;
+		background-color: $main-bright;
 		color: #fff;
 		cursor: pointer;
+		transition: .2s;
 
 		&:hover {
-			background-color: $submain-lowshadeblue;
 			filter: brightness(80%);
 		}
 	}
@@ -99,11 +110,13 @@
 	export let enterGameModal: any;
 
 	let maxPoint: number = 10;
-	let difficulty: number = 3;
+	let puckSpeed: number = 3;
 	let mapSize: number = 2;
 	let privateMode: boolean = false;
-	let roomTitle: string = "Hello World!";
+	let roomTitle: string = "";
+	let paddleSize: number = 1;
 
+	//TODO radio -> colored block
 </script>
 
 <div class="vflex container">
@@ -116,16 +129,16 @@
 	<div class="vflex box">
 		<div class="option">
 			<p>Title</p>
-			<label>				
-				<input bind:value={roomTitle}>
+			<label>
+				<input class="text-input" placeholder="Room Title" bind:value={roomTitle}>
 			</label>
 		</div>
 		<div class="option">
 			<p>Size</p>
 			<label>
-				<input type=radio bind:group={mapSize} name="mapSize" value={1}>Small
-				<input type=radio bind:group={mapSize} name="mapSize" value={2}>Medium
-				<input type=radio bind:group={mapSize} name="mapSize" value={3}>Large
+				<input class="radio" type=radio bind:group={mapSize} name="mapSize" value={1}>Small
+				<input class="radio" type=radio bind:group={mapSize} name="mapSize" value={2}>Medium
+				<input class="radio" type=radio bind:group={mapSize} name="mapSize" value={3}>Large
 			</label>
 		</div>
 		<div class="option">
@@ -136,11 +149,19 @@
 			</label>
 		</div>
 		<div class="option">
-			<p>Difficulty</p>
+			<p>Paddle Size</p>
 			<label>
-				<input type=radio bind:group={difficulty} name="difficulty" value={1}>Easy
-				<input type=radio bind:group={difficulty} name="difficulty" value={2}>Normal
-				<input type=radio bind:group={difficulty} name="difficulty" value={3}>Hard
+				<input class="radio" type=radio bind:group={paddleSize} name="paddleSize" value={1}>Short
+				<input class="radio" type=radio bind:group={paddleSize} name="paddleSize" value={2}>Normal
+				<input class="radio" type=radio bind:group={paddleSize} name="paddleSize" value={3}>Long
+			</label>
+		</div>
+		<div class="option">
+			<p>Puck Speed</p>
+			<label>
+				<input type=radio bind:group={puckSpeed} name="puckSpeed" value={1}>Slow
+				<input type=radio bind:group={puckSpeed} name="puckSpeed" value={2}>Normal
+				<input type=radio bind:group={puckSpeed} name="puckSpeed" value={3}>Fast
 			</label>
 		</div>
 		<div class="option">
@@ -154,10 +175,11 @@
 	<button class="submit" on:click={()=>{
 		$client.socket.emit("CreateRoom", {
 			username: $user.username,
-			title: roomTitle,
+			title: (roomTitle.length) ? roomTitle : "Let's enjoy pong together!",
 			mapSize: mapSize,
 			maxPoint: maxPoint,
-			difficulty: difficulty,
+			puckSpeed: puckSpeed,
+			paddleSize: paddleSize,
 			privateMode: privateMode
 		});
 		itself.close();

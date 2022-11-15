@@ -10,22 +10,18 @@ export class Pong {
 	moveMax: number;
 	scores: Array<number>;
 
-	constructor(size: Array<number>, difficulty: number) {
+	constructor(size: Array<number>, puckSpeed: number, paddleSize: number) {
 		
 		this.size = size;
 		this.puck = new Puck(this.size[0], this.size[1],
-			difficulty * ((Math.floor(Math.random() * 2)) ? 1 : -1));
+			puckSpeed * ((Math.floor(Math.random() * 2)) ? 1 : -1));
 
-		this.paddleSize = PaddleSize[1] // TODO put it into createGame
+		this.paddleSize = paddleSize // TODO put it into createGame
 		let initPos = (this.size[0] - this.paddleSize) / 2;
 		this.paddlePos = [initPos, initPos];
 
-		console.log("this is the paddlepos: ", this.paddlePos);
-
 		this.moveMin = 0;
-		this.moveMax = this.size[0] - this.paddleSize;
-	
-		this.scores = [0, 0];
+		this.moveMax = this.size[0] - this.paddleSize;	
 	}
 
 	movePaddle(userIndex: number, left: boolean) {

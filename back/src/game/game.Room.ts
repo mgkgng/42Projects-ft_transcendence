@@ -7,7 +7,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { MainServerService } from "src/mainServer/mainServer.gateway";
 import { UserService } from "src/user/user.service";
-import { MapSize, Difficulty } from "./game.utils";
+import { MapSize, PaddleSize, PuckSpeed } from "./game.utils";
 
 
 export class Room {
@@ -34,7 +34,7 @@ export class Room {
 	chat: Map<string, string>
 		
 	constructor(players: any, clients: any, title:string, size: number, maxpoint: number = 25,
-				difficulty : number = 8, privateMode : boolean = true, hostname: string = "",
+				puckSpeed : number, paddleSize:number, privateMode : boolean = true, hostname: string = "",
 				@InjectRepository(GameEntity) private gameRep: Repository<GameEntity>, 
 				private mainServerService : MainServerService,
 				private dataSource : DataSource,
@@ -52,10 +52,8 @@ export class Room {
 		this.clients = new Map();
 		this.addClients(clients);
 
-		this.pong = new Pong(MapSize[size], Difficulty[difficulty]);
+		this.pong = new Pong(MapSize[size], PuckSpeed[puckSpeed], paddleSize[paddleSize]);
 		this.players = players;
-		// for (let player of players)
-		// 	this.getPlayerInfo(player).then((res)=>{ this.players.push(res); });
 
 		if (!this.hostname.length)
 			this.startPong();

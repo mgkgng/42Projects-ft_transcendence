@@ -31,9 +31,8 @@ export const MapSize = {
 	2: [400, 700]
 }
 
-export const Difficulty = {
+export const PuckSpeed = {
 	0 : 3,
 	1 : 5,
-	2 : 8,
-	3 : 15
+	2 : 8
 }

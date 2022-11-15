@@ -10,9 +10,7 @@ import { MainServerService } from "../mainServer/mainServer.gateway";
 import { UseGuards, Request, HttpException } from '@nestjs/common';
 import { AuthGuard } from "@nestjs/passport";
 import { toDataURL } from "qrcode";
-import * as bcrypt from 'bcrypt';
-
-// let bcrypt = require('bcryptjs')
+// import * as bcrypt from 'bcrypt';
 
 @WebSocketGateway({
 	cors: {
@@ -102,7 +100,8 @@ export class ChatRoomService {
 			const room = await this.dataSource.getRepository(ChatRoomEntity).createQueryBuilder("room").
 			where("room.id_g = :id ", {id: id_room}).getOne();
 
-			const is_good_password = await bcrypt.compare(data.room_password, room.password);
+			// const is_good_password = await bcrypt.compare(data.room_password, room.password);
+			const is_good_password = "bcrypt crash chaque fois";
 
 			const is_already_in = await this.dataSource.getRepository(UserChatRoomEntity).createQueryBuilder("userRoom").
 			where("userRoom.room = :id and userRoom.id_user = :id_u", {id: id_room, id_u : id_user}).getOne();

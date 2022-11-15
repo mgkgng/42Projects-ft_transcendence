@@ -25,7 +25,7 @@
 			}
 
 			&:hover {
-				background-color: transparentize(#fff, .7);
+				background-color: transparentize(#fff, .9);
 			}
 		}
 
