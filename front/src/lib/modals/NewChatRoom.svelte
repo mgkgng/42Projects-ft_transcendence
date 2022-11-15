@@ -2,12 +2,12 @@
 	.chat {
 		width: 60vw;
 		height: 75vh;
-		gap: .5em;
 		padding: 0;
+		gap: 0;
 	}
 
 	.rooms {
-		width: 22%;
+		width: 23%;
 		padding: 0;
 		margin: 0;
 
@@ -18,9 +18,55 @@
 		}
 
 		.list {
-			padding: 1em .2em;
-			.room {
-				
+			padding: .5em 0;
+			padding-right: 1em;
+			
+			.line {
+				position: relative;
+				align-items: center;
+				height: 3em;
+
+				.room {
+					width: 90%;
+					height: 100%;
+					cursor: pointer;
+					border-radius: 0 0em 2em 0;
+					z-index: 2;
+					background-color: #212121;
+					transition: .3s;
+					padding: 1em;
+
+					&:nth-child(odd) {
+						border: solid 2px transparentize(#fff, .6);
+						border-left: none;
+					}
+
+				}
+				.choose{
+					background-color: rgba(207, 196, 196, 0.5);
+					text-decoration: underline;
+				}
+				.button {
+					z-index: 1;
+					position: absolute;
+					right: 5%;
+					width: 20%;
+					height: 100%;
+					border-radius: 0 .2em .2em 0;
+					background-color: transparentize(#fff, .7);
+					cursor: pointer;
+	
+				}
+
+				&:hover {
+					.room {
+						background-color: #fff;
+					}
+					.button {
+						background-color: $red;
+					}
+				}
+
 			}
 		}
 	}
@@ -114,49 +160,7 @@
 	}
 
 	.users {
-		width: 18%;
-	}
-	.btn-new-room{
-		width: 50%;
-		text-align: center;
-		padding: 1em;
-		border-radius: 1em;
-		border: solid #fff;
-		background-color: transparentize($submain, 0.8);
-		color: #fff;
-		cursor: pointer;
-	}
-	.submit {
-		padding: 1em;
-		border-radius: 1em;
-		width: 50%;
-		border: solid #fff;
-		text-align: center;
-		background-color: transparentize($submain, 0.8);
-		color: #fff;
-		cursor: pointer;
-	}
-	.btn-room{
-		padding: 1em;
-		width: 100%;
-		color:rgb(255, 255, 255);
-		text-align: center;
-		background-color: rgba(97, 97, 97, 0.5);
-		cursor: pointer;
-	}
-	.search{
-		margin-left: 20%;
-		margin-bottom: 1em;
-		margin-top: 1em;
-		width: 60%;
-		border-style: solid;
-		border-color: rgb(255, 255, 255);
-		border-width: 2px;
-		border-radius: 1em;
-	}
-	.choose{
-		background-color: rgba(207, 196, 196, 0.5);
-		text-decoration: underline;
+		width: 17%;
 	}
 </style>
 
@@ -321,14 +325,16 @@
 		<div class="tools">
 			tools will be here
 		</div>
-		<div class="list">
+		<div class="vflex list">
 			{#each ($chatRoom.sortRoomsKeys([...$chatRoom.messages.keys()])) as room}
-			{#if (room != actualName)}
-			<div class="room" on:click={() => chooseRoom({room})}>{room}</div>
-			{:else}
-			<div class="room chosen" on:click={() => chooseRoom({room})}>{room}</div>
-			{/if}
-			<button on:click={() => setNotVisible({room})}>X</button>
+			<div class="flex line">
+				{#if (room != actualName)}
+				<div class="room" on:click={() => chooseRoom({room})}>{room}</div>
+				{:else}
+				<div class="room chosen" on:click={() => chooseRoom({room})}>{room}</div>
+				{/if}
+				<div class="button" on:click={() => setNotVisible({room})}></div>
+			</div>
 			{/each}
 		</div>
 	</div>
