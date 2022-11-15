@@ -65,7 +65,7 @@ export class friendSystemService {
         .leftJoinAndSelect("u.id_first_user", "friendrequester")
         .leftJoinAndSelect("u.id_second_user", "friendrequested")
         .where(`friendrequester.username = :username OR friendrequested.username = :username`, {username: username})
-        .andWhere(`u.is_user_friend = false`)
+        .andWhere(`u.is_user_friend = false AND u.is_user_refused = false`)
         .getMany();
 
         let i : number = 0;
@@ -112,22 +112,18 @@ export class friendSystemService {
             newUserRel.is_user_friend = false;
             return await this.userFriendRepository.save(newUserRel);
         }
-		else
-		{
-			return null;
-		}
         return firstHaveAlreadyRequestedEntity;
     }
 
     // This function will delete the entry from the userFriendEntity table
     // where the friend appear
-    async unFriend(first_username : string, second_username : string)
+    async removeFriend(first_username : string, second_username : string)
     {
         const qb = this.userFriendRepository.createQueryBuilder('u');
         let isFriendEntity = await this.isFriendWithByUsername(first_username, second_username);
         if (isFriendEntity == null)
-            return ;
-        return qb.delete().where(`id_g = ${isFriendEntity.id_g}`).execute();
+            return null;
+        return await qb.delete().where(`id_g = ${isFriendEntity.id_g}`).execute();
     }
 
     // If first_username have asked second_username as friend
@@ -145,6 +141,36 @@ export class friendSystemService {
             return ;
         return await this.unFriend(first_username, second_username);
     }
+
+	// Function to refuse a friend request if the user is the one who have been asked
+	async refuseFriend(first_username : string, second_username : string)
+	{
+		const qb = this.userFriendRepository.createQueryBuilder('u');
+		let isRequestedEntity = await qb
+		.leftJoinAndSelect("u.id_first_user", "friendrequester")
+		.leftJoinAndSelect("u.id_second_user", "friendrequested")
+		.where("friendrequester.username = :first_username AND friendrequested.username = :second_username", {first_username: first_username, second_username: second_username})
+		.andWhere("u.is_user_friend = false AND u.is_user_refused = false")
+		.getOne();
+		if (isRequestedEntity == null)
+			return null;
+		isRequestedEntity.is_user_refused = true;
+		return await this.userFriendRepository.save(isRequestedEntity);
+	}
+
+	// async removeFriend(first_username : string, second_username : string)
+	// {
+	// 	const qb = this.userFriendRepository.createQueryBuilder('u');
+	// 	let isFriendEntity = await qb
+	// 	.leftJoinAndSelect("u.id_first_user", "friendrequester")
+	// 	.leftJoinAndSelect("u.id_second_user", "friendrequested")
+	// 	.where("friendrequester.username = :first_username AND friendrequested.username = :second_username", {first_username: first_username, second_username: second_username})
+	// 	.andWhere("u.is_user_friend = true AND u.is_user_refused = false")
+	// 	.getOne();
+	// 	if (isFriendEntity == null)
+	// 		return null;
+	// 	return await this.unFriend(first_username, second_username);
+	// }
 
     async changeStatus(username : string, status : string)
     {

@@ -14,4 +14,7 @@ export class UserFriendEntity {
     
     @Column({default: false})
     is_user_friend?: boolean;
+
+	@Column({default: false})
+	is_user_refused?: boolean;
 }

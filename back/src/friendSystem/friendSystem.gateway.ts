@@ -35,50 +35,25 @@ export class friendSystemGateway {
 
 	@WebSocketServer() server;
 
-	@SubscribeMessage('isFriendWith')
-	async isFriendWith(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
-		const user = await this.userRepository.findOne({where: {username: this.mainServerService.getUserConnectedBySocketId(client.id).username}});
-		const friend = await this.userRepository.findOne({where: {username: data.username}});
-		if (!user || !friend)
-		{
-			this.server.to(client.id).emit('error_isFriendWith', {error: "User not found"});
-			return;
-		}
-		const userFriend = await this.friendSystemService.isFriendWithByUsername(user.username, friend.username);
-		if (!userFriend)
-		{
-			this.server.to(client.id).emit('error_isFriendWith', {error: "Users not asked as friend"});
-			return;
-		}
-		this.server.to(client.id).emit('success_isFriendWith', {isFriend: userFriend.is_user_friend});
-		return;
-	}
-
 	@SubscribeMessage('getFriendList')
 	async getFriendList(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
-		
-		console.log("coucou");
 		const user = await this.userRepository.findOne({where: {username: this.mainServerService.getUserConnectedBySocketId(client.id).username}});
 		if (!user)
 		{
-			console.log("User not found");
 			this.server.to(client.id).emit('error_getFriendList', {error: "User not found"});
 			return;
 		}
 		const friends = await this.friendSystemService.getFriendList(user.username);
 		if (!friends)
 		{
-			console.log("No friend found");
 			this.server.to(client.id).emit('error_getFriendList', {error: "No friends found"});
 			return;
 		}
-		console.log("Friends found");
-		// this.server.to(client.id).emit('success_getFriendList', {friends: friends});
-		client.emit('success_getFriendList', {friends: friends});
+		this.server.to(client.id).emit('success_getFriendList', {friends: friends});
 		return;
 	}
 
-	@SubscribeMessage('getAskFriendList')
+	@SubscribeMessage('getAskList')
 	async getAskedFriendList(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
 		const user = await this.userRepository.findOne({where: {username: this.mainServerService.getUserConnectedBySocketId(client.id).username}});
 		if (!user)
@@ -100,19 +75,25 @@ export class friendSystemGateway {
 	async askFriend(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
 		const user = await this.userRepository.findOne({where: {username: this.mainServerService.getUserConnectedBySocketId(client.id).username}});
 		const friend = await this.userRepository.findOne({where: {username: data.username}});
+
 		if (!user || !friend)
 		{
 			this.server.to(client.id).emit('error_askFriend', {error: "User not found"});
 			return;
 		}
-		const userFriend = await this.friendSystemService.askFriend(user.username, friend.username);
-		if (!userFriend)
+		const userAskList = await this.friendSystemService.getAskList(user.username);
+		const userFriendList = await this.friendSystemService.getFriendList(user.username);
+		if (userAskList.find((user) => user.username == friend.username) || userFriendList.find((user) => user.username == friend.username))
 		{
 			this.server.to(client.id).emit('error_askFriend', {error: "User already asked as friend"});
 			return;
 		}
-		this.server.to(client.id).emit('success_askFriend', {friend: friend.username});
-		return;
+		else
+		{
+			const userFriend = await this.friendSystemService.askFriend(user.username, friend.username);
+			this.server.to(client.id).emit('success_askFriend', {friend: friend.username});
+			return;
+		}
 	}
 
 	@SubscribeMessage('acceptFriend')
@@ -124,32 +105,85 @@ export class friendSystemGateway {
 			this.server.to(client.id).emit('error_acceptFriend', {error: "User not found"});
 			return;
 		}
-		const userFriend = await this.friendSystemService.askFriend(user.username, friend.username);
-		if (userFriend && userFriend.is_user_friend)
+		const FriendAskList = await this.friendSystemService.getAskList(friend.username);
+		const userFriendList = await this.friendSystemService.getFriendList(user.username);
+		if (userFriendList.find((user) => user.username == friend.username))
 		{
+			this.server.to(client.id).emit('error_acceptFriend', {error: "User already accepted as friend"});
+			return;
+		}
+		else if (!FriendAskList.find((user) => user.username == user.username))
+		{
+			this.server.to(client.id).emit('error_acceptFriend', {error: "User doesnt asked you as friend"});
+			return;
+		}
+		else
+		{
+			const userFriend = await this.friendSystemService.askFriend(user.username, friend.username);
 			this.server.to(client.id).emit('success_acceptFriend', {friend: friend.username});
 			return;
 		}
-		this.server.to(client.id).emit('error_acceptFriend', {error: "User not asked as friend"});
-		return;
 	}
 
-	// @SubscribeMessage('refuseFriend')
-	// async refuseFriend(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
-	// 	const user = await this.userRepository.findOne({where: {username: this.mainServerService.getUserConnectedBySocketId(client.id).username}});
-	// 	const friend = await this.userRepository.findOne({where: {username: data.username}});
-	// 	if (!user || !friend)
-	// 	{
-	// 		this.server.to(client.id).emit('error_refuseFriend', {error: "User not found"});
-	// 		return;
-	// 	}
-	// 	const userFriend = await this.friendSystemService.unAskFriend(user.username, friend.username);
-	// 	if (userFriend && !userFriend.is_user_friend)
-	// 	{
-	// 		this.server.to(client.id).emit('success_refuseFriend', {friend: friend.username});
-	// 		return;
-	// 	}
-	// 	this.server.to(client.id).emit('error_refuseFriend', {error: "User not friend"});
-	// 	return;
-	// }
+	@SubscribeMessage('refuseFriend')
+	async refuseFriend(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
+		const user = await this.userRepository.findOne({where: {username: this.mainServerService.getUserConnectedBySocketId(client.id).username}});
+		const friend = await this.userRepository.findOne({where: {username: data.username}});
+		if (!user || !friend)
+		{
+			this.server.to(client.id).emit('error_refuseFriend', {error: "User not found"});
+			return;
+		}
+		const userFriendList = await this.friendSystemService.getFriendList(user.username);
+		const userAskList = await this.friendSystemService.getAskList(user.username);
+		if (userFriendList.find((user) => user.username == friend.username))
+		{
+			this.server.to(client.id).emit('error_refuseFriend', {error: "User already accepted as friend"});
+			return;
+		}
+		else if (!userAskList.find((user) => user.username == friend.username))
+		{
+			this.server.to(client.id).emit('error_refuseFriend', {error: "User doesnt asked you as friend or has been refused"});
+			return;
+		}
+		else
+		{
+			const userFriend = await this.friendSystemService.refuseFriend(friend.username, user.username);
+			if (!userFriend)
+			{
+				this.server.to(client.id).emit('error_refuseFriend', {error: "Unknown error while refusing friend"});
+				return;
+			}
+			this.server.to(client.id).emit('success_refuseFriend', {friend: friend.username});
+			return;
+		}
+	}
+
+	@SubscribeMessage('removeFriend')
+	async removeFriend(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
+		const user = await this.userRepository.findOne({where: {username: this.mainServerService.getUserConnectedBySocketId(client.id).username}});
+		const friend = await this.userRepository.findOne({where: {username: data.username}});
+		if (!user || !friend)
+		{
+			this.server.to(client.id).emit('error_removeFriend', {error: "User not found"});
+			return;
+		}
+		const userFriendList = await this.friendSystemService.getFriendList(user.username);
+		if (!userFriendList.find((user) => user.username == friend.username))
+		{
+			this.server.to(client.id).emit('error_removeFriend', {error: "User is not your friend"});
+			return;
+		}
+		else
+		{
+			const userFriend = await this.friendSystemService.removeFriend(user.username, friend.username);
+			if (!userFriend)
+			{
+				this.server.to(client.id).emit('error_removeFriend', {error: "Unknown error while removing friend"});
+				return;
+			}
+			this.server.to(client.id).emit('success_removeFriend', {friend: friend.username});
+			return;
+		}
+	}
 }
