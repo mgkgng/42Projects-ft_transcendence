@@ -13,13 +13,30 @@
 
 		.tools {
 			width: 100%;
-			height: 8%;
-			border-bottom: 2px solid transparentize(#fff, .6);
+			height: 10%;
+
+			button {
+				width: 48%;
+				height: 100%;
+				border-radius: 0 0 .2em .2em;
+				// padding-top: .1em;
+				background-color: transparentize(#fff, .6);
+				cursor: pointer;
+				transition: .3s;
+
+				&:nth-child(1):hover { background-color: $main-bright; }
+				&:nth-child(2):hover { background-color: $submain-lowshadeblue; }
+			}
 		}
 
 		.list {
-			padding: .5em 0;
-			padding-right: 1em;
+			padding-right: .5em;
+			gap: 0;
+			p {
+				padding-left: .5em;
+				font-size: 25px;
+				margin: .5em;
+			}
 			
 			.line {
 				position: relative;
@@ -27,7 +44,7 @@
 				height: 3em;
 
 				.room {
-					width: 90%;
+					width: 80%;
 					height: 100%;
 					cursor: pointer;
 					border-radius: 0 0em 2em 0;
@@ -35,37 +52,53 @@
 					background-color: #212121;
 					transition: .3s;
 					padding: 1em;
-
-					&:nth-child(odd) {
-						border: solid 2px transparentize(#fff, .6);
-						border-left: none;
-					}
+					border: $border-thin;
+					border-left: none;
 
 				}
+
 				.choose{
 					background-color: rgba(207, 196, 196, 0.5);
 					text-decoration: underline;
 				}
+
+				&:hover {
+					.room {
+						background-color: rgb(94, 94, 94);
+						width: 83%;
+					}
+					.button {
+						background-color: $red;
+						right: 9%;
+					}
+				}
+
 				.button {
 					z-index: 1;
 					position: absolute;
-					right: 5%;
-					width: 20%;
+					right: 15%;
+					width: 35%;
 					height: 100%;
 					border-radius: 0 .2em .2em 0;
 					background-color: transparentize(#fff, .7);
 					cursor: pointer;
-	
+					transition: .3s;
+
+					p {
+						position: absolute;
+						right: 0.2em;
+						bottom: 0.2em;
+						font-size: 15px;
+						opacity: 0;
+						transition: .3s;
+					}
+
+					&:hover {
+						right: 2%;
+						p { opacity: .5; }
+					}
 				}
 
-				&:hover {
-					.room {
-						background-color: #fff;
-					}
-					.button {
-						background-color: $red;
-					}
-				}
 
 			}
 		}
@@ -73,37 +106,54 @@
 
 	.chatroom {
 		width: 60%;
-		border-left: 2px solid transparentize(#fff, .6);
-		border-right: 2px solid transparentize(#fff, .6);
+		border-right: $border;
 
 		.read {
 			overflow-y: scroll;
 			padding: 2em;
 
 			width: 100%;
-			height: 80%;
+			height: 70%;
 
 		}
 		.write {
 			position: relative;
-			padding-left: 1.5em;
 			width: 100%;
-			height: 20%;
+			height: 30%;
 
-			border-top: 2px solid transparentize(#fff, .6);
 
 			input {
+				padding-left: 1.5em;
+				border-radius: .3em 0 .8em 0;
+
 				width: 100%;
 				height: 100%;
-				background-color: #212121;
+				background-color: transparentize($submain-lowshadeblue, .8	);
+				border-top: $border;
+				border-left: $border;
 			}
 
 			button {
 				position: absolute;
-				right: 1em;
-				bottom: 1em;
+				right: 0;
+				bottom: 0;
+				width: 3em;
+				height: 2em;
 				cursor: pointer;
+				transition: .3s;
+				border-radius: .2em 0 .8em 0;
+
+				&:hover {
+					background-color: transparentize(#fff, .7);
+				}
 			}
+		}
+
+		.no-select {
+			width: 100%;
+			height: 100%;
+			padding-left: 4em;
+			align-items: center;
 		}
 	}
 
@@ -111,7 +161,7 @@
 		position: relative;
 		width: 100%;
 		height: 3em;
-		border: 2px solid transparentize(#fff, .6);
+		border: $border;
 		background-color: #313131;
 		border-radius: .2em;
 		align-items: center;
@@ -161,6 +211,29 @@
 
 	.users {
 		width: 17%;
+		gap: 0;
+
+		p {
+			padding: 1em;
+			text-align: center;
+			border-bottom: $border;
+			background-color: transparentize($submain-blue, .3);
+		}
+
+		.list {
+			padding: .8em .5em;
+			gap: 0;
+			.user {
+				padding-left: .5em;
+				height: 1.8em;
+				cursor: pointer;
+				transition: .1s;
+				border-radius: .2em 0 .5em .2em;
+				&:hover {
+					background-color: transparentize(#fff, .7);
+				}
+			}
+		}
 	}
 </style>
 
@@ -323,9 +396,11 @@
 			itself.close();	
 		}}> -->
 		<div class="tools">
-			tools will be here
+			<button>Create</button>
+			<button>Search</button>
 		</div>
 		<div class="vflex list">
+			<p>RoomList</p>
 			{#each ($chatRoom.sortRoomsKeys([...$chatRoom.messages.keys()])) as room}
 			<div class="flex line">
 				{#if (room != actualName)}
@@ -333,7 +408,9 @@
 				{:else}
 				<div class="room chosen" on:click={() => chooseRoom({room})}>{room}</div>
 				{/if}
-				<div class="button" on:click={() => setNotVisible({room})}></div>
+				<div class="button" on:click={() => setNotVisible({room})}>
+				<p>Quit</p>
+				</div>
 			</div>
 			{/each}
 		</div>
@@ -366,16 +443,23 @@
 				<button on:click={sendMessage}>send</button>
 			</div>
 		{:else}
-			choose a room 
+			<div class="flex no-select">
+				<h2>Please select a room</h2> 
+			</div>
 		{/if}
 	</div>
 
-	<div class="users">
-		{#each actualMessages?.usersRoom as actual_user}
-			<input type="button" class="btn-room" value={actual_user.username} />
-			<input type="button" class="btn-room" value="mute" on:click={()=>muteUser(actual_user.username)}/>
-			<input type="button" class="btn-room" value="ban" on:click={()=>banUser(actual_user.username)}/>
-			<input type="button" class="btn-room" value="set Admin" on:click={()=>setAdmin(actual_user.username)}/>
-		{/each}
+	<div class="vflex users">
+		<p>Online</p>
+		<div class="vflex list">
+			{#each actualMessages?.usersRoom as actual_user}
+			<div class="user">
+				<div>{actual_user.username}</div>
+				<!-- <input type="button" class="btn-room" value="mute" on:click={()=>muteUser(actual_user.username)}/>
+				<input type="button" class="btn-room" value="ban" on:click={()=>banUser(actual_user.username)}/>
+				<input type="button" class="btn-room" value="set Admin" on:click={()=>setAdmin(actual_user.username)}/> -->
+			</div>
+			{/each}
+		</div>
 	</div>
 </div>

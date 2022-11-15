@@ -243,14 +243,14 @@
 		<Player userInfo={(roomInfo.players.length > 1) ? roomInfo.players[opponentIndex] : undefined} left={true} host={(roomInfo.players[opponentIndex]?.username == roomInfo.roomHost) ? true : false} ready={ready}/>	
 		<div class="pong-game" style="min-width: {roomInfo.mapSize[1]}px; min-height: {roomInfo.mapSize[0]}px;">
 			<Paddle pos={paddlePos[opponentIndex]} paddleWidth={roomInfo.paddleSize}
-				gameWidth={roomInfo.mapSize[0]} gameHeight={roomInfo.mapSize[1]}
-				user={false} userIndex={userIndex} userPresent={(roomInfo.players.length > 1) ? true : false}/>
+				gameHeight={roomInfo.mapSize[1]} user={false}
+				userIndex={userIndex} userPresent={(roomInfo.players.length > 1) ? true : false}/>
 			{#if puck}
 			<PongPuck posX={(userIndex == UserType.Player1) ? roomInfo.mapSize[0] - puck.posX : puck.posX}
 				posY={(userIndex == UserType.Player1) ? roomInfo.mapSize[1] - puck.posY : puck.posY} />
 			{/if}
 			<Paddle pos={paddlePos[userIndex]} paddleWidth={roomInfo.paddleSize}
-				gameWidth={roomInfo.mapSize[0]} gameHeight={roomInfo.mapSize[1]}
+				gameHeight={roomInfo.mapSize[1]}
 				user={true} userIndex={userIndex} userPresent={true}/>
 		</div>
 		<Player userInfo={roomInfo.players[userIndex]} left={false} host={(roomInfo.players[userIndex]?.username == roomInfo.roomHost) ? true : false} ready={ready}/>

@@ -10,7 +10,7 @@
 		z-index: 2;
 
 		// border: 5px solid $red;
-		box-shadow: 0px 0px 5px 5px $red;
+		box-shadow: 0px 0px 5px 5px $main-bright;
 	}
 
 	.absent {
@@ -20,7 +20,7 @@
 
 	.user {
 		margin: 0;
-		box-shadow: 0px 0px 5px 5px $blue;
+		box-shadow: 0px 0px 5px 5px $submain-blue;
 	}
 </style>
 
@@ -28,7 +28,6 @@
 	export let user: boolean;
 	export let userIndex: number;
 
-	export let gameWidth : number;
 	export let gameHeight : number;
 	export let paddleWidth : number;
 
