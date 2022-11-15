@@ -109,7 +109,7 @@ export class MainServerService {
 	{
 		const client_username : any = username;
 		const id_user = await this.dataSource.getRepository(UserEntity)
-		.createQueryBuilder().where("UserEntity.username = :u", { u: client_username }).getOneOrFail();
+		.createQueryBuilder().where("UserEntity.username_42 = :u", { u: client_username }).getOneOrFail();
 		return (id_user.id_g);
 	}
 	async getIdRoom (@MessageBody() name) //GET THE UNIQ ID OF A ROOM FIND WITH THE ROOM'S NAME 
