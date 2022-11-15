@@ -68,7 +68,7 @@
 						width: 83%;
 					}
 					.button {
-						background-color: $red;
+						background-color: $main-bright;
 						right: 9%;
 					}
 				}

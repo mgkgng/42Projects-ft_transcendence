@@ -6,6 +6,29 @@
 		padding-right: .5em;
 		justify-content: space-between;
 
+		h2 {
+			padding-bottom: .2em;
+			width: 85%;
+			border-bottom: $border-thin;
+		}
+		.search {
+			position: absolute;
+			top: 1.6em;
+			right: 1em;
+			padding: .5em;
+			border-radius: 50%;
+			transition: .1s;
+			cursor: pointer;
+			
+			img {
+				width: 2em;
+			}
+
+			&:hover {
+				background-color: transparentize(#fff, .7);
+			}
+		}
+
 		.friends-list {
 			margin-top: 1em;
 			padding-left: .2em;
@@ -93,6 +116,9 @@
 
 <div class="window friends">
 	<h2>Friends</h2>
+	<button class="search">
+		<img src="/search.png" alt="search">
+	</button>
 	{#if friends}
 	<div class="vflex friends-list">
 		{#each friends as friend}
