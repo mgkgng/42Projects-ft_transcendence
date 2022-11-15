@@ -69,19 +69,19 @@ export class OAuthStrategy extends PassportStrategy(Strategy, "oauth") {
 		}
 		else //else create the user in db
 		{
-			let new_user = new UserEntity();
-			new_user.username = user.login;
+			let new_user = new UserEntity(); 
+			new_user.username = await this.authService.get_valid_username(user.login);
 			new_user.username_42 = user.login;
 			new_user.email = data.email;
-			new_user.password = "42";
+			new_user.password = "42"; 
 			new_user.display_name = data.displayname;
 			new_user.campus_name = data.campus[0].name;
 			new_user.campus_country = data.campus[0].country;
 			new_user.is_42_user = true;
 			new_user.img_url = data.image_url;
 			new_user.is_2fa = false;
-			new_user.secret_2fa = authenticator.generateSecret();
-			new_user.otpauthUrl_2fa = authenticator.keyuri(new_user.email, 'Tanscendence', new_user.secret_2fa);
+			new_user.secret_2fa = authenticator.generateSecret(); //Create a secret for 2FA
+			new_user.otpauthUrl_2fa = authenticator.keyuri(new_user.email, 'Tanscendence', new_user.secret_2fa); //Create a Key URI code for 2FA => QR code
 			try {
 				const create = await this.userRepository.save([new_user]);
 				return ({username: data.login,

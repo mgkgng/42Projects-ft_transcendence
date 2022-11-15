@@ -4,6 +4,7 @@ import { UserService } from 'src/user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { lastValueFrom } from 'rxjs';
 import { verify } from 'jsonwebtoken';
+import { UserEntity } from 'src/entity/User.entity';
 
 @Injectable()
 export class AuthService {
@@ -74,5 +75,17 @@ export class AuthService {
 			return (false);
 		}
 	  });
+	}
+	async get_valid_username(username: string)
+	{
+		let i : number = 0;
+		let user : UserEntity;
+		let final_username = username;
+		do{
+			user = await this.userService.findOne(username + i + "");
+			if (!user)
+				i++;
+		}while(user);
+		return (username + (i ? i + "" : "" ));
 	}
 }

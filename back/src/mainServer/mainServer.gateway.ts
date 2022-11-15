@@ -18,7 +18,7 @@ import { MessageChatRoomEntity } from 'src/entity/MessageChatRoom.entity';
 import { Socket } from 'socket.io';
 import { Interval } from '@nestjs/schedule';
 import { GameEntity } from 'src/entity/Game.entity';
-
+import { Like } from 'typeorm';
 
 @WebSocketGateway({
 	cors: {
@@ -29,7 +29,9 @@ import { GameEntity } from 'src/entity/Game.entity';
 export class MainServerService {
 	constructor(
 		private dataSource : DataSource,
-		private jwtServer: JwtService, 
+		private jwtServer: JwtService,
+		@InjectRepository(UserEntity)
+		private userRepository : Repository<UserEntity>,
 	){
 	}
 	@WebSocketServer() server;
@@ -127,6 +129,30 @@ export class MainServerService {
 		.andWhere("(userRooms.ban_end < :d OR userRooms.ban_end is null)", { d: new Date() })
 		.select(["userRooms.id", "chatRoom.name", "userRooms.is_admin", "userRooms.is_owner", "chatRoom.is_password_protected", "chatRoom.is_private"]).getMany();
 		return (names_rooms);
+	}
+
+	@SubscribeMessage('getUserinDB')
+	async getUserinDB(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
+		if (data.username.length < 1)
+			return;
+		const users = await this.userRepository.find({where: {username: Like(data.username + "%")}, take: 8});
+		if (!users || users.length < 1)
+		{
+			console.log("ERROR GET USER IN DB");
+			this.server.to(client.id).emit('error_getUserinDB', {error: "No user found"});
+			return;
+		}
+		else
+		{
+			const parsedList = users.map((user) => {
+				return {username: user.username, img_url: user.img_url, status: this.getUserStatus(user.username)}});
+			const index = parsedList.indexOf(this.getUserConnectedBySocketId(client.id).username);
+			if (index > -1) {
+				parsedList.splice(index, 1);
+			}
+			this.server.to(client.id).emit('success_getUserinDB', {users: parsedList});
+			return;
+		}
 	}
 	
 }
