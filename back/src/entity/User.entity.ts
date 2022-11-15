@@ -61,6 +61,9 @@ export class UserEntity
 	@Column({default: ""})
 	img_url?: string;
 
+	@Column({default: ""})
+	img : string;
+
 	@Column({default: false})
 	is_2fa?: boolean;	
 

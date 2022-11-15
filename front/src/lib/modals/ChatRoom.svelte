@@ -234,6 +234,23 @@
 				$client.socket.emit("mute_user", { room_name : $chatRoom.actualRoomName, username_ban: username, mute_end: res});
 		}
 	}
+	let files : any;
+	
+	function handleSubmits(event) {
+		console.log(event)
+  		let image = files[0];
+		const data = new FormData();
+		data.append('file', image);
+		console.log(data, image);
+		
+		fetch("http://localhost:3000/upload_image", {
+			method: "POST",
+			body: data,
+			headers: {
+				"Authorization": "Bearer " + localStorage.getItem("transcendence-jwt"),
+			}
+		})
+	};
 </script>
 
 <div class="container">
@@ -243,6 +260,8 @@
 			allChatModal.open();
 			itself.close();	
 		}}>
+		<input type="file" bind:files >
+		<button type="submit" on:click={handleSubmits} class="btn-room">upload</button>
 		<ul>
 		{#each ($chatRoom.sortRoomsKeys([...$chatRoom.messages.keys()])) as room}
 			<li>

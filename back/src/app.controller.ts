@@ -1,13 +1,13 @@
-import { Controller, Post, Get, UseGuards, Request } from '@nestjs/common';
+import { Controller, Post, Get, UseGuards, Request, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AppService } from './app.service';
 import { AuthService } from './auth/auth.service';
-
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService,
               private authService : AuthService) {}
   // constructor(private readonly appService: AppService){}
+
 
   @Get("/")
   getHello(): string {
@@ -24,6 +24,8 @@ export class AppController {
   {
       return (this.authService.login(req.user));
   }
+
+
   @UseGuards(AuthGuard('oauth'))
   @Post("/auth42")
   async login42(@Request() req)

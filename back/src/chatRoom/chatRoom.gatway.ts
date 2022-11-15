@@ -544,7 +544,7 @@ export class ChatRoomService {
 			const id_user = await this.mainServer.getIdUser(req);
 			const res = await this.dataSource.getRepository(UserEntity).createQueryBuilder("user")
 						.where("id_g = :id", {id : id_user})
-						.select(["user.email", "user.username", "user.img_url", "user.display_name", "user.campus_name", "user.campus_country", "user.is_2fa", "user.otpauthUrl_2fa" ]).getOne();
+						.select(["user.email", "user.username", "user.img", "user.img_url", "user.display_name", "user.campus_name", "user.campus_country", "user.is_2fa", "user.otpauthUrl_2fa" ]).getOne();
         	const url = await toDataURL(res.otpauthUrl_2fa);
 			res.otpauthUrl_2fa = url;
 			client.emit("get_user_info", res);
@@ -563,7 +563,7 @@ export class ChatRoomService {
 			const id_user = await this.mainServer.getIdUserByUsername(data.username_search);
 			const res = await this.dataSource.getRepository(UserEntity).createQueryBuilder("user")
 						.where("id_g = :id", {id : id_user})
-						.select(["user.email", "user.username", "user.img_url", "user.display_name", "user.campus_name", "user.campus_country", ]).getOne();
+						.select(["user.email", "user.username", "user.img", "user.img_url", "user.display_name", "user.campus_name", "user.campus_country", ]).getOne();
 			client.emit("get_other_user_info", res);
 			return (res);
 		}catch(e)

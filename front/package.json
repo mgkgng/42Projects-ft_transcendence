@@ -26,6 +26,7 @@
 		"node-sass": "^7.0.3",
 		"sass": "^1.55.0",
 		"socket.io": "^4.5.2",
-		"socket.io-client": "^4.5.2"
+		"socket.io-client": "^4.5.2",
+		"svelte-forms-lib": "^2.0.1"
 	}
 }
