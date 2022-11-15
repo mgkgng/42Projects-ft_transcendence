@@ -369,7 +369,7 @@ export class ChatRoomService {
 				.set({is_banned: true, ban_end: ban_end})
 				.where("id_user = :u AND room = :r", {u: user_ban[0].id_g, r: room[0].id_g})
 				.execute();
-				client.emit("ban_user", data);
+				this.server.to(data.room_name).emit("ban_user", data);
 			}
 	}
 	//OK
@@ -400,7 +400,7 @@ export class ChatRoomService {
 				.set({is_muted: true, mute_end: mute_end})
 				.where("id_user = :u AND room = :r", {u: user_ban[0].id_g, r: room[0].id_g})
 				.execute();
-				client.emit("mute_user", data);
+				this.server.to(data.room_name).emit("mute_user", data);
 			}
 	}
 	//OK
@@ -409,26 +409,26 @@ export class ChatRoomService {
 	@SubscribeMessage('set_admin')
 	async setAdminUser(@MessageBody() data, @ConnectedSocket() client: Socket, @Request() req)
 	{
-			const client_username : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
-			const user : any = await this.dataSource.getRepository(UserEntity).find({where: {username_42: client_username.username_42}});
-			const user_ban : any = await this.dataSource.getRepository(UserEntity).find({where: {username: data.username_new_admin}});
-			const room : any = await this.dataSource.getRepository(ChatRoomEntity).find({where: {name: data.room_name}});
+		const client_username : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
+		const user : any = await this.dataSource.getRepository(UserEntity).find({where: {username_42: client_username.username_42}});
+		const user_ban : any = await this.dataSource.getRepository(UserEntity).find({where: {username: data.username_new_admin}});
+		const room : any = await this.dataSource.getRepository(ChatRoomEntity).find({where: {name: data.room_name}});
 
-			const is_admin = await this.dataSource.getRepository(UserChatRoomEntity).createQueryBuilder("userRoom")
-			.where("userRoom.id_user = :u AND userRoom.room = :r", {u: user[0].id_g, r: room[0].id_g})
-			.select("userRoom.is_admin").getMany();
-			if (!is_admin[0].is_admin)
-			{
-				client.emit("error_ban_user", {error: "You are not admin of the room"});
-				throw new WsException("You are not admin");
-			}
-			else
-			{
-				const res = await this.dataSource.createQueryBuilder().update(UserChatRoomEntity)
-				.where("id_user = :u AND room = :r", {u: user_ban[0].id_g, r: room[0].id_g})
-				.set({is_admin: true, is_banned: false, is_muted: false}).execute();
-				client.emit("set_admin", data);
-			}
+		const is_admin = await this.dataSource.getRepository(UserChatRoomEntity).createQueryBuilder("userRoom")
+		.where("userRoom.id_user = :u AND userRoom.room = :r", {u: user[0].id_g, r: room[0].id_g})
+		.select("userRoom.is_admin").getMany();
+		if (!is_admin[0].is_admin)
+		{
+			client.emit("error_ban_user", {error: "You are not admin of the room"});
+			throw new WsException("You are not admin");
+		}
+		else
+		{
+			const res = await this.dataSource.createQueryBuilder().update(UserChatRoomEntity)
+			.where("id_user = :u AND room = :r", {u: user_ban[0].id_g, r: room[0].id_g})
+			.set({is_admin: true, is_banned: false, is_muted: false}).execute();
+			this.server.to(data.room_name).emit("set_admin", data);
+		}
 	}
 	//Put a room in state "note visible" for a user
 	//{room_name:string}
