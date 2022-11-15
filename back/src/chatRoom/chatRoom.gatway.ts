@@ -10,7 +10,7 @@ import { MainServerService } from "../mainServer/mainServer.gateway";
 import { UseGuards, Request, HttpException } from '@nestjs/common';
 import { AuthGuard } from "@nestjs/passport";
 import { toDataURL } from "qrcode";
-// import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcrypt';
 
 // let bcrypt = require('bcryptjs')
 
@@ -94,19 +94,22 @@ export class ChatRoomService {
 	async append_user_to_room(@MessageBody() data: any, @ConnectedSocket() client: Socket, @Request() req)
 	{
 		try{
-			const id_user = await this.mainServer.getIdUser(req);
+			const user : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
+			const client_username_42 = user.username_42;
+			const id_user : any = await this.mainServer.getIdUserByUsername(client_username_42);
 			const id_room = await this.mainServer.getIdRoom(data);
+
 			const room = await this.dataSource.getRepository(ChatRoomEntity).createQueryBuilder("room").
 			where("room.id_g = :id ", {id: id_room}).getOne();
-			// const is_good_password = await bcrypt.compare(data.room_password, room.password);
-			const is_good_password = true;
-			if (room.is_password_protected && !is_good_password) //Test password
-			{
-				client.emit("error_append_user_to_room", {error: "Bad password"});
-				throw new WsException("Bad password");
-			}
+
+			const is_good_password = await bcrypt.compare(data.room_password, room.password);
+
 			const is_already_in = await this.dataSource.getRepository(UserChatRoomEntity).createQueryBuilder("userRoom").
 			where("userRoom.room = :id and userRoom.id_user = :id_u", {id: id_room, id_u : id_user}).getOne();
+
+			if (room.is_password_protected && (!is_good_password )) //Test password
+				if (!(is_already_in && is_already_in.is_owner)) //Test if user is admin
+					client.emit("error_append_user_to_room", {error: "Bad password"});
 			if (is_already_in != undefined) //Client already in room => just make this room visible for him
 			{
 				if (is_already_in.is_banned && is_already_in.ban_end > new Date())
@@ -126,6 +129,7 @@ export class ChatRoomService {
 				{id_user: id_user, room: id_room, is_admin: false, is_banned: false, is_muted: false}
 			]).execute(); //Add user to the room
 			client.emit("set_room_visible", {room_name: room.name});
+			client.emit("append_user_to_room", {room_name: room.name, is_admin: false, username: user.username});
 		}
 		catch(e){
 			console.log("getMessage Error: bad data");
