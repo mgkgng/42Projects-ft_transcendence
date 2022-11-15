@@ -139,7 +139,7 @@ export class friendSystemService {
         .getOne();
         if (isRequestedEntity == null)
             return ;
-        return await this.unFriend(first_username, second_username);
+        return await this.removeFriend(first_username, second_username);
     }
 
 	// Function to refuse a friend request if the user is the one who have been asked
