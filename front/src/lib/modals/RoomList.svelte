@@ -25,20 +25,20 @@
 		right: 8em;
 		width: 12em;
 		height: 2.5em;
+		gap: 0;
 
-		border: 2px solid transparentize(#fff, .6);
+		border: $border;
 		border-radius: .2em;
 		background-color: #212121;
 
 		label {
-			width: 50%;
+			width: 49%;
 			height: 100%;
 			font-size: 15px;
 			cursor: pointer;
 
-			&:nth-child(2) {
-				border-left: 2px solid transparentize(#fff, .6); 
-			}
+			&:nth-child(2) { border-left: $border; }
+		
 			.wrapper {
 				position: absolute;
 				width: 50%;
@@ -46,13 +46,8 @@
 				padding-top: .7em;
 			}
 
-			input {
-				display: none;	
-			}
-
-			input:checked + .wrapper {
-				background-color: $main-lowshade;
-			}
+			input { display: none;	}
+			input:checked + .wrapper { background-color: $main-lowshade; }
 		}
 	}
 
@@ -192,6 +187,7 @@
 		height: 2em;
 		background-color: #212121;
 		border: 2px solid transparentize(#fff, .6);
+		gap: 0;
 
 		justify-content: center;
 		align-items: center;

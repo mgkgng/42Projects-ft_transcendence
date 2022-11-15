@@ -126,6 +126,9 @@
 	import Modal from "$lib/tools/Modal.svelte";
 	import MainCircle from '$lib/MainCircle.svelte';
     import PlayOrChat from "$lib/modals/PlayOrChat.svelte";
+    import CreateGame from "$lib/modals/CreateGame.svelte";
+    import EnterGame from "$lib/modals/EnterGame.svelte";
+    import RoomList from "$lib/modals/RoomList.svelte";
 
 	type Circle = {
 		size: number;
@@ -134,6 +137,9 @@
 	};
 
 	let enterModal: any;
+	let enterGameModal: any;
+	let createGameModal: any;
+	let roomListModal: any;
 
 	export let title: string;
 
@@ -186,9 +192,22 @@
 
 </script>
 
-<Modal bind:this={enterModal} closeOnBgClick={true}>
-	<PlayOrChat itself={enterModal} />
+<Modal bind:this={createGameModal} closeOnBgClick={true}>
+	<CreateGame itself={createGameModal} enterGameModal={enterGameModal}/>
 </Modal>
+
+<Modal bind:this={roomListModal} closeOnBgClick={true}>
+	<RoomList itself={roomListModal} enterGameModal={enterGameModal}/>
+</Modal>
+
+<Modal bind:this={enterGameModal} closeOnBgClick={true}>
+	<EnterGame itself={enterGameModal} createGameModal={createGameModal} roomListModal={roomListModal}/>
+</Modal>
+
+<Modal bind:this={enterModal} closeOnBgClick={true}>
+	<PlayOrChat itself={enterModal} enterGameModal={enterGameModal}/>
+</Modal>
+
 
 <div class="container">
 	{#each blues as blue}

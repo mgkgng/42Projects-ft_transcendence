@@ -31,7 +31,7 @@
 
 		.list {
 			padding-right: .5em;
-			gap: 0;
+			gap: 0.1em;
 			p {
 				padding-left: .5em;
 				font-size: 25px;
@@ -54,7 +54,6 @@
 					padding: 1em;
 					border: $border-thin;
 					border-left: none;
-
 				}
 
 				.choose{
@@ -79,6 +78,7 @@
 					right: 15%;
 					width: 35%;
 					height: 100%;
+					border: $border-thin;
 					border-radius: 0 .2em .2em 0;
 					background-color: transparentize(#fff, .7);
 					cursor: pointer;
@@ -94,7 +94,7 @@
 					}
 
 					&:hover {
-						right: 2%;
+						right: 0;
 						p { opacity: .5; }
 					}
 				}
