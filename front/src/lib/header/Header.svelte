@@ -72,9 +72,12 @@
 				text-align: center;
 				transition: .1s;
 
-				&:hover { filter: brightness(80%); }
-				&:nth-child(odd):hover { background-color: transparentize($main-light, .2); }
-				&:nth-child(even):hover { background-color: transparentize($submain, .2); }
+				&:hover {
+					filter: brightness(80%);
+					background-color: transparentize(#fff, .6);
+				}
+				// &:nth-child(odd):hover { background-color: transparentize(#fff, .6); }
+				// &:nth-child(even):hover { background-color: transparentize(#fff, .6); }
 			}
 		}
 		&:focus-within .menu {

@@ -1,42 +1,72 @@
 <style lang="scss">
 	.chat {
-		width: 65vw;
-		height: 75%;
-		max-height: 90vh;
-		padding: 2em;
-		border-radius: 2em;
-	}
-	.userRoom-zone{
-		width: 25%;
-		background-color: transparentize(#000, 0.2);
-		border: 2px solid transparentize(#fff, .6);
-		border-radius: 0.5em;
-	}	
-	.room-zone {
-		width: 15%;
-		background-color: transparentize(#000, 0.2);
-		border: 2px solid transparentize(#fff, .6);
-		border-radius: 0.5em;
-	}
-	.message-zone {
-		width: 50%;
-		padding-left: 1em;
-		background-color: transparentize(#000, 0.2);
-		border: 2px solid transparentize(#fff, .6);
-	
-		color: #fff;	
-		display: flex;
-		flex-direction: column;
-		padding: 1em;
+		width: 60vw;
+		height: 75vh;
 		gap: .5em;
-		overflow-y: scroll;
+		padding: 0;
 	}
 
-	.add-room{
+	.rooms {
+		width: 22%;
+		padding: 0;
+		margin: 0;
+
+		.tools {
+			width: 100%;
+			height: 8%;
+			border-bottom: 2px solid transparentize(#fff, .6);
+		}
+
+		.list {
+			padding: 1em .2em;
+			.room {
+				
+			}
+		}
+	}
+
+	.chatroom {
+		width: 60%;
+		border-left: 2px solid transparentize(#fff, .6);
+		border-right: 2px solid transparentize(#fff, .6);
+
+		.read {
+			overflow-y: scroll;
+			padding: 2em;
+
+			width: 100%;
+			height: 80%;
+
+		}
+		.write {
+			position: relative;
+			padding-left: 1.5em;
+			width: 100%;
+			height: 20%;
+
+			border-top: 2px solid transparentize(#fff, .6);
+
+			input {
+				width: 100%;
+				height: 100%;
+				background-color: #212121;
+			}
+
+			button {
+				position: absolute;
+				right: 1em;
+				bottom: 1em;
+				cursor: pointer;
+			}
+		}
+	}
+
+	.add-room {
 		position: relative;
 		width: 100%;
 		height: 3em;
 		border: 2px solid transparentize(#fff, .6);
+		background-color: #313131;
 		border-radius: .2em;
 		align-items: center;
 		gap: 0;
@@ -48,8 +78,11 @@
 
 		.text-input {
 			margin: .5em;
+			border-radius: .2em;
 
-			width: 8em;
+			width: 35%;
+			height: 1.8em;
+
 			background-color: #fff;
 			color: #000;
 		}
@@ -58,17 +91,17 @@
 			margin: .5em;
 			border-radius: .2em;
 
-			width: 8em;
-			height: 1.4em;
+			width: 35%;
+			height: 1.8em;
 			background-color: #000;
 		}
 
-
 		button {
-			width: 5em;
+			width: 3em;
 			height: 100%;
 			position: absolute;
 			right: 0;
+			font-size: 25px;
 			cursor: pointer;
 			background-color: transparentize(#fff, .7);
 			
@@ -78,6 +111,10 @@
 
 		}
 
+	}
+
+	.users {
+		width: 18%;
 	}
 	.btn-new-room{
 		width: 50%;
@@ -262,9 +299,9 @@
 	}
 </script>
 
-<div class="vflex window chat">
+<div class="flex window chat">
 	<!--Zone de liste des rooms du user-->
-	<div class="flex add-room">
+	<!-- <div class="flex add-room">
 		<input class="text-input" placeholder="Room Name" bind:value={newRoomName}>
 		{#if (is_new_room_password_protected == true)}
 		<input class="text-input" placeholder="Password" bind:value={newRoomPassword}>
@@ -274,37 +311,32 @@
 		<input class="checkbox" type="checkbox" bind:checked={is_new_room_password_protected}>
 		<p>Password</p>
 		<button on:click={createRoom}>+</button>
-	</div>
+	</div> -->
 
-	<div class="room-zone">
-		<input class="btn-room search" value="search" on:click={() =>{
+	<div class="rooms">
+		<!-- <input class="btn-room search" value="search" on:click={() =>{
 			allChatModal.open();
 			itself.close();	
-		}}>
-		<ul>
-		{#each ($chatRoom.sortRoomsKeys([...$chatRoom.messages.keys()])) as room}
-			<li>
-				{#if (room != actualName)}
-					<button class="btn-room" on:click={chooseRoom({room})}>{room}</button>
-				{:else}
-					<button class="btn-room choose" on:click={chooseRoom({room})}>{room}</button>
-				{/if}
-				<button class="btn-room" on:click={setNotVisible({room})}>X</button>
-			</li>
-		{/each}
-		</ul>
+		}}> -->
+		<div class="tools">
+			tools will be here
+		</div>
+		<div class="list">
+			{#each ($chatRoom.sortRoomsKeys([...$chatRoom.messages.keys()])) as room}
+			{#if (room != actualName)}
+			<div class="room" on:click={() => chooseRoom({room})}>{room}</div>
+			{:else}
+			<div class="room chosen" on:click={() => chooseRoom({room})}>{room}</div>
+			{/if}
+			<button on:click={() => setNotVisible({room})}>X</button>
+			{/each}
+		</div>
 	</div>
-	<div class="userRoom-zone">
-		{#each actualMessages?.usersRoom as actual_user}
-			<input type="button" class="btn-room" value={actual_user.username} />
-			<input type="button" class="btn-room" value="mute" on:click={muteUser(actual_user.username)}/>
-			<input type="button" class="btn-room" value="ban" on:click={banUser(actual_user.username)}/>
-			<input type="button" class="btn-room" value="set Admin" on:click={setAdmin(actual_user.username)}/>
-		{/each}
-	</div>
+	
 	<!--Zone de liste des messages de la room selectionne-->
-	<div class="message-zone" bind:this={message_zone}>
+	<div class="vflex chatroom" bind:this={message_zone}>
 		{#if ($chatRoom.actualRoomName !== "")}
+			<div class="read">
 			{#if actualMessages.is_owner}
 				{#if actualMessages.is_private}
 					<input class="button" value="Set private" on:click={unset_private_room}>
@@ -322,12 +354,22 @@
 			{#each actualMessages?.messages as message}
 				<ChatRoomMessage username={message.username} content_message={message.message} itself={ itself } axelUserProfileModal={axelUserProfileModal} is_admin={actualMessages.is_admin}/>
 			{/each}
-			<input class="text-input" bind:value={newMessage}>
-			<input type="button" class="submit" value="send" on:click={sendMessage}>
+			</div>
+			<div class="write">
+				<input class="text-input" placeholder="write your message here..." bind:value={newMessage}>
+				<button on:click={sendMessage}>send</button>
+			</div>
 		{:else}
 			choose a room 
 		{/if}
 	</div>
-	<!--Zone de creation de room -->
 
+	<div class="users">
+		{#each actualMessages?.usersRoom as actual_user}
+			<input type="button" class="btn-room" value={actual_user.username} />
+			<input type="button" class="btn-room" value="mute" on:click={()=>muteUser(actual_user.username)}/>
+			<input type="button" class="btn-room" value="ban" on:click={()=>banUser(actual_user.username)}/>
+			<input type="button" class="btn-room" value="set Admin" on:click={()=>setAdmin(actual_user.username)}/>
+		{/each}
+	</div>
 </div>

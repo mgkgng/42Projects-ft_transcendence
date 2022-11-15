@@ -9,6 +9,35 @@
 		width: 100%;
 
 		min-width: 800px;
+
+		button {
+			font-size: 30px;
+			position: absolute;
+			top: 68%;
+			left: 46%;
+
+			text-align: center;
+			align-items: center;
+
+			width: 6em;
+			height: 2em;
+			border-radius: .3em;
+
+			color: #e6e6e6;
+			letter-spacing: 4px;
+			border: solid 2.5px;
+
+			background-color: #000;
+
+			transition: .5s;
+			cursor: pointer;
+
+			&:hover {
+				color: transparentize(#e6e6e6, 0.3);
+				border-color: transparentize(#e6e6e6, .7);
+				background-color: transparentize(#000, .8);
+			}
+	}
 	}
 
 	@keyframes rotate {
@@ -87,36 +116,7 @@
 		background: linear-gradient(90deg, $main 0%, #5610c6 60%, $submain 100%);
 	}
 	
-	.click {
-		font-size: 30px;
-		position: absolute;
-		top: 68%;
-		left: 46%;
-
-		text-align: center;
-		align-items: center;
-
-		width: 6em;
-		height: 2em;
-		border-radius: .3em;
-
-		color: #e6e6e6;
-		letter-spacing: 4px;
-		border-bottom: solid;
-		border: solid 2.5px;
-
-		background-color: #000;
-		padding-top: .2em;
-
-		transition: .8s;
-		cursor: pointer;
-
-		&:hover {
-			color: transparentize(#e6e6e6, 0.6);
-			border-color: transparentize(#e6e6e6, 0.9);
-			background-color: transparentize(#000, .75);
-		}
-	}
+	
 </style>
 
 <script lang="ts">
@@ -203,13 +203,13 @@
 
 	<div class="click-bg"></div>
 	{#if !login}
-	<div class="click" on:click={() => {
+	<button on:click={() => {
 		goto("https://api.intra.42.fr/oauth/authorize?client_id=7e2bea32b8d407dab9d25b1ab4ff8ec14118a99e50807a191bc47334ed598658&redirect_uri=http%3A%2F%2Flocalhost%3A3002&response_type=code");
-	}}>Login</div>
+	}}>Login</button>
 	{:else}
-	<div class="click" on:click={() => {
+	<button on:click={() => {
 		enterModal.open();
-	}}>Enter</div>
+	}}>Enter</button>
 	{/if}
 	<h1 class="title">{title}</h1>
 </div>
