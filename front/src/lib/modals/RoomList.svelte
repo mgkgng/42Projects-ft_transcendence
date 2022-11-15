@@ -186,15 +186,15 @@
 		bottom: 2em;
 		height: 2em;
 		background-color: #212121;
-		border: 2px solid transparentize(#fff, .6);
+		border: $border;
 		gap: 0;
 
 		justify-content: center;
 		align-items: center;
 
 		.info {
-			border-left: 2px solid transparentize(#fff, .6);
-			border-right: 2px solid transparentize(#fff, .6);
+			border-left: $border;
+			border-right: $border;
 			height: 100%;
 			padding: 0 1em;
 			padding-top: .3em;
