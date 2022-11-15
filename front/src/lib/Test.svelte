@@ -13,6 +13,7 @@
 		}
 		console.log('clieckd');
 	}
+	$: userSearchList = [];
 	onMount(() => {
 		$client.socket.on("success_getFriendList", (data) => {
 				console.log("success", data);
@@ -56,11 +57,31 @@
 			$client.socket.on("error_removeFriend", (data) => {
 				console.log("error", data);
 			});
+			$client.socket.on("success_getUserinDB", (data) => {
+				console.log("success", data);
+				userSearchList = data.users;
+			});
+			$client.socket.on("error_getUserinDB", (data) => {
+				console.log("error", data);
+			});
 	});
+	$: searchUser = "";
+	$: searchUser = searchUser.toLowerCase();
+	$: {
+		$client.socket.emit("getUserinDB", {username: searchUser});
+		console.log("searchUser", searchUser);
+	}
+	
 </script>
 
 <div class="testDiv">
 	<button class=".testButton" on:click={getFriendList}>HEKKi</button>
+	<input type="text" bind:value={searchUser}>
+	{#if searchUser.length > 0 && userSearchList.length > 0}
+		{#each userSearchList as user}
+			<div class="userSearchListDiv">{user.username}</div>
+		{/each}
+	{/if}
 </div>
 
 <style>
@@ -69,5 +90,8 @@
 	}
 	.testDiv {
 		background-color: green;
+	}
+	.userSearchListDiv {
+		background-color: blue;
 	}
 </style>
