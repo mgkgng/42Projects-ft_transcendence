@@ -108,7 +108,7 @@ export class GameGateway {
 
 		// TODO plus tard
 		if (this.queue.length > 1) {
-			let room = new Room([this.queue[0], this.queue[1]], [], "", 1, 10, 1, true, "", this.gameRep, this.mainServerService, this.dataSource, this.userService);
+			let room = new Room([this.queue[0], this.queue[1]], [], "", 1, 10, 1, 1, true, "", this.gameRep, this.mainServerService, this.dataSource, this.userService);
 			// TODO: think about it: if i just join a match randomlmy like this, it could be by default a private game
 			this.queue[0].room = room.id;
 			this.queue[1].room = room.id;
@@ -204,7 +204,8 @@ export class GameGateway {
 		// if (client.room.length)
 		// 	return ;
 
-		let room = new Room([data.username], [client], data.title, data.mapSize, data.maxPoint, data.difficulty, data.privateMode, data.username,
+		let room = new Room([data.username], [client], data.title, data.mapSize, data.maxPoint,
+			data.puckSpeed, data.paddleSize, data.privateMode, data.username,
 			this.gameRep, this.mainServerService, this.dataSource, this.userService);
 		this.rooms.set(room.id, room);
 
@@ -239,6 +240,25 @@ export class GameGateway {
 			roomId: data.roomId
 		});
 	}
+
+	@SubscribeMessage("ExitRoom")
+	exitRoom(@ConnectedSocket() client: Socket, @MessageBody() data: any, @Request() req) {
+		const user : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
+		let room = this.getRoom(data.roomId);
+
+		if (room.players.includes(user.username)) {
+			room.players = room.players.splice(room.players.indexOf(user.username), 1);
+			// this.clients.delete() // TODO delete from clients
+			room.broadcast("PlayerUpdate", {
+				join: false,
+				userInfo: user.username
+			});
+		}
+
+		if (!room.players.length) //TODO or should I wait for every watch client to leave the room?
+			this.rooms.delete(room.id);
+	}
+
 
 	@SubscribeMessage("isReady")
 	setReady(@MessageBody() data: any, @Request() req) {

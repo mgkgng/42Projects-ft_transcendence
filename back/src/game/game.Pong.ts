@@ -1,5 +1,4 @@
 import { Puck } from "./game.Puck"
-import { PaddleSize } from "./game.utils";
 
 export class Pong {
 	size: Array<number>;

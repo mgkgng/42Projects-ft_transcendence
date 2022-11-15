@@ -52,7 +52,7 @@ export class Room {
 		this.clients = new Map();
 		this.addClients(clients);
 
-		this.pong = new Pong(MapSize[size], PuckSpeed[puckSpeed], paddleSize[paddleSize]);
+		this.pong = new Pong(MapSize[size], PuckSpeed[puckSpeed], PaddleSize[paddleSize]);
 		this.players = players;
 
 		if (!this.hostname.length)

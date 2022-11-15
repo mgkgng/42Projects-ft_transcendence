@@ -135,10 +135,14 @@
 	$: quitRoom(resQuitConfirm);
 
 	function quitRoom(res: boolean) {
-		if (res == false)
+		if (!res) {
 			quitConfirmMsgModal.close();
-		else if (res == true)
-			itself.close();
+			return ;
+		}
+		$client.socket.emit("ExitRoom", {
+			roomId: roomId
+		})
+		itself.close();
 	}
 
 	onMount(()=> {
