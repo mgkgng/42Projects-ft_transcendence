@@ -9,3 +9,21 @@ export const UserType = {
 }
 
 export const frameDuration = 20;
+
+export const PaddleSize = {
+	"Short" : 40,
+	"Normal" : 80,
+	"Long" : 130
+}
+
+export const MapSize = {
+	"Small": [200, 300],
+	"Medium": [300, 500],
+	"Large": [400, 700]
+}
+
+export const PuckSpeed = {
+	"Slow" : 3,
+	"Normal" : 5,
+	"Fast" : 8
+}

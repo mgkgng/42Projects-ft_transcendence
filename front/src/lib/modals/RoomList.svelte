@@ -104,22 +104,35 @@
 			}
 		}
 
+		.score {
+			font-size: 25px;
+		}
+
 		.info {
-			border: 2.5px solid transparentize(#fff, .6);
-			border-radius: .3em;
+			width: 100%;
+			height: 3.5em;
+			border-top: $border-thin;
+			border-bottom: $border-thin;
+			padding: .5em;
+			font-size: 12px;
+
+			display: grid;
+			grid-template-columns: 30% 20% 20% 20%;
+			text-align: center;
 			
 			div {
-				padding: 1em;
+				padding: .2em;
+				border-right: $border-thin;
 
 				// &:nth-child(1) {
 				// 	background-color: $red;
 				// }
 
-				&:nth-child(2) {
-					height: 100%;
-					border-left: 2.5px solid transparentize(#fff, .6);
-					border-right: 2.5px solid transparentize(#fff, .6);
+				&:last-child {
+					border-right: none;
 				}
+
+				
 			}
 		}
 
@@ -195,6 +208,7 @@
 		.info {
 			border-left: $border;
 			border-right: $border;
+			width: 5em;
 			height: 100%;
 			padding: 0 1em;
 			padding-top: .3em;
@@ -207,6 +221,9 @@
 			padding-bottom: .2em;
 			background-color: #313131;
 			color: transparentize(#fff, .3);
+			transition: .1s;
+
+			&:hover { background-color: $main-bright; }
 		}
 	}
 </style>
@@ -230,6 +247,7 @@
 		: [...rooms.values()];
 	$: roomsOnPage = roomArray.slice(roomPage * perPage, roomPage * perPage + perPage);
 	$: roomPageNb = Math.ceil(roomArray?.length / perPage);
+	$: console.log(roomsOnPage);
 
 	function movePage(left: boolean){
 		if (left && (roomPage - 1) * perPage >= 0)
@@ -250,11 +268,8 @@
 		$client.socket.emit("AskRooms", { id: $client.id });
 
 		$client.socket.on("GetAllRooms", (data: any) => {
-			let roomsData = JSON.parse(data.rooms);
-			for (let roomData of roomsData)
-				rooms.set(roomData[0], roomData[1]);
-			roomArray = (showAvailable) ? [...rooms?.values()].filter(room => room.available == true)
-				: [...rooms.values()];
+			console.log("GetAllRooms");
+			roomArray = data.rooms;
 			console.log(roomArray[0]);
 		});
 		$client.socket.on("UpdateRooms", (data: any) => {
@@ -312,11 +327,12 @@
 				<div class="grey-box">?</div>
 				{/if}
 			</div>
-			<div class="flex info">
-				<div>{room.maxpoint}</div>
-				<div>{room.difficulty}</div>
-				<div>{room.width}</div>
-			</div>
+			<!-- <div class="info"> TODO
+				<div>{room.mapInfo[0]} pts</div>
+				<div>{room.mapInfo[1]} Size</div>
+				<div>{room.mapInfo[2]} Speed</div>
+				<div>{room.mapInfo[3]} Paddle</div>
+			</div> -->
 			<div class="flex buttons">
 				<button class="watch" on:click={()=>joinRoom(room.id, false)}>WATCH</button>
 				<button class="play" on:click={()=>joinRoom(room.id, true)}>PLAY</button>
@@ -333,8 +349,8 @@
 		<!-- if less than perPage, gray card -->
 	</div>
 	<div class="flex page">
-		<button on:click={()=>movePage(false)}>&lt;</button>
+		<button on:click={()=>movePage(true)}>&lt;</button>
 		<span class="info">{roomPage + 1} / {(roomPageNb) ? roomPageNb : 1}</span>
-		<button on:click={() => movePage(true)}>&gt;</button>
+		<button on:click={() => movePage(false)}>&gt;</button>
 	</div>
 </div>

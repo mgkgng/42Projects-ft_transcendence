@@ -1,7 +1,5 @@
 <style lang="scss">
-	.container {
-		display: flex;
-		flex-direction: column;
+	.player {
 		gap: .2em;
 		width: 80px;
 		color: #fff;
@@ -41,16 +39,29 @@
 			}
 		}
 
-		div {
+		.username {
 			width: 100%;
 			text-align: center;
-			transition: .5s;
+			transition: .3s;
 			padding: .2em;
 			cursor: pointer;
+			border-radius: .2em;
 
 			&:hover {
 				background-color: transparentize(#fff, .5);
 			}
+		}
+
+		.who {
+			border-radius: .2em;
+			width: 80px;
+			height: 80px;
+			border: $border;
+			font-family: 'fake-receipt';
+			font-size: 60px;
+			text-align: center;
+			padding-top: .08em;
+
 		}
 	}
 
@@ -65,9 +76,11 @@
 	export let left: boolean;
 	export let host: boolean;
 	export let ready: boolean;
+
+	console.log("this is host: ", host, userInfo?.username);
 </script>
 
-<div class="container {(left) ? "left" : ""}">
+<div class="vflex player {(left) ? "left" : ""}">
 	{#if userInfo}
 	<div class="img-box">
 		{#if host}
@@ -77,9 +90,8 @@
 		{/if}
 		<img src={userInfo.image_url} alt="profile"/>
 	</div>
-	<div>{userInfo.username}</div>
+	<div class="username">{userInfo.username_42}</div>
 	{:else}
-	<img src="/pingu/pingu-coucou.jpeg" alt="pingu" />
-	<div>???</div>
+	<div class="who">?</div>
 	{/if}
 </div>

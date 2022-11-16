@@ -36,7 +36,6 @@
 
 	let deadZoneHeight = 50;
 
-	$: console.log(paddleWidth);
 </script>
 
 <div class="paddle {(user) ? "user" : ""} {(!userPresent) ? "absent" : ""}"

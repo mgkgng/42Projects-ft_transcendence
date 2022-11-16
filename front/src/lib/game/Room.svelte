@@ -132,16 +132,16 @@
 	let tryStart: boolean = false;
 	let gameStart: boolean = false;
 
+	let winner: any;
+
 	$: quitRoom(resQuitConfirm);
 
 	function quitRoom(res: boolean) {
 		if (!res) {
-			quitConfirmMsgModal.close();
+			quitConfirmMsgModal?.close();
 			return ;
 		}
-		$client.socket.emit("ExitRoom", {
-			roomId: roomId
-		})
+		$client.socket.emit("ExitRoom", { roomId: roomId });
 		itself.close();
 	}
 
@@ -158,13 +158,10 @@
 			initPos = (roomInfo?.mapSize[0] + roomInfo?.paddleSize) / 2;
 			paddlePos = [initPos, initPos];
 
-			if (roomInfo?.players.length == 1)
-				userType = UserType.Player1;
-			else
-				userType = ($user.username == roomInfo.players[0].username) ? UserType.Player1 
-					: ($user.username == roomInfo.players?.[1].username) ? UserType.Player2 
-					: UserType.Watcher;
-
+			userType = ($user.username == roomInfo?.players[0].username_42) ? UserType.Player1 :
+				(roomInfo.players.length > 1 && $user.username == roomInfo.players[1].username_42) ? UserType.Player2 : //TODO 42 wtf???
+				UserType.Player2;
+			
 			if (userType == UserType.Player2) {
 				[userIndex, opponentIndex] = [opponentIndex, userIndex];
 				paddlePos[0] -= roomInfo?.paddleSize, paddlePos[1] -= roomInfo?.paddleSize;
@@ -178,7 +175,8 @@
 				roomInfo.players.push(data.userInfo);
 				roomInfo = roomInfo;
 			} else {
-				// leaving
+				let userIndex = (roomInfo.players[0].username_42 == user.username_42) ? 0 : 1;
+				roomInfo.players = roomInfo.players.splice(userIndex, 1);
 			}
 		})
 		
@@ -195,8 +193,10 @@
 			puck = new Puck(roomInfo?.mapSize[0], roomInfo?.mapSize[1], data.vectorX, data.vectorY);
 		});
 
-		$client.socket.on("PongStart", (data: any) => {
-			console.log("PongStart", data);
+		$client.socket.on("PongStart", () => {
+			console.log("PongStart");
+			if (!puck)
+				console.log("Pongstart Error!");
 
 			puckMoving = setInterval(() => {
 				puck.move();
@@ -216,20 +216,23 @@
 
 		$client.socket.on("ScoreUpdate", (data: any) => {
 			console.log("ScoreUpdate", data);
+
 			clearInterval(puckMoving);
-			scores[data]++;
+			scores[data.scoreTo]++;
+
 			puck = undefined;
 		});
 
 		$client.socket.on("ReadyUpdate", (data: any) => {
+			console.log("ReadyUpdate??", ready);
+
 			ready = data.ready;
-		})
+		});
 
 		$client.socket.on("GameFinished", (data: any) => {
 			console.log("GameFinished");
-			console.log((userType == data) ? "You Win!"
-				: (userType != UserType.Watcher) ? "You Lose!" 
-				: ".");
+			winner = roomInfo.players[data.winner];
+			puck = undefined;
 			gameFinishedModal.open();
 		});
 
@@ -244,7 +247,7 @@
 <div class="container">
 	{#if roomInfo}
 	<div class="pong" style="width: {roomInfo.mapSize[1] + 200}px; height: {roomInfo.mapSize[0]}px;">
-		<Player userInfo={(roomInfo.players.length > 1) ? roomInfo.players[opponentIndex] : undefined} left={true} host={(roomInfo.players[opponentIndex]?.username == roomInfo.roomHost) ? true : false} ready={ready}/>	
+		<Player userInfo={(roomInfo.players.length > 1) ? roomInfo.players[opponentIndex] : undefined} left={true} host={(roomInfo.players[opponentIndex]?.username_42 == roomInfo.roomHost) ? true : false} ready={ready}/>	
 		<div class="pong-game" style="min-width: {roomInfo.mapSize[1]}px; min-height: {roomInfo.mapSize[0]}px;">
 			<Paddle pos={paddlePos[opponentIndex]} paddleWidth={roomInfo.paddleSize}
 				gameHeight={roomInfo.mapSize[1]} user={false}
@@ -257,7 +260,7 @@
 				gameHeight={roomInfo.mapSize[1]}
 				user={true} userIndex={userIndex} userPresent={true}/>
 		</div>
-		<Player userInfo={roomInfo.players[userIndex]} left={false} host={(roomInfo.players[userIndex]?.username == roomInfo.roomHost) ? true : false} ready={ready}/>
+		<Player userInfo={roomInfo.players[userIndex]} left={false} host={(roomInfo.players[userIndex]?.username_42 == roomInfo.roomHost) ? true : false} ready={ready}/>
 		<ScoreBox score1={(roomInfo.players.length > 1) ? scores?.[opponentIndex] : "-"} score2={scores?.[userIndex]}/>
 	</div>
 	{/if}
@@ -272,14 +275,13 @@
 				return ;
 			}
 			tryStart = true;
-			$client.socket.emit("StartGame", {
-				roomId: roomId
-			})
+			$client.socket.emit("StartGame", { roomId: roomId })
 		}}>START</button>
 		{:else}
 		<button class="start loading"></button>
 		{/if}
-		{:else if userType == UserType.Player2}
+		{/if}
+		{#if userType == UserType.Player2}
 		<button class="ready" on:click={()=>{
 			$client.socket.emit("isReady", {
 				roomId: roomId,
@@ -289,11 +291,8 @@
 		{/if}
 		{/if}
 		<button class="exit" on:click={()=>{ quitConfirmMsgModal.open(); }}>EXIT</button>
-
 	</div>
-	<div class="mini-mode" on:click={()=>{
-		miniMode = true;
-	}}>_</div>
+	<div class="mini-mode" on:click={()=>{ miniMode = true; }}>_</div>
 </div>
 {:else}
 <div class="loading-box">
@@ -304,8 +303,8 @@
 what is this?
 {/if}
 
-<Modal bind:this={gameFinishedModal} closeOnBgClick={false}>
-	<GameOver />
+<Modal bind:this={gameFinishedModal} closeOnBgClick={true}>
+	<GameOver winner={winner} gameModal={itself} itself={gameFinishedModal} scores={scores}/>
 </Modal>
 
 <Modal bind:this={quitConfirmMsgModal} closeOnBgClick={false}>

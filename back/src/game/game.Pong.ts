@@ -2,6 +2,7 @@ import { Puck } from "./game.Puck"
 
 export class Pong {
 	size: Array<number>;
+	puckSpeed: number;
 	puck: Puck;
 	paddleSize: number;
 	paddlePos: Array<number>;
@@ -12,8 +13,9 @@ export class Pong {
 	constructor(size: Array<number>, puckSpeed: number, paddleSize: number) {
 		
 		this.size = size;
+		this.puckSpeed = puckSpeed;
 		this.puck = new Puck(this.size[0], this.size[1],
-			puckSpeed * ((Math.floor(Math.random() * 2)) ? 1 : -1));
+			this.puckSpeed);
 
 		this.paddleSize = paddleSize // TODO put it into createGame
 		let initPos = (this.size[0] - this.paddleSize) / 2;

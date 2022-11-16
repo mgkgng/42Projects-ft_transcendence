@@ -54,9 +54,8 @@ export class MainServerService {
 		}
 		return null;
 	}
-	
 
-	//@UseGuards(AuthGuard("jwt"))
+	@UseGuards(AuthGuard("jwt"))
 	handleConnection(@Request() req)
 	{
 		console.log("Connect to main");
@@ -64,7 +63,7 @@ export class MainServerService {
 		const client_username : string = user?.username_42;
 		let userConnected = {username: client_username, socket: req, status: "online"};
 		this.userConnectedList.push(userConnected);
-		//console.log(this.userConnectedList);
+		// console.log(this.userConnectedList);
 	}
 
 	handleDisconnect(@Request() req)

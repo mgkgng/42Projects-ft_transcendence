@@ -138,8 +138,6 @@ function socket_event_update_front(client : any) {
 			return (chatRoom);
 		});
 	});
-	client.socket.off("get_message_room", (data: any) => {
-	});
 	client.socket.on("get_message_room", (data: any) => {
 		chatRoom.update((chatRoom) => {
 			let inter : Array<Message> = [];

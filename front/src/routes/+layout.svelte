@@ -20,25 +20,20 @@
 <script lang="ts">
 	import '$lib/stores/client';
 	import '$lib/scss/app.scss';
-	import { loginState } from "$lib/stores/var";
+ 	import { loginState } from "$lib/stores/var";
 	import { client } from '$lib/stores/client';
 	import { chatRoom } from '$lib/stores/chatRoom';
     import { onMount } from 'svelte';
-	import jwt_decode from "jwt-decode";
     import { browser } from '$app/environment';
 	import io, { Socket } from "socket.io-client";
-    import { goto } from "$app/navigation";
     import { user } from '$lib/stores/user';
     import Modal from '$lib/tools/Modal.svelte';
 	import Room from "$lib/game/Room.svelte";
-
+    import { goto } from '$app/navigation';
 
 	let login: boolean;
-
 	let roomModal: any;
-
 	let roomId: string = "";
-
 
 	loginState.subscribe(value => { login = value; });
 
@@ -64,7 +59,6 @@
 					headers: {
 						'Content-Type': 'application/json'
 					},
-					//body:JSON.stringify({username: "oui", password: url.get('code')}),
 					body:JSON.stringify({username: ufa_code, password: tok.tmp_jwt}),
 				});
 				tok = await res_ufa.json();
@@ -111,16 +105,12 @@
 			await connectWithUrlCode(url);
 
 		if ($client.socket) {
-			$client.socket.off("GetConnectionInfo", (data: any) => {
-			});
 			$client.socket.on("GetConnectionInfo", (data: any) => {
 				console.log("GetConnectionInfo", data);
 				$client.id = data.id;
 				user.set(data.user);				
 			});	
 
-			$client.socket.off("RoomCreated", (data: any) => {
-			});
 			$client.socket.on("RoomCreated", (data: any) => {
 				console.log("RoomCreated", data);
 				roomId = data;
@@ -138,15 +128,11 @@
 				// and also ask for roomsDataUpdate
 			});
 
-			$client.socket.off("connection", (data: any) => {
-			});
 			$client.socket.on("connection", (data: any) => {
 				console.log("connection", data);
 				$client.connect();
 				loginState.set(true);
 				$chatRoom.LoadMessages($client);
-			});
-			$client.socket.off("get_user_info", (data: any) => {
 			});
 			$client.socket.on("get_user_info", (data: any) => {
 				client.update((value) => {

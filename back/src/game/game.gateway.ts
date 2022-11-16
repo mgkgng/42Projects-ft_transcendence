@@ -30,6 +30,7 @@ import { UserService } from "src/user/user.service";
 export class GameGateway {
 	clients: Map<string, Client>;
 	rooms: Map<string, Room>;
+	roomlistClients: Array<any>;
 	queue: Array<Client>;
 	control: Map<string, any>;
 
@@ -41,6 +42,7 @@ export class GameGateway {
 	) {
 		this.clients = new Map<string, Client>();
 		this.rooms = new Map<string, Room>();
+		this.roomlistClients = [];
 		this.queue = [];
 		this.control = new Map<string, any>();
 
@@ -63,11 +65,11 @@ export class GameGateway {
 	// 	console.log(this.rooms);
 	// }
 
-	@UseGuards(AuthGuard("jwt"))
-	async handleConnection(client: Socket) { //TODO handle connection here
-		console.log("New Connection on site.");
-		// i don't know yet how to use well this function
-	}
+	// @UseGuards(AuthGuard("jwt"))
+	// async handleConnection(client: Socket) { //TODO handle connection here
+	// 	console.log("New Connection on site.");
+	// 	// i don't know yet how to use well this function
+	// }
 
 	async handleDisconnect(@ConnectedSocket() client: Socket) { //TODO handle connection here
 		console.log("Disconnection...", client.id);
@@ -97,7 +99,6 @@ export class GameGateway {
 
 	@SubscribeMessage("JoinQueue")
 	joinQueue(@MessageBody() data: any) {
-		console.log(data);
 		console.log("Join Queue", data);
 		let client = this.getClient(data);
 		//TODO: should maybe optimize the algorithm later -- for includes
@@ -108,7 +109,7 @@ export class GameGateway {
 
 		// TODO plus tard
 		if (this.queue.length > 1) {
-			let room = new Room([this.queue[0], this.queue[1]], [], "", 1, 10, 1, 1, true, "", this.gameRep, this.mainServerService, this.dataSource, this.userService);
+			let room = new Room([this.queue[0], this.queue[1]], [], "", "Medium", 10, "Normal", "Normal", true, "", this.gameRep, this.mainServerService, this.dataSource, this.userService);
 			// TODO: think about it: if i just join a match randomlmy like this, it could be by default a private game
 			this.queue[0].room = room.id;
 			this.queue[1].room = room.id;
@@ -139,15 +140,9 @@ export class GameGateway {
 			return ;
 		}
 
-		let players = []
-		for (let player of room.players) {
-			const x = await this.getPlayerInfo(player);
-			players.push(x);
-		}
-
 		client.emit("RoomInfo", {
 			roomHost: room.hostname,
-			players: players,
+			players: room.players,
 			maxpoint: room.maxpoint,
 			scores: room.scores,
 			mapSize: [room.pong.size[0], room.pong.size[1]],
@@ -179,32 +174,32 @@ export class GameGateway {
 
 	@SubscribeMessage("AskRooms")
 	askRooms(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
-		console.log("AskRooms");
-		// let client = this.server.sockets.sockets.get(sock.id);
-		// console.log("hahaha: ", sock.id);
-		// console.log("=================================");
-		// console.log("YOYOYOYOYOYO: ", this.server.sockets.sockets.get(sock.id));
-	
-		// I need to think more about how i should save the data and how i'll send it
-		// there should be at least these information:
-		// playersInfo, availability / format (max point, map, mode...)
-		// and then if the game is going on...
-		// score...
-		
-		client.emit("GetAllRooms", {
-			rooms: JSON.stringify([...this.rooms].filter(room => !room[1].privateMode), replacer())
-		});
+		//TODO should check if it still works when the client leaves the modal
+		this.roomlistClients.push(client);
+
+		let allRooms = [];
+		for (let room of this.rooms.values()) {
+			if (room.privateMode)
+				continue ;
+			allRooms.push({
+				id: room.id,
+				players: room.players,
+				title: room.title,
+				mapInfo: room.mapInfo
+			});
+		}
+		client.emit("GetAllRooms", { rooms: allRooms });
 	}
 
 	@SubscribeMessage("CreateRoom")
-	createRoom(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
+	async createRoom(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
 		console.log("CreateRoom", data);
 		
 		// TODO should be able to have client's room state
 		// if (client.room.length)
 		// 	return ;
-
-		let room = new Room([data.username], [client], data.title, data.mapSize, data.maxPoint,
+		let user = await this.getPlayerInfo(data.username);
+		let room = new Room([user], [client], data.title, data.mapSize, data.maxPoint,
 			data.puckSpeed, data.paddleSize, data.privateMode, data.username,
 			this.gameRep, this.mainServerService, this.dataSource, this.userService);
 		this.rooms.set(room.id, room);
@@ -222,12 +217,12 @@ export class GameGateway {
 			client.emit("JoinRoomRes", { allowed: false });
 			return ;
 		} else if (data.play) {
-			room.addPlayer(client, data.username);
 			const newPlayer = await this.getPlayerInfo(data.username);
 			room.broadcast("PlayerUpdate", {
 				join: true,
 				userInfo: newPlayer
 			});
+			room.addPlayer(client, newPlayer);
 		} else {
 			room.broadcast("WatcherUpdate", { //TODO potentiellement
 				join: true
@@ -245,13 +240,18 @@ export class GameGateway {
 	exitRoom(@ConnectedSocket() client: Socket, @MessageBody() data: any, @Request() req) {
 		const user : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
 		let room = this.getRoom(data.roomId);
+		if (!room)
+			return ;
 
-		if (room.players.includes(user.username)) {
-			room.players = room.players.splice(room.players.indexOf(user.username), 1);
+		let userIndex = (room.players[0].username_42 == user.username_42) ? 0 : 
+			(room.players[1]?.username_42 == user.username_42) ? 1 :
+			-1;
+ 		if (userIndex != -1) {
+			room.players = room.players.splice(userIndex, 1);
 			// this.clients.delete() // TODO delete from clients
 			room.broadcast("PlayerUpdate", {
 				join: false,
-				userInfo: user.username
+				userInfo: user.username_42
 			});
 		}
 
@@ -259,25 +259,24 @@ export class GameGateway {
 			this.rooms.delete(room.id);
 	}
 
-
 	@SubscribeMessage("isReady")
 	setReady(@MessageBody() data: any, @Request() req) {
+		console.log("ready");
 
 		const user : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
 		let room = this.getRoom(data.roomId);
-
-		if (!room || user.username != room.players[1])//for example
+		if (!room || user.username_42 != room.players[1].username_42)//for example
 			return ;
 
 		room.ready = data.ready;
-		room.broadcast("ReadyUpdate", { ready: room.ready })
+		room.broadcast("ReadyUpdate", { ready: room.ready });
 	}
 
 	@SubscribeMessage("StartGame")
 	startGame(@ConnectedSocket() client: Socket, @MessageBody() data: any, @Request() req) {
 		const user : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
 		let room = this.getRoom(data.roomId);
-		if (!room || user.username != room.players[0])
+		if (!room || user.username_42 != room.players[0].username_42)
 			return ;
 
 		if (!room.ready) {
@@ -307,7 +306,7 @@ export class GameGateway {
 	async getChatGameMessage(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
 		let room = this.getRoom(data.roomId);
 		client.emit("getChatGameMessage", room.chat);	
-	}
+	} 
 
 	getClient(id: string) { return (this.clients.get(id)); }
 	getRoom(id: string) { return (this.rooms.get(id)); }

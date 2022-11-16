@@ -1,6 +1,7 @@
 import { Room } from "./game.Room";
 
 export class Puck {
+	puckSpeed: number;
 	posX: number;
 	posY: number;
 	vectorX: number;
@@ -9,9 +10,10 @@ export class Puck {
 	gameHeight: number;
 
 	constructor(gameWidth : number, gameHeight : number,
-		vectorY: number) { // temporary test
-		this.vectorX = (Math.floor(Math.random() * 6) + 1) * ((Math.floor(Math.random() * 2)) ? 1 : -1);
-		this.vectorY = vectorY * ((Math.floor(Math.random() * 2)) ? 1 : -1);
+		puckSpeed: number) { // temporary test
+		this.puckSpeed = puckSpeed;
+		this.vectorX = (Math.floor(Math.random() * 3) + 1) * ((Math.floor(Math.random() * 2)) ? 2 : -2);
+		this.vectorY = puckSpeed * ((Math.floor(Math.random() * 2)) ? 1 : -1);
 		this.gameWidth = gameWidth;
 		this.gameHeight = gameHeight;
 		this.posX = gameWidth / 2;
@@ -53,22 +55,19 @@ export class Puck {
 				console.log("ScoreUpdate");
 	
 				let winner = (this.vectorY > 0) ? 0 : 1;
-				room.broadcast("ScoreUpdate", { scoreTo: (this.vectorY > 0) ? 0 : 1 });
+				room.broadcast("ScoreUpdate", { scoreTo: winner });
 				room.scores[winner]++;
 
-				console.log("Actual score: ", room.scores[0], ":", room.scores[1]);
 				if (room.scores[0] == room.maxpoint || room.scores[1] == room.maxpoint) {
-					room.broadcast("GameFinished", { win: (room.scores[0] > room.scores[1]) ? 0 : 1 });
-
-					// TODO Save the game to the database
+					room.broadcast("GameFinished", { winner: winner });
 					room.putScore();
 					return ;
 				}
 
-				room.pong.puck = new Puck(room.pong.size[0], room.pong.size[1], room.difficulty);
+				room.pong.puck = new Puck(room.pong.size[0], room.pong.size[1], room.pong.puckSpeed);
 				setTimeout(() => {
 					Room.startPong(room);
-				}, 1000);
+				}, 2000);
 			}
 		}, timeOut);
 	}
