@@ -24,19 +24,19 @@ export class GameEntity {
 	@Column()
 	is_finished: boolean;
 
-	@Column()
+	@Column({nullable: true})
 	is_cancelled: boolean;
 
 	@Column({nullable: true})
 	cancelled_player?: number;
 
-	@Column()
+	@Column({nullable: true})
 	is_abandoned: boolean;
 
 	@Column({nullable: true})
 	abandoned_player?: number;
 
-	@Column()
+	@Column({nullable: true})
 	is_disconnected: boolean;
 
 	@Column({nullable: true})
