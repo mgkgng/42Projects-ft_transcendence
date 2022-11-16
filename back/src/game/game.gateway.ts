@@ -259,23 +259,18 @@ export class GameGateway {
 
 		const user : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
 		let room = this.getRoom(data.roomId);
-
-
 		if (!room || user.username_42 != room.players[1].username_42)//for example
 			return ;
 
 		room.ready = data.ready;
-		console.log("c'est grave: ", room.clients);
-		room.broadcast("ReadyUpdate", {
-			ready: room.ready
-		});
+		room.broadcast("ReadyUpdate", { ready: room.ready });
 	}
 
 	@SubscribeMessage("StartGame")
 	startGame(@ConnectedSocket() client: Socket, @MessageBody() data: any, @Request() req) {
 		const user : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
 		let room = this.getRoom(data.roomId);
-		if (!room || user.username != room.players[0])
+		if (!room || user.username_42 != room.players[0].username_42)
 			return ;
 
 		if (!room.ready) {
@@ -305,7 +300,7 @@ export class GameGateway {
 	async getChatGameMessage(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
 		let room = this.getRoom(data.roomId);
 		client.emit("getChatGameMessage", room.chat);	
-	}
+	} 
 
 	getClient(id: string) { return (this.clients.get(id)); }
 	getRoom(id: string) { return (this.rooms.get(id)); }
