@@ -162,7 +162,7 @@
 			initPos = (roomInfo?.mapSize[0] + roomInfo?.paddleSize) / 2;
 			paddlePos = [initPos, initPos];
 
-			userType = ($user.username == roomInfo?.players[0].username) ? UserType.Player1 :
+			userType = ($user.username == roomInfo?.players[0].username_42) ? UserType.Player1 :
 				(roomInfo.players.length > 1 && $user.username == roomInfo.players[1].username_42) ? UserType.Player2 : //TODO 42 wtf???
 				UserType.Player2;
 			
