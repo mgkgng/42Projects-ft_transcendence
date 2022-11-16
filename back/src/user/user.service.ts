@@ -3,13 +3,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserChatRoomEntity } from 'src/entity/UserChatRoom.entity';
 import { Repository, DataSource } from 'typeorm';
 import { UserEntity } from '../entity/User.entity';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UserService {
 	constructor(
 		@InjectRepository(UserEntity)
 		private usersRepository: Repository<UserEntity>, 
-		private dataSource : DataSource
+		private dataSource : DataSource,
+		private jwtServer: JwtService,
 	  ) {}
 	
 	  async findAll(): Promise<UserEntity[]> {
@@ -43,5 +45,22 @@ export class UserService {
 			console.log("Create User failed");
 			return (null);
 		}
+	}
+	getUsername(req)
+	{
+		const user : any = (this.jwtServer.decode(req.headers.authorization.split(' ')[1]));
+		return (user?.username_42);
+	}
+	async change_img(username : string, file : any)
+	{
+		const encoded_file = ("data:" + file.mimetype + ";base64," + file.buffer.toString('base64'));
+		this.dataSource.createQueryBuilder().update(UserEntity)
+		.set({img: encoded_file}).where({username_42: username}).execute();
+		return (encoded_file);
+	}
+	async delete_img(username : string)
+	{
+		this.dataSource.createQueryBuilder().update(UserEntity)
+		.set({img: ""}).where({username_42: username}).execute();
 	}
 }

@@ -94,6 +94,7 @@
     import AllChatModal from "$lib/modals/allChatRooms.svelte";
     import AxelUserProfile from "$lib/modals/AxelUserProfile.svelte";
     import { user } from "$lib/stores/user";
+    import { client } from "$lib/stores/client";
     import { loginState } from "$lib/stores/var";
     import Modal from "$lib/tools/Modal.svelte";
     import Setting from "../modals/Setting.svelte";
@@ -141,9 +142,13 @@
 	<div class="profile">
 		<div class="summary">
 			{#if !$user}
-			<img src="/pingu/pingu-coucou.jpeg" alt="pingu-coucou">
+				<img src="/pingu/pingu-coucou.jpeg" alt="pingu-coucou">
 			{:else}
-			<img src={$user.image_url} alt="profile" />
+				{#if !$client.user_info || $client.user_info.img === ""}
+					<img src={$user.image_url} alt="profile" />
+				{:else}
+					<img src={$client.user_info.img} alt="profile" />
+				{/if}
 			{/if}
 		</div>
 		<div class="menu">
