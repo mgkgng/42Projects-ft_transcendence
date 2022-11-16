@@ -12,7 +12,7 @@ export class Puck {
 	constructor(gameWidth : number, gameHeight : number,
 		puckSpeed: number) { // temporary test
 		this.puckSpeed = puckSpeed;
-		this.vectorX = (Math.floor(Math.random() * 6) + 1) * ((Math.floor(Math.random() * 2)) ? 1 : -1);
+		this.vectorX = (Math.floor(Math.random() * 3) + 1) * ((Math.floor(Math.random() * 2)) ? 2 : -2);
 		this.vectorY = puckSpeed * ((Math.floor(Math.random() * 2)) ? 1 : -1);
 		this.gameWidth = gameWidth;
 		this.gameHeight = gameHeight;

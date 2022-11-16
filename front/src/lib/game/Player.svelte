@@ -65,6 +65,8 @@
 	export let left: boolean;
 	export let host: boolean;
 	export let ready: boolean;
+
+	console.log("this is host: ", host, userInfo?.username);
 </script>
 
 <div class="container {(left) ? "left" : ""}">

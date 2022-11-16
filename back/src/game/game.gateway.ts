@@ -172,18 +172,6 @@ export class GameGateway {
 
 	@SubscribeMessage("AskRooms")
 	askRooms(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
-		console.log("AskRooms");
-		// let client = this.server.sockets.sockets.get(sock.id);
-		// console.log("hahaha: ", sock.id);
-		// console.log("=================================");
-		// console.log("YOYOYOYOYOYO: ", this.server.sockets.sockets.get(sock.id));
-	
-		// I need to think more about how i should save the data and how i'll send it
-		// there should be at least these information:
-		// playersInfo, availability / format (max point, map, mode...)
-		// and then if the game is going on...
-		// score...
-
 		let allRooms = [];
 		for (let room of this.rooms.values()) {
 			if (room.privateMode)
@@ -196,13 +184,7 @@ export class GameGateway {
 				mapInfo: room.mapInfo
 			});
 		}
-		console.log("whassup?", allRooms);
-		client.emit("GetAllRooms", {
-			rooms: allRooms
-		});
-		// client.emit("GetAllRooms", {
-		// 	rooms: JSON.stringify([...this.rooms].filter(room => !room[1].privateMode), replacer())
-		// });
+		client.emit("GetAllRooms", { rooms: allRooms });
 	}
 
 	@SubscribeMessage("CreateRoom")
@@ -232,11 +214,11 @@ export class GameGateway {
 			return ;
 		} else if (data.play) {
 			const newPlayer = await this.getPlayerInfo(data.username);
-			room.addPlayer(client, newPlayer);
 			room.broadcast("PlayerUpdate", {
 				join: true,
-				userInfo: room.players[1]
+				userInfo: newPlayer
 			});
+			room.addPlayer(client, newPlayer);
 		} else {
 			room.broadcast("WatcherUpdate", { //TODO potentiellement
 				join: true
@@ -273,6 +255,7 @@ export class GameGateway {
 
 	@SubscribeMessage("isReady")
 	setReady(@MessageBody() data: any, @Request() req) {
+		console.log("ready");
 
 		const user : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
 		let room = this.getRoom(data.roomId);
@@ -281,7 +264,9 @@ export class GameGateway {
 			return ;
 
 		room.ready = data.ready;
-		room.broadcast("ReadyUpdate", { ready: room.ready })
+		room.broadcast("ReadyUpdate", {
+			ready: room.ready
+		});
 	}
 
 	@SubscribeMessage("StartGame")

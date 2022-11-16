@@ -133,6 +133,10 @@
 	let gameStart: boolean = false;
 
 	$: quitRoom(resQuitConfirm);
+	$: console.log("PlayerType: ", userType);
+	$: console.log("userIndex: ", userIndex, "OpponentIndex: ", opponentIndex);
+	$: console.log("But why1111???", roomInfo?.players?.[userIndex]?.username);
+	$: console.log("But why???", roomInfo?.players?.[opponentIndex]?.username);
 
 	function quitRoom(res: boolean) {
 		if (!res) {
@@ -156,12 +160,16 @@
 			initPos = (roomInfo?.mapSize[0] + roomInfo?.paddleSize) / 2;
 			paddlePos = [initPos, initPos];
 
-			if (roomInfo?.players.length == 1)
+			if ($user.username == roomInfo?.players[0].username)
 				userType = UserType.Player1;
-			else
-				userType = ($user.username == roomInfo.players[0].username) ? UserType.Player1 
-					: ($user.username == roomInfo.players?.[1].username) ? UserType.Player2 
-					: UserType.Watcher;
+			else if (roomInfo.players.length > 1 && $user.username == roomInfo.players[1].username_42) { //TODO WTF????????
+				console.log("quand meme");
+				userType = UserType.Player2;
+			}
+			else {
+				console.log("wtf?");
+				userType = UserType.Watcher;
+			}
 
 			if (userType == UserType.Player2) {
 				[userIndex, opponentIndex] = [opponentIndex, userIndex];
@@ -220,8 +228,10 @@
 		});
 
 		$client.socket.on("ReadyUpdate", (data: any) => {
+			console.log("ReadyUpdate??", ready);
+
 			ready = data.ready;
-		})
+		});
 
 		$client.socket.on("GameFinished", (data: any) => {
 			console.log("GameFinished");
@@ -242,7 +252,7 @@
 <div class="container">
 	{#if roomInfo}
 	<div class="pong" style="width: {roomInfo.mapSize[1] + 200}px; height: {roomInfo.mapSize[0]}px;">
-		<Player userInfo={(roomInfo.players.length > 1) ? roomInfo.players[opponentIndex] : undefined} left={true} host={(roomInfo.players[opponentIndex]?.username == roomInfo.roomHost) ? true : false} ready={ready}/>	
+		<Player userInfo={(roomInfo.players.length > 1) ? roomInfo.players[opponentIndex] : undefined} left={true} host={(roomInfo.players[opponentIndex]?.username_42 == roomInfo.roomHost) ? true : false} ready={ready}/>	
 		<div class="pong-game" style="min-width: {roomInfo.mapSize[1]}px; min-height: {roomInfo.mapSize[0]}px;">
 			<Paddle pos={paddlePos[opponentIndex]} paddleWidth={roomInfo.paddleSize}
 				gameHeight={roomInfo.mapSize[1]} user={false}
@@ -255,7 +265,7 @@
 				gameHeight={roomInfo.mapSize[1]}
 				user={true} userIndex={userIndex} userPresent={true}/>
 		</div>
-		<Player userInfo={roomInfo.players[userIndex]} left={false} host={(roomInfo.players[userIndex]?.username == roomInfo.roomHost) ? true : false} ready={ready}/>
+		<Player userInfo={roomInfo.players[userIndex]} left={false} host={(roomInfo.players[userIndex]?.username_42 == roomInfo.roomHost) ? true : false} ready={ready}/>
 		<ScoreBox score1={(roomInfo.players.length > 1) ? scores?.[opponentIndex] : "-"} score2={scores?.[userIndex]}/>
 	</div>
 	{/if}
@@ -277,7 +287,8 @@
 		{:else}
 		<button class="start loading"></button>
 		{/if}
-		{:else if userType == UserType.Player2}
+		{/if}
+		{#if userType == UserType.Player2}
 		<button class="ready" on:click={()=>{
 			$client.socket.emit("isReady", {
 				roomId: roomId,

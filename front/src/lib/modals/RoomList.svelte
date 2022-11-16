@@ -221,6 +221,11 @@
 			padding-bottom: .2em;
 			background-color: #313131;
 			color: transparentize(#fff, .3);
+			transition: .1s;
+
+			&:hover {
+				background-color: $main-bright;
+			}
 		}
 	}
 </style>
@@ -229,7 +234,6 @@
 	import { onMount } from "svelte";
 	import { client } from "$lib/stores/client";
     import { user } from "$lib/stores/user";
-	import { PaddleSize, MapSize, PuckSpeed } from "$lib/stores/var";
 
 	export let itself: any;
 	export let enterGameModal: any;
@@ -245,6 +249,7 @@
 		: [...rooms.values()];
 	$: roomsOnPage = roomArray.slice(roomPage * perPage, roomPage * perPage + perPage);
 	$: roomPageNb = Math.ceil(roomArray?.length / perPage);
+	$: console.log(roomsOnPage);
 
 	function movePage(left: boolean){
 		if (left && (roomPage - 1) * perPage >= 0)
@@ -347,8 +352,8 @@
 		<!-- if less than perPage, gray card -->
 	</div>
 	<div class="flex page">
-		<button on:click={()=>movePage(false)}>&lt;</button>
+		<button on:click={()=>movePage(true)}>&lt;</button>
 		<span class="info">{roomPage + 1} / {(roomPageNb) ? roomPageNb : 1}</span>
-		<button on:click={() => movePage(true)}>&gt;</button>
+		<button on:click={() => movePage(false)}>&gt;</button>
 	</div>
 </div>
