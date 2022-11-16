@@ -7,10 +7,11 @@ import { Post } from "@nestjs/common";
 import { UseInterceptors } from "@nestjs/common";
 import { UploadedFile } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
+import { Controller } from "@nestjs/common";
 
 
 // Controller to handle the image upload
-@Injectable()
+@Controller()
 export class ImageController {
     constructor(
         private imageService : ImageService,
