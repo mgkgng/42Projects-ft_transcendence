@@ -223,9 +223,7 @@
 			color: transparentize(#fff, .3);
 			transition: .1s;
 
-			&:hover {
-				background-color: $main-bright;
-			}
+			&:hover { background-color: $main-bright; }
 		}
 	}
 </style>

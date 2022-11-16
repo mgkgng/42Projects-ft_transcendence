@@ -110,7 +110,7 @@ export class Room {
 		});
 		
 		setTimeout(() => {
-			room.broadcast("PongStart", { undefined });
+			room.broadcast("PongStart", undefined);
 			room.pong.puck.setCheckPuck(room);
 		}, 2000);
 	}

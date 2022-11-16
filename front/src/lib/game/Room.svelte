@@ -160,17 +160,10 @@
 			initPos = (roomInfo?.mapSize[0] + roomInfo?.paddleSize) / 2;
 			paddlePos = [initPos, initPos];
 
-			if ($user.username == roomInfo?.players[0].username)
-				userType = UserType.Player1;
-			else if (roomInfo.players.length > 1 && $user.username == roomInfo.players[1].username_42) { //TODO WTF????????
-				console.log("quand meme");
-				userType = UserType.Player2;
-			}
-			else {
-				console.log("wtf?");
-				userType = UserType.Watcher;
-			}
-
+			userType = ($user.username == roomInfo?.players[0].username) ? UserType.Player1 :
+				(roomInfo.players.length > 1 && $user.username == roomInfo.players[1].username_42) ? UserType.Player2 : //TODO 42 wtf???
+				UserType.Player2;
+			
 			if (userType == UserType.Player2) {
 				[userIndex, opponentIndex] = [opponentIndex, userIndex];
 				paddlePos[0] -= roomInfo?.paddleSize, paddlePos[1] -= roomInfo?.paddleSize;
@@ -201,8 +194,10 @@
 			puck = new Puck(roomInfo?.mapSize[0], roomInfo?.mapSize[1], data.vectorX, data.vectorY);
 		});
 
-		$client.socket.on("PongStart", (data: any) => {
-			console.log("PongStart", data);
+		$client.socket.on("PongStart", () => {
+			console.log("PongStart");
+			if (!puck)
+				console.log("Pongstart Error!");
 
 			puckMoving = setInterval(() => {
 				puck.move();
@@ -222,8 +217,10 @@
 
 		$client.socket.on("ScoreUpdate", (data: any) => {
 			console.log("ScoreUpdate", data);
+
 			clearInterval(puckMoving);
 			scores[data]++;
+			
 			puck = undefined;
 		});
 
@@ -238,6 +235,7 @@
 			console.log((userType == data) ? "You Win!"
 				: (userType != UserType.Watcher) ? "You Lose!" 
 				: ".");
+			puck = undefined;
 			gameFinishedModal.open();
 		});
 

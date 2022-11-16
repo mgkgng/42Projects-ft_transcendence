@@ -55,7 +55,7 @@ export class Puck {
 				console.log("ScoreUpdate");
 	
 				let winner = (this.vectorY > 0) ? 0 : 1;
-				room.broadcast("ScoreUpdate", { scoreTo: (this.vectorY > 0) ? 0 : 1 });
+				room.broadcast("ScoreUpdate", { scoreTo: winner });
 				room.scores[winner]++;
 
 				console.log("Actual score: ", room.scores[0], ":", room.scores[1]);
@@ -67,10 +67,10 @@ export class Puck {
 					return ;
 				}
 
-				room.pong.puck = new Puck(room.pong.size[0], room.pong.size[1], room.difficulty);
+				room.pong.puck = new Puck(room.pong.size[0], room.pong.size[1], room.pong.puckSpeed);
 				setTimeout(() => {
 					Room.startPong(room);
-				}, 1000);
+				}, 2000);
 			}
 		}, timeOut);
 	}
