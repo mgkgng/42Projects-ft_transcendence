@@ -32,11 +32,10 @@ export class ChatRoomService {
 		const client : Socket = req;
 		try {
 			const names = await this.mainServer.getNamesRoomsForUser(req);
-			console.log(names);
 			for (let n of names) //ADD USER TO HIS ROOMS
 			{
 				const name : string = n.room.name;
-				console.log("Join => ", n.room.name);
+				// console.log("Join => ", n.room.name);
 				client.join(n.room.name);
 			}
 		} catch (e) { console.log("error"); return (e); }
@@ -213,8 +212,7 @@ export class ChatRoomService {
 				//console.log(res);
 				client.emit('get_message_room', {messages : res, room_name: data.room_name});
 			} catch (e) {
-				console.log("getMessage Error");
-				console.log(e);
+				console.log("getMessage Error", e);
 				throw new WsException("No message in this room");
 			}
 		}catch(e){
@@ -251,8 +249,7 @@ export class ChatRoomService {
 				.getMany();
 				client.emit('get_message_room', res);
 			} catch (e) {
-				console.log("getMessage Error");
-				console.log(e);
+				console.log("getMessage Error", e);
 				throw new WsException("No message in this room");
 			}
 		}catch(e){

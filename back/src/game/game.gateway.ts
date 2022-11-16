@@ -63,11 +63,11 @@ export class GameGateway {
 	// 	console.log(this.rooms);
 	// }
 
-	@UseGuards(AuthGuard("jwt"))
-	async handleConnection(client: Socket) { //TODO handle connection here
-		console.log("New Connection on site.");
-		// i don't know yet how to use well this function
-	}
+	// @UseGuards(AuthGuard("jwt"))
+	// async handleConnection(client: Socket) { //TODO handle connection here
+	// 	console.log("New Connection on site.");
+	// 	// i don't know yet how to use well this function
+	// }
 
 	async handleDisconnect(@ConnectedSocket() client: Socket) { //TODO handle connection here
 		console.log("Disconnection...", client.id);
@@ -97,7 +97,6 @@ export class GameGateway {
 
 	@SubscribeMessage("JoinQueue")
 	joinQueue(@MessageBody() data: any) {
-		console.log(data);
 		console.log("Join Queue", data);
 		let client = this.getClient(data);
 		//TODO: should maybe optimize the algorithm later -- for includes
@@ -197,6 +196,7 @@ export class GameGateway {
 				mapInfo: room.mapInfo
 			});
 		}
+		console.log("whassup?", allRooms);
 		client.emit("GetAllRooms", {
 			rooms: allRooms
 		})

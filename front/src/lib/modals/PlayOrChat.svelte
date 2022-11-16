@@ -35,7 +35,6 @@
 	
 
 	export let itself: any;
-
 	export let enterGameModal: any;
 
 	let chatModal: any;
