@@ -16,8 +16,8 @@ export class Room {
 	title: string;
 	size: number;
 	maxpoint: number;
-	difficulty: number;
 	hostname: string;
+	mapInfo: Array<string>;
 
 	/* RoomState */
 	privateMode: boolean;
@@ -33,8 +33,8 @@ export class Room {
 	clients: Map<string, any>;
 	chat: Map<string, string>
 		
-	constructor(players: any, clients: any, title:string, size: number, maxpoint: number = 25,
-				puckSpeed : number, paddleSize:number, privateMode : boolean = true, hostname: string = "",
+	constructor(players: any, clients: any, title:string, mapSize: string, maxpoint: number,
+				puckSpeed : string, paddleSize:string, privateMode : boolean = true, hostname: string = "",
 				@InjectRepository(GameEntity) private gameRep: Repository<GameEntity>, 
 				private mainServerService : MainServerService,
 				private dataSource : DataSource,
@@ -44,6 +44,7 @@ export class Room {
 		this.maxpoint = maxpoint;
 		this.hostname = hostname;
 		this.scores = [0, 0];
+		this.mapInfo = [maxpoint.toString(), mapSize, puckSpeed, paddleSize];
 
 		this.privateMode = privateMode;
 		this.available = (players.length < 2) ? true : false;
@@ -52,24 +53,11 @@ export class Room {
 		this.clients = new Map();
 		this.addClients(clients);
 
-		this.pong = new Pong(MapSize[size], PuckSpeed[puckSpeed], PaddleSize[paddleSize]);
+		this.pong = new Pong(MapSize[mapSize], PuckSpeed[puckSpeed], PaddleSize[paddleSize]);
 		this.players = players;
 
 		if (!this.hostname.length)
 			this.startPong();
-	}
-
-	async getPlayerInfo(player: any) {
-		console.log("getplayerinfo: ", player);
-		const userdata = await this.userService.findOne(player);
-		console.log("userdata: ", userdata);
-		return ({
-			username: userdata.username,
-			displayname: userdata.display_name,
-			image_url: userdata.img_url,
-			campus_name: userdata.campus_name,
-			campus_country: userdata.campus_country,
-		});
 	}
 
 	/**

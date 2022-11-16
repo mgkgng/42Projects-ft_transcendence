@@ -136,7 +136,7 @@
 
 	function quitRoom(res: boolean) {
 		if (!res) {
-			quitConfirmMsgModal.close();
+			quitConfirmMsgModal?.close();
 			return ;
 		}
 		$client.socket.emit("ExitRoom", {

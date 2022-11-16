@@ -108,7 +108,7 @@ export class GameGateway {
 
 		// TODO plus tard
 		if (this.queue.length > 1) {
-			let room = new Room([this.queue[0], this.queue[1]], [], "", 1, 10, 1, 1, true, "", this.gameRep, this.mainServerService, this.dataSource, this.userService);
+			let room = new Room([this.queue[0], this.queue[1]], [], "", "Medium", 10, "Normal", "Normal", true, "", this.gameRep, this.mainServerService, this.dataSource, this.userService);
 			// TODO: think about it: if i just join a match randomlmy like this, it could be by default a private game
 			this.queue[0].room = room.id;
 			this.queue[1].room = room.id;
@@ -139,15 +139,9 @@ export class GameGateway {
 			return ;
 		}
 
-		let players = []
-		for (let player of room.players) {
-			const x = await this.getPlayerInfo(player);
-			players.push(x);
-		}
-
 		client.emit("RoomInfo", {
 			roomHost: room.hostname,
-			players: players,
+			players: room.players,
 			maxpoint: room.maxpoint,
 			scores: room.scores,
 			mapSize: [room.pong.size[0], room.pong.size[1]],
@@ -190,21 +184,36 @@ export class GameGateway {
 		// playersInfo, availability / format (max point, map, mode...)
 		// and then if the game is going on...
 		// score...
-		
+
+		let allRooms = [];
+		for (let room of this.rooms.values()) {
+			if (room.privateMode)
+				continue ;
+			allRooms.push({
+				id: room.id,
+				players: room.players,
+				title: room.title,
+				score: room.scores,
+				mapInfo: room.mapInfo
+			});
+		}
 		client.emit("GetAllRooms", {
-			rooms: JSON.stringify([...this.rooms].filter(room => !room[1].privateMode), replacer())
-		});
+			rooms: allRooms
+		})
+		// client.emit("GetAllRooms", {
+		// 	rooms: JSON.stringify([...this.rooms].filter(room => !room[1].privateMode), replacer())
+		// });
 	}
 
 	@SubscribeMessage("CreateRoom")
-	createRoom(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
+	async createRoom(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
 		console.log("CreateRoom", data);
 		
 		// TODO should be able to have client's room state
 		// if (client.room.length)
 		// 	return ;
-
-		let room = new Room([data.username], [client], data.title, data.mapSize, data.maxPoint,
+		let user = await this.getPlayerInfo(data.username);
+		let room = new Room([user], [client], data.title, data.mapSize, data.maxPoint,
 			data.puckSpeed, data.paddleSize, data.privateMode, data.username,
 			this.gameRep, this.mainServerService, this.dataSource, this.userService);
 		this.rooms.set(room.id, room);
@@ -222,11 +231,11 @@ export class GameGateway {
 			client.emit("JoinRoomRes", { allowed: false });
 			return ;
 		} else if (data.play) {
-			room.addPlayer(client, data.username);
 			const newPlayer = await this.getPlayerInfo(data.username);
+			room.addPlayer(client, newPlayer);
 			room.broadcast("PlayerUpdate", {
 				join: true,
-				userInfo: newPlayer
+				userInfo: room.players[1]
 			});
 		} else {
 			room.broadcast("WatcherUpdate", { //TODO potentiellement

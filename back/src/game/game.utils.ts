@@ -20,19 +20,19 @@ export function replacer() {
 }
 
 export const PaddleSize = {
-	0 : 40,
-	1 : 80,
-	2 : 130
+	"Short" : 40,
+	"Normal" : 80,
+	"Long" : 130
 }
 
 export const MapSize = {
-	0: [200, 300],
-	1: [300, 500],
-	2: [400, 700]
+	"Small": [200, 300],
+	"Medium": [300, 500],
+	"Large": [400, 700]
 }
 
 export const PuckSpeed = {
-	0 : 3,
-	1 : 5,
-	2 : 8
+	"Slow" : 3,
+	"Normal" : 5,
+	"Fast" : 8
 }

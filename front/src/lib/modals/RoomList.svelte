@@ -195,6 +195,7 @@
 		.info {
 			border-left: $border;
 			border-right: $border;
+			width: 5em;
 			height: 100%;
 			padding: 0 1em;
 			padding-top: .3em;
@@ -215,6 +216,7 @@
 	import { onMount } from "svelte";
 	import { client } from "$lib/stores/client";
     import { user } from "$lib/stores/user";
+	import { PaddleSize, MapSize, PuckSpeed } from "$lib/stores/var";
 
 	export let itself: any;
 	export let enterGameModal: any;
@@ -312,9 +314,11 @@
 				<div class="grey-box">?</div>
 				{/if}
 			</div>
+			<div class="size">{room.scores[0]} : {room.scores[1]}</div>
 			<div class="flex info">
-				<div>{room.maxpoint}</div>
-				<div>{room.difficulty}</div>
+				<div>{room.maxpoint}pts</div>
+				<div>{MapSize[toString(room.pong.size[0])]}</div>
+				<div>{PaddleSize[toString(room.pong.paddleSize)]}</div>
 				<div>{room.width}</div>
 			</div>
 			<div class="flex buttons">

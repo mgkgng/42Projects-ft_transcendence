@@ -110,11 +110,11 @@
 	export let enterGameModal: any;
 
 	let maxPoint: number = 10;
-	let puckSpeed: number = 3;
-	let mapSize: number = 2;
+	let puckSpeed: string = "Normal";
+	let mapSize: string = "Medium";
 	let privateMode: boolean = false;
 	let roomTitle: string = "";
-	let paddleSize: number = 1;
+	let paddleSize: string = "Normal";
 
 	//TODO radio -> colored block
 </script>
@@ -136,9 +136,9 @@
 		<div class="option">
 			<p>Size</p>
 			<label>
-				<input class="radio" type=radio bind:group={mapSize} name="mapSize" value={1}>Small
-				<input class="radio" type=radio bind:group={mapSize} name="mapSize" value={2}>Medium
-				<input class="radio" type=radio bind:group={mapSize} name="mapSize" value={3}>Large
+				<input class="radio" type=radio bind:group={mapSize} name="mapSize" value={"Small"}>Small
+				<input class="radio" type=radio bind:group={mapSize} name="mapSize" value={"Medium"}>Medium
+				<input class="radio" type=radio bind:group={mapSize} name="mapSize" value={"Large"}>Large
 			</label>
 		</div>
 		<div class="option">
@@ -151,17 +151,17 @@
 		<div class="option">
 			<p>Paddle Size</p>
 			<label>
-				<input class="radio" type=radio bind:group={paddleSize} name="paddleSize" value={1}>Short
-				<input class="radio" type=radio bind:group={paddleSize} name="paddleSize" value={2}>Normal
-				<input class="radio" type=radio bind:group={paddleSize} name="paddleSize" value={3}>Long
+				<input class="radio" type=radio bind:group={paddleSize} name="paddleSize" value={"Short"}>Short
+				<input class="radio" type=radio bind:group={paddleSize} name="paddleSize" value={"Normal"}>Normal
+				<input class="radio" type=radio bind:group={paddleSize} name="paddleSize" value={"Long"}>Long
 			</label>
 		</div>
 		<div class="option">
 			<p>Puck Speed</p>
 			<label>
-				<input type=radio bind:group={puckSpeed} name="puckSpeed" value={1}>Slow
-				<input type=radio bind:group={puckSpeed} name="puckSpeed" value={2}>Normal
-				<input type=radio bind:group={puckSpeed} name="puckSpeed" value={3}>Fast
+				<input type=radio bind:group={puckSpeed} name="puckSpeed" value={"Slow"}>Slow
+				<input type=radio bind:group={puckSpeed} name="puckSpeed" value={"Normal"}>Normal
+				<input type=radio bind:group={puckSpeed} name="puckSpeed" value={"Fast"}>Fast
 			</label>
 		</div>
 		<div class="option">
