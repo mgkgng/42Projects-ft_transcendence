@@ -135,10 +135,6 @@
 	let winner: any;
 
 	$: quitRoom(resQuitConfirm);
-	$: console.log("PlayerType: ", userType);
-	$: console.log("userIndex: ", userIndex, "OpponentIndex: ", opponentIndex);
-	$: console.log("But why1111???", roomInfo?.players?.[userIndex]?.username);
-	$: console.log("But why???", roomInfo?.players?.[opponentIndex]?.username);
 
 	function quitRoom(res: boolean) {
 		if (!res) {
@@ -179,7 +175,8 @@
 				roomInfo.players.push(data.userInfo);
 				roomInfo = roomInfo;
 			} else {
-				// leaving
+				let userIndex = (roomInfo.players[0].username_42 == user.username_42) ? 0 : 1;
+				roomInfo.players = roomInfo.players.splice(userIndex, 1);
 			}
 		})
 		
@@ -278,9 +275,7 @@
 				return ;
 			}
 			tryStart = true;
-			$client.socket.emit("StartGame", {
-				roomId: roomId
-			})
+			$client.socket.emit("StartGame", { roomId: roomId })
 		}}>START</button>
 		{:else}
 		<button class="start loading"></button>
@@ -296,11 +291,8 @@
 		{/if}
 		{/if}
 		<button class="exit" on:click={()=>{ quitConfirmMsgModal.open(); }}>EXIT</button>
-
 	</div>
-	<div class="mini-mode" on:click={()=>{
-		miniMode = true;
-	}}>_</div>
+	<div class="mini-mode" on:click={()=>{ miniMode = true; }}>_</div>
 </div>
 {:else}
 <div class="loading-box">

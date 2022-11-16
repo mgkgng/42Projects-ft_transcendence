@@ -327,7 +327,6 @@
 				<div class="grey-box">?</div>
 				{/if}
 			</div>
-			<div class="score">{room.score[0]} : {room.score[1]}</div>
 			<!-- <div class="info"> TODO
 				<div>{room.mapInfo[0]} pts</div>
 				<div>{room.mapInfo[1]} Size</div>

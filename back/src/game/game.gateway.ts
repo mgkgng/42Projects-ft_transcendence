@@ -30,6 +30,7 @@ import { UserService } from "src/user/user.service";
 export class GameGateway {
 	clients: Map<string, Client>;
 	rooms: Map<string, Room>;
+	roomlistClients: Array<any>;
 	queue: Array<Client>;
 	control: Map<string, any>;
 
@@ -41,6 +42,7 @@ export class GameGateway {
 	) {
 		this.clients = new Map<string, Client>();
 		this.rooms = new Map<string, Room>();
+		this.roomlistClients = [];
 		this.queue = [];
 		this.control = new Map<string, any>();
 
@@ -172,6 +174,9 @@ export class GameGateway {
 
 	@SubscribeMessage("AskRooms")
 	askRooms(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
+		//TODO should check if it still works when the client leaves the modal
+		this.roomlistClients.push(client);
+
 		let allRooms = [];
 		for (let room of this.rooms.values()) {
 			if (room.privateMode)
@@ -180,7 +185,6 @@ export class GameGateway {
 				id: room.id,
 				players: room.players,
 				title: room.title,
-				score: room.scores,
 				mapInfo: room.mapInfo
 			});
 		}
@@ -239,19 +243,21 @@ export class GameGateway {
 		if (!room)
 			return ;
 
-		if (room.players.includes(user.username)) {
-			room.players = room.players.splice(room.players.indexOf(user.username), 1);
+		let userIndex = (room.players[0].username_42 == user.username_42) ? 0 : 
+			(room.players[1]?.username_42 == user.username_42) ? 1 :
+			-1;
+ 		if (userIndex != -1) {
+			room.players = room.players.splice(userIndex, 1);
 			// this.clients.delete() // TODO delete from clients
 			room.broadcast("PlayerUpdate", {
 				join: false,
-				userInfo: user.username
+				userInfo: user.username_42
 			});
 		}
 
 		if (!room.players.length) //TODO or should I wait for every watch client to leave the room?
 			this.rooms.delete(room.id);
 	}
-
 
 	@SubscribeMessage("isReady")
 	setReady(@MessageBody() data: any, @Request() req) {
