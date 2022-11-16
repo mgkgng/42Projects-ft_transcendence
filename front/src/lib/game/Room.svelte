@@ -132,6 +132,8 @@
 	let tryStart: boolean = false;
 	let gameStart: boolean = false;
 
+	let winner: any;
+
 	$: quitRoom(resQuitConfirm);
 	$: console.log("PlayerType: ", userType);
 	$: console.log("userIndex: ", userIndex, "OpponentIndex: ", opponentIndex);
@@ -232,9 +234,7 @@
 
 		$client.socket.on("GameFinished", (data: any) => {
 			console.log("GameFinished");
-			console.log((userType == data) ? "You Win!"
-				: (userType != UserType.Watcher) ? "You Lose!" 
-				: ".");
+			winner = roomInfo.players[data.winner];
 			puck = undefined;
 			gameFinishedModal.open();
 		});
@@ -311,8 +311,8 @@
 what is this?
 {/if}
 
-<Modal bind:this={gameFinishedModal} closeOnBgClick={false}>
-	<GameOver />
+<Modal bind:this={gameFinishedModal} closeOnBgClick={true}>
+	<GameOver winner={winner} gameModal={itself} itself={gameFinishedModal} scores={scores}/>
 </Modal>
 
 <Modal bind:this={quitConfirmMsgModal} closeOnBgClick={false}>

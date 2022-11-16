@@ -58,11 +58,8 @@ export class Puck {
 				room.broadcast("ScoreUpdate", { scoreTo: winner });
 				room.scores[winner]++;
 
-				console.log("Actual score: ", room.scores[0], ":", room.scores[1]);
 				if (room.scores[0] == room.maxpoint || room.scores[1] == room.maxpoint) {
-					room.broadcast("GameFinished", { win: (room.scores[0] > room.scores[1]) ? 0 : 1 });
-
-					// TODO Save the game to the database
+					room.broadcast("GameFinished", { winner: winner });
 					room.putScore();
 					return ;
 				}
