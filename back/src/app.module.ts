@@ -22,6 +22,7 @@ import { ChatRoomService } from './chatRoom/chatRoom.gatway';
 import { ChatRoomModule } from './chatRoom/chatRoom.module';
 import { GameModule } from './game/game.module';
 import { friendSystemModule } from './friendSystem/friendSystem.module';
+import { ImageModule } from './image/image.module';
 
 @Module({
   imports: [
@@ -35,7 +36,7 @@ import { friendSystemModule } from './friendSystem/friendSystem.module';
       synchronize: true,
       autoLoadEntities: true,
     }),
-   MainServerModule, ChatRoomModule , UserModule, AuthModule, HttpModule, JwtModule, ChatDirectMessageModule, GameModule, friendSystemModule, ScheduleModule.forRoot()],
+   MainServerModule, ChatRoomModule , UserModule, AuthModule, HttpModule, JwtModule, ChatDirectMessageModule, GameModule, friendSystemModule, ImageModule, ScheduleModule.forRoot()],
   controllers: [AppController],
   providers: [AppService, AuthService],
 })
