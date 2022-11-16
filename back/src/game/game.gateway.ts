@@ -260,10 +260,12 @@ export class GameGateway {
 		const user : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
 		let room = this.getRoom(data.roomId);
 
-		if (!room || user.username != room.players[1])//for example
+
+		if (!room || user.username_42 != room.players[1].username_42)//for example
 			return ;
 
 		room.ready = data.ready;
+		console.log("c'est grave: ", room.clients);
 		room.broadcast("ReadyUpdate", {
 			ready: room.ready
 		});
