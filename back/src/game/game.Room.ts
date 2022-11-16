@@ -133,10 +133,10 @@ export class Room {
 
 	async storeGame() {
 	 	// Store the game result in db
-		const id_player1 : any = await this.mainServerService.getIdUserByUsername(this.clients[0].username);
-		const id_player2 : any = await this.mainServerService.getIdUserByUsername(this.clients[1].username);
+		const id_player1 : any = await this.mainServerService.getIdUserByUsername(this.players[0].username_42);
+		const id_player2 : any = await this.mainServerService.getIdUserByUsername(this.players[1].username_42);
 		const res_user_chat_room = await this.dataSource.createQueryBuilder().insert().into(GameEntity).values
-			([ 
+			([ 	
 				{ player1: id_player1, player2: id_player2, is_finished: true, player1_score: this.scores[0], player2_score: this.scores[1],}
 			]).execute();
 	}

@@ -219,8 +219,8 @@
 			console.log("ScoreUpdate", data);
 
 			clearInterval(puckMoving);
-			scores[data]++;
-			
+			scores[data.scoreTo]++;
+
 			puck = undefined;
 		});
 
