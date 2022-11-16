@@ -13,7 +13,7 @@ export class Pong {
 		
 		this.size = size;
 		this.puck = new Puck(this.size[0], this.size[1],
-			puckSpeed * ((Math.floor(Math.random() * 2)) ? 1 : -1));
+			puckSpeed);
 
 		this.paddleSize = paddleSize // TODO put it into createGame
 		let initPos = (this.size[0] - this.paddleSize) / 2;

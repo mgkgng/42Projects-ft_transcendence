@@ -139,9 +139,7 @@
 			quitConfirmMsgModal?.close();
 			return ;
 		}
-		$client.socket.emit("ExitRoom", {
-			roomId: roomId
-		})
+		$client.socket.emit("ExitRoom", { roomId: roomId });
 		itself.close();
 	}
 

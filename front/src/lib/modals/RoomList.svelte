@@ -104,22 +104,35 @@
 			}
 		}
 
+		.score {
+			font-size: 25px;
+		}
+
 		.info {
-			border: 2.5px solid transparentize(#fff, .6);
-			border-radius: .3em;
+			width: 100%;
+			height: 3.5em;
+			border-top: $border-thin;
+			border-bottom: $border-thin;
+			padding: .5em;
+			font-size: 12px;
+
+			display: grid;
+			grid-template-columns: 30% 20% 20% 20%;
+			text-align: center;
 			
 			div {
-				padding: 1em;
+				padding: .2em;
+				border-right: $border-thin;
 
 				// &:nth-child(1) {
 				// 	background-color: $red;
 				// }
 
-				&:nth-child(2) {
-					height: 100%;
-					border-left: 2.5px solid transparentize(#fff, .6);
-					border-right: 2.5px solid transparentize(#fff, .6);
+				&:last-child {
+					border-right: none;
 				}
+
+				
 			}
 		}
 
@@ -252,11 +265,8 @@
 		$client.socket.emit("AskRooms", { id: $client.id });
 
 		$client.socket.on("GetAllRooms", (data: any) => {
-			let roomsData = JSON.parse(data.rooms);
-			for (let roomData of roomsData)
-				rooms.set(roomData[0], roomData[1]);
-			roomArray = (showAvailable) ? [...rooms?.values()].filter(room => room.available == true)
-				: [...rooms.values()];
+			console.log("GetAllRooms");
+			roomArray = data.rooms;
 			console.log(roomArray[0]);
 		});
 		$client.socket.on("UpdateRooms", (data: any) => {
@@ -314,13 +324,13 @@
 				<div class="grey-box">?</div>
 				{/if}
 			</div>
-			<div class="size">{room.scores[0]} : {room.scores[1]}</div>
-			<div class="flex info">
-				<div>{room.maxpoint}pts</div>
-				<div>{MapSize[toString(room.pong.size[0])]}</div>
-				<div>{PaddleSize[toString(room.pong.paddleSize)]}</div>
-				<div>{room.width}</div>
-			</div>
+			<div class="score">{room.score[0]} : {room.score[1]}</div>
+			<!-- <div class="info"> TODO
+				<div>{room.mapInfo[0]} pts</div>
+				<div>{room.mapInfo[1]} Size</div>
+				<div>{room.mapInfo[2]} Speed</div>
+				<div>{room.mapInfo[3]} Paddle</div>
+			</div> -->
 			<div class="flex buttons">
 				<button class="watch" on:click={()=>joinRoom(room.id, false)}>WATCH</button>
 				<button class="play" on:click={()=>joinRoom(room.id, true)}>PLAY</button>

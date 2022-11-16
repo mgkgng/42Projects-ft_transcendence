@@ -199,7 +199,7 @@ export class GameGateway {
 		console.log("whassup?", allRooms);
 		client.emit("GetAllRooms", {
 			rooms: allRooms
-		})
+		});
 		// client.emit("GetAllRooms", {
 		// 	rooms: JSON.stringify([...this.rooms].filter(room => !room[1].privateMode), replacer())
 		// });
@@ -254,6 +254,8 @@ export class GameGateway {
 	exitRoom(@ConnectedSocket() client: Socket, @MessageBody() data: any, @Request() req) {
 		const user : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
 		let room = this.getRoom(data.roomId);
+		if (!room)
+			return ;
 
 		if (room.players.includes(user.username)) {
 			room.players = room.players.splice(room.players.indexOf(user.username), 1);
