@@ -258,10 +258,13 @@ export class GameGateway {
 			-1;
  		if (userIndex != -1) {
 			room.players.splice(userIndex, 1);
+			if (user.username_42 == room.hostname)
+				room.hostname = room.players[0].username_42;
 			// this.clients.delete() // TODO delete from clients
 			room.broadcast("PlayerUpdate", {
 				join: false,
-				userInfo: user.username_42
+				userInfo: user.username_42,
+				hostname: room.hostname
 			});
 		}
 

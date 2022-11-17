@@ -180,6 +180,8 @@
 			} else {
 				let userIndex = (roomInfo.players[0].username_42 == user.username_42) ? 0 : 1;
 				roomInfo.players = roomInfo.players.splice(userIndex, 1);
+				if (roomInfo.roomHost != data.hostname)
+					roomInfo.roomHost = data.hostname;
 			}
 		})
 		
