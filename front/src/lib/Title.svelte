@@ -37,7 +37,7 @@
 				border-color: transparentize(#e6e6e6, .7);
 				background-color: transparentize(#000, .8);
 			}
-	}
+		}
 	}
 
 	@keyframes rotate {
@@ -116,7 +116,11 @@
 		background: linear-gradient(90deg, $main 0%, #5610c6 60%, $submain 100%);
 	}
 	
-	
+	@media screen and (max-width: 950px) {
+		.container {
+			h1 { font-size: 60px; }
+		}
+	}
 </style>
 
 <script lang="ts">

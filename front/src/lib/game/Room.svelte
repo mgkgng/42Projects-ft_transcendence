@@ -321,14 +321,6 @@ what is this?
 </Modal>
 
 <svelte:window
-on:mouseup={()=>{
-	grapped = false;
-}}
-
-on:mousemove={(event)=>{
-	if (grapped)
-		console.log(event);
-}}
 
 on:keypress={(event) => {
 	if (userType == UserType.Watcher

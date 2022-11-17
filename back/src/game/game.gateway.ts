@@ -18,8 +18,8 @@ import { JwtService } from '@nestjs/jwt';
 import { GameEntity } from "src/entity/Game.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository, DataSource } from "typeorm";
-import { replacer } from "./game.utils";
 import { UserService } from "src/user/user.service";
+import { RoomUpdate } from "./game.utils";
 
 @WebSocketGateway({
 	cors: {
@@ -208,6 +208,12 @@ export class GameGateway {
 		// client.room = room.id;
 
 		client.emit("RoomCreated", room.id);
+		this.updateRooms(RoomUpdate.NewRoom, {
+			id: room.id,
+			players: room.players,
+			title: room.title,
+			mapInfo: room.mapInfo
+		});
 	}
 
 	@SubscribeMessage("JoinRoom")
@@ -223,6 +229,10 @@ export class GameGateway {
 				userInfo: newPlayer
 			});
 			room.addPlayer(client, newPlayer);
+			this.updateRooms(RoomUpdate.NewPlayer, {
+				roomId: room.id,
+				player: newPlayer
+			});
 		} else {
 			room.broadcast("WatcherUpdate", { //TODO potentiellement
 				join: true
@@ -247,7 +257,7 @@ export class GameGateway {
 			(room.players[1]?.username_42 == user.username_42) ? 1 :
 			-1;
  		if (userIndex != -1) {
-			room.players = room.players.splice(userIndex, 1);
+			room.players.splice(userIndex, 1);
 			// this.clients.delete() // TODO delete from clients
 			room.broadcast("PlayerUpdate", {
 				join: false,
@@ -255,8 +265,17 @@ export class GameGateway {
 			});
 		}
 
-		if (!room.players.length) //TODO or should I wait for every watch client to leave the room?
+		if (!room.players.length) {//TODO or should I wait for every watch client to leave the room?
+			this.updateRooms(RoomUpdate.DeleteRoom, {
+				roomId: room.id
+			});
 			this.rooms.delete(room.id);
+		} else {
+			this.updateRooms(RoomUpdate.ExitPlayer, {
+				roomId: room.id,
+				userIndex: userIndex
+			});
+		}
 	}
 
 	@SubscribeMessage("isReady")
@@ -285,6 +304,18 @@ export class GameGateway {
 		}
 		room.broadcast("GameStart", undefined);
 		room.startPong();
+	}
+
+	updateRooms(type: number, data: any) { // maybe there could be a better way?
+		this.broadcast(this.roomlistClients, "UpdateRooms", {
+			updateType: type,
+			roomData: data
+		});
+	}
+
+	broadcast(clients: any, event: string, data: any) {
+		for (let client of clients)
+			client.emit(event, data);
 	}
 
 	static broadcast(clients: any, event: string, data: any) {

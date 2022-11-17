@@ -232,7 +232,9 @@
 	import { onMount } from "svelte";
 	import { client } from "$lib/stores/client";
     import { user } from "$lib/stores/user";
-
+    import Modal from "$lib/tools/Modal.svelte";
+	import Message from "$lib/modals/Message.svelte";
+	
 	export let itself: any;
 	export let enterGameModal: any;
 
@@ -243,9 +245,12 @@
 	let roomPage: number = 0;
 	let perPage: number = 3;
 
+	let messageModal: any;
+	let modalMessage: string = "";
+
 	$: roomArray = (showAvailable) ? [...rooms?.values()].filter(room => room.available == true)
 		: [...rooms.values()];
-	$: roomsOnPage = roomArray.slice(roomPage * perPage, roomPage * perPage + perPage);
+	$: roomsOnPage = roomArray?.slice(roomPage * perPage, roomPage * perPage + perPage);
 	$: roomPageNb = Math.ceil(roomArray?.length / perPage);
 	$: console.log(roomsOnPage);
 
@@ -264,13 +269,16 @@
 		})
 	}
 
+	function updateRooms() {
+
+	}
+
 	onMount(() => {
 		$client.socket.emit("AskRooms", { id: $client.id });
 
 		$client.socket.on("GetAllRooms", (data: any) => {
 			console.log("GetAllRooms");
 			roomArray = data.rooms;
-			console.log(roomArray[0]);
 		});
 		$client.socket.on("UpdateRooms", (data: any) => {
 			if (data.method == "ADD")
@@ -281,20 +289,25 @@
 		});
 
 		$client.socket.on("JoinRoomRes", (data: any) => {
-			
 			if (data.allowed) {
 				itself.close();
 				return ;
+			} else {
+				modalMessage = "You cannot enter this room";
+				messageModal.open();
 			}
-			// If couldn't join the game, there should be an error message
-			// and also ask for roomsDataUpdate
 		});
 
-		return (() => {
-			// maybe remove listeners here?
+		$client.socket.on("RoomListUpdate", (data: any) => {
+			console.log("Updated", data);
+			rooms = data.rooms;
 		});
 	});
 </script>
+
+<Modal bind:this={messageModal}>
+	<Message itself={messageModal} msg={modalMessage}/>
+</Modal>
 
 <div class="vflex container">
 	<div class="button-box">
