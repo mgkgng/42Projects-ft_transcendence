@@ -36,22 +36,9 @@
 
 	export let itself: any;
 	export let enterGameModal: any;
-
-	let chatModal: any;
-	let axelUserProfileModal : any;
-	let allChatModal : any;
+	export let chatRoomModal: any;
 	
 </script>
-
-<Modal bind:this={chatModal} closeOnBgClick={true}>
-	<ChatRoom itself={chatModal} axelUserProfileModal={axelUserProfileModal} allChatModal={allChatModal} />
-</Modal>
-<Modal bind:this={allChatModal} closeOnBgClick={true} >
-	<AllChatRooms itself={allChatModal} ChatRoomsModal={chatModal}/>
-</Modal>
-<Modal bind:this={axelUserProfileModal} closeOnBgClick={true} >
-	<AxelUserProfile itself={axelUserProfileModal} ChatRoomsModal={chatModal}/>
-</Modal>
 
 <div class="flex buttons">
 	<button class="play" on:click={()=>{
@@ -59,7 +46,7 @@
 		itself.close();
 	}}>Play</button>
 	<button class="chat" on:click={()=>{
-		chatModal.open();
+		chatRoomModal.open();
 		itself.close();
 	}}>Chat</button>
 </div>

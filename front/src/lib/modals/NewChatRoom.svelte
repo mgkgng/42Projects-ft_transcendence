@@ -246,8 +246,8 @@
     import ChatRoomMessage from "$lib/tools/chatRoomMessage.svelte";
 
 	export let itself: any; 
-	export let axelUserProfileModal : any;
-	export let allChatModal: any;
+	// export let axelUserProfileModal : any;
+	// export let allChatModal: any;
 
 	let newRoomName : string; //Valeur du insert de création de room
 	let newMessage : string;  //Valeur du insert d'envoie de message
