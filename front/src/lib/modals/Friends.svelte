@@ -41,17 +41,26 @@
 				border: $border-thin;
 				border-radius: .2em;
 
-				&:focus {
-					background-color: transparentize(#fff, .5);
-				}
+				&:focus { background-color: transparentize(#fff, .5); }
 			}
 
 			.result {
 				position: absolute;
-				top: 1.8em;
+				top: 2em;
 				padding-top: .5em;
 				width: 85%;
-				background-color: transparentize(#fff, .6);
+				background-color: transparentize(#fff, .8);
+				border-radius: .1em;
+
+				.user {
+					padding: 0 .6em;
+					padding-bottom: .4em;
+				}
+
+				p {
+					padding: 0 .6em;
+					padding-bottom: .4em;
+				}
 			}
 		}
 
@@ -109,10 +118,10 @@
 		}
 
 		.no-friend {
-			padding-top: 2em;
+			padding-left: 3em;
+			padding-bottom: 3em;
 			height: 80%;
 			display: flex;
-			justify-content: center;
 			align-items: center;
 		}
 	}
@@ -149,10 +158,6 @@
 	});
 </script>
 
-<div class="search-bar">
-</div>
-
-
 <div class="vflex window friends">
 	<h2>Friends</h2>
 	<div class="search">
@@ -187,7 +192,7 @@
 	</div>
 	{:else}
 	<div class="no-friend">
-		<p>You don't have friends yet</p>
+		<p>You have no friends yet</p>
 	</div>
 	{/if}
 	<CloseButton window={itself} />
