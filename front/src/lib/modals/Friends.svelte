@@ -5,6 +5,7 @@
 		padding-bottom: .2em;
 		padding-right: .5em;
 		justify-content: space-between;
+		gap: .2em;
 
 		h2 {
 			padding-bottom: .2em;
@@ -26,6 +27,31 @@
 
 			&:hover {
 				background-color: transparentize(#fff, .9);
+			}
+		}
+
+		.search-bar {
+			position: relative;
+			
+			input {
+				width: 85%;
+				height: 2em;
+				background-color: transparentize(#fff, .8);
+				padding: .5em;
+				border: $border-thin;
+				border-radius: .2em;
+
+				&:focus {
+					background-color: transparentize(#fff, .5);
+				}
+			}
+
+			.result {
+				position: absolute;
+				top: 1.8em;
+				padding-top: .5em;
+				width: 85%;
+				background-color: transparentize(#fff, .6);
 			}
 		}
 
@@ -100,6 +126,10 @@
 	export let itself: any;
 
 	let friends: Array<any>
+	let searchUser: string = "";
+	let userSearchList: Array<any> = [];
+
+	$: { $client.socket.emit("getUserinDB", {username: searchUser}); }
 
 	onMount(() => {
 		$client.socket.emit("getFriendList");
@@ -110,15 +140,39 @@
 
 		$client.socket.on("success_getFriendList", (data: any) => {
 			console.log(data);
-		})
+		});
+
+		$client.socket.on("success_getUserinDB", (data: any) => {
+			console.log("success", data);
+			userSearchList = data.users;
+		});
 	});
 </script>
 
-<div class="window friends">
+<div class="search-bar">
+</div>
+
+
+<div class="vflex window friends">
 	<h2>Friends</h2>
-	<button class="search">
+	<div class="search">
 		<img src="/search.png" alt="search">
-	</button>
+	</div>
+	<div class="flex search-bar">
+		<input class="bar" type="text" placeholder="Search for users" bind:value={searchUser}>
+			{#if searchUser.length}
+			<div class="result">
+				{#if userSearchList.length}
+				{#each userSearchList as user}
+				<div class="user">{user.username}</div>
+				{/each}
+				{:else if searchUser.length && !userSearchList.length}
+				<p>No result found</p>
+				{/if}
+			</div>
+			{/if}
+	</div>
+
 	{#if friends}
 	<div class="vflex friends-list">
 		{#each friends as friend}

@@ -129,6 +129,7 @@
     import CreateGame from "$lib/modals/CreateGame.svelte";
     import EnterGame from "$lib/modals/EnterGame.svelte";
     import RoomList from "$lib/modals/RoomList.svelte";
+    import NewChatRoom from "./modals/NewChatRoom.svelte";
 
 	type Circle = {
 		size: number;
@@ -140,6 +141,7 @@
 	let enterGameModal: any;
 	let createGameModal: any;
 	let roomListModal: any;
+	let chatRoomModal: any;
 
 	export let title: string;
 
@@ -192,20 +194,28 @@
 
 </script>
 
-<Modal bind:this={createGameModal} closeOnBgClick={true}>
+<Modal bind:this={createGameModal}>
 	<CreateGame itself={createGameModal} enterGameModal={enterGameModal}/>
 </Modal>
 
-<Modal bind:this={roomListModal} closeOnBgClick={true}>
+<Modal bind:this={createGameModal}>
+	<CreateGame itself={createGameModal} enterGameModal={enterGameModal}/>
+</Modal>
+
+<Modal bind:this={roomListModal}>
 	<RoomList itself={roomListModal} enterGameModal={enterGameModal}/>
 </Modal>
 
-<Modal bind:this={enterGameModal} closeOnBgClick={true}>
+<Modal bind:this={enterGameModal}>
 	<EnterGame itself={enterGameModal} createGameModal={createGameModal} roomListModal={roomListModal}/>
 </Modal>
 
-<Modal bind:this={enterModal} closeOnBgClick={true}>
-	<PlayOrChat itself={enterModal} enterGameModal={enterGameModal}/>
+<Modal bind:this={enterModal}>
+	<PlayOrChat itself={enterModal} enterGameModal={enterGameModal} chatRoomModal={chatRoomModal}/>
+</Modal>
+
+<Modal bind:this={chatRoomModal}>
+	<NewChatRoom itself={chatRoomModal} />
 </Modal>
 
 
