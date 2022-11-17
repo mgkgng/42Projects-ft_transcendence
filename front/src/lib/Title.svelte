@@ -198,10 +198,6 @@
 	<CreateGame itself={createGameModal} enterGameModal={enterGameModal}/>
 </Modal>
 
-<Modal bind:this={createGameModal}>
-	<CreateGame itself={createGameModal} enterGameModal={enterGameModal}/>
-</Modal>
-
 <Modal bind:this={roomListModal}>
 	<RoomList itself={roomListModal} enterGameModal={enterGameModal}/>
 </Modal>

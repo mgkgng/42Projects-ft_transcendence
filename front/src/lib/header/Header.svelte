@@ -111,6 +111,8 @@
 
 	let lol: any;
 
+	$:console.log($user);
+
 	loginState.subscribe(value => { login = value; })
 
 	function handleLogout() {
@@ -122,7 +124,7 @@
 </script>
 
 <Modal bind:this={profileModal} closeOnBgClick={true}>
-	<UserProfile userProfile={$user}/>
+	<UserProfile profileUser={$user}/>
 </Modal>
 <Modal bind:this={settingModal} closeOnBgClick={true} >
 	<Setting itself={settingModal}/>
