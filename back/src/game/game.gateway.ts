@@ -239,7 +239,7 @@ export class GameGateway {
 			})
 			room.addClient(client);
 		}
-
+		console.log("PARDON?????", data);
 		client.emit("JoinRoomRes", {
 			allowed: true,
 			roomId: data.roomId

@@ -122,7 +122,7 @@
 			});
 
 			$client.socket.on("JoinRoomRes", (data: any) => {
-				console.log("coucou?", data);
+				console.log("WTF?", data);
 				if (data.allowed) {
 					roomId = data.roomId;
 					roomModal.open();
