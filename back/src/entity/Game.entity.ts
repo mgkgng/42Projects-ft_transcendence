@@ -21,7 +21,7 @@ export class GameEntity {
 	@Column()
 	date_game: Date;
 
-	@Column()
+	@Column({default: true})
 	is_finished: boolean;
 
 	@Column({nullable: true})
