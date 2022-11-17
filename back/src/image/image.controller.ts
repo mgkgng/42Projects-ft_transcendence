@@ -1,6 +1,6 @@
 import { ImageService } from "./image.service";
 import { ImageEntity } from "src/entity/Image.entity";
-import { MainServerService } from "src/mainServer/mainServer.gateway";
+import { MainServerService } from "src/mainServer/mainServer.service";
 import { JwtService } from "@nestjs/jwt";
 import { Injectable } from "@nestjs/common";
 import { Post } from "@nestjs/common";

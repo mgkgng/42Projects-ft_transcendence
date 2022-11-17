@@ -13,7 +13,7 @@ import {Room} from "./game.Room"
 import { UseGuards, Request, HttpException } from '@nestjs/common';
 import { AuthGuard } from "@nestjs/passport";
 import { UserBlockEntity } from "src/entity/UserBlock.entity";
-import { MainServerService } from "src/mainServer/mainServer.gateway";
+import { MainServerService } from "src/mainServer/mainServer.service";
 import { JwtService } from '@nestjs/jwt';
 import { GameEntity } from "src/entity/Game.entity";
 import { InjectRepository } from "@nestjs/typeorm";

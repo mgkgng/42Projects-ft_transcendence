@@ -4,7 +4,8 @@ import { Socket } from 'socket.io';
 import { ChatRoomEntity } from "src/entity/ChatRoom.entity";
 import { MessageChatRoomEntity } from "src/entity/MessageChatRoom.entity";
 import { DataSource } from "typeorm";
-import { MainServerService } from "../mainServer/mainServer.gateway";
+import { MainServerService } from "src/mainServer/mainServer.service";
+
 import { UseGuards, Request, HttpException } from '@nestjs/common';
 import { friendSystemService } from "./friendSystem.service";
 import { Inject } from "@nestjs/common";

@@ -6,7 +6,7 @@ import { MessageChatRoomEntity } from "src/entity/MessageChatRoom.entity";
 import { UserEntity } from "src/entity/User.entity";
 import { UserChatRoomEntity } from "src/entity/UserChatRoom.entity";
 import { DataSource } from "typeorm";
-import { MainServerService } from "../mainServer/mainServer.gateway";
+import { MainServerService } from "src/mainServer/mainServer.service";
 import { UseGuards, Request, HttpException } from '@nestjs/common';
 import { AuthGuard } from "@nestjs/passport";
 import { toDataURL } from "qrcode";

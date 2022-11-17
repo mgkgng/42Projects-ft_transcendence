@@ -14,7 +14,7 @@ import { ChatRoomEntity } from './entity/ChatRoom.entity';
 import { GameEntity } from './entity/Game.entity';
 import { MessageChatRoomEntity } from './entity/MessageChatRoom.entity';
 import { UserBlockEntity } from './entity/UserBlock.entity';
-import { MainServerService } from './mainServer/mainServer.gateway';
+import { MainServerService } from './mainServer/mainServer.service';
 import { MainServerModule } from './mainServer/mainServer.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ChatDirectMessageModule } from './chatDirectMessage/chatDirectMessage.module';

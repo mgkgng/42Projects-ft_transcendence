@@ -5,7 +5,7 @@ import { DataSource } from "typeorm";
 import { GameEntity } from "src/entity/Game.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { MainServerService } from "src/mainServer/mainServer.gateway";
+import { MainServerService } from "src/mainServer/mainServer.service";
 import { UserService } from "src/user/user.service";
 import { MapSize, PaddleSize, PuckSpeed } from "./game.utils";
 

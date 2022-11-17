@@ -4,7 +4,8 @@ import { friendSystemController } from './friendSystem.controller';
 import { friendSystemService } from './friendSystem.service';
 import { TypeOrmModule } from '@nestjs/typeorm'; 
 import { UserFriendEntity } from 'src/entity/UserFriend.entity';
-import { MainServerService } from 'src/mainServer/mainServer.gateway';
+import { MainServerService } from "src/mainServer/mainServer.service";
+
 import { JwtService } from '@nestjs/jwt';
 import { friendSystemGateway } from './friendSystem.gateway';
 

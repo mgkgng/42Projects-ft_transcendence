@@ -1,7 +1,7 @@
 import { Inject } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway } from "@nestjs/websockets";
-import { MainServerService } from "src/mainServer/mainServer.gateway";
+import { MainServerService } from "src/mainServer/mainServer.service";
 import { ChatDirectMessageService } from "./chatDirectMessage.service";
 import { Repository } from "typeorm";
 import { UserEntity } from "src/entity/User.entity";

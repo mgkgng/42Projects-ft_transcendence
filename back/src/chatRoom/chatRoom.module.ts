@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { MainServerService } from '../mainServer/mainServer.gateway';
+import { MainServerService } from "src/mainServer/mainServer.service";
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from 'src/entity/User.entity';
 import { UserChatRoomEntity } from 'src/entity/UserChatRoom.entity';

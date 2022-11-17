@@ -5,7 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ChatDirectMessageEntity } from 'src/entity/ChatDirectMessage.entity';
 import { UserEntity } from 'src/entity/User.entity';
 import { UserFriendEntity } from 'src/entity/UserFriend.entity';
-import { MainServerService } from 'src/mainServer/mainServer.gateway';
+import { MainServerService } from "src/mainServer/mainServer.service";
 import { JwtService } from '@nestjs/jwt';
 import { ChatDirectMessageGateway } from './chatDirectMessage.gateway';
 

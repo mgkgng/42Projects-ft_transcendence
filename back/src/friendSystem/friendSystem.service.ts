@@ -3,7 +3,8 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { UserEntity } from "src/entity/User.entity";
 import { UserFriendEntity } from "src/entity/UserFriend.entity";
 import { Repository } from "typeorm";
-import { MainServerService } from "src/mainServer/mainServer.gateway";
+import { MainServerService } from "src/mainServer/mainServer.service";
+
 
 @Injectable()
 export class friendSystemService {

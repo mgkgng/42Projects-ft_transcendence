@@ -3,7 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { ChatDirectMessageEntity } from 'src/entity/ChatDirectMessage.entity';
 import { QueryResult, Repository } from "typeorm";
 import { UserEntity } from 'src/entity/User.entity';
-import { MainServerService } from "src/mainServer/mainServer.gateway";
+import { MainServerService } from "src/mainServer/mainServer.service";
 import { ChatDirectMessageService } from './chatDirectMessage.service';
 
 @Controller()

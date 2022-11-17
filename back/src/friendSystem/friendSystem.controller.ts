@@ -6,7 +6,8 @@ import { UserEntity } from "src/entity/User.entity";
 import { UserFriendEntity } from "src/entity/UserFriend.entity";
 import { Repository } from "typeorm";
 import { friendSystemService } from "./friendSystem.service";
-import { MainServerService } from "src/mainServer/mainServer.gateway";
+import { MainServerService } from "src/mainServer/mainServer.service";
+
 
 @Controller()
 export class friendSystemController {
