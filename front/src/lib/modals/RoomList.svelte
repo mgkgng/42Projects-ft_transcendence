@@ -234,6 +234,7 @@
     import { user } from "$lib/stores/user";
     import Modal from "$lib/tools/Modal.svelte";
 	import Message from "$lib/modals/Message.svelte";
+	import { RoomUpdate } from "$lib/stores/var";
 	
 	export let itself: any;
 	export let enterGameModal: any;
@@ -269,10 +270,6 @@
 		})
 	}
 
-	function updateRooms() {
-
-	}
-
 	onMount(() => {
 		$client.socket.emit("AskRooms", { id: $client.id });
 
@@ -281,11 +278,14 @@
 			roomArray = data.rooms;
 		});
 		$client.socket.on("UpdateRooms", (data: any) => {
-			if (data.method == "ADD")
-				rooms.set(data.id, data.roomInfo);
-			else
-				rooms.delete(data.id);
-			rooms = rooms;
+			if (data.type == RoomUpdate.NewRoom)
+				rooms.set(data.roomData.id, data.roomData);
+			else if (data.type == RoomUpdate.DeleteRoom)
+				rooms.delete(data.roomData.id);
+			else if (data.type == RoomUpdate.PlayerJoin)
+				rooms.get(data.roomData.id).players.push(data.roomData.player);
+			else 
+				rooms.get(data.roomData.id).players.splice(data.roomData.userIndex, 1);
 		});
 
 		$client.socket.on("JoinRoomRes", (data: any) => {

@@ -229,8 +229,8 @@ export class GameGateway {
 				userInfo: newPlayer
 			});
 			room.addPlayer(client, newPlayer);
-			this.updateRooms(RoomUpdate.NewPlayer, {
-				roomId: room.id,
+			this.updateRooms(RoomUpdate.PlayerJoin, {
+				id: room.id,
 				player: newPlayer
 			});
 		} else {
@@ -267,12 +267,12 @@ export class GameGateway {
 
 		if (!room.players.length) {//TODO or should I wait for every watch client to leave the room?
 			this.updateRooms(RoomUpdate.DeleteRoom, {
-				roomId: room.id
+				id: room.id
 			});
 			this.rooms.delete(room.id);
 		} else {
-			this.updateRooms(RoomUpdate.ExitPlayer, {
-				roomId: room.id,
+			this.updateRooms(RoomUpdate.PlayerExit, {
+				id: room.id,
 				userIndex: userIndex
 			});
 		}

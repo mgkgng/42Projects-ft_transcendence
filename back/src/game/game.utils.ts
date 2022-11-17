@@ -40,6 +40,6 @@ export const PuckSpeed = {
 export const RoomUpdate = {
 	NewRoom: 0,
 	DeleteRoom: 1,
-	NewPlayer: 2,
-	ExitPlayer: 3
+	PlayerJoin: 2,
+	PlayerExit: 3
 }
