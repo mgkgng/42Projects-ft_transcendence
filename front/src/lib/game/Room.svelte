@@ -101,7 +101,7 @@
     import Player from '$lib/game/Player.svelte';
 
 	export let roomId: string;
-	export let itself: any;
+	export let itself: any;	
 
 	let roomInfo: any;
 
