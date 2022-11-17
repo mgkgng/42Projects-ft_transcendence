@@ -278,14 +278,16 @@
 			roomArray = data.rooms;
 		});
 		$client.socket.on("UpdateRooms", (data: any) => {
-			if (data.type == RoomUpdate.NewRoom)
+			console.log("updaterooms", data);
+			if (data.updateType == RoomUpdate.NewRoom)
 				rooms.set(data.roomData.id, data.roomData);
-			else if (data.type == RoomUpdate.DeleteRoom)
+			else if (data.updateType == RoomUpdate.DeleteRoom)
 				rooms.delete(data.roomData.id);
-			else if (data.type == RoomUpdate.PlayerJoin)
+			else if (data.updateType == RoomUpdate.PlayerJoin)
 				rooms.get(data.roomData.id).players.push(data.roomData.player);
 			else 
 				rooms.get(data.roomData.id).players.splice(data.roomData.userIndex, 1);
+			rooms = rooms;
 		});
 
 		$client.socket.on("JoinRoomRes", (data: any) => {
@@ -293,6 +295,7 @@
 				itself.close();
 				return ;
 			} else {
+				console.log("coucou?");
 				modalMessage = "You cannot enter this room";
 				messageModal.open();
 			}
