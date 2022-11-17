@@ -36,8 +36,11 @@
 </style>
 
 <script lang="ts">
+    import { client } from "$lib/stores/client";
+
 	export let msg: string;
-	export let result: boolean;
+	export let toQuit: any;
+	export let roomId: string;
 	export let itself: any;
 </script>
 
@@ -45,12 +48,11 @@
 	<p>{msg}</p>
 	<div class="flex buttons">
 		<button class="cancel" on:click={()=>{
-			result = false;
 			itself.close();
 		}}>Cancel</button>
 		<button class="quit" on:click={()=>{
-			result = true;
-			itself.close();
+			$client.socket.emit("ExitRoom", { roomId: roomId });
+			toQuit.close();
 		}}>Quit</button>
 	</div>
 </div>

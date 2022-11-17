@@ -173,7 +173,7 @@ export class GameGateway {
 	}
 
 	@SubscribeMessage("AskRooms")
-	askRooms(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
+	askRooms(@ConnectedSocket() client: Socket) {
 		//TODO should check if it still works when the client leaves the modal
 		this.roomlistClients.push(client);
 

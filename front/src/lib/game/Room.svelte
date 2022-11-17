@@ -20,9 +20,25 @@
 	.pong {
 		position: relative;
 		padding: 0;
+		gap: .2em;
 
 		display: flex;
 		justify-content: center;
+
+		.side {
+			width: 6em;
+			height: 100%;
+			align-items: center;
+			gap: .2em;
+
+			h1 {
+				color: #fff;
+				font-size: 65px;
+			}
+		}
+		.right {
+			flex-direction: column-reverse;
+		}
 	}
 	
 	.pong-game {
@@ -93,7 +109,6 @@
 	import Paddle from '$lib/game/Paddle.svelte';
 	import { Puck } from '$lib/pong/Puck';
     import PongPuck from '$lib/game/PongPuck.svelte';
-    import ScoreBox from '$lib/game/ScoreBox.svelte';
     import Modal from '$lib/tools/Modal.svelte';
     import GameOver from '$lib/modals/GameOver.svelte';
     import ConfirmMsg from '$lib/modals/ConfirmMsg.svelte';
@@ -116,7 +131,6 @@
 	let paddlePos: Array<number>;
 
 	let quitConfirmMsgModal: any;
-	let resQuitConfirm: boolean;
 
 	let grapped = false;
 	let deathPoint: number;
@@ -133,17 +147,6 @@
 	let gameStart: boolean = false;
 
 	let winner: any;
-
-	$: quitRoom(resQuitConfirm);
-
-	function quitRoom(res: boolean) {
-		if (!res) {
-			quitConfirmMsgModal?.close();
-			return ;
-		}
-		$client.socket.emit("ExitRoom", { roomId: roomId });
-		itself.close();
-	}
 
 	onMount(()=> {
 		$client.socket.emit("RoomCheck", {
@@ -219,6 +222,7 @@
 
 			clearInterval(puckMoving);
 			scores[data.scoreTo]++;
+			scores = scores;
 
 			puck = undefined;
 		});
@@ -246,8 +250,11 @@
 {#if roomFound}
 <div class="container">
 	{#if roomInfo}
-	<div class="pong" style="width: {roomInfo.mapSize[1] + 200}px; height: {roomInfo.mapSize[0]}px;">
-		<Player userInfo={(roomInfo.players.length > 1) ? roomInfo.players[opponentIndex] : undefined} left={true} host={(roomInfo.players[opponentIndex]?.username_42 == roomInfo.roomHost) ? true : false} ready={ready}/>	
+	<div class="flex pong" style="width: {roomInfo.mapSize[1] + 200}px; height: {roomInfo.mapSize[0]}px;">
+		<div class="vflex side">
+			<Player userInfo={(roomInfo.players.length > 1) ? roomInfo.players[opponentIndex] : undefined} left={true} host={(roomInfo.players[opponentIndex]?.username_42 == roomInfo.roomHost) ? true : false} ready={ready}/>	
+			<h1>{scores[opponentIndex]}</h1>
+		</div>
 		<div class="pong-game" style="min-width: {roomInfo.mapSize[1]}px; min-height: {roomInfo.mapSize[0]}px;">
 			<Paddle pos={paddlePos[opponentIndex]} paddleWidth={roomInfo.paddleSize}
 				gameHeight={roomInfo.mapSize[1]} user={false}
@@ -260,8 +267,10 @@
 				gameHeight={roomInfo.mapSize[1]}
 				user={true} userIndex={userIndex} userPresent={true}/>
 		</div>
-		<Player userInfo={roomInfo.players[userIndex]} left={false} host={(roomInfo.players[userIndex]?.username_42 == roomInfo.roomHost) ? true : false} ready={ready}/>
-		<ScoreBox score1={(roomInfo.players.length > 1) ? scores?.[opponentIndex] : "-"} score2={scores?.[userIndex]}/>
+		<div class="vflex side right">
+			<Player userInfo={roomInfo.players[userIndex]} left={false} host={(roomInfo.players[userIndex]?.username_42 == roomInfo.roomHost) ? true : false} ready={ready}/>
+			<h1>{scores[userIndex]}</h1>
+		</div>
 	</div>
 	{/if}
 	<div class="button-container">
@@ -308,7 +317,7 @@ what is this?
 </Modal>
 
 <Modal bind:this={quitConfirmMsgModal} closeOnBgClick={false}>
-	<ConfirmMsg msg={"Are you sure you want to quit?"} bind:result={resQuitConfirm} itself={quitConfirmMsgModal}/>
+	<ConfirmMsg msg={"Are you sure you want to quit?"} toQuit={itself} roomId={roomId} itself={quitConfirmMsgModal}/>
 </Modal>
 
 <svelte:window
