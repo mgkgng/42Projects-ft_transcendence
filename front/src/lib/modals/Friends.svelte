@@ -47,20 +47,37 @@
 			.result {
 				position: absolute;
 				top: 2em;
-				padding-top: .5em;
 				width: 85%;
 				background-color: transparentize(#fff, .8);
 				border-radius: .1em;
 
-				.user {
-					padding: 0 .6em;
-					padding-bottom: .4em;
+				.line {
+					padding: .5em .6em;
+					gap: .4em;
+					cursor: pointer;
+					align-items: center;
+
+					img {
+						margin-left: .2em;
+						width: 25px;
+						height: 25px;
+						object-fit: cover;
+						border-radius: 50%;
+					}
+
+					.status {
+						width: 8px;
+						height: 8px;
+						border-radius: 50%;
+					}
+
+					&:hover { background-color: transparentize($main-dark, .7); }
 				}
 
 				p {
 					padding: 0 .6em;
 					padding-bottom: .4em;
-				}
+				}	
 			}
 		}
 
@@ -131,13 +148,18 @@
     import CloseButton from "$lib/items/CloseButton.svelte";
 	import { client } from "$lib/stores/client";
     import { onMount } from "svelte";
+    import Modal from "../tools/Modal.svelte";
+    import UserProfile from "./UserProfile.svelte";
 
 	export let itself: any;
 
 	let friends: Array<any>
 	let searchUser: string = "";
 	let userSearchList: Array<any> = [];
+	let userProfileModal: any;
 
+	$: searchUser = "";
+	$: searchUser = searchUser.toLowerCase();
 	$: { $client.socket.emit("getUserinDB", {username: searchUser}); }
 
 	onMount(() => {
@@ -158,6 +180,10 @@
 	});
 </script>
 
+<Modal bind:this={userProfileModal}>
+	<UserProfile />
+</Modal>
+
 <div class="vflex window friends">
 	<h2>Friends</h2>
 	<div class="search">
@@ -169,7 +195,13 @@
 			<div class="result">
 				{#if userSearchList.length}
 				{#each userSearchList as user}
-				<div class="user">{user.username}</div>
+				<div class="flex line">
+					<img src="{user.img_url}" alt="user">
+					<div class="user" on:click={() => {
+						$client.socket.emit("getUserProfile", { username: user.username });
+					}}>{user.username}</div>
+					<!-- <div class="status" style="background-color: {()}"></div> -->
+				</div>
 				{/each}
 				{:else if searchUser.length && !userSearchList.length}
 				<p>No result found</p>

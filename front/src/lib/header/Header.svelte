@@ -122,7 +122,7 @@
 </script>
 
 <Modal bind:this={profileModal} closeOnBgClick={true}>
-	<UserProfile />
+	<UserProfile userProfile={$user}/>
 </Modal>
 <Modal bind:this={settingModal} closeOnBgClick={true} >
 	<Setting itself={settingModal}/>

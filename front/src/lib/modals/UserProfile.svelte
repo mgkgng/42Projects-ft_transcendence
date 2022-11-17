@@ -74,21 +74,18 @@
 <div class="window profile">
 	<div class="flex info-zone">
 		<!-- <div class="photo-zone">
-			{#if !profileUser}
-			<img src="/pingu/pingu-angry.jpeg" alt="pingu-angry">
-			{:else}
 			<img src={profileUser.image_url} alt="grosse-tete">
-			{/if}
 		</div>
 		<p>Username: {profileUser.username}</p>
 		<p>Campus : {profileUser.campus_name}, {profileUser.campus_country}</p> -->
 	</div>
-	<!-- {#if $user.username != } -->
+	{#if !profileUser.username == $user.username}
 	<div class="flex tool-zone">
 		<button>Add</button>
 		<button>Block</button>
 		<button>Message</button>
 	</div>
+	{/if}
 	
 	<div class="history-zone">
 		No Game History Yet
