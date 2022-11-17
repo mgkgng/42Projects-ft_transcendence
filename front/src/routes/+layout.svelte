@@ -70,12 +70,13 @@
 					Authorization: "Bearer " + tok.access_token,
 				}
 			});
+			console.log(tok.access_token)
 			localStorage.setItem('transcendence-jwt', tok.access_token);
 			$client.connect();
-			const val : any = await jwt_decode(localStorage.getItem("transcendence-jwt"));
 			loginState.set(true);
 			goto('/');
 		}catch(e){
+			console.log("NOT CONNECTED");
 			loginState.set(false);
 			localStorage.removeItem('transcendence-jwt');
 		}
