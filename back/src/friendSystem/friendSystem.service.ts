@@ -5,7 +5,6 @@ import { UserFriendEntity } from "src/entity/UserFriend.entity";
 import { Repository } from "typeorm";
 import { MainServerService } from "src/mainServer/mainServer.service";
 
-
 @Injectable()
 export class friendSystemService {
     constructor(
