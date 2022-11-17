@@ -1,11 +1,23 @@
 <style lang="scss">
 	.message {
-		width: 500px;
+		width: 350px;
 		height: 200px;
+		padding-top: 2.8em;
+
+		h3 {
+			font-size: 22px;
+		}
+
+		align-items: center;
+		justify-content: space-around;
+
 		button {
-			width: 4em;
-			height: 2.5em;
+			width: 5em;
+			height: 3em;
 			transition: .3s;
+			border: $border;
+			border-radius: .3em;
+			cursor: pointer;
 			&:hover { background-color: $main-dark; }
 		}
 	}
@@ -15,10 +27,9 @@
 	export let itself: any;
 	export let msg: string;
 
-	$:console.log("coucou, le modal est ouvert!");
 </script>
 
 <div class="vflex window message">
-	<h2>{msg}</h2>
+	<h3>{msg}</h3>
 	<button on:click={()=>{ itself.close(); }}>Close</button>
 </div>

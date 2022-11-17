@@ -246,9 +246,6 @@
 	let roomPage: number = 0;
 	let perPage: number = 3;
 
-	let messageModal: any;
-	let modalMessage: string = "";
-
 	$: roomArray = (showAvailable) ? [...rooms?.values()].filter(room => room.available == true)
 		: [...rooms.values()];
 	$: roomsOnPage = roomArray?.slice(roomPage * perPage, roomPage * perPage + perPage);
@@ -291,14 +288,8 @@
 		});
 
 		$client.socket.on("JoinRoomRes", (data: any) => {
-			if (data.allowed) {
+			if (data.allowed)
 				itself.close();
-				return ;
-			} else {
-				console.log("coucou?");
-				modalMessage = "You cannot enter this room";
-				messageModal.open();
-			}
 		});
 
 		$client.socket.on("RoomListUpdate", (data: any) => {
@@ -307,10 +298,6 @@
 		});
 	});
 </script>
-
-<Modal bind:this={messageModal}>
-	<Message itself={messageModal} msg={modalMessage}/>
-</Modal>
 
 <div class="vflex container">
 	<div class="button-box">

@@ -30,10 +30,14 @@
     import Modal from '$lib/tools/Modal.svelte';
 	import Room from "$lib/game/Room.svelte";
     import { goto } from '$app/navigation';
+	import Message from '$lib/modals/Message.svelte';
 
 	let login: boolean;
 	let roomModal: any;
 	let roomId: string = "";
+
+	let messageModal: any;
+	let modalMessage: string = "";
 
 	loginState.subscribe(value => { login = value; });
 
@@ -123,9 +127,11 @@
 					roomId = data.roomId;
 					roomModal.open();
 					return ;
-				}
-				// If couldn't join the game, there should be an error message
-				// and also ask for roomsDataUpdate
+				}else {
+					console.log("coucou?");
+					modalMessage = "You cannot enter this room";
+					messageModal.open();
+				}	
 			});
 
 			$client.socket.on("connection", (data: any) => {
@@ -156,6 +162,10 @@
 <main>
 	<slot />
 </main>
+
+<Modal bind:this={messageModal}>
+	<Message itself={messageModal} msg={modalMessage}/>
+</Modal>
 
 <Modal bind:this={roomModal} closeOnBgClick={false}>
 	<Room itself={roomModal} roomId={roomId}/>
