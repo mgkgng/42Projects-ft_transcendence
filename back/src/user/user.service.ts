@@ -21,7 +21,9 @@ export class UserService {
 	  async findOne(username: string): Promise<UserEntity> {
 		return this.usersRepository.findOne({where : { username_42: username }});
 	  }
-
+	async findOneByUsername(username: string): Promise<UserEntity> {
+		return this.usersRepository.findOne({where : { username: username }});
+	  }
 	  async addJohn()
 	  {
 		return await (this.dataSource.createQueryBuilder().insert().into(UserEntity).values([

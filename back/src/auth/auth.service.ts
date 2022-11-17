@@ -78,12 +78,12 @@ export class AuthService {
 	}
 	async get_valid_username(username: string)
 	{
+		console.log("get_valid_username");
 		let i : number = 0;
 		let user : UserEntity;
-		let final_username = username;
 		do{
-			user = await this.userService.findOne(username + i + "");
-			if (!user)
+			user = await this.userService.findOneByUsername(username + (i ? i + "" : "" ));
+			if (user)
 				i++;
 		}while(user);
 		return (username + (i ? i + "" : "" ));
