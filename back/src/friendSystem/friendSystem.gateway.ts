@@ -91,6 +91,9 @@ export class friendSystemGateway {
 		else
 		{
 			const userFriend = await this.friendSystemService.askFriend(user.username, friend.username);
+			const friendSocketId = this.mainServerService.getUserConnectedByUsername(friend.username);
+			if (friendSocketId)
+				this.server.to(friendSocketId.id).emit('askFriendNotification', {friend: user.username});
 			this.server.to(client.id).emit('success_askFriend', {friend: friend.username});
 			return;
 		}
