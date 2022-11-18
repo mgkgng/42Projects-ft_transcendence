@@ -15,7 +15,6 @@
     import EnterGame from "$lib/modals/EnterGame.svelte";
     import RoomList from "$lib/modals/RoomList.svelte";
     import NewChatRoom from '$lib/chat/NewChatRoom.svelte';
-	// import { chatRoom } from '$lib/stores/chatRoom';
 
 	let roomModal: any;
 	let roomId: string = "";
@@ -44,15 +43,17 @@
 			if (data.allowed) {
 				roomId = data.roomId;
 				roomListModal.close();
-				console.log("why not openend?");
 				roomModal.open();
-				console.log("really, why?");
 				return ;
 			} else {
 				modalMessage = "You cannot enter this room";
 				messageModal.open();
 			}	
 		});
+
+		$client.socket.on("askFriendNotification", (data: any) => {
+			console.log("Notif", data);
+		})
 	});
 </script>
 

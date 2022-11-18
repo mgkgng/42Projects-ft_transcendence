@@ -151,6 +151,7 @@
 	let searchUser: string = "";
 	let userSearchList: Array<any> = [];
 	let userProfileModal: any;
+	let profileUser: any;
 
 	$: searchUser = "";
 	$: searchUser = searchUser.toLowerCase();
@@ -176,11 +177,24 @@
 			console.log("error", data);
 			userSearchList = [];
 		});
+
+		$client.socket.on("resUserProfile", (data: any) => {
+			profileUser = data;
+			userProfileModal.open();
+		});
+
+		return (() => {
+			$client.socket.off("error_getFriendList");
+			$client.socket.off("success_getFriendList");
+			$client.socket.off("success_getUserinDB");
+			$client.socket.off("error_getUserinDB");
+			$client.socket.off("resUserProfile");
+		});
 	});
 </script>
 
 <Modal bind:this={userProfileModal}>
-	<UserProfile />
+	<UserProfile profileUser={profileUser}/>
 </Modal>
 
 <div class="vflex window friends">
