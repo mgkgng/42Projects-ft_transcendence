@@ -157,57 +157,7 @@
 		}
 	}
 
-	.add-room {
-		position: relative;
-		width: 100%;
-		height: 3em;
-		border: $border;
-		background-color: #313131;
-		border-radius: .2em;
-		align-items: center;
-		gap: 0;
 	
-		p {
-			padding-left: .3em;
-			font-size: 14px;
-		}
-
-		.text-input {
-			margin: .5em;
-			border-radius: .2em;
-
-			width: 35%;
-			height: 1.8em;
-
-			background-color: #fff;
-			color: #000;
-		}
-
-		.empty {
-			margin: .5em;
-			border-radius: .2em;
-
-			width: 35%;
-			height: 1.8em;
-			background-color: #000;
-		}
-
-		button {
-			width: 3em;
-			height: 100%;
-			position: absolute;
-			right: 0;
-			font-size: 25px;
-			cursor: pointer;
-			background-color: transparentize(#fff, .7);
-			
-			&:hover {
-				background-color: transparentize(#fff, .5);
-			}
-
-		}
-
-	}
 
 	.users {
 		width: 17%;
@@ -244,22 +194,20 @@
     import { chatRoom, ChatRooms, Room } from "$lib/stores/chatRoom";
 	import { onMount, afterUpdate } from "svelte";
     import ChatRoomMessage from "$lib/tools/chatRoomMessage.svelte";
+    import AddRoom from "./AddRoom.svelte";
 
 	export let itself: any; 
 	// export let axelUserProfileModal : any;
 	// export let allChatModal: any;
 
-	let newRoomName : string; //Valeur du insert de création de room
-	let newMessage : string;  //Valeur du insert d'envoie de message
-	let newRoomPassword : string; //Valeur du insert, password
+	let newMessage : string;
 
 	let rooms : string[]; //Rooms visibles par le user
 	let actualName: string; //Name de la room selectionnee
 	let actualMessages : Room = new Room("", false, false, false, false);
-
-	let is_new_room_password_protected : boolean = false; //Si la room est protege par un mot de passe
-
 	
+	let addRoomModal: any;
+
 	//afterUpdate(() => {
 			//message_zone.scroll({top: 1000000000});
 	//});
@@ -317,12 +265,7 @@
 		$client.socket.emit("set_room_not_visible", {room_name: room.room });
 		$chatRoom.deleteRoom(room.room);
 	}
-	function createRoom()
-	{
-		if (newRoomPassword == null)
-			newRoomPassword = ""
-		$client.socket.emit("new_room", {room_name: newRoomName, is_password_protected: is_new_room_password_protected, room_password: newRoomPassword, is_private: false});
-	}
+
 	function set_private_room()
 	{
 		$client.socket.emit("set_room_private", {room_name: $chatRoom.actualRoomName});
@@ -374,27 +317,17 @@
 	}
 </script>
 
+<Modal bind:this={addRoomModal}>
+	<AddRoom itself={addRoomModal} />
+</Modal>
 <div class="flex window chat">
-	<!--Zone de liste des rooms du user-->
-	<!-- <div class="flex add-room">
-		<input class="text-input" placeholder="Room Name" bind:value={newRoomName}>
-		{#if (is_new_room_password_protected == true)}
-		<input class="text-input" placeholder="Password" bind:value={newRoomPassword}>
-		{:else}
-		<div class="empty"></div>
-		{/if}
-		<input class="checkbox" type="checkbox" bind:checked={is_new_room_password_protected}>
-		<p>Password</p>
-		<button on:click={createRoom}>+</button>
-	</div> -->
-
 	<div class="rooms">
 		<!-- <input class="btn-room search" value="search" on:click={() =>{
 			allChatModal.open();
 			itself.close();	
 		}}> -->
 		<div class="tools">
-			<button>Create</button>
+			<button on:click={() => { addRoomModal.open(); }}>Add</button>
 			<button>Search</button>
 		</div>
 		<div class="vflex list">
