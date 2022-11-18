@@ -132,52 +132,52 @@
 	let user_info = null;
 	let qrcode_modal : any;
 
-	chatRoom.subscribe(value => {	username = value.username_search;	});
-	client.subscribe(value => {	local_username = value.username; });
+	// chatRoom.subscribe(value => {	username = value.username_search;	});
+	// client.subscribe(value => {	local_username = value.username; });
 	onMount(() => {
 		$client.socket.emit("getHistory", { username: profileUser.username });
 		$client.socket.on("resHistory", (data: any) => {
 			console.log("game history", data);
 			gameHistory = data;
 		});
-		if ($client.socket._callbacks.$get_other_user_info == null) {
-			$client.socket.on("get_other_user_info", (data) => {
-				console.log(data);
-			});
+		// if ($client.socket._callbacks.$get_other_user_info == null) {
+		// 	$client.socket.on("get_other_user_info", (data) => {
+		// 		console.log(data);
+		// 	});
 
-			$client.socket.on("error_get_other_user_info", (data) => {
-				alert("Error: " + data);	
-			});
-			$client.socket.on("error_change_username", (data) => {
-				alert("Error: " + data);	
-			});
-			$client.socket.on("change_username", (data) => {
-				$client.socket.emit("get_user_info",{});
-				chatRoom.update((value) => {
-					value.username_search = data.new_username;
-					return value;
-				});
-				$client.socket.emit("get_user_info", { } );
-			});
-			$client.socket.on("active_double_auth", (data) => {
-				user_info.is_2fa = true; 
-			});
-			$client.socket.on("disable_double_auth", (data) => {
-				user_info.is_2fa = false; 
-			});
+		// 	$client.socket.on("error_get_other_user_info", (data) => {
+		// 		alert("Error: " + data);	
+		// 	});
+		// 	$client.socket.on("error_change_username", (data) => {
+		// 		alert("Error: " + data);	
+		// 	});
+		// 	$client.socket.on("change_username", (data) => {
+		// 		$client.socket.emit("get_user_info",{});
+		// 		chatRoom.update((value) => {
+		// 			value.username_search = data.new_username;
+		// 			return value;
+		// 		});
+		// 		$client.socket.emit("get_user_info", { } );
+		// 	});
+		// 	$client.socket.on("active_double_auth", (data) => {
+		// 		user_info.is_2fa = true; 
+		// 	});
+		// 	$client.socket.on("disable_double_auth", (data) => {
+		// 		user_info.is_2fa = false; 
+		// 	});
 			// $client.socket.emit("getHistory", { username: profileUser.username });
 			// $client.socket.emit("resHistory", (data: any) => {
 			// 	gameHistory = data.history
 			// });
-		}
-		console.log("username ", $chatRoom.username_search, $client.user_info.username);
-		if ($chatRoom.username_search == $client.user_info.username)
-		{
-			user_info = $client.user_info;
-			client.subscribe(value => {	user_info = value.user_info;	});
-		}
-		else
-			$client.socket.emit("get_other_user_info", { username_search: $chatRoom.username_search } );
+		// }
+		// console.log("username ", $chatRoom.username_search, $client.user_info.username);
+		// if ($chatRoom.username_search == $client.user_info.username)
+		// {
+		// 	user_info = $client.user_info;
+		// 	client.subscribe(value => {	user_info = value.user_info;	});
+		// }
+		// else
+		// 	$client.socket.emit("get_other_user_info", { username_search: $chatRoom.username_search } );
 	});
 	function changeUsername()
 	{
@@ -214,7 +214,7 @@
 				$client.socket.emit("askFriend", {
 					username: profileUser.username
 				});
-			}}>A</button>s
+			}}>A</button>
 			<button>B</button>
 			<button>M</button>
 		</div>
@@ -232,8 +232,8 @@
 				<button>B</button>
 				<button>M</button>
 			</div>
-			{/if}
-		{/if} -->
+			{/if}-->
+		{/if} 
 	</div>
 	<!-- <div class="info-zone history">
 		{#if user_info}
@@ -250,8 +250,8 @@
 				<input on:click={seeQrcode} class="btn-room" type="button" value="qrcode">
 				<input type="button" name="scales" class="btn-room" value="disable" on:click={disable2FA}>
 			{/if}
-		{/if}
-	</div> -->
+		{/if} -->
+	<!-- </div> -->
 	<div class="history">
 		{#if gameHistory.length}
 		{#each gameHistory as game}

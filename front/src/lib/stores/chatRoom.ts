@@ -111,6 +111,9 @@ export class ChatRooms{
 //Ici les evenements qui changent les attributs de chatRoom et qui sont suscribe dans le front
 // (obligation d'utiliser update() pour un rafraichissement du front)
 function socket_event_update_front(client : any) {
+	if (client.socket._callbacks.$get_all_rooms)
+		return ;
+
 	client.socket.on("get_all_rooms", (data : any) => {
 		chatRoom.update((chatRoom) => {
 			chatRoom.all_rooms = new Map();

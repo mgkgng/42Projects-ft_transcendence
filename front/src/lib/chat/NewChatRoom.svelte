@@ -255,6 +255,8 @@
 				return (chat);
 			})
 		});
+
+		
 	});
 	function  chooseRoom(room : any){
 		chatRoom.update(chat => { 
