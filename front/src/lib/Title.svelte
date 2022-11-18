@@ -140,10 +140,10 @@
 		angle: number;
 	};
 
+	export let roomListModal: any;
 	let enterModal: any;
 	let enterGameModal: any;
 	let createGameModal: any;
-	let roomListModal: any;
 
 	export let title: string;
 
