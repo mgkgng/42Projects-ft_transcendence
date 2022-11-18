@@ -55,6 +55,8 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
+
+		color: #fff;
 	}
 
 	.button-container {
@@ -149,6 +151,8 @@
 	let winner: any;
 
 	onMount(()=> {
+		console.log("Room Mounted");
+		
 		$client.socket.emit("RoomCheck", {
 			client: $client.id,
 			room: roomId

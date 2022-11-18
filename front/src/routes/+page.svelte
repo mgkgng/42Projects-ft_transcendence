@@ -3,6 +3,7 @@
 </style>
 
 <script lang="ts">
+	import '$lib/stores/client';
 	import '$lib/scss/app.scss';
 	import Title from "$lib/Title.svelte";
 	import { client } from "$lib/stores/client";
@@ -13,6 +14,14 @@
 	import Modal from '$lib/tools/Modal.svelte';
 	import Room from "$lib/game/Room.svelte";
 	import Message from '$lib/modals/Message.svelte';
+	import PlayOrChat from "$lib/modals/PlayOrChat.svelte";
+    import CreateGame from "$lib/modals/CreateGame.svelte";
+    import EnterGame from "$lib/modals/EnterGame.svelte";
+    import RoomList from "$lib/modals/RoomList.svelte";
+	import { chatRoom } from '$lib/stores/chatRoom';
+	import io, { Socket } from "socket.io-client";
+    import { user } from '$lib/stores/user';
+    import { goto } from '$app/navigation';
 
 	let roomModal: any;
 	let roomId: string = "";
@@ -21,14 +30,9 @@
 	let modalMessage: string = "";
 
 	let roomListModal: any;
-
-	import '$lib/stores/client';
-	import '$lib/scss/app.scss';
-	import { chatRoom } from '$lib/stores/chatRoom';
-	import io, { Socket } from "socket.io-client";
-    import { user } from '$lib/stores/user';
-    import { goto } from '$app/navigation';
-    
+	let enterModal: any;
+	let enterGameModal: any;
+	let createGameModal: any;
 
 	let login: boolean;
 
@@ -129,6 +133,7 @@
 			});
 			$client.socket.emit("get_user_info", {});
 		}
+		goto('/');
 
 		if (!$client.socket)
 			return;
@@ -143,6 +148,7 @@
 			console.log("WTF?", data);
 			if (data.allowed) {
 				roomId = data.roomId;
+				roomListModal.close();
 				roomModal.open();
 				return ;
 			} else {
@@ -150,12 +156,23 @@
 				messageModal.open();
 			}	
 		});
-
 	});
 </script>
 
-<Modal bind:this={roomListModal}>
+<Modal bind:this={enterModal}>
+	<PlayOrChat itself={enterModal} enterGameModal={enterGameModal}/>
+</Modal>
 
+<Modal bind:this={createGameModal}>
+	<CreateGame itself={createGameModal} enterGameModal={enterGameModal}/>
+</Modal>
+
+<Modal bind:this={enterGameModal}>
+	<EnterGame itself={enterGameModal} createGameModal={createGameModal} roomListModal={roomListModal}/>
+</Modal>
+
+<Modal bind:this={roomListModal}>
+	<RoomList itself={roomListModal} enterGameModal={enterGameModal}/>
 </Modal>
 
 <Modal bind:this={messageModal}>
@@ -166,6 +183,6 @@
 	<Room itself={roomModal} roomId={roomId}/>
 </Modal>
 
-
 <Header />
-<Title title={"TRANSCENDENCE"} roomListModal={roomListModal}/>
+<Title title={"TRANSCENDENCE"} roomListModal={roomListModal} enterModal={enterModal}
+	enterGameModal={enterGameModal} createGameModal={createGameModal}/>

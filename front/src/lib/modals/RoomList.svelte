@@ -287,11 +287,6 @@
 			rooms = rooms;
 		});
 
-		$client.socket.on("JoinRoomRes", (data: any) => {
-			if (data.allowed)
-				itself.close();
-		});
-
 		$client.socket.on("RoomListUpdate", (data: any) => {
 			console.log("Updated", data);
 			rooms = data.rooms;

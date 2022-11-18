@@ -220,30 +220,38 @@ export class GameGateway {
 	async joinRoom(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
 		let room = this.getRoom(data.roomId);
 		if (!room || (room.players.length > 1 && data.play)) {
-			client.emit("JoinRoomRes", { allowed: false });
+			console.log("here1");
+			client.emit("JoinRoomRes", {
+				allowed: false, 
+				roomId: undefined });
 			return ;
 		} else if (data.play) {
 			const newPlayer = await this.getPlayerInfo(data.username);
+			console.log("here2");
 			room.broadcast("PlayerUpdate", {
 				join: true,
 				userInfo: newPlayer
 			});
 			room.addPlayer(client, newPlayer);
+			client.emit("JoinRoomRes", {
+				allowed: true,
+				roomId: data.roomId
+			});	
 			this.updateRooms(RoomUpdate.PlayerJoin, {
 				id: room.id,
 				player: newPlayer
 			});
-		} else {
-			room.broadcast("WatcherUpdate", { //TODO potentiellement
-				join: true
-			})
+		} else { //TODO I DONT UDNERSTAND WHY
+			console.log("here3");
+			// room.broadcast("WatcherUpdate", { //TODO potentiellement
+			// 	join: true
+			// })
+			client.emit("JoinRoomRes", {
+				allowed: true,
+				roomId: data.roomId
+			});	
 			room.addClient(client);
 		}
-		console.log("PARDON?????", data);
-		client.emit("JoinRoomRes", {
-			allowed: true,
-			roomId: data.roomId
-		});
 	}
 
 	@SubscribeMessage("ExitRoom")
