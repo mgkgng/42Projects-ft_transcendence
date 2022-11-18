@@ -1,7 +1,3 @@
-<style lang="scss">
-
-</style>
-
 <script lang="ts">
 	import '$lib/stores/client';
 	import '$lib/scss/app.scss';
@@ -85,16 +81,11 @@
 	}
 
 	onMount(async () => {
-		
-
 		if (!browser)
 			return ;
 
-		console.log("yo?");
-
-		
-
 		if (!$client.socket) {
+			console.log("Again?", $client.socket);
 			if (localStorage.getItem('transcendence-jwt') != null
 				&& localStorage.getItem('transcendence-jwt') != undefined)
 			{
@@ -120,7 +111,8 @@
 				$client.socket.on("GetConnectionInfo", (data: any) => {
 					console.log("GetConnectionInfo", data);
 					$client.id = data.id;
-					user.set(data.user);				
+					user.set(data.user);
+					$client.socket.off("GetConnectionInfo");
 				});	
 
 				$client.socket.on("connection", (data: any) => {
@@ -128,6 +120,7 @@
 					$client.connect();
 					loginState.set(true);
 					// $chatRoom.LoadMessages($client);
+					$client.socket.off("connection");
 				});
 				$client.socket.on("get_user_info", (data: any) => {
 					client.update((value) => {
@@ -136,11 +129,11 @@
 						return value;
 					});
 					console.log("DATA: ", data);
+					$client.socket.off("get_user_info");
 				});
 				$client.socket.emit("get_user_info", {});
 			}
 
-			console.log("here", $client);
 			if ($client.socket)
 				goto('/');
 			else
@@ -154,11 +147,12 @@
 		});
 
 		$client.socket.on("JoinRoomRes", (data: any) => {
-			console.log("WTF?", data);
 			if (data.allowed) {
 				roomId = data.roomId;
 				roomListModal.close();
+				console.log("why not openend?");
 				roomModal.open();
+				console.log("really, why?");
 				return ;
 			} else {
 				modalMessage = "You cannot enter this room";

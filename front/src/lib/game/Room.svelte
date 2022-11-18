@@ -134,8 +134,6 @@
 
 	let quitConfirmMsgModal: any;
 
-	let grapped = false;
-	let deathPoint: number;
 	let moving = false;
 	let puckMoving: any;
 	
@@ -151,13 +149,10 @@
 	let winner: any;
 
 	onMount(()=> {
-		console.log("Room Mounted");
+		console.log("Room Mounted", $client.socket);
+		if (!roomId.length)
+			return ;
 		
-		$client.socket.emit("RoomCheck", {
-			client: $client.id,
-			room: roomId
-		});
-
 		$client.socket.on("RoomInfo", (data: any) => {
 			console.log("RoomInfo", data);
 			roomFound = true;
@@ -213,11 +208,6 @@
 			}, 20);
 		});
 
-		$client.socket.on("DeathPointUpdate", (data: any) => {
-			console.log("DeathPointUpdate");
-			deathPoint = data;
-		});
-
 		$client.socket.on("PuckHit", (data: any) => {
 			console.log("PuckHit");
 			puck.vectorY *= -1;
@@ -248,6 +238,13 @@
 
 		$client.socket.on("GameStartFail", () => { tryStart = false; });
 		$client.socket.on("GameStart", () => { gameStart = true });
+
+		console.log("here is listeners: ", $client.socket);
+
+		$client.socket.emit("RoomCheck", {
+			client: $client.id,
+			room: roomId
+		});
 	});
 
 </script>

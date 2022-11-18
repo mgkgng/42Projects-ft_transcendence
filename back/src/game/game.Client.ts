@@ -1,5 +1,4 @@
 import { Socket } from "socket.io";
-import { uid } from "./game.utils";
 
 export class Client {
 	id: string;
@@ -9,7 +8,7 @@ export class Client {
 	user: any;
 
 	constructor(socket: Socket, username: string, user: any) {
-		this.id = uid();
+		this.id = socket.id;
 		this.username = username;
 		this.socket = socket;
 		this.room = "";

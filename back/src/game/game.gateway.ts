@@ -27,7 +27,7 @@ import { RoomUpdate } from "./game.utils";
 	},
 })
 //export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
-export class GameGateway {
+export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	clients: Map<string, Client>;
 	rooms: Map<string, Room>;
 	roomlistClients: Array<any>;
@@ -65,22 +65,11 @@ export class GameGateway {
 	// 	console.log(this.rooms);
 	// }
 
-	// @UseGuards(AuthGuard("jwt"))
-	// async handleConnection(client: Socket) { //TODO handle connection here
-	// 	console.log("New Connection on site.");
-	// 	// i don't know yet how to use well this function
-	// }
-
-	async handleDisconnect(@ConnectedSocket() client: Socket) { //TODO handle connection here
-		console.log("Disconnection...", client.id);
-		this.clients.delete(client.id);
-	}
-
-	@SubscribeMessage("Connection")
-	handleConnexion(@ConnectedSocket() client: Socket, @Request() req) {
+	public handleConnection(client: any, ...args: any[]): void {
 		console.log("Connection!!", client.id);
-		const user: any = (this.jwtService.decode(req.handshake.headers.authorization.split(' ')[1]));
-  		let newClient = new Client(client, user.username, {});
+		const user: any = (this.jwtService.decode(client.handshake.headers.authorization.split(' ')[1]));
+  		console.log("test", user);
+		let newClient = new Client(client, user.username, {});
 		this.clients.set(newClient.id, newClient);
 
 		// Should send it only once
@@ -94,8 +83,12 @@ export class GameGateway {
 				campus_country: user.campus_country
 			}
 		})
-		// Here maybe should be db check - if user is already registered.
 	}
+
+	public handleDisconnect(client: any): void {
+		console.log("Disconnection...", client.id);
+		this.clients.delete(client.id);
+    }
 
 	@SubscribeMessage("JoinQueue")
 	joinQueue(@MessageBody() data: any) {
@@ -130,7 +123,7 @@ export class GameGateway {
 	}
 
 	@SubscribeMessage("RoomCheck")
-	async roomCheck(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
+	roomCheck(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
 		console.log("RoomCheck", data);
 
 		let room = this.getRoom(data.room);
@@ -148,6 +141,8 @@ export class GameGateway {
 			mapSize: [room.pong.size[0], room.pong.size[1]],
 			paddleSize: room.pong.paddleSize
 		});
+
+		console.log("data was sent!");
 	}
 
 	@SubscribeMessage("PaddleMove")
@@ -220,38 +215,34 @@ export class GameGateway {
 	async joinRoom(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
 		let room = this.getRoom(data.roomId);
 		if (!room || (room.players.length > 1 && data.play)) {
-			console.log("here1");
 			client.emit("JoinRoomRes", {
 				allowed: false, 
 				roomId: undefined });
 			return ;
 		} else if (data.play) {
 			const newPlayer = await this.getPlayerInfo(data.username);
-			console.log("here2");
 			room.broadcast("PlayerUpdate", {
 				join: true,
 				userInfo: newPlayer
 			});
 			room.addPlayer(client, newPlayer);
-			client.emit("JoinRoomRes", {
-				allowed: true,
-				roomId: data.roomId
-			});	
 			this.updateRooms(RoomUpdate.PlayerJoin, {
 				id: room.id,
 				player: newPlayer
 			});
+
+			console.log("how many client now?", room.clients.size);
 		} else { //TODO I DONT UDNERSTAND WHY
-			console.log("here3");
 			// room.broadcast("WatcherUpdate", { //TODO potentiellement
 			// 	join: true
 			// })
-			client.emit("JoinRoomRes", {
-				allowed: true,
-				roomId: data.roomId
-			});	
 			room.addClient(client);
 		}
+		client.emit("JoinRoomRes", {
+			allowed: true,
+			roomId: data.roomId
+		});	
+
 	}
 
 	@SubscribeMessage("ExitRoom")
