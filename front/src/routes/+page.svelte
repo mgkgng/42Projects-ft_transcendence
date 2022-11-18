@@ -18,7 +18,7 @@
     import CreateGame from "$lib/modals/CreateGame.svelte";
     import EnterGame from "$lib/modals/EnterGame.svelte";
     import RoomList from "$lib/modals/RoomList.svelte";
-	import { chatRoom } from '$lib/stores/chatRoom';
+	// import { chatRoom } from '$lib/stores/chatRoom';
 	import io, { Socket } from "socket.io-client";
     import { user } from '$lib/stores/user';
     import { goto } from '$app/navigation';
@@ -121,7 +121,7 @@
 				console.log("connection", data);
 				$client.connect();
 				loginState.set(true);
-				$chatRoom.LoadMessages($client);
+				// $chatRoom.LoadMessages($client);
 			});
 			$client.socket.on("get_user_info", (data: any) => {
 				client.update((value) => {
