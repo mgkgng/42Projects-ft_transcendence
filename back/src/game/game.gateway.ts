@@ -341,6 +341,17 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		let room = this.getRoom(data.roomId);
 		client.emit("getChatGameMessage", room.chat);	
 	} 
+	@SubscribeMessage("getHistory")
+	async getHistGame(@MessageBody() data: any, @ConnectedSocket() client: Socket, @Request() req) {
+		let id_user = await this.mainServerService.getIdUser(req);
+		const res = await this.dataSource.getRepository(GameEntity).createQueryBuilder("game")
+		.innerJoin("game.player1", "user1")
+		.innerJoin("game.player2", "user2")
+		.where("game.player1.id_g = :u or game.player2.id_g = :u", {u: id_user})
+		.select(["game.player1_score", "game.player2_score", "user1.username", "user2.username", "user1.img_url", "user1.img", "user2.img_url", "user2.img", "game.date_game"]).getMany();
+		
+		client.emit("resHistory", res);
+	}
 
 	getClient(id: string) { return (this.clients.get(id)); }
 	getRoom(id: string) { return (this.rooms.get(id)); }

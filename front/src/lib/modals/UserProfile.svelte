@@ -1,6 +1,7 @@
 <style lang="scss">
 	.profile {
 		width: 550px;
+		height: 650px;
 		padding: 1.8em 1.5em;
 		gap: .5em;
 
@@ -95,13 +96,19 @@
 			padding: 1.2em;
 	
 			color: #e6e6e6;
-			font-size: 36px;
+			font-size: 18px;
 	
 			overflow-y: scroll;
+
+			.line {
+				img {
+					width: 32px;
+					height: 32px;
+					object-fit: cover;
+				}
+			}
 		}
 	}
-	
-
 
 </style>
 
@@ -117,8 +124,9 @@
 
 	onMount(() => {
 		$client.socket.emit("getHistory", { username: profileUser.username });
-		$client.socket.emit("resHistory", (data: any) => {
-			gameHistory = data.history
+		$client.socket.on("resHistory", (data: any) => {
+			console.log("game history", data);
+			gameHistory = data;
 		});
 	});
 </script>
@@ -143,9 +151,17 @@
 	</div>
 	<div class="history">
 		{#if gameHistory.length}
-		<div class="line">
-
+		{#each gameHistory as game}
+		<div class="flex line">
+			<img src="{(game.player1.img_url) ? game.player1.img_url : game.player1.img}" alt="player1">
+			<div class="vflex result">
+				<div>{game.player1.username} vs {game.player2.username}</div>
+				<div>{game.player1_score} : {game.player2_score}</div>
+			</div>
+			<img src="{(game.player2.img_url) ? game.player2.img_url : game.player2.img}" alt="player2">
+			<div>{game.date_game.split("T")[0]}</div>
 		</div>
+		{/each}
 		{:else}
 		<p>No Game History Yet</p>
 		{/if}
