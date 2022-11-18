@@ -100,11 +100,7 @@
     import Setting from "$lib/modals/Setting.svelte";
     import ChatDirectBox from "$lib/chat/ChatDirectBox.svelte";
 	import Friends from "$lib/modals/Friends.svelte"
-<<<<<<< HEAD
-    import NewChatRoom from "$lib/modals/NewChatRoom.svelte";
     import { chatRoom } from "../stores/chatRoom";
-=======
->>>>>>> e013eb945ae654cacf73553fdb5f4bafdc760b43
 
 	let profileModal: any;
 	let chatModal: any;
