@@ -19,6 +19,7 @@
     import { onMount } from "svelte";
 	import { browser } from "$app/environment";
     import { loginState } from "$lib/stores/var";
+    import { chatRoom } from '$lib/stores/chatRoom';
 
 	let login: boolean;
 	let tryConnect: boolean = false;
@@ -108,7 +109,7 @@
 					console.log("connection", data);
 					$client.connect();
 					loginState.set(true);
-					// $chatRoom.LoadMessages($client);
+					$chatRoom.LoadMessages($client);
 					// $client.socket.off("connection");
 				});
 				$client.socket.on("get_user_info", (data: any) => {

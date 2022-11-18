@@ -259,7 +259,6 @@
 
 	let is_new_room_password_protected : boolean = false; //Si la room est protege par un mot de passe
 
-	let message_zone;
 	
 	//afterUpdate(() => {
 			//message_zone.scroll({top: 1000000000});
@@ -308,7 +307,6 @@
 		chatRoom.update(chat => { 
 			chat.actualRoom = chat.messages.get(room.room);
 			chat.actualRoomName = room.room;
-			message_zone.scrollTo({top: 1000000000});
 			return (chat);
 		});
 	}
@@ -401,7 +399,7 @@
 		</div>
 		<div class="vflex list">
 			<p>RoomList</p>
-			{#each ($chatRoom.sortRoomsKeys([...$chatRoom.messages.keys()])) as room}
+			{#each ($chatRoom?.sortRoomsKeys([...$chatRoom.messages.keys()])) as room}
 			<div class="flex line">
 				{#if (room != actualName)}
 				<div class="room" on:click={() => chooseRoom({room})}>{room}</div>
@@ -417,7 +415,8 @@
 	</div>
 	
 	<!--Zone de liste des messages de la room selectionne-->
-	<div class="vflex chatroom" bind:this={message_zone}>
+	<!-- <div class="vflex chatroom" bind:this={message_zone}> -->
+	<div class="vflex chatroom">
 		{#if ($chatRoom.actualRoomName !== "")}
 			<div class="read">
 			{#if actualMessages.is_owner}
