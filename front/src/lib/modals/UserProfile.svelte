@@ -132,7 +132,11 @@
 
 		{#if profileUser.username != $user.username}
 		<div class="flex tools">
-			<button>A</button>
+			<button on:click={() => {
+				$client.socket.emit("askFriend", {
+					username: profileUser.username
+				});
+			}}>A</button>
 			<button>B</button>
 			<button>M</button>
 		</div>

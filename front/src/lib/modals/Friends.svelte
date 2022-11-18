@@ -185,9 +185,6 @@
 
 <div class="vflex window friends">
 	<h2>Friends</h2>
-	<div class="search">
-		<img src="/search.png" alt="search">
-	</div>
 	<div class="flex search-bar">
 		<input class="bar" type="text" placeholder="Search for users" bind:value={searchUser}>
 			{#if searchUser.length}
