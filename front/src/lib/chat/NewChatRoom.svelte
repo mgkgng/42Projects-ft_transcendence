@@ -131,7 +131,7 @@
 
 				width: 100%;
 				height: 100%;
-				background-color: transparentize($submain-lowshadeblue, .8	);
+				background-color: transparentize(#fff, .8	);
 				border-top: $border;
 				border-left: $border;
 			}
@@ -197,7 +197,8 @@
     import { chatRoom, ChatRooms, Room } from "$lib/stores/chatRoom";
 	import { onMount, afterUpdate } from "svelte";
     import ChatRoomMessage from "$lib/tools/chatRoomMessage.svelte";
-    import AddRoom from "./AddRoom.svelte";
+    import AddRoom from "$lib/chat/AddRoom.svelte";
+    import AllChatRooms from "$lib/chat/AllChatRooms.svelte";
 
 	export let itself: any; 
 	// export let axelUserProfileModal : any;
@@ -210,6 +211,7 @@
 	let actualMessages : Room = new Room("", false, false, false, false);
 	
 	let addRoomModal: any;
+	let allChatRoomModal: any;
 
 	//afterUpdate(() => {
 			//message_zone.scroll({top: 1000000000});
@@ -323,15 +325,16 @@
 <Modal bind:this={addRoomModal}>
 	<AddRoom itself={addRoomModal} />
 </Modal>
+
+<Modal bind:this={allChatRoomModal}>
+	<AllChatRooms itself={allChatRoomModal} />
+</Modal>
+
 <div class="flex window chat">
 	<div class="rooms">
-		<!-- <input class="btn-room search" value="search" on:click={() =>{
-			allChatModal.open();
-			itself.close();	
-		}}> -->
 		<div class="flex tools">
 			<button on:click={() => { addRoomModal.open(); }}>Add</button>
-			<button>Search</button>
+			<button on:click={() => { allChatRoomModal.open(); }}>Join</button>
 		</div>
 		<div class="vflex list">
 			<p>RoomList</p>

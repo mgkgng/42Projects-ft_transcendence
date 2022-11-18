@@ -30,7 +30,7 @@
 <script lang="ts">
     import Modal from "$lib/tools/Modal.svelte";
     import ChatRoom from "$lib/chat/ChatRoom.svelte";
-	import AllChatRooms from "../chat/allChatRooms.svelte";
+	import AllChatRooms from "../chat/AllChatRooms.svelte";
     import AxelUserProfile from "./AxelUserProfile.svelte";
 	
 

@@ -91,7 +91,7 @@
     import { goto } from "$app/navigation";
     import UserProfile from "$lib/modals/UserProfile.svelte";
     import ChatModal from "$lib/chat/ChatRoom.svelte";
-    import AllChatModal from "$lib/chat/allChatRooms.svelte";
+    import AllChatModal from "$lib/chat/AllChatRooms.svelte";
     import AxelUserProfile from "$lib/modals/AxelUserProfile.svelte";
     import { user } from "$lib/stores/user";
     import { client } from "$lib/stores/client";
@@ -100,7 +100,6 @@
     import Setting from "$lib/modals/Setting.svelte";
     import ChatDirectBox from "$lib/chat/ChatDirectBox.svelte";
 	import Friends from "$lib/modals/Friends.svelte"
-    import NewChatRoom from "$lib/chat/NewChatRoom.svelte";
 
 	let profileModal: any;
 	let chatModal: any;
@@ -137,11 +136,6 @@
 	<Friends itself={friendsModal} />
 </Modal>
 
-<Modal bind:this={chatRoomModal}>
-	<NewChatRoom itself={chatRoomModal} />
-</Modal>
-
-
 <header>
 	<div class="profile">
 		<div class="summary">
@@ -158,7 +152,6 @@
 		<div class="menu">
 			<button on:click={()=>{ profileModal.open(); }}>Profile</button>
 			<button on:click={()=>{ friendsModal.open(); }}>Friends</button>
-			<button on:click={()=>{ chatRoomModal.open(); }}>ChatDirect</button>
 			<button on:click={()=>{ settingModal.open(); }}>Setting</button>
 			<button on:click={handleLogout}>Logout</button>
 		</div>

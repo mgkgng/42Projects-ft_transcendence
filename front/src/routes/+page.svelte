@@ -14,6 +14,7 @@
     import CreateGame from "$lib/modals/CreateGame.svelte";
     import EnterGame from "$lib/modals/EnterGame.svelte";
     import RoomList from "$lib/modals/RoomList.svelte";
+    import NewChatRoom from '$lib/chat/NewChatRoom.svelte';
 	// import { chatRoom } from '$lib/stores/chatRoom';
 
 	let roomModal: any;
@@ -26,7 +27,7 @@
 	let enterModal: any;
 	let enterGameModal: any;
 	let createGameModal: any;
-
+	let chatRoomModal: any;
 
 	onMount(() => {
 		if (!browser || !$client.socket)
@@ -55,8 +56,12 @@
 	});
 </script>
 
+<Modal bind:this={chatRoomModal}>
+	<NewChatRoom itself={chatRoomModal} />
+</Modal>
+
 <Modal bind:this={enterModal}>
-	<PlayOrChat itself={enterModal} enterGameModal={enterGameModal}/>
+	<PlayOrChat itself={enterModal} enterGameModal={enterGameModal} chatRoomModal={chatRoomModal}/>
 </Modal>
 
 <Modal bind:this={createGameModal}>
