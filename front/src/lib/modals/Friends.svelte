@@ -171,6 +171,11 @@
 			console.log("success", data);
 			userSearchList = data.users;
 		});
+
+		$client.socket.on("error_getUserinDB", (data: any) => {
+			console.log("error", data);
+			userSearchList = [];
+		});
 	});
 </script>
 
