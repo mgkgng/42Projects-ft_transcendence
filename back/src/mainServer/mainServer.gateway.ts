@@ -38,11 +38,11 @@ export class MainServerGateway {
 	@UseGuards(AuthGuard("jwt"))
 	handleConnection(@Request() req)
 	{
-		console.log("Connect to main");
 		const user : any = (this.jwtServer.decode(req.handshake?.headers?.authorization.split(' ')[1]));
 		const client_username : string = user?.username_42;
 		let userConnected = {username: client_username, socket: req, status: "online"};
 		this.mainServerService.userConnectedList.push(userConnected);
+		this.userRepository.update({username_42: client_username}, {last_connection: new Date()});
 		// console.log(this.mainServerService.userConnectedList);
 	}
 
@@ -75,7 +75,7 @@ export class MainServerGateway {
 		else
 		{
 			const parsedList = users.map((user) => {
-				return {username: user.username, img_url: user.img_url, status: this.mainServerService.getUserStatus(user.username)}});
+				return {username: user.username, img_url: user.img_url, last_connection: user.last_connection, created_at: user.created_at,status: this.mainServerService.getUserStatus(user.username)}});
 			const index = parsedList.indexOf(this.mainServerService.getUserConnectedBySocketId(client.id).username);
 			if (index > -1) {
 				parsedList.splice(index, 1);
