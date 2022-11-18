@@ -118,13 +118,7 @@
 					border-radius: 3em .2em .2em .2em;
 					cursor: pointer;
 
-					img {
-						height: 1.2em;
-					}
-
-					button {
-						cursor: pointer;
-					}
+					img { height: 1.2em; }
 
 					&:hover {
 						background-color: transparentize($submain-lowshadeblue, .3);
@@ -157,6 +151,7 @@
 	let searchUser: string = "";
 	let userSearchList: Array<any> = [];
 	let userProfileModal: any;
+	let profileUser: any;
 
 	$: searchUser = "";
 	$: searchUser = searchUser.toLowerCase();
@@ -177,18 +172,33 @@
 			console.log("success", data);
 			userSearchList = data.users;
 		});
+
+		$client.socket.on("error_getUserinDB", (data: any) => {
+			console.log("error", data);
+			userSearchList = [];
+		});
+
+		$client.socket.on("resUserProfile", (data: any) => {
+			profileUser = data;
+			userProfileModal.open();
+		});
+
+		return (() => {
+			$client.socket.off("error_getFriendList");
+			$client.socket.off("success_getFriendList");
+			$client.socket.off("success_getUserinDB");
+			$client.socket.off("error_getUserinDB");
+			$client.socket.off("resUserProfile");
+		});
 	});
 </script>
 
 <Modal bind:this={userProfileModal}>
-	<UserProfile />
+	<UserProfile profileUser={profileUser}/>
 </Modal>
 
 <div class="vflex window friends">
 	<h2>Friends</h2>
-	<div class="search">
-		<img src="/search.png" alt="search">
-	</div>
 	<div class="flex search-bar">
 		<input class="bar" type="text" placeholder="Search for users" bind:value={searchUser}>
 			{#if searchUser.length}

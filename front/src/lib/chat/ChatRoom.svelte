@@ -103,8 +103,8 @@
 	import { onMount, afterUpdate } from "svelte";
 	import { get } from 'svelte/store';
     import ChatRoomMessage from "$lib/tools/chatRoomMessage.svelte";
-    import AllChatRooms from "./allChatRooms.svelte";
-    import AxelUserProfile from "./AxelUserProfile.svelte";
+    import AllChatRooms from "./AllChatRooms.svelte";
+    import AxelUserProfile from "../modals/AxelUserProfile.svelte";
 	
 	export let itself: any; 
 	export let axelUserProfileModal : any;

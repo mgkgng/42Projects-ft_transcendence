@@ -90,17 +90,16 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
     import UserProfile from "$lib/modals/UserProfile.svelte";
-    import ChatModal from "$lib/modals/ChatRoom.svelte";
-    import AllChatModal from "$lib/modals/allChatRooms.svelte";
+    import ChatModal from "$lib/chat/ChatRoom.svelte";
+    import AllChatModal from "$lib/chat/AllChatRooms.svelte";
     import AxelUserProfile from "$lib/modals/AxelUserProfile.svelte";
     import { user } from "$lib/stores/user";
     import { client } from "$lib/stores/client";
     import { loginState } from "$lib/stores/var";
     import Modal from "$lib/tools/Modal.svelte";
-    import Setting from "../modals/Setting.svelte";
-    import ChatDirectBox from "$lib/modals/ChatDirectBox.svelte";
+    import Setting from "$lib/modals/Setting.svelte";
+    import ChatDirectBox from "$lib/chat/ChatDirectBox.svelte";
 	import Friends from "$lib/modals/Friends.svelte"
-    import NewChatRoom from "$lib/modals/NewChatRoom.svelte";
 
 	let profileModal: any;
 	let chatModal: any;
@@ -109,7 +108,7 @@
 	let chatDirectModal : any;
 	let friendsModal: any;
 
-	let lol: any;
+	let chatRoomModal: any;
 
 	$:console.log($user);
 
@@ -123,22 +122,19 @@
 
 </script>
 
-<Modal bind:this={profileModal} closeOnBgClick={true}>
+<Modal bind:this={profileModal}>
 	<UserProfile profileUser={$user}/>
 </Modal>
-<Modal bind:this={settingModal} closeOnBgClick={true} >
+<Modal bind:this={settingModal} >
 	<Setting itself={settingModal}/>
 </Modal>
-<Modal bind:this={chatDirectModal} closeOnBgClick={true}>
+<Modal bind:this={chatDirectModal}>
 	<ChatDirectBox />
 </Modal>
-<Modal bind:this={friendsModal} closeOnBgClick={true}>
+
+<Modal bind:this={friendsModal}>
 	<Friends itself={friendsModal} />
 </Modal>
-<Modal bind:this={lol} closeOnBgClick={true}>
-	<NewChatRoom itself={lol} />
-</Modal>
-
 
 <header>
 	<div class="profile">
@@ -156,7 +152,6 @@
 		<div class="menu">
 			<button on:click={()=>{ profileModal.open(); }}>Profile</button>
 			<button on:click={()=>{ friendsModal.open(); }}>Friends</button>
-			<button on:click={()=>{ lol.open(); }}>ChatDirect</button>
 			<button on:click={()=>{ settingModal.open(); }}>Setting</button>
 			<button on:click={handleLogout}>Logout</button>
 		</div>

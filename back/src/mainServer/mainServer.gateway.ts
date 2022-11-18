@@ -69,7 +69,6 @@ export class MainServerGateway {
 		const users = await this.userRepository.find({where: {username: Like(data.username + "%")}, take: 8});
 		if (!users || users.length < 1)
 		{
-			console.log("ERROR GET USER IN DB");
 			this.server.to(client.id).emit('error_getUserinDB', {error: "No user found"});
 			return;
 		}

@@ -109,7 +109,6 @@
 			}
 		}
 	}
-
 </style>
 
 <script lang="ts">
@@ -141,9 +140,13 @@
 			<p class="campus">Campus: {profileUser.campus_name}, {profileUser.campus_country}</p>
 		</div>
 
-		{#if profileUser.username == $user.username}
+		{#if profileUser.username != $user.username}
 		<div class="flex tools">
-			<button>A</button>
+			<button on:click={() => {
+				$client.socket.emit("askFriend", {
+					username: profileUser.username
+				});
+			}}>A</button>
 			<button>B</button>
 			<button>M</button>
 		</div>

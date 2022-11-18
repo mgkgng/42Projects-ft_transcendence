@@ -53,6 +53,17 @@ export class friendSystemGateway {
 		return;
 	}
 
+	@SubscribeMessage('getUserProfile')
+	async getUserProfile(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
+		// const user = await this.userRepository.findOne({where: {username: this.mainServerService.getUserConnectedBySocketId(client.id).username}});
+
+		const id_user = await this.mainServerService.getIdUserByUsername(data.username);
+		const res = await this.dataSource.getRepository(UserEntity).createQueryBuilder("user")
+					.where("id_g = :id", {id : id_user})
+					.select(["user.email", "user.username", "user.img", "user.img_url", "user.display_name", "user.campus_name", "user.campus_country", "user.is_2fa", "user.otpauthUrl_2fa" ]).getOne();
+		client.emit("resUserProfile", res)
+	}
+
 	@SubscribeMessage('getAskList')
 	async getAskedFriendList(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
 		const user = await this.userRepository.findOne({where: {username: this.mainServerService.getUserConnectedBySocketId(client.id).username}});
@@ -91,6 +102,9 @@ export class friendSystemGateway {
 		else
 		{
 			const userFriend = await this.friendSystemService.askFriend(user.username, friend.username);
+			const friendSocketId = this.mainServerService.getUserConnectedByUsername(friend.username);
+			if (friendSocketId)
+				this.server.to(friendSocketId.id).emit('askFriendNotification', {friend: user.username});
 			this.server.to(client.id).emit('success_askFriend', {friend: friend.username});
 			return;
 		}
