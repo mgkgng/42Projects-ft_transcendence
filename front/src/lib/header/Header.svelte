@@ -101,6 +101,7 @@
     import ChatDirectBox from "$lib/modals/ChatDirectBox.svelte";
 	import Friends from "$lib/modals/Friends.svelte"
     import NewChatRoom from "$lib/modals/NewChatRoom.svelte";
+    import { chatRoom } from "../stores/chatRoom";
 
 	let profileModal: any;
 	let chatModal: any;
@@ -123,8 +124,8 @@
 
 </script>
 
-<Modal bind:this={profileModal} closeOnBgClick={true}>
-	<UserProfile profileUser={$user}/>
+<Modal bind:this={profileModal} closeOnBgClick={true} >
+	<UserProfile profileUser={$client.user_info}  />
 </Modal>
 <Modal bind:this={settingModal} closeOnBgClick={true} >
 	<Setting itself={settingModal}/>
@@ -154,7 +155,7 @@
 			{/if}
 		</div>
 		<div class="menu">
-			<button on:click={()=>{ profileModal.open(); }}>Profile</button>
+			<button on:click={()=>{ profileModal.open(); chatRoom.update((chatRoom) => { chatRoom.username_search = $client.username; return (chatRoom); });}}>Profile</button>
 			<button on:click={()=>{ friendsModal.open(); }}>Friends</button>
 			<button on:click={()=>{ lol.open(); }}>ChatDirect</button>
 			<button on:click={()=>{ settingModal.open(); }}>Setting</button>
