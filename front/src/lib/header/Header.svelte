@@ -100,6 +100,7 @@
     import Setting from "$lib/modals/Setting.svelte";
     import ChatDirectBox from "$lib/chat/ChatDirectBox.svelte";
 	import Friends from "$lib/modals/Friends.svelte"
+    import { chatRoom } from "../stores/chatRoom";
 
 	let profileModal: any;
 	let chatModal: any;
@@ -122,8 +123,8 @@
 
 </script>
 
-<Modal bind:this={profileModal}>
-	<UserProfile profileUser={$user}/>
+<Modal bind:this={profileModal} >
+	<UserProfile profileUser={$client.user_info}  />
 </Modal>
 <Modal bind:this={settingModal} >
 	<Setting itself={settingModal}/>
@@ -150,7 +151,7 @@
 			{/if}
 		</div>
 		<div class="menu">
-			<button on:click={()=>{ profileModal.open(); }}>Profile</button>
+			<button on:click={()=>{ profileModal.open(); chatRoom.update((chatRoom) => { chatRoom.username_search = $client.username; return (chatRoom); });}}>Profile</button>
 			<button on:click={()=>{ friendsModal.open(); }}>Friends</button>
 			<button on:click={()=>{ settingModal.open(); }}>Setting</button>
 			<button on:click={handleLogout}>Logout</button>

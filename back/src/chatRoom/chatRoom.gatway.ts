@@ -318,10 +318,18 @@ export class ChatRoomService {
 	@SubscribeMessage('get_all_rooms')
 	async getAllRooms(@MessageBody() data, @ConnectedSocket() client: Socket)
 	{
-		const res = await this.dataSource.getRepository(ChatRoomEntity)
-		.createQueryBuilder("chatRoom")
-		.where("chatRoom.is_private = :p", {p: false})
-		.select(["chatRoom.name", "chatRoom.is_password_protected"]).getMany();
+		const res = await this.dataSource.getRepository(MessageChatRoomEntity)
+		.createQueryBuilder("messages")
+		.innerJoin("messages.id_chat", "room")
+		.groupBy("room.id_g")
+		.where("room.is_private = :p", {p: false})
+		.select(["Sum(1) as nb_users", "room.name", "room.is_password_protected"]).getMany();
+
+		// const res = await this.dataSource.getRepository(ChatRoomEntity)
+		// .createQueryBuilder("chatRoom")
+		// .where("chatRoom.is_private = :p", {p: false})
+		// .select(["chatRoom.name", "chatRoom.is_password_protected"]).getMany();
+		console.log("get_all_rooms: ", res)
 		client.emit("get_all_rooms", res);
 	}
 	//OK
@@ -330,12 +338,21 @@ export class ChatRoomService {
 	@SubscribeMessage('get_all_rooms_begin_by')
 	async getAllRoomsBeginBy(@MessageBody() data, @ConnectedSocket() client: Socket)
 	{
+
+		// const res = await this.dataSource.getRepository(MessageChatRoomEntity)
+		// .createQueryBuilder("messages")
+		// .innerJoin("messages.id_chat_room", "room")
+		// .groupBy("room.id_g")
+		// .where("substr(room.name, 1, :l) = :s", {l: data.research.length, s: data.research})
+		// .andWhere("room.is_private = :p", {p: false}).select(["room.name"]).getMany();
+		//.select(["Sum(1) as nb_users", "room.name", "room.is_password_protected"]).getMany();
 		const res = await this.dataSource.getRepository(ChatRoomEntity)
 		.createQueryBuilder("chatRoom")
 		.select(["chatRoom.name", "chatRoom.is_password_protected"])
 		.where("substr(chatRoom.name, 1, :l) = :s", {l: data.research.length, s: data.research})
 		.andWhere("chatRoom.is_private = :p", {p: false})
 		.getMany();
+		console.log(res);
 		client.emit("get_all_rooms", res);
 	}
 	//Ban a user if current socket user is Admin on the room 
