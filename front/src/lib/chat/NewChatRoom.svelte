@@ -1,7 +1,7 @@
 <style lang="scss">
 	.chat {
-		width: 60vw;
-		height: 75vh;
+		width: 960px;
+		height: 640px;
 		padding: 0;
 		gap: 0;
 	}
@@ -14,10 +14,13 @@
 		.tools {
 			width: 100%;
 			height: 10%;
+			gap: .2em;
+			padding: .2em;
+			padding-top: 0;
 
 			button {
-				width: 48%;
-				height: 100%;
+				width: 5em;
+				height: 2em;
 				border-radius: 0 0 .2em .2em;
 				// padding-top: .1em;
 				background-color: transparentize(#fff, .6);
@@ -326,7 +329,7 @@
 			allChatModal.open();
 			itself.close();	
 		}}> -->
-		<div class="tools">
+		<div class="flex tools">
 			<button on:click={() => { addRoomModal.open(); }}>Add</button>
 			<button>Search</button>
 		</div>

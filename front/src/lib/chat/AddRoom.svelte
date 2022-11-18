@@ -103,7 +103,7 @@
 	let isPrivate: boolean = false;
 
 	function createRoom() {
-		$client.socket.emit("new_room", {room_name: newRoomName, is_password_protected: is_new_room_password_protected, room_password: newRoomPassword, is_private: false});
+		$client.socket.emit("new_room", {room_name: newRoomName, is_password_protected: withPassword, room_password: newRoomPassword, is_private: false});
 		itself.close();
 	}
 </script>
@@ -126,6 +126,6 @@
 		</label>
 	</div>
 		
-	<button on:click={() => createRoom}>ADD</button>
+	<button on:click={() => createRoom()}>ADD</button>
 
 </div>
