@@ -213,6 +213,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage("JoinRoom")
 	async joinRoom(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
+		console.log("JoinRoom", client.id);
 		let room = this.getRoom(data.roomId);
 		if (!room || (room.players.length > 1 && data.play)) {
 			client.emit("JoinRoomRes", {
@@ -226,18 +227,18 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				userInfo: newPlayer
 			});
 			room.addPlayer(client, newPlayer);
-			this.updateRooms(RoomUpdate.PlayerJoin, {
-				id: room.id,
-				player: newPlayer
-			});
-
-			console.log("how many client now?", room.clients.size);
+			console.log("hahaha");
+			// this.updateRooms(RoomUpdate.PlayerJoin, {
+			// 	id: room.id,
+			// 	player: newPlayer
+			// });
 		} else { //TODO I DONT UDNERSTAND WHY
 			// room.broadcast("WatcherUpdate", { //TODO potentiellement
 			// 	join: true
 			// })
 			room.addClient(client);
 		}
+		console.log("reponse ready", data);
 		client.emit("JoinRoomRes", {
 			allowed: true,
 			roomId: data.roomId
