@@ -26,6 +26,8 @@ export class OAuthStrategy extends PassportStrategy(Strategy, "oauth") {
 	if (code_2fa == "oui")
 	{
 		res = await this.authService.validateUser42(code);
+		if (!res) // temporary solution
+			return;
 		res.data.username_42 = res.data.login;
 	}else
 	{

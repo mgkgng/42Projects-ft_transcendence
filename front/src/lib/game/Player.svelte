@@ -1,17 +1,17 @@
 <style lang="scss">
 	.player {
-		gap: .2em;
+		gap: .1em;
 		width: 80px;
 		color: #fff;
 
-		position: absolute;
+		// position: absolute;
 		right: 0;
 		bottom: 0;
 
-		margin: 8px;
-
 		.img-box {
 			position: relative; 
+			margin-top: 5px;
+
 
 			img {
 				border-radius: .2em;
@@ -61,7 +61,7 @@
 			font-size: 60px;
 			text-align: center;
 			padding-top: .08em;
-
+			margin-top: 5px;
 		}
 	}
 
@@ -76,8 +76,6 @@
 	export let left: boolean;
 	export let host: boolean;
 	export let ready: boolean;
-
-	console.log("this is host: ", host, userInfo?.username);
 </script>
 
 <div class="vflex player {(left) ? "left" : ""}">

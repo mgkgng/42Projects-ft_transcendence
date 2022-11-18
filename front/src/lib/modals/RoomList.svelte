@@ -232,7 +232,10 @@
 	import { onMount } from "svelte";
 	import { client } from "$lib/stores/client";
     import { user } from "$lib/stores/user";
-
+    import Modal from "$lib/tools/Modal.svelte";
+	import Message from "$lib/modals/Message.svelte";
+	import { RoomUpdate } from "$lib/stores/var";
+	
 	export let itself: any;
 	export let enterGameModal: any;
 
@@ -245,7 +248,7 @@
 
 	$: roomArray = (showAvailable) ? [...rooms?.values()].filter(room => room.available == true)
 		: [...rooms.values()];
-	$: roomsOnPage = roomArray.slice(roomPage * perPage, roomPage * perPage + perPage);
+	$: roomsOnPage = roomArray?.slice(roomPage * perPage, roomPage * perPage + perPage);
 	$: roomPageNb = Math.ceil(roomArray?.length / perPage);
 	$: console.log(roomsOnPage);
 
@@ -270,28 +273,23 @@
 		$client.socket.on("GetAllRooms", (data: any) => {
 			console.log("GetAllRooms");
 			roomArray = data.rooms;
-			console.log(roomArray[0]);
 		});
 		$client.socket.on("UpdateRooms", (data: any) => {
-			if (data.method == "ADD")
-				rooms.set(data.id, data.roomInfo);
-			else
-				rooms.delete(data.id);
+			console.log("updaterooms", data);
+			if (data.updateType == RoomUpdate.NewRoom)
+				rooms.set(data.roomData.id, data.roomData);
+			else if (data.updateType == RoomUpdate.DeleteRoom)
+				rooms.delete(data.roomData.id);
+			else if (data.updateType == RoomUpdate.PlayerJoin)
+				rooms.get(data.roomData.id).players.push(data.roomData.player);
+			else 
+				rooms.get(data.roomData.id).players.splice(data.roomData.userIndex, 1);
 			rooms = rooms;
 		});
 
-		$client.socket.on("JoinRoomRes", (data: any) => {
-			
-			if (data.allowed) {
-				itself.close();
-				return ;
-			}
-			// If couldn't join the game, there should be an error message
-			// and also ask for roomsDataUpdate
-		});
-
-		return (() => {
-			// maybe remove listeners here?
+		$client.socket.on("RoomListUpdate", (data: any) => {
+			console.log("Updated", data);
+			rooms = data.rooms;
 		});
 	});
 </script>

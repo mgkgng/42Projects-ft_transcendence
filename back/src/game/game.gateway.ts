@@ -18,8 +18,8 @@ import { JwtService } from '@nestjs/jwt';
 import { GameEntity } from "src/entity/Game.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository, DataSource } from "typeorm";
-import { replacer } from "./game.utils";
 import { UserService } from "src/user/user.service";
+import { RoomUpdate } from "./game.utils";
 
 @WebSocketGateway({
 	cors: {
@@ -27,7 +27,7 @@ import { UserService } from "src/user/user.service";
 	},
 })
 //export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
-export class GameGateway {
+export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	clients: Map<string, Client>;
 	rooms: Map<string, Room>;
 	roomlistClients: Array<any>;
@@ -65,22 +65,11 @@ export class GameGateway {
 	// 	console.log(this.rooms);
 	// }
 
-	// @UseGuards(AuthGuard("jwt"))
-	// async handleConnection(client: Socket) { //TODO handle connection here
-	// 	console.log("New Connection on site.");
-	// 	// i don't know yet how to use well this function
-	// }
-
-	async handleDisconnect(@ConnectedSocket() client: Socket) { //TODO handle connection here
-		console.log("Disconnection...", client.id);
-		this.clients.delete(client.id);
-	}
-
-	@SubscribeMessage("Connection")
-	handleConnexion(@ConnectedSocket() client: Socket, @Request() req) {
+	public handleConnection(client: any, ...args: any[]): void {
 		console.log("Connection!!", client.id);
-		const user: any = (this.jwtService.decode(req.handshake.headers.authorization.split(' ')[1]));
-  		let newClient = new Client(client, user.username, {});
+		const user: any = (this.jwtService.decode(client.handshake.headers.authorization.split(' ')[1]));
+  		console.log("test", user);
+		let newClient = new Client(client, user.username, {});
 		this.clients.set(newClient.id, newClient);
 
 		// Should send it only once
@@ -94,8 +83,12 @@ export class GameGateway {
 				campus_country: user.campus_country
 			}
 		})
-		// Here maybe should be db check - if user is already registered.
 	}
+
+	public handleDisconnect(client: any): void {
+		console.log("Disconnection...", client.id);
+		this.clients.delete(client.id);
+    }
 
 	@SubscribeMessage("JoinQueue")
 	joinQueue(@MessageBody() data: any) {
@@ -130,7 +123,7 @@ export class GameGateway {
 	}
 
 	@SubscribeMessage("RoomCheck")
-	async roomCheck(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
+	roomCheck(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
 		console.log("RoomCheck", data);
 
 		let room = this.getRoom(data.room);
@@ -148,6 +141,8 @@ export class GameGateway {
 			mapSize: [room.pong.size[0], room.pong.size[1]],
 			paddleSize: room.pong.paddleSize
 		});
+
+		console.log("data was sent!");
 	}
 
 	@SubscribeMessage("PaddleMove")
@@ -173,7 +168,7 @@ export class GameGateway {
 	}
 
 	@SubscribeMessage("AskRooms")
-	askRooms(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
+	askRooms(@ConnectedSocket() client: Socket) {
 		//TODO should check if it still works when the client leaves the modal
 		this.roomlistClients.push(client);
 
@@ -208,13 +203,22 @@ export class GameGateway {
 		// client.room = room.id;
 
 		client.emit("RoomCreated", room.id);
+		this.updateRooms(RoomUpdate.NewRoom, {
+			id: room.id,
+			players: room.players,
+			title: room.title,
+			mapInfo: room.mapInfo
+		});
 	}
 
 	@SubscribeMessage("JoinRoom")
 	async joinRoom(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
+		console.log("JoinRoom", client.id);
 		let room = this.getRoom(data.roomId);
 		if (!room || (room.players.length > 1 && data.play)) {
-			client.emit("JoinRoomRes", { allowed: false });
+			client.emit("JoinRoomRes", {
+				allowed: false, 
+				roomId: undefined });
 			return ;
 		} else if (data.play) {
 			const newPlayer = await this.getPlayerInfo(data.username);
@@ -223,17 +227,23 @@ export class GameGateway {
 				userInfo: newPlayer
 			});
 			room.addPlayer(client, newPlayer);
-		} else {
-			room.broadcast("WatcherUpdate", { //TODO potentiellement
-				join: true
-			})
+			console.log("hahaha");
+			// this.updateRooms(RoomUpdate.PlayerJoin, {
+			// 	id: room.id,
+			// 	player: newPlayer
+			// });
+		} else { //TODO I DONT UDNERSTAND WHY
+			// room.broadcast("WatcherUpdate", { //TODO potentiellement
+			// 	join: true
+			// })
 			room.addClient(client);
 		}
-
+		console.log("reponse ready", data);
 		client.emit("JoinRoomRes", {
 			allowed: true,
 			roomId: data.roomId
-		});
+		});	
+
 	}
 
 	@SubscribeMessage("ExitRoom")
@@ -247,16 +257,28 @@ export class GameGateway {
 			(room.players[1]?.username_42 == user.username_42) ? 1 :
 			-1;
  		if (userIndex != -1) {
-			room.players = room.players.splice(userIndex, 1);
+			room.players.splice(userIndex, 1);
+			if (user.username_42 == room.hostname)
+				room.hostname = room.players[0].username_42;
 			// this.clients.delete() // TODO delete from clients
 			room.broadcast("PlayerUpdate", {
 				join: false,
-				userInfo: user.username_42
+				userInfo: user.username_42,
+				hostname: room.hostname
 			});
 		}
 
-		if (!room.players.length) //TODO or should I wait for every watch client to leave the room?
+		if (!room.players.length) {//TODO or should I wait for every watch client to leave the room?
+			this.updateRooms(RoomUpdate.DeleteRoom, {
+				id: room.id
+			});
 			this.rooms.delete(room.id);
+		} else {
+			this.updateRooms(RoomUpdate.PlayerExit, {
+				id: room.id,
+				userIndex: userIndex
+			});
+		}
 	}
 
 	@SubscribeMessage("isReady")
@@ -285,6 +307,18 @@ export class GameGateway {
 		}
 		room.broadcast("GameStart", undefined);
 		room.startPong();
+	}
+
+	updateRooms(type: number, data: any) { // maybe there could be a better way?
+		this.broadcast(this.roomlistClients, "UpdateRooms", {
+			updateType: type,
+			roomData: data
+		});
+	}
+
+	broadcast(clients: any, event: string, data: any) {
+		for (let client of clients)
+			client.emit(event, data);
 	}
 
 	static broadcast(clients: any, event: string, data: any) {

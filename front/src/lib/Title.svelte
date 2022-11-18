@@ -37,7 +37,7 @@
 				border-color: transparentize(#e6e6e6, .7);
 				background-color: transparentize(#000, .8);
 			}
-	}
+		}
 	}
 
 	@keyframes rotate {
@@ -116,32 +116,29 @@
 		background: linear-gradient(90deg, $main 0%, #5610c6 60%, $submain 100%);
 	}
 	
-	
+	@media screen and (max-width: 950px) {
+		.container {
+			h1 { font-size: 60px; }
+		}
+	}
 </style>
 
 <script lang="ts">
 	import { onMount } from "svelte";
     import { loginState } from "$lib/stores/var";
     import { goto } from "$app/navigation";
-	import Modal from "$lib/tools/Modal.svelte";
 	import MainCircle from '$lib/MainCircle.svelte';
-    import PlayOrChat from "$lib/modals/PlayOrChat.svelte";
-    import CreateGame from "$lib/modals/CreateGame.svelte";
-    import EnterGame from "$lib/modals/EnterGame.svelte";
-    import RoomList from "$lib/modals/RoomList.svelte";
-    import NewChatRoom from "./modals/NewChatRoom.svelte";
-
+ 
 	type Circle = {
 		size: number;
 		duration: number;
 		angle: number;
 	};
 
-	let enterModal: any;
-	let enterGameModal: any;
-	let createGameModal: any;
-	let roomListModal: any;
-	let chatRoomModal: any;
+	export let roomListModal: any;
+	export let enterModal: any;
+	export let enterGameModal: any;
+	export let createGameModal: any;
 
 	export let title: string;
 
@@ -193,27 +190,6 @@
 	});
 
 </script>
-
-<Modal bind:this={createGameModal}>
-	<CreateGame itself={createGameModal} enterGameModal={enterGameModal}/>
-</Modal>
-
-<Modal bind:this={roomListModal}>
-	<RoomList itself={roomListModal} enterGameModal={enterGameModal}/>
-</Modal>
-
-<Modal bind:this={enterGameModal}>
-	<EnterGame itself={enterGameModal} createGameModal={createGameModal} roomListModal={roomListModal}/>
-</Modal>
-
-<Modal bind:this={enterModal}>
-	<PlayOrChat itself={enterModal} enterGameModal={enterGameModal} chatRoomModal={chatRoomModal}/>
-</Modal>
-
-<Modal bind:this={chatRoomModal}>
-	<NewChatRoom itself={chatRoomModal} />
-</Modal>
-
 
 <div class="container">
 	{#each blues as blue}

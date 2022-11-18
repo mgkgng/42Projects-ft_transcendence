@@ -27,3 +27,10 @@ export const PuckSpeed = {
 	"Normal" : 5,
 	"Fast" : 8
 }
+
+export const RoomUpdate = {
+	NewRoom: 0,
+	DeleteRoom: 1,
+	PlayerJoin: 2,
+	PlayerExit: 3
+}
