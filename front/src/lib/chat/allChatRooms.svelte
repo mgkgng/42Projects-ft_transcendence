@@ -1,13 +1,7 @@
 <style lang="scss">
-	.container {
-		display: flex;
-		flex-direction: row;
+	.rooms {
 		width: 550px;
-		height: 75%;
-		max-height: 90vh;
-		background-color: transparentize(rgb(255, 0, 0), 0.9);
-		padding: 2em;
-		border-radius: 2em;
+		height: 550px;
 	}
 	
 	.room-zone {
@@ -70,7 +64,6 @@
 	import { onMount, beforeUpdate } from "svelte";
 	
 	export let itself: any; 
-	export let ChatRoomsModal : any;
 
 	let rooms : string[];
 	let all_rooms : Map<string, boolean> = new Map();
@@ -82,6 +75,7 @@
 		$client.socket.emit("get_all_rooms_begin_by", {research: research});
 
 	});
+
 	function addToTheRoom(room : any)
 	{
 		let user_password : string = "";
@@ -91,6 +85,7 @@
 		}
 		$client.socket.emit("append_user_to_room", {room_name: room, room_password: user_password});				
 	}
+	
 	function researchRooms()
 	{
 		// console.log("changed")
@@ -99,11 +94,7 @@
 	}
 </script>
 
-<div class="container">
-	<button class="btn-room back" on:click={() => {
-		itself.close();
-		ChatRoomsModal.open();
-	}}>&lt</button>
+<div class="vflex window rooms">
 	<div class="room-zone">
 		<div class="research-zone">
 			<input class="text-input" bind:value={research}>

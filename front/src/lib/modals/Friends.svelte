@@ -118,13 +118,7 @@
 					border-radius: 3em .2em .2em .2em;
 					cursor: pointer;
 
-					img {
-						height: 1.2em;
-					}
-
-					button {
-						cursor: pointer;
-					}
+					img { height: 1.2em; }
 
 					&:hover {
 						background-color: transparentize($submain-lowshadeblue, .3);

@@ -100,9 +100,6 @@
 			overflow-y: scroll;
 		}
 	}
-	
-
-
 </style>
 
 <script lang="ts">
