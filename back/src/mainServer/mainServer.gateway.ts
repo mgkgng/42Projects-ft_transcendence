@@ -41,19 +41,17 @@ export class MainServerGateway {
 		const user : any = (this.jwtServer.decode(req.handshake?.headers?.authorization.split(' ')[1]));
 		const client_username : string = user?.username_42;
 		let userConnected = {username: client_username, socket: req, status: "online"};
-		this.mainServerService.userConnectedList.push(userConnected);
-		this.userRepository.update({username_42: client_username}, {last_connection: new Date()});
-		// console.log(this.mainServerService.userConnectedList);
+		global.userConnectedList.push(userConnected);
+		this.userRepository.update({username: client_username}, {last_connection: new Date()});
 	}
 
 	handleDisconnect(@Request() req)
 	{
-		for (let i = 0; i < this.mainServerService.userConnectedList.length; i++)
+		for (let i = 0; i < global.userConnectedList.length; i++)
 		{
-			if (this.mainServerService.userConnectedList[i].socket === req)
+			if (global.userConnectedList[i].socket === req)
 			{
-				// console.log(`User ${this.mainServerService.userConnectedList[i].username} deleted`);
-				this.mainServerService.userConnectedList.splice(i, 1);
+				global.userConnectedList.splice(i, 1);
 			}
 		}
 	}

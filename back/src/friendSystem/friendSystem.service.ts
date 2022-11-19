@@ -176,7 +176,7 @@ export class friendSystemService {
     {
         if (status != "online" && status != "offline" && status != "in game")
             return ;
-        this.mainServerService.userConnectedList.forEach(element => {
+        global.userConnectedList.forEach(element => {
             if (element.username === username)
             {
                 element.status = status;

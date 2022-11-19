@@ -8,6 +8,7 @@ import {InjectRepository} from '@nestjs/typeorm';
 import { UseGuards, Request, HttpException } from '@nestjs/common';
 import { MessageBody } from '@nestjs/websockets';
 
+global.userConnectedList = []; // userConnectedList[] = {username : "username", socket : socket, status : "online" | "in game" | "offline"}
 
 @Injectable()
 export class MainServerService {
@@ -18,22 +19,21 @@ export class MainServerService {
 		private userRepository : Repository<UserEntity>,
 	){}
 
-	userConnectedList = []; // userConnectedList[] = {username : "username", socket : socket, status : "online" | "in game" | "offline"}
 	
 		// Function that will return the userConnectList entry by socketId if found
 		getUserConnectedBySocketId(socketId : string) : any {
-			for (let i = 0; i < this.userConnectedList.length; i++) {
-				if (this.userConnectedList[i].socket.id == socketId)
-					return this.userConnectedList[i];
+			for (let i = 0; i < global.userConnectedList.length; i++) {
+				if (global.userConnectedList[i].socket.id == socketId)
+					return global.userConnectedList[i];
 			}
 			return null;
 		}
 	
 		// Function that will return the userConnectList entry by username if found
 		getUserConnectedByUsername(username : string) : any {
-			for (let i = 0; i < this.userConnectedList.length; i++) {
-				if (this.userConnectedList[i].username == username)
-					return this.userConnectedList[i];
+			for (let i = 0; i < global.userConnectedList.length; i++) {
+				if (global.userConnectedList[i].username == username)
+					return global.userConnectedList[i];
 			}
 			return null;
 		}
@@ -78,10 +78,10 @@ export class MainServerService {
 	// the user must exist to use this function
 	getUserStatus(username : string) : string
 	{
-		for (let i = 0; i < this.userConnectedList.length; i++)
+		for (let i = 0; i < global.userConnectedList.length; i++)
 		{
-			if (this.userConnectedList[i].username === username)
-				return this.userConnectedList[i].status;
+			if (global.userConnectedList[i].username === username)
+				return global.userConnectedList[i].status;
 			else
 				return "offline";
 		}
