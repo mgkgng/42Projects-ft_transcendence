@@ -142,6 +142,7 @@
     import CloseButton from "$lib/items/CloseButton.svelte";
 	import { client } from "$lib/stores/client";
     import { onMount } from "svelte";
+    import { user } from "../stores/user";
     import Modal from "../tools/Modal.svelte";
     import UserProfile from "./UserProfile.svelte";
 
@@ -158,7 +159,7 @@
 	$: { $client.socket.emit("getUserinDB", {username: searchUser}); }
 
 	onMount(() => {
-		$client.socket.emit("getFriendList");
+		$client.socket.emit("getFriendList", { username: $user.username });
 
 		$client.socket.on("error_getFriendList", (data: any) => {
 			console.log("Error!");
@@ -205,11 +206,11 @@
 			<div class="result">
 				{#if userSearchList.length}
 				{#each userSearchList as user}
-				<div class="flex line">
+				<div class="flex line" on:click={() => {
+					$client.socket.emit("getUserProfile", { username: user.username });
+				}}>
 					<img src="{user.img_url}" alt="user">
-					<div class="user" on:click={() => {
-						$client.socket.emit("getUserProfile", { username: user.username });
-					}}>{user.username}</div>
+					<div class="user">{user.username}</div>
 					<!-- <div class="status" style="background-color: {()}"></div> -->
 				</div>
 				{/each}
