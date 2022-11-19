@@ -10,6 +10,22 @@
 		flex-direction: row;
 	}
 
+	.who {
+		position: absolute;
+		top: 0;
+		right: 0;
+		width: 65px;
+		height: 65px;
+		border: $border;
+		border-radius: .3em;
+		font-size: 48px;
+		font-family: 'fake-receipt';
+		color: #fff;
+		padding-left: .3em;
+		padding-top: .05em;
+		background-color: transparentize(#fff, .9);
+	}
+
 	.profile {
 		position: absolute;
 		top: 0;
@@ -120,7 +136,6 @@
 		loginState.set(false);
 		window.location.reload();
 	}
-
 </script>
 
 <Modal bind:this={profileModal} >
@@ -139,15 +154,14 @@
 
 <header>
 	<div class="profile">
+		{#if !$user}
+		<div class="who">?</div>
+		{:else}
 		<div class="summary">
-			{#if !$user}
-				<img src="/pingu/pingu-coucou.jpeg" alt="pingu-coucou">
+			{#if !$client.user_info || $client.user_info.img === ""}
+				<img src={$user.image_url} alt="profile" />
 			{:else}
-				{#if !$client.user_info || $client.user_info.img === ""}
-					<img src={$user.image_url} alt="profile" />
-				{:else}
-					<img src={$client.user_info.img} alt="profile" />
-				{/if}
+				<img src={$client.user_info.img} alt="profile" />
 			{/if}
 		</div>
 		<div class="menu">
@@ -156,5 +170,6 @@
 			<button on:click={()=>{ settingModal.open(); }}>Setting</button>
 			<button on:click={handleLogout}>Logout</button>
 		</div>
+		{/if}
 	</div>
 </header>

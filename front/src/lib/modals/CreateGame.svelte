@@ -46,12 +46,31 @@
 				color: #000;
 			}
 
+			.choice {
+				gap: .2em;
+				justify-content: center;
+				align-items: center;
+			}
+			.choice input[type="radio"] {
+				display: none;
+			}
+
+			.choice label {
+				display: inline-block;
+				border: $border-thin;
+				border-radius: .2em;
+				width: 5em;
+				height: 1.8em;
+				text-align: center;
+				padding: .2em;
+				font-size: 17px;
+				cursor: pointer;
+			}
+
+			.choice input[type="radio"]:checked+label { background-color: $submain-blue; }
+
 			label {
 				padding: 0 1em; 
-			
-				input[type='radio']:checked::after { //TODO
-					background-color: $main-bright;
-				}
 			}
 
 		}
@@ -135,11 +154,15 @@
 		</div>
 		<div class="option">
 			<p>Size</p>
-			<label>
-				<input class="radio" type=radio bind:group={mapSize} name="mapSize" value={"Small"}>Small
-				<input class="radio" type=radio bind:group={mapSize} name="mapSize" value={"Medium"}>Medium
-				<input class="radio" type=radio bind:group={mapSize} name="mapSize" value={"Large"}>Large
-			</label>
+			<div class="flex choice">
+				<input class="radio" id="size1" type=radio bind:group={mapSize} name="mapSize" value={"Small"}>
+				<label for="size1">Small</label>
+				<input class="radio" id="size2" type=radio bind:group={mapSize} name="mapSize" value={"Medium"}>
+				<label for="size2">Medium</label>
+				<input class="radio" id="size3" type=radio bind:group={mapSize} name="mapSize" value={"Large"}>
+				<label for="size3">Large</label>
+
+			</div>
 		</div>
 		<div class="option">
 			<p>Points</p>
@@ -150,26 +173,40 @@
 		</div>
 		<div class="option">
 			<p>Paddle Size</p>
-			<label>
-				<input class="radio" type=radio bind:group={paddleSize} name="paddleSize" value={"Short"}>Short
-				<input class="radio" type=radio bind:group={paddleSize} name="paddleSize" value={"Normal"}>Normal
-				<input class="radio" type=radio bind:group={paddleSize} name="paddleSize" value={"Long"}>Long
-			</label>
+			<div class="flex choice">
+				<input class="radio" id="paddle1" type=radio bind:group={paddleSize} name="paddleSize" value={"Short"}>
+				<label for="paddle1">Short</label>
+				<input class="radio" id="paddle2" type=radio bind:group={paddleSize} name="paddleSize" value={"Normal"}>
+				<label for="paddle2">Normal</label>
+				<input class="radio" id="paddle3" type=radio bind:group={paddleSize} name="paddleSize" value={"Long"}>
+				<label for="paddle3">Long</label>
+
+			</div>
 		</div>
 		<div class="option">
 			<p>Puck Speed</p>
-			<label>
-				<input type=radio bind:group={puckSpeed} name="puckSpeed" value={"Slow"}>Slow
-				<input type=radio bind:group={puckSpeed} name="puckSpeed" value={"Normal"}>Normal
-				<input type=radio bind:group={puckSpeed} name="puckSpeed" value={"Fast"}>Fast
-			</label>
+			<div class="flex choice">
+				<input type=radio id="speed1" bind:group={puckSpeed} name="puckSpeed" value={"Slow"}>
+				<label for="speed1">Slow</label>
+
+				<input type=radio id="speed2" bind:group={puckSpeed} name="puckSpeed" value={"Normal"}>
+				<label for="speed2">Normal</label>
+
+				<input type=radio id="speed3" bind:group={puckSpeed} name="puckSpeed" value={"Fast"}>
+				<label for="speed3">Fast</label>
+
+			</div>
 		</div>
 		<div class="option">
 			<p>Mode</p>
-			<label>
-				<input type=radio bind:group={privateMode} name="privateMode" value={false}> Public
-				<input type=radio bind:group={privateMode} name="privateMode" value={true}> Private
-			</label>
+			<div class="flex choice">
+				<input type=radio id="public" bind:group={privateMode} name="privateMode" value={false}> 
+				<label for="public">Public</label>
+
+				<input type=radio id="private" bind:group={privateMode} name="privateMode" value={true}> 
+				<label for="private">Private</label>
+
+			</div>
 		</div>
 	</div>
 	<button class="submit" on:click={()=>{
