@@ -28,12 +28,6 @@
 </style>
 
 <script lang="ts">
-    import Modal from "$lib/tools/Modal.svelte";
-    import ChatRoom from "$lib/chat/ChatRoom.svelte";
-	import AllChatRooms from "../chat/AllChatRooms.svelte";
-    import AxelUserProfile from "./AxelUserProfile.svelte";
-	
-
 	export let itself: any;
 	export let enterGameModal: any;
 	export let chatRoomModal: any;

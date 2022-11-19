@@ -104,10 +104,6 @@
 			}
 		}
 
-		.score {
-			font-size: 25px;
-		}
-
 		.info {
 			width: 100%;
 			height: 3.5em;
