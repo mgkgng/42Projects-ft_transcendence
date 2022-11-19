@@ -44,7 +44,7 @@
 			if (isNaN(res.getTime()))
 				alert("Bad date");
 			else 
-				$client.socket.emit("ban_user", { room_name : $chatRoom.actualRoomName, username_ban: username, ban_end: res});
+				$client.socket.emit("ban_user", { id_public_room : $chatRoom.actualRoomName, username_ban: username, ban_end: res});
 		}
 	}
 	function muteUser()
@@ -58,7 +58,7 @@
 			if (isNaN(res.getTime()))
 				alert("Bad date");
 			else 
-				$client.socket.emit("mute_user", { room_name : $chatRoom.actualRoomName, username_ban: username, mute_end: res});
+				$client.socket.emit("mute_user", { id_public_room : $chatRoom.actualRoomName, username_ban: username, mute_end: res});
 		}
 	}
 </script>

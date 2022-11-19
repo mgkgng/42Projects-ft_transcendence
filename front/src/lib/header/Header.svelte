@@ -91,7 +91,7 @@
     import { goto } from "$app/navigation";
     import UserProfile from "$lib/modals/UserProfile.svelte";
     import ChatModal from "$lib/chat/ChatRoom.svelte";
-    import AllChatModal from "$lib/chat/AllChatRooms.svelte";
+    import AllChatModal from "$lib/chat/allChatRooms.svelte";
     import AxelUserProfile from "$lib/modals/AxelUserProfile.svelte";
     import { user } from "$lib/stores/user";
     import { client } from "$lib/stores/client";

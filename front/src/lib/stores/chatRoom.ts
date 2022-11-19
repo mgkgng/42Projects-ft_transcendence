@@ -31,6 +31,7 @@ class userRoom{
 };
 export class Room
 {
+	id_public_room : string = "";
 	room_name : string = "";
 	is_password_protected : boolean = false;
 	is_private : boolean = false;
@@ -38,7 +39,7 @@ export class Room
 	is_owner : boolean = false;
 	messages : Array<Message>;
 	usersRoom : any[];
-	constructor(room_name : string, is_password_protected : boolean, is_private : boolean, are_you_admin : boolean, are_you_owner : boolean)
+	constructor(id_public_room : string, room_name : string, is_password_protected : boolean, is_private : boolean, are_you_admin : boolean, are_you_owner : boolean)
 	{
 		this.room_name = room_name;
 		this.is_password_protected = is_password_protected;
@@ -52,10 +53,10 @@ export class Room
 let client : any;
 
 export class ChatRooms{
-	all_rooms: Map<string, boolean> = new Map(); //toutes les rooms (utilisées pour s'ajouter a une room)
+	all_rooms: Map<string, Room> = new Map(); //toutes les rooms (utilisées pour s'ajouter a une room)
 	rooms: Array<string> = [];					//room visibles pour l'utilisateur
 	messages : Map<string, Room> = new Map();		//les messages de chaques room
-	actualRoom : any;
+	actualRoom  = new Room("", "", false, false, false, false);
 	actualRoomName : string = "";				//room selectionnee 
 
 	username_search : string = "";		//username search profile
@@ -68,14 +69,17 @@ export class ChatRooms{
 			console.log("Try load messages");
 			client.socket.emit("get_my_rooms", {});
 			
-			client.socket.off("set_room_not_visible", (data) => {
-			});
 			client.socket.on("set_room_not_visible", (data) => {
 				client.socket.emit("get_my_rooms", {});
 			});
-			client.socket.off("set_room_visible", (data) => {
+			client.socket.on("notification_new_message_room", (data) => { //Get notofocation of a new message
+				client.socket.emit("get_message_by_id", {id_message: data.id_message});
+			});
+			client.socket.on("get_message_by_id", (data) => {
+				console.log("get_message_by_id", data);
 			});
 			client.socket.on("set_room_visible", (data) => {
+				this.all_rooms.delete(data.id_public_room);
 				client.socket.emit("get_my_rooms", {});
 			});
 			socket_event_update_front(client);			
@@ -115,7 +119,10 @@ function socket_event_update_front(client : any) {
 		chatRoom.update((chatRoom) => {
 			chatRoom.all_rooms = new Map();
 			for (let r of data)
-				chatRoom.all_rooms.set(r.name, r.is_password_protected);
+			{
+				console.log(r);
+				chatRoom.all_rooms.set(r.id_public_room, new Room(r.id_public_room, r.name, r.is_password_protected, false, false, false));
+			}
 			return (chatRoom);
 		});
 	});
@@ -123,27 +130,27 @@ function socket_event_update_front(client : any) {
 		chatRoom.update((chatRoom) => {
 			chatRoom.rooms = [];
 			chatRoom.messages = new Map();
-			chatRoom.actualRoom = new Room("", false, false, false, false);
+			chatRoom.actualRoom = new Room("", "", false, false, false, false);
 			return(chatRoom);
 		});
 		chatRoom.update((chatRoom) => {
 			for (let rooms of data ){
 				chatRoom.rooms.push(rooms.room.name);
-				chatRoom.messages.set(rooms.room.name, new Room(rooms.room.name, rooms.room.is_password_protected, rooms.room.is_private, rooms.is_admin, rooms.is_owner))
-				client.socket.emit("get_message_room", {room_name: rooms.room.name});
-				client.socket.emit("get_users_room", {room_name: rooms.room.name});
+				chatRoom.messages.set(rooms.room.id_public_room, new Room(rooms.id_public_room, rooms.room.name, rooms.room.is_password_protected, rooms.room.is_private, rooms.is_admin, rooms.is_owner))
+				client.socket.emit("get_message_room", {id_public_room: rooms.room.id_public_room});
+				client.socket.emit("get_users_room", {id_public_room: rooms.room.id_public_room});
 			}
 			// console.log(data);
-			// console.log("rooms: ", chatRoom.rooms);
 			return (chatRoom);
 		});
 	});
 	client.socket.on("get_message_room", (data: any) => {
 		chatRoom.update((chatRoom) => {
+			console.log(chatRoom)
 			let inter : Array<Message> = [];
 			for (let message of data.messages)
 				inter.push(new Message(message.id_chat_room.name, message.id_user.username, message.content_message, message.date_message));
-			chatRoom.messages.get(data.room_name).messages = inter;
+			chatRoom.messages.get(data.id_public_room).messages = inter;
 			console.log("Message2: ", chatRoom);
 			return (chatRoom);
 		});
@@ -154,7 +161,7 @@ function socket_event_update_front(client : any) {
 			let inter : Array<userRoom> = new Array<userRoom>;
 			for (let users of data.users)
 				inter.push(new userRoom(users.id_user.username, users.is_admin, users.is_owner, users.is_login))
-			chatRoom.messages.get(data.room_name).usersRoom = inter;
+			chatRoom.messages.get(data.id_public_room).usersRoom = inter;
 			return (chatRoom);
 		});
 	})
@@ -162,7 +169,7 @@ function socket_event_update_front(client : any) {
 	{
 		chatRoom.update( chat => {
 			console.log("newMessage: ", data, chat);
-			chat.messages.get(data.room_name).messages.push(new Message(data.room_name, data.username, data.content_message, data.date_message));
+			chat.messages.get(data.id_public_room).messages.push(new Message(data.room_name, data.username, data.content_message, data.date_message));
 			return (chat);
 		});
 	});
@@ -171,7 +178,7 @@ function socket_event_update_front(client : any) {
 		chatRoom.update( chat => {
 			chat.rooms.push(data.room_name);
 			const mess : Message[] = [];
-			chat.messages.set(data.room_name, new Room(data.room_name, data.is_password_protected, data.is_private, data.is_admin, true));
+			chat.messages.set(data.id_public_room, new Room(data.id_public_room, data.room_name, data.is_password_protected, data.is_private, data.is_admin, true));
 			return (chat);
 		});
 	});

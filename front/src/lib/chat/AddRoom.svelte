@@ -103,7 +103,7 @@
 	let isPrivate: boolean = false;
 
 	function createRoom() {
-		$client.socket.emit("new_room", {room_name: newRoomName, is_password_protected: withPassword, room_password: newRoomPassword, is_private: false});
+		$client.socket.emit("new_room", {room_name: newRoomName, is_password_protected: withPassword, room_password: newRoomPassword, is_private: isPrivate});
 		itself.close();
 	}
 </script>

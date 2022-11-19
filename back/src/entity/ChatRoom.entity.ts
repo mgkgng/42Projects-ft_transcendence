@@ -7,6 +7,9 @@ export class ChatRoomEntity {
 	@PrimaryGeneratedColumn()
 	id_g: number;
 
+	@Column()
+	id_public_room : string;
+
 	@OneToMany(() => UserChatRoomEntity, (id: UserChatRoomEntity) => id.room)
 	relation_userChatRoom: UserChatRoomEntity[];
 	

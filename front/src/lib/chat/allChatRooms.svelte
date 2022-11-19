@@ -60,13 +60,13 @@
 <script lang="ts">
 
     import { client } from "$lib/stores/client";
-    import { chatRoom } from "$lib/stores/chatRoom";
+    import { chatRoom, Room } from "$lib/stores/chatRoom";
 	import { onMount, beforeUpdate } from "svelte";
 	
 	export let itself: any; 
 
 	let rooms : string[];
-	let all_rooms : Map<string, boolean> = new Map();
+	let all_rooms : Map<string, Room> = new Map();
 	chatRoom.subscribe(chat => { rooms = chat.rooms;});
 	chatRoom.subscribe(chat => { all_rooms= chat.all_rooms;});
 
@@ -79,11 +79,11 @@
 	function addToTheRoom(room : any)
 	{
 		let user_password : string = "";
-		if (all_rooms.get(room) == true && user_password == "")
+		if (all_rooms.get(room).is_password_protected == true && user_password == "")
 		{
 			user_password = prompt("Please enter the password", "");
 		}
-		$client.socket.emit("append_user_to_room", {room_name: room, room_password: user_password});				
+		$client.socket.emit("append_user_to_room", {id_public_room: room, room_password: user_password});				
 	}
 	
 	function researchRooms()
@@ -101,11 +101,11 @@
 			<button class="btn-room" on:click={researchRooms}>Search</button>
 		</div>
 		<ul>
-		{#each ([...all_rooms.keys()].sort()) as room_name}
-			{#if (rooms.includes(room_name)) == false}
+		{#each ([...all_rooms.keys()].sort()) as room_id}
+			{#if (rooms.includes(room_id)) == false}
 				<li class="room">
-					<p>{room_name}</p>
-					<button class="btn-room" on:click={addToTheRoom(room_name)}>Add</button>
+					<p>{all_rooms.get(room_id).room_name}</p>
+					<button class="btn-room" on:click={addToTheRoom(room_id)}>Add</button>
 				</li>
 			{/if}
 		{/each}

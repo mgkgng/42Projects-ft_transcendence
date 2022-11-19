@@ -198,7 +198,7 @@
 	import { onMount, afterUpdate } from "svelte";
     import ChatRoomMessage from "$lib/tools/chatRoomMessage.svelte";
     import AddRoom from "$lib/chat/AddRoom.svelte";
-    import AllChatRooms from "$lib/chat/AllChatRooms.svelte";
+    import AllChatRooms from "$lib/chat/allChatRooms.svelte";
 
 	export let itself: any; 
 	// export let axelUserProfileModal : any;
@@ -230,28 +230,28 @@
 		$client.socket.on("set_room_private", (data) =>
 		{
 			chatRoom.update((chat) =>{
-				chat.messages.get(data.room_name).is_private = true;
+				chat.messages.get(data.id_public_room).is_private = true;
 				return (chat);
 			})
 		});
 		$client.socket.on("unset_room_private", (data) =>
 		{
 			chatRoom.update((chat) =>{
-				chat.messages.get(data.room_name).is_private = false;
+				chat.messages.get(data.id_public_room).is_private = false;
 				return (chat);
 			})
 		});
 		$client.socket.on("set_password_room", (data) =>
 		{
 			chatRoom.update((chat) =>{
-				chat.messages.get(data.room_name).is_password_protected = true;
+				chat.messages.get(data.id_public_room).is_password_protected = true;
 				return (chat);
 			})
 		});
 		$client.socket.on("unset_password_room", (data) =>
 		{
 			chatRoom.update((chat) =>{
-				chat.messages.get(data.room_name).is_password_protected = false;
+				chat.messages.get(data.id_public_room).is_password_protected = false;
 				return (chat);
 			})
 		});
@@ -264,29 +264,29 @@
 		});
 	}
 	function sendMessage(){
-		$client.socket.emit("new_message_room", {room_name: actualName, content_message: newMessage});
+		$client.socket.emit("new_message_room", {id_public_room: actualName, content_message: newMessage});
 	}
 	function setNotVisible(room : any) { //Supprime un room des rooms visibles
-		$client.socket.emit("set_room_not_visible", {room_name: room.room });
+		$client.socket.emit("set_room_not_visible", {id_public_room: room.room });
 		$chatRoom.deleteRoom(room.room);
 	}
 
 	function set_private_room()
 	{
-		$client.socket.emit("set_room_private", {room_name: $chatRoom.actualRoomName});
+		$client.socket.emit("set_room_private", {id_public_room: $chatRoom.actualRoomName});
 	}
 	function unset_private_room()
 	{
-		$client.socket.emit("unset_room_private", {room_name: $chatRoom.actualRoomName});
+		$client.socket.emit("unset_room_private", {id_public_room: $chatRoom.actualRoomName});
 	}
 	function set_password_room()
 	{
 		let password = prompt("Enter the new passwod's room: ");
-		$client.socket.emit("set_password_room", {room_name: $chatRoom.actualRoomName, password: password});
+		$client.socket.emit("set_password_room", {id_public_room: $chatRoom.actualRoomName, password: password});
 	}
 	function unset_password_room()
 	{
-		$client.socket.emit("unset_password_room", {room_name: actualName});
+		$client.socket.emit("unset_password_room", {id_public_room: actualName});
 	}
 	function banUser(username)
 	{
@@ -299,12 +299,12 @@
 			if (isNaN(res.getTime()))
 				alert("Bad date");
 			else 
-				$client.socket.emit("ban_user", { room_name : $chatRoom.actualRoomName, username_ban: username, ban_end: res});
+				$client.socket.emit("ban_user", { id_public_room : $chatRoom.actualRoomName, username_ban: username, ban_end: res});
 		}
 	}
 	function setAdmin(username)
 	{
-		$client.socket.emit("set_admin", { room_name : $chatRoom.actualRoomName, username_new_admin: username});
+		$client.socket.emit("set_admin", { id_public_room : $chatRoom.actualRoomName, username_new_admin: username});
 	}
 	function muteUser(username)
 	{
@@ -317,7 +317,7 @@
 			if (isNaN(res.getTime()))
 				alert("Bad date");
 			else 
-				$client.socket.emit("mute_user", { room_name : $chatRoom.actualRoomName, username_ban: username, mute_end: res});
+				$client.socket.emit("mute_user", { id_public_room : $chatRoom.actualRoomName, username_ban: username, mute_end: res});
 		}
 	}
 </script>
@@ -341,9 +341,9 @@
 			{#each ($chatRoom?.sortRoomsKeys([...$chatRoom.messages.keys()])) as room}
 			<div class="flex line">
 				{#if (room != actualName)}
-				<div class="room" on:click={() => chooseRoom({room})}>{room}</div>
+				<div class="room" on:click={() => chooseRoom({room})}>{$chatRoom.messages.get(room).room_name}</div>
 				{:else}
-				<div class="room chosen" on:click={() => chooseRoom({room})}>{room}</div>
+				<div class="room chosen" on:click={() => chooseRoom({room})}>{$chatRoom.messages.get(room).room_name}</div>
 				{/if}
 				<div class="button" on:click={() => setNotVisible({room})}>
 				<p>Quit</p>
@@ -373,7 +373,7 @@
 
 			{/if}
 			{#each actualMessages?.messages as message}
-				<ChatRoomMessage username={message.username} content_message={message.message} itself={ itself } axelUserProfileModal={axelUserProfileModal} is_admin={actualMessages.is_admin}/>
+				<ChatRoomMessage username={message.username} content_message={message.message} itself={ itself } axelUserProfileModal={itself} is_admin={actualMessages.is_admin}/>
 			{/each}
 			</div>
 			<div class="write">
