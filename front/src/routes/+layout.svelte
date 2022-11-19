@@ -21,6 +21,7 @@
 	import { browser } from "$app/environment";
     import { loginState } from "$lib/stores/var";
     import { chatRoom } from '$lib/stores/chatRoom';
+    import Loading from '../lib/Loading.svelte';
 
 	let login: boolean;
 	let tryConnect: boolean = false;
@@ -138,6 +139,6 @@
 	{#if tryConnect}
 	<slot />
 	{:else}
-	<div>Loading...</div>
+	<Loading />
 	{/if}
 </main>
