@@ -13,9 +13,9 @@
 
 		.tools {
 			width: 100%;
-			height: 10%;
+			height: 7%;
 			gap: .2em;
-			padding: .2em;
+			padding-left: 1em;
 			padding-top: 0;
 
 			button {
@@ -27,16 +27,21 @@
 				cursor: pointer;
 				transition: .3s;
 
-				&:nth-child(1):hover { background-color: $main-bright; }
-				&:nth-child(2):hover { background-color: $submain-lowshadeblue; }
+				&:nth-child(1) { background-color: $main-bright; }
+				&:nth-child(2) { background-color: $submain-lowshadeblue; }
 			}
 		}
 
 		.list {
+			border-top: $border;
+			border-right: $border;
+			border-radius: 0 1em 0 0;
 			padding-right: .5em;
+			height: 93%;
 			gap: 0.1em;
+
 			p {
-				padding-left: .5em;
+				text-align: center;
 				font-size: 25px;
 				margin: .5em;
 			}
@@ -101,15 +106,19 @@
 						p { opacity: .5; }
 					}
 				}
+			}
 
-
+			.no-room {
+				height: 100%;
+				font-size: 15px;
+				justify-content: center;
+				padding-top: 30%;
 			}
 		}
 	}
 
 	.chatroom {
-		width: 60%;
-		border-right: $border;
+		width: 77%;
 
 		.read {
 			overflow-y: scroll;
@@ -155,12 +164,10 @@
 		.no-select {
 			width: 100%;
 			height: 100%;
-			padding-left: 4em;
+			justify-content: center;
 			align-items: center;
 		}
 	}
-
-	
 
 	.users {
 		width: 17%;
@@ -211,6 +218,8 @@
 	
 	let addRoomModal: any;
 	let allChatRoomModal: any;
+
+	$: console.log($chatRoom);
 
 	//afterUpdate(() => {
 			//message_zone.scroll({top: 1000000000});
@@ -361,7 +370,8 @@
 			<button on:click={() => { allChatRoomModal.open(); }}>Join</button>
 		</div>
 		<div class="vflex list">
-			<p>MyRoomList</p>
+			<p>My Rooms</p>
+			{#if $chatRoom?.rooms.length}
 			{#each ($chatRoom?.sortRoomsKeys([...$chatRoom.messages.keys()])) as room}
 			<div class="flex line">
 				{#if (room != actualName)}
@@ -374,11 +384,11 @@
 				</div>
 			</div>
 			{/each}
+			{:else}
+			<div class="flex no-room">You didn't join any room yet</div>
+			{/if}
 		</div>
 	</div>
-	
-	<!--Zone de liste des messages de la room selectionne-->
-	<!-- <div class="vflex chatroom" bind:this={message_zone}> -->
 	<div class="vflex chatroom">
 		{#if ($chatRoom.actualRoomName !== "")}
 			<div class="read">
@@ -394,7 +404,6 @@
 				{:else}
 					<input class="button" value="add password" on:click={set_password_room}>
 				{/if}
-
 			{/if}
 			{#each actualMessages?.messages as message}
 				<!-- <ChatRoomMessage username={message.username} content_message={message.message} itself={ itself } axelUserProfileModal={axelUserProfileModal} is_admin={actualMessages.is_admin}/> -->
@@ -404,24 +413,24 @@
 				<input class="text-input" placeholder="write your message here..." bind:value={newMessage}>
 				<button on:click={sendMessage}>send</button>
 			</div>
+			<div class="vflex users">
+				<p>Online</p>
+				<div class="vflex list">
+					{#each actualMessages?.usersRoom as actual_user}
+					<div class="user">
+						<div>{actual_user.username}</div>
+						<!-- <input type="button" class="btn-room" value="mute" on:click={()=>muteUser(actual_user.username)}/>
+						<input type="button" class="btn-room" value="ban" on:click={()=>banUser(actual_user.username)}/>
+						<input type="button" class="btn-room" value="set Admin" on:click={()=>setAdmin(actual_user.username)}/> -->
+					</div>
+					{/each}
+				</div>
+			</div>
 		{:else}
 			<div class="flex no-select">
 				<h2>Please select a room</h2> 
 			</div>
 		{/if}
 	</div>
-
-	<div class="vflex users">
-		<p>Online</p>
-		<div class="vflex list">
-			{#each actualMessages?.usersRoom as actual_user}
-			<div class="user">
-				<div>{actual_user.username}</div>
-				<!-- <input type="button" class="btn-room" value="mute" on:click={()=>muteUser(actual_user.username)}/>
-				<input type="button" class="btn-room" value="ban" on:click={()=>banUser(actual_user.username)}/>
-				<input type="button" class="btn-room" value="set Admin" on:click={()=>setAdmin(actual_user.username)}/> -->
-			</div>
-			{/each}
-		</div>
-	</div>
 </div>
+
