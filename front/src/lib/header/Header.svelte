@@ -104,13 +104,13 @@
 </style>
 
 <script lang="ts">
-    import UserProfile from "$lib/modals/UserProfile.svelte";
+    import UserProfile from "$lib/profile/UserProfile.svelte";
     import { user } from "$lib/stores/user";
     import { client } from "$lib/stores/client";
     import { loginState } from "$lib/stores/var";
     import Modal from "$lib/tools/Modal.svelte";
 	import Friends from "$lib/modals/Friends.svelte"
-    import { chatRoom } from "../stores/chatRoom";
+    import { chatRoom } from "$lib/stores/chatRoom";
 
 	let profileModal: any;
 	let login: boolean;

@@ -11,9 +11,9 @@
 	import Room from "$lib/game/Room.svelte";
 	import Message from '$lib/modals/Message.svelte';
 	import PlayOrChat from "$lib/modals/PlayOrChat.svelte";
-    import CreateGame from "$lib/modals/CreateGame.svelte";
-    import EnterGame from "$lib/modals/EnterGame.svelte";
-    import RoomList from "$lib/modals/RoomList.svelte";
+    import CreateGame from "$lib/game/CreateGame.svelte";
+    import EnterGame from "$lib/game/EnterGame.svelte";
+    import JoinGame from "$lib/game/JoinGame.svelte";
     import NewChatRoom from '$lib/chat/NewChatRoom.svelte';
 
 	let roomModal: any;
@@ -22,7 +22,7 @@
 	let messageModal: any;
 	let modalMessage: string = "";
 
-	let roomListModal: any;
+	let joinGameModal: any;
 	let enterModal: any;
 	let enterGameModal: any;
 	let createGameModal: any;
@@ -42,9 +42,8 @@
 			console.log('JoinRes', data);
 			if (data.allowed) {
 				roomId = data.roomId;
-				roomListModal.close();
+				joinGameModal.close();
 				roomModal.open();
-				return ;
 			} else {
 				modalMessage = "You cannot enter this room";
 				messageModal.open();
@@ -54,6 +53,11 @@
 		$client.socket.on("askFriendNotification", (data: any) => {
 			console.log("Notif", data);
 		})
+
+		$client.socket.on("MatchFound", (data: any) => {
+			roomId = data;
+			roomModal.open();
+		});
 	});
 </script>
 
@@ -70,11 +74,11 @@
 </Modal>
 
 <Modal bind:this={enterGameModal}>
-	<EnterGame itself={enterGameModal} createGameModal={createGameModal} roomListModal={roomListModal}/>
+	<EnterGame itself={enterGameModal} createGameModal={createGameModal} joinGameModal={joinGameModal}/>
 </Modal>
 
-<Modal bind:this={roomListModal}>
-	<RoomList itself={roomListModal} enterGameModal={enterGameModal}/>
+<Modal bind:this={joinGameModal}>
+	<JoinGame itself={joinGameModal} enterGameModal={enterGameModal}/>
 </Modal>
 
 <Modal bind:this={messageModal}>
@@ -86,5 +90,5 @@
 </Modal>
 
 <Header />
-<Title title={"TRANSCENDENCE"} roomListModal={roomListModal} enterModal={enterModal}
+<Title title={"TRANSCENDENCE"} joinGameModal={joinGameModal} enterModal={enterModal}
 	enterGameModal={enterGameModal} createGameModal={createGameModal}/>

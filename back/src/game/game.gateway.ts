@@ -31,7 +31,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	clients: Map<string, Client>;
 	rooms: Map<string, Room>;
 	roomlistClients: Array<any>;
-	queue: Array<Client>;
+	queue: Array<any>;
 	control: Map<string, any>;
 
 	constructor(private mainServerService : MainServerService, private jwtService: JwtService, 
@@ -68,7 +68,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	public handleConnection(client: any, ...args: any[]): void {
 		console.log("Connection!!", client.id);
 		const user: any = (this.jwtService.decode(client.handshake.headers.authorization.split(' ')[1]));
-  		console.log("test", user);
 		let newClient = new Client(client, user.username, {});
 		this.clients.set(newClient.id, newClient);
 
@@ -91,32 +90,34 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
 	@SubscribeMessage("JoinQueue")
-	joinQueue(@MessageBody() data: any) {
-		console.log("Join Queue", data);
-		let client = this.getClient(data);
-		//TODO: should maybe optimize the algorithm later -- for includes
-		if (client && (client.room.length || this.queue.includes(client)))
+	async joinQueue(@ConnectedSocket() client: Socket, @MessageBody() data: any, @Request() req) {
+		const user: any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
+		let userInfo = await this.getPlayerInfo(data);
+		if (user.username != userInfo.username)
 			return ;
+		// TODO protection necessaire
+		// let client = this.getClient(data);
+		// //TODO: should maybe optimize the algorithm later -- for includes
+		// if (client && (client.room.length || this.queue.includes(client)))
+		// 	return ;
 
-		this.queue.push(client);
-
-		// TODO plus tard
+		this.queue.push([userInfo, client]);
+		console.log("how many?", this.queue.length);
 		if (this.queue.length > 1) {
-			let room = new Room([this.queue[0], this.queue[1]], [], "", "Medium", 10, "Normal", "Normal", true, "", this.gameRep, this.mainServerService, this.dataSource, this.userService);
+			let room = new Room([this.queue[0][0], this.queue[1][0]], [this.queue[0][1], this.queue[1][1]], "", "Medium", 10, "Normal", "Normal", true, "", this.gameRep, this.mainServerService, this.dataSource, this.userService);
 			// TODO: think about it: if i just join a match randomlmy like this, it could be by default a private game
-			this.queue[0].room = room.id;
-			this.queue[1].room = room.id;
-
-			room.broadcast('MatchFound', room.id);
-
+			// this.queue[0].room = room.id;
+			// this.queue[1].room = room.id;
+			room.broadcast("MatchFound", room.id);
 			this.rooms.set(room.id, room);
-			this.queue = this.queue.slice(2);
+			this.queue.splice(0, 2);
 		}
 	}
 
 	@SubscribeMessage("LeaveQueue")
-	leaveQueue(@MessageBody() data: any) {
-		let index = this.queue.indexOf(this.getClient(data));
+	leaveQueue(@MessageBody() data: any, @Request() req) {
+		const user: any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
+		let index = this.queue.findIndex(x => x[0].username == user.username);
 		if (index > -1)
 			this.queue.splice(index, 1);
 		// TODO algo & protection revoir
@@ -227,7 +228,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				userInfo: newPlayer
 			});
 			room.addPlayer(client, newPlayer);
-			console.log("hahaha");
 			// this.updateRooms(RoomUpdate.PlayerJoin, {
 			// 	id: room.id,
 			// 	player: newPlayer

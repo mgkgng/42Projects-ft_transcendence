@@ -112,7 +112,7 @@
 	import { Puck } from '$lib/pong/Puck';
     import PongPuck from '$lib/game/PongPuck.svelte';
     import Modal from '$lib/tools/Modal.svelte';
-    import GameOver from '$lib/modals/GameOver.svelte';
+    import GameOver from '$lib/game/GameOver.svelte';
     import ConfirmMsg from '$lib/modals/ConfirmMsg.svelte';
     import { user } from '$lib/stores/user';
     import Player from '$lib/game/Player.svelte';

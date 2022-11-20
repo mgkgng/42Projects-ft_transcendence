@@ -108,15 +108,9 @@
 				padding: .2em;
 				border-right: $border-thin;
 
-				// &:nth-child(1) {
-				// 	background-color: $red;
-				// }
-
 				&:last-child {
 					border-right: none;
 				}
-
-				
 			}
 		}
 
@@ -271,10 +265,7 @@
 			rooms = rooms;
 		});
 
-		$client.socket.on("RoomListUpdate", (data: any) => {
-			console.log("Updated", data);
-			rooms = data.rooms;
-		});
+		$client.socket.on("RoomListUpdate", (data: any) => { rooms = data.rooms; });
 	});
 </script>
 

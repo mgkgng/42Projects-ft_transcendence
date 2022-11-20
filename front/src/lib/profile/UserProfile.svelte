@@ -118,7 +118,7 @@
 
 	import { chatRoom } from "$lib/stores/chatRoom.ts";
     import { browser } from '$app/environment';
-	import QrcodeModal from "$lib/modals/qrcodeModal.svelte"
+	import QRCodeModal from "$lib/profile/QRCodeModal.svelte"
     import Modal from "$lib/tools/Modal.svelte";
 
 	export let profileUser: any;
