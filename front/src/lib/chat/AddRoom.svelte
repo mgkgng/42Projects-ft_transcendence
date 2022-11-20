@@ -24,6 +24,7 @@
 				font-size: 17px;
 				cursor: pointer;
 			}
+			
 			input[type="radio"]:checked + label { background-color: $main-bright;  }
 			input[id="private"]:checked + label { background-color: $main-bright;  }
 		}

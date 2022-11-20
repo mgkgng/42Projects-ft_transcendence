@@ -104,27 +104,18 @@
 </style>
 
 <script lang="ts">
-    import { goto } from "$app/navigation";
     import UserProfile from "$lib/modals/UserProfile.svelte";
-    import ChatModal from "$lib/chat/ChatRoom.svelte";
-    import AllChatModal from "$lib/chat/AllChatRooms.svelte";
     import { user } from "$lib/stores/user";
     import { client } from "$lib/stores/client";
     import { loginState } from "$lib/stores/var";
     import Modal from "$lib/tools/Modal.svelte";
-    import Setting from "$lib/modals/Setting.svelte";
-    import ChatDirectBox from "$lib/chat/ChatDirectBox.svelte";
 	import Friends from "$lib/modals/Friends.svelte"
     import { chatRoom } from "../stores/chatRoom";
 
 	let profileModal: any;
-	let chatModal: any;
 	let login: boolean;
-	let settingModal: any;
-	let chatDirectModal : any;
 	let friendsModal: any;
 
-	let chatRoomModal: any;
 
 	$:console.log($user);
 
@@ -140,13 +131,6 @@
 <Modal bind:this={profileModal} >
 	<UserProfile profileUser={$client.user_info}  />
 </Modal>
-<Modal bind:this={settingModal} >
-	<Setting itself={settingModal}/>
-</Modal>
-<Modal bind:this={chatDirectModal}>
-	<ChatDirectBox />
-</Modal>
-
 <Modal bind:this={friendsModal}>
 	<Friends itself={friendsModal} />
 </Modal>
@@ -164,9 +148,10 @@
 			{/if}
 		</div>
 		<div class="menu">
-			<button on:click={()=>{ profileModal.open(); chatRoom.update((chatRoom) => { chatRoom.username_search = $client.username; return (chatRoom); });}}>Profile</button>
+			<button on:click={()=>{
+				profileModal.open(); 
+			}}>Profile</button>
 			<button on:click={()=>{ friendsModal.open(); }}>Friends</button>
-			<button on:click={()=>{ settingModal.open(); }}>Setting</button>
 			<button on:click={handleLogout}>Logout</button>
 		</div>
 		{/if}
