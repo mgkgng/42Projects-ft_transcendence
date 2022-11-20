@@ -23,32 +23,21 @@
 		position: absolute;
 		top: 1.5em;
 		right: 8em;
-		width: 12em;
-		height: 2.5em;
-		gap: 0;
-
-		border: $border;
-		border-radius: .2em;
-		background-color: #212121;
 
 		label {
-			width: 49%;
-			height: 100%;
-			font-size: 15px;
+			display: inline-block;
+			border: $border;
+			border-radius: .2em;
+			width: 6em;
+			height: 2.5em;
+			text-align: center;
+			padding: .5em;
+			font-size: 17px;
 			cursor: pointer;
-
-			&:nth-child(2) { border-left: $border; }
-		
-			.wrapper {
-				position: absolute;
-				width: 50%;
-				height: 100%;
-				padding-top: .7em;
-			}
-
-			input { display: none;	}
-			input:checked + .wrapper { background-color: $main-lowshade; }
 		}
+		input { display: none; }
+		input:checked + label { background-color: $main-bright; }
+
 	}
 
 	.room-container {
@@ -298,14 +287,8 @@
 		}}>&lt</button>
 	</div>
 	<div class="flex tools">
-		<label class="form">
-			<input type="checkbox" bind:checked={showAvailable} />
-			<div class="wrapper">Available</div>
-		</label>
-		<label class="form">
-			<input type="checkbox" bind:checked={showGrid} />
-			<div class="wrapper">Grid</div>
-		</label>
+		<input type="checkbox" id="only" bind:checked={showAvailable} />
+		<label for="only">Available</label>
 	</div>
 	<div class="flex room-container">
 		{#each roomsOnPage as room}
@@ -321,12 +304,6 @@
 				<div class="grey-box">?</div>
 				{/if}
 			</div>
-			<!-- <div class="info"> TODO
-				<div>{room.mapInfo[0]} pts</div>
-				<div>{room.mapInfo[1]} Size</div>
-				<div>{room.mapInfo[2]} Speed</div>
-				<div>{room.mapInfo[3]} Paddle</div>
-			</div> -->
 			<div class="flex buttons">
 				<button class="watch" on:click={()=>joinRoom(room.id, false)}>WATCH</button>
 				<button class="play" on:click={()=>joinRoom(room.id, true)}>PLAY</button>

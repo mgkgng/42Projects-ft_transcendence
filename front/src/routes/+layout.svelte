@@ -5,8 +5,26 @@
 		min-width: 800px;
 		height: 100vh;
 		overflow: hidden;
+		display: flex;
+		justify-content: center;
 
 		background-color: #000;
+
+		.load {
+			position: absolute;
+			color: #fff;
+			top: 50%;
+			left: 50%;
+
+			width: 5em;
+			height: 5em;
+
+			p {
+				position: absolute;
+				top: 18%;
+				left: 8%;
+			}
+		}
 	}
 </style>
 
@@ -21,7 +39,6 @@
 	import { browser } from "$app/environment";
     import { loginState } from "$lib/stores/var";
     import { chatRoom } from '$lib/stores/chatRoom';
-    import Loading from '../lib/Loading.svelte';
 
 	let login: boolean;
 	let tryConnect: boolean = false;
@@ -65,7 +82,7 @@
 			$client.connect();
 			loginState.set(true);
 			goto('/');
-		}catch(e){
+		} catch(e){
 			console.log("NOT CONNECTED");
 			loginState.set(false);
 			localStorage.removeItem('transcendence-jwt');
@@ -139,6 +156,9 @@
 	{#if tryConnect}
 	<slot />
 	{:else}
-	<Loading />
+	<div class="load">
+		<div class="loading"></div>
+		<p>Loading...</p>
+	</div>
 	{/if}
 </main>
