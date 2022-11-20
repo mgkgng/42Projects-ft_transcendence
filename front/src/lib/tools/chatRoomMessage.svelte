@@ -21,7 +21,6 @@
 	export let	username : any;
 	export let content_message : any;
 	export let itself : any;
-	export let axelUserProfileModal : any;
 	export let is_admin : boolean;
 
 	function seeUserProfile()
@@ -31,7 +30,6 @@
 			return value;
 		});
 		itself.close();
-		axelUserProfileModal.open();
 	}
 	function banUser()
 	{

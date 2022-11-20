@@ -104,10 +104,8 @@
 	import { get } from 'svelte/store';
     import ChatRoomMessage from "$lib/tools/chatRoomMessage.svelte";
     import AllChatRooms from "./AllChatRooms.svelte";
-    import AxelUserProfile from "../modals/AxelUserProfile.svelte";
 	
 	export let itself: any; 
-	export let axelUserProfileModal : any;
 	export let allChatModal: any;
 
 	let newRoomName : string; //Valeur du insert de création de room
@@ -301,7 +299,7 @@
 
 			{/if}
 			{#each actualMessages?.messages as message}
-				<ChatRoomMessage username={message.username} content_message={message.message} itself={ itself } axelUserProfileModal={axelUserProfileModal} is_admin={actualMessages.is_admin}/>
+				<ChatRoomMessage username={message.username} content_message={message.message} itself={ itself } is_admin={actualMessages.is_admin}/>
 			{/each}
 			<input class="text-input" bind:value={newMessage}>
 			<input type="button" class="submit" value="send" on:click={sendMessage}>

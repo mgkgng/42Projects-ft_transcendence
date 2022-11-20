@@ -37,7 +37,6 @@
 		}
 		input { display: none; }
 		input:checked + label { background-color: $main-bright; }
-
 	}
 
 	.room-container {

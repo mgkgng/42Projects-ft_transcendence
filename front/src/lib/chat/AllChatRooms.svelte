@@ -2,26 +2,61 @@
 	.rooms {
 		width: 550px;
 		height: 550px;
+
+		.research {
+			justify-content: center;
+			align-items: center;
+			gap: .5em;
+
+			input {
+				border-radius: .2em;
+				width: 15em;
+				height: 1.5em;
+				background-color: #fff;
+				color: #000;
+				padding-left: .4em;
+			}
+			button {
+				height: 1.2em;
+			}
+		}
+
+		.result {
+			width: 100%;
+			height: 80%;
+			overflow-y: scroll;
+			gap: .2em;
+
+			.list {
+				position: relative;
+				height: 3em;
+				border: $border-thin;
+				border-radius: .3em;
+				align-items: center;
+				padding-left: 1em;
+
+				button {
+					width: 4em;
+					height: 100%;
+					position: absolute;
+					right: 0;
+					border-left: $border-thin;
+					background-color: transparentize(#fff, .9);
+					transition: .2s;
+					&:hover {
+						background-color: $submain-lowshadeblue;
+					}
+				}
+
+				&:hover {
+				background-color: transparentize(#fff, .8);
+				}
+			}
+
+		}
 	}
+
 	
-	.room-zone {
-		width: 100%;
-		color:rgb(255, 255, 255);
-		max-height: 90%;
-		background-color: transparentize(#000, 0.2);
-		border: 2px solid transparentize(#fff, .6);
-		border-radius: 0.5em;
-		overflow-y: scroll;
-	}
-	.btn-room{
-		padding: 1em;
-		width: 20%;
-		border-radius: 0.5em;
-		color:rgb(255, 255, 255);
-		text-align: center;
-		background-color: rgba(97, 97, 97, 0.5);
-		cursor: pointer;
-	}
 	.back{
 		padding: 0em;
 		width: 50px;
@@ -33,27 +68,13 @@
 		background-color: rgba(97, 97, 97, 0.5);
 		cursor: pointer;
 	}
-	.room{
-		display: flex;
-		flex-direction: row;
-		justify-content: space-between;
-		padding: 0.2em;
-		margin: 0.5em;
-		border-color: #fff;
-		border-width: 1px;
-		border-style: solid;
-	}
+
 	.research-zone{
 		display: flex;
 		flex-direction: row;
 		padding: 0.2em;
 		margin: 0.5em;
 		height: 40px;
-	}
-	.text-input{
-		margin : 0.5em;
-		background-color: white;
-		color: black;
 	}
 </style>
 
@@ -74,6 +95,10 @@
 	onMount(() => {
 		$client.socket.emit("get_all_rooms_begin_by", {research: research});
 
+		return (() => {
+			$client.socket.off("get_all_rooms_begin_by");
+			// $client
+		})
 	});
 
 	function addToTheRoom(room : any)
@@ -95,20 +120,18 @@
 </script>
 
 <div class="vflex window rooms">
-	<div class="room-zone">
-		<div class="research-zone">
-			<input class="text-input" bind:value={research}>
-			<button class="btn-room" on:click={researchRooms}>Search</button>
-		</div>
-		<ul>
+	<div class="flex research">
+		<input class="text-input" placeholder="Search Room Name ..." bind:value={research}>
+		<button on:click={researchRooms}>Search</button>
+	</div>
+	<div class="vflex result">
 		{#each ([...all_rooms.keys()].sort()) as room_name}
-			{#if (rooms.includes(room_name)) == false}
-				<li class="room">
+			{#if (!rooms.includes(room_name))}
+				<div class="flex list">
 					<p>{room_name}</p>
-					<button class="btn-room" on:click={addToTheRoom(room_name)}>Add</button>
-				</li>
+					<button on:click={() => addToTheRoom(room_name)}>Join</button>
+				</div>
 			{/if}
 		{/each}
-		</ul>
 	</div>
 </div>

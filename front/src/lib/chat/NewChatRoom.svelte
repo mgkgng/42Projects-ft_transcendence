@@ -201,7 +201,6 @@
     import AllChatRooms from "$lib/chat/AllChatRooms.svelte";
 
 	export let itself: any; 
-	// export let axelUserProfileModal : any;
 	// export let allChatModal: any;
 
 	let newMessage : string;
@@ -262,6 +261,7 @@
 		chatRoom.update(chat => { 
 			chat.actualRoom = chat.messages.get(room.room);
 			chat.actualRoomName = room.room;
+			message_zone.scrollTo({top: 1000000000});
 			return (chat);
 		});
 	}
@@ -272,7 +272,12 @@
 		$client.socket.emit("set_room_not_visible", {room_name: room.room });
 		$chatRoom.deleteRoom(room.room);
 	}
-
+	function createRoom()
+	{
+		if (newRoomPassword == null)
+			newRoomPassword = ""
+		$client.socket.emit("new_room", {room_name: newRoomName, is_password_protected: is_new_room_password_protected, room_password: newRoomPassword, is_private: false});
+	}
 	function set_private_room()
 	{
 		$client.socket.emit("set_room_private", {room_name: $chatRoom.actualRoomName});
@@ -322,6 +327,23 @@
 				$client.socket.emit("mute_user", { room_name : $chatRoom.actualRoomName, username_ban: username, mute_end: res});
 		}
 	}
+	let files : any;
+	
+	function handleSubmits(event) {
+		console.log(event)
+  		let image = files[0];
+		const data = new FormData();
+		data.append('file', image);
+		console.log(data, image);
+		
+		fetch("http://localhost:3000/upload_image", {
+			method: "POST",
+			body: data,
+			headers: {
+				"Authorization": "Bearer " + localStorage.getItem("transcendence-jwt"),
+			}
+		})
+	};
 </script>
 
 <Modal bind:this={addRoomModal}>
@@ -339,7 +361,7 @@
 			<button on:click={() => { allChatRoomModal.open(); }}>Join</button>
 		</div>
 		<div class="vflex list">
-			<p>RoomList</p>
+			<p>MyRoomList</p>
 			{#each ($chatRoom?.sortRoomsKeys([...$chatRoom.messages.keys()])) as room}
 			<div class="flex line">
 				{#if (room != actualName)}
@@ -375,7 +397,7 @@
 
 			{/if}
 			{#each actualMessages?.messages as message}
-				<ChatRoomMessage username={message.username} content_message={message.message} itself={ itself } axelUserProfileModal={axelUserProfileModal} is_admin={actualMessages.is_admin}/>
+				<!-- <ChatRoomMessage username={message.username} content_message={message.message} itself={ itself } axelUserProfileModal={axelUserProfileModal} is_admin={actualMessages.is_admin}/> -->
 			{/each}
 			</div>
 			<div class="write">

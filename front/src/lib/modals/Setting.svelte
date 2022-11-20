@@ -24,7 +24,6 @@
 			}
 		}
 	}
-
 </style>
 
 <script lang="ts">
