@@ -55,6 +55,8 @@
 		})
 
 		$client.socket.on("MatchFound", (data: any) => {
+			console.log("matchfound", data);
+
 			roomId = data;
 			roomModal.open();
 		});
@@ -90,5 +92,4 @@
 </Modal>
 
 <Header />
-<Title title={"TRANSCENDENCE"} joinGameModal={joinGameModal} enterModal={enterModal}
-	enterGameModal={enterGameModal} createGameModal={createGameModal}/>
+<Title title={"TRANSCENDENCE"} enterModal={enterModal}/>

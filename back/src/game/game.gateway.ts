@@ -92,10 +92,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		// Check if client is available
 		let target = this.getClient(req);
 		if (target.state != UserState.Available) {
-			client.emit("JoinQueueRes", {
-				allowed: false,
-				errorMsg: (target.state == UserState.Waiting) ? ErrorMessage.AlreadyJoined : ErrorMessage.NotAvailble
-			});
+			client.emit("JoinQueueError", (target.state == UserState.Waiting) ? ErrorMessage.AlreadyJoined : ErrorMessage.NotAvailble);
 			return ;
 		}
 
@@ -105,7 +102,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 		// Game distribution
 		if (this.queue.length > 1) {
-
 			// create a room for two players
 			let [target1, target2] = [this.getClient(this.queue[0][0]), this.getClient(this.queue[1][0])];
 			let [player1, player2] = [this.getPlayerInfo(target1.username), this.getPlayerInfo(target2.username)];
@@ -117,16 +113,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			this.queue.splice(0, 2);
 
 			// broadcast to let them join the game
-			room.broadcast("JoinQueueRes", {
-				allowed: true,
-				roomId: room.id
-			});
+			room.broadcast("MatchFound", room.id);
 		}
 	}
 
 	@SubscribeMessage("LeaveQueue")
 	leaveQueue(@Request() req) {
-
 		// Check if the target is effectively waiting for the game
 		let target = this.getClient(req);
 		if (target.state != UserState.Waiting)

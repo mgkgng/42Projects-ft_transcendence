@@ -35,20 +35,35 @@
     import { client } from "$lib/stores/client";
 	import { onMount } from "svelte";
     import { user } from "$lib/stores/user";
+    import Modal from "$lib/tools/Modal.svelte";
+	import Message from "$lib/modals/Message.svelte";
 
 	export let itself: any;
 	export let createGameModal: any;
 	export let joinGameModal: any;
 
+	let messageModal: any;
+	let modalMessage: string;
+
 	let loading = false;
 
 	onMount(() => {
+		$client.socket.on("JoinQueueError", (data: any) => {
+			loading = false;
+			modalMessage = data;
+			messageModal.open();
+		});
+
 		return (() => {
 			if (loading)
 				$client.socket.emit("LeaveQueue");
 		});
 	})
 </script>
+
+<Modal bind:this={messageModal}>
+	<Message itself={messageModal} msg={modalMessage}/>
+</Modal>
 
 <div class="flex buttons">
 	<button class="join" on:click={()=>{
