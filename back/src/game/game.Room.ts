@@ -116,7 +116,7 @@ export class Room {
 		}
 		this.broadcast("PlayerUpdate", {
 			join: false,
-			userInfo: client.username,
+			username: client.username,
 			hostname: this.hostname
 		});
 		return (true);

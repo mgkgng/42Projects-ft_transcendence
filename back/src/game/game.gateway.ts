@@ -144,36 +144,52 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 		// Give the user the room information
 		target.broadcast("RoomFound", {
-			roomHost: room.hostname,
 			players: room.players,
+			hostname: room.hostname,
 			maxpoint: room.maxpoint,
-			scores: room.scores,
-			mapSize: [room.pong.size[0], room.pong.size[1]],
-			paddleSize: room.pong.paddleSize
+			mapSize: room.pong.mapSize,
+			paddleSize: room.pong.paddles[0].width
 		});
 	}
 
 	@SubscribeMessage("PaddleMoveKey")
-	paddleMove(@MessageBody() data: any, @Request() req) {
+	paddleMoveKey(@MessageBody() data: any, @Request() req) {
 		// Check if the request came from a proper player
 		let target = this.getClient(req);
 		let room = this.getRoom(data.room);
+		if (!room || !room.players.has(target.username))
+			return ;
 
+		// Get the player
+		let player = room.players.get(target.username);
+	
+		// TODO protection switching between keyboard and mouse
 		// Paddle starts to move, Websocket Messages set with interval
-		let intervalId = setInterval(() => {
-			room.pong.movePaddle(data.player, data.left);
+		let intervalID = setInterval(() => {
+			room.pong.movePaddle(player.index, data.left);
 			room.broadcast("PaddleUpdate", {
 				player: data.player,
-				paddlePos: room.pong.paddlePos[data.player]
+				paddlePos: room.pong.paddles[player.index].pos
 			});
 		}, 20);
-		room.keyControl.set(data.client, intervalId);
+		player.control[0] = intervalID;
 	}
 
-	@SubscribeMessage("PaddleStop")
-	paddleStop(@MessageBody() data: any, @Request() req) {
-		clearInterval(this.keyControl.get(data));
-		this.keyControl.delete(data);
+	@SubscribeMessage("PaddleStopKey")
+	paddleStopKey(@MessageBody() data: any, @Request() req) {
+		// TODO is there any more efficient way to handle this?
+		// Check if the request came from a proper player
+		let target = this.getClient(req);
+		let room = this.getRoom(data);
+		if (!room || !room.players.has(target.username))
+			return ;
+
+		// Get the player
+		let player = room.players.get(target.username);
+
+		// clear the interval and delete it
+		clearInterval(player.control[0].get(data));
+		player.control[0] = undefined
 	}
 
 	@SubscribeMessage("AskRooms")
@@ -268,19 +284,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			// if the user is a watcher, remove the user from clients of the room
 			room.clients.delete(target.username);
 		}
- 
-		// TODO room list
-		// if (!room.players.size) {
-		// 	this.updateRooms(RoomUpdate.DeleteRoom, {
-		// 		id: room.id
-		// 	});
-		// 	this.rooms.delete(room.id);
-		// } else {
-		// 	this.updateRooms(RoomUpdate.PlayerExit, {
-		// 		id: room.id,
-		// 		userIndex: userIndex
-		// 	});
-		// }
 	}
 
 	@SubscribeMessage("isReady")

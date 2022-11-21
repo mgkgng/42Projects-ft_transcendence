@@ -336,8 +336,6 @@ on:keypress={(event) => {
 	moving = true;
 
 	$client.socket.emit("PaddleMove", {
-		client: $client.id,
-		player: userType,
 		room: roomId,
 		left: (userType == UserType.Player1 && event.code == 'KeyD'
 			|| userType == UserType.Player2 && event.code == 'KeyA')
@@ -349,7 +347,7 @@ on:keyup={(event)=>{
 		return ;
 	
 	//* TODO some precision to make
-	$client.socket.emit("PaddleStop", $client.id)
+	$client.socket.emit("PaddleStop", roomId);
 
 	moving = false;
 }}

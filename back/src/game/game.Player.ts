@@ -7,8 +7,7 @@ export class Player {
 	paddle: Paddle;
 	score: number;
 	index: number;
-	keyControl: any;
-	mouseControl: any;
+	control: Array<any>;
 
 	constructor(userInfo: any, isHost: boolean, index: number) {
 		this.username = userInfo.username_42;
@@ -16,7 +15,6 @@ export class Player {
 		this.isHost = isHost;
 		this.score = 0;
 		this.index = 0;
-		this.keyControl = undefined;
-		this.mouseControl = undefined;
+		this.control = [undefined, undefined];
 	}
 }
