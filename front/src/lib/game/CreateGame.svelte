@@ -72,7 +72,6 @@
 			label {
 				padding: 0 1em; 
 			}
-
 		}
 	}
 
@@ -129,11 +128,11 @@
 	export let enterGameModal: any;
 
 	let maxPoint: number = 10;
-	let puckSpeed: string = "Normal";
-	let mapSize: string = "Medium";
+	let puckSpeed: number = 1;
+	let mapSize: number = 1;
+	let paddleSize: number = 1;
 	let privateMode: boolean = false;
 	let roomTitle: string = "";
-	let paddleSize: string = "Normal";
 
 	//TODO radio -> colored block
 </script>
@@ -155,11 +154,11 @@
 		<div class="option">
 			<p>Size</p>
 			<div class="flex choice">
-				<input class="radio" id="size1" type=radio bind:group={mapSize} name="mapSize" value={"Small"}>
+				<input class="radio" id="size1" type=radio bind:group={mapSize} name="mapSize" value=0>
 				<label for="size1">Small</label>
-				<input class="radio" id="size2" type=radio bind:group={mapSize} name="mapSize" value={"Medium"}>
+				<input class="radio" id="size2" type=radio bind:group={mapSize} name="mapSize" value=1>
 				<label for="size2">Medium</label>
-				<input class="radio" id="size3" type=radio bind:group={mapSize} name="mapSize" value={"Large"}>
+				<input class="radio" id="size3" type=radio bind:group={mapSize} name="mapSize" value=2>
 				<label for="size3">Large</label>
 
 			</div>
@@ -174,25 +173,24 @@
 		<div class="option">
 			<p>Paddle Size</p>
 			<div class="flex choice">
-				<input class="radio" id="paddle1" type=radio bind:group={paddleSize} name="paddleSize" value={"Short"}>
+				<input class="radio" id="paddle1" type=radio bind:group={paddleSize} name="paddleSize" value=0>
 				<label for="paddle1">Short</label>
-				<input class="radio" id="paddle2" type=radio bind:group={paddleSize} name="paddleSize" value={"Normal"}>
+				<input class="radio" id="paddle2" type=radio bind:group={paddleSize} name="paddleSize" value=1>
 				<label for="paddle2">Normal</label>
-				<input class="radio" id="paddle3" type=radio bind:group={paddleSize} name="paddleSize" value={"Long"}>
+				<input class="radio" id="paddle3" type=radio bind:group={paddleSize} name="paddleSize" value=2>
 				<label for="paddle3">Long</label>
-
 			</div>
 		</div>
 		<div class="option">
 			<p>Puck Speed</p>
 			<div class="flex choice">
-				<input type=radio id="speed1" bind:group={puckSpeed} name="puckSpeed" value={"Slow"}>
+				<input type=radio id="speed1" bind:group={puckSpeed} name="puckSpeed" value=0>
 				<label for="speed1">Slow</label>
 
-				<input type=radio id="speed2" bind:group={puckSpeed} name="puckSpeed" value={"Normal"}>
+				<input type=radio id="speed2" bind:group={puckSpeed} name="puckSpeed" value=1>
 				<label for="speed2">Normal</label>
 
-				<input type=radio id="speed3" bind:group={puckSpeed} name="puckSpeed" value={"Fast"}>
+				<input type=radio id="speed3" bind:group={puckSpeed} name="puckSpeed" value=2>
 				<label for="speed3">Fast</label>
 
 			</div>
@@ -211,7 +209,6 @@
 	</div>
 	<button class="submit" on:click={()=>{
 		$client.socket.emit("CreateRoom", {
-			username: $user.username,
 			title: (roomTitle.length) ? roomTitle : "Let's enjoy pong together!",
 			mapSize: mapSize,
 			maxPoint: maxPoint,

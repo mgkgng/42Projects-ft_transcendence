@@ -15,11 +15,11 @@ import { Player } from "./game.Player";
 export class Room {
 	/* RoomInfo */
 	id: string;
+	mapInfo: any;
 	title: string;
 	size: number;
 	maxpoint: number;
 	hostname: string;
-	mapInfo: Array<string>;
 
 	/* RoomState */
 	privateMode: boolean;
@@ -39,8 +39,7 @@ export class Room {
 	// keyControl: Map<string, any>;
 	// mouseControl: Map<string, any>;
 		
-	constructor(playersInfo: Array<any>, clients: Array<any>, title:string, mapSize: string, maxpoint: number,
-		puckSpeed : string, paddleSize:string, privateMode : boolean = true, hostname: string = "",
+	constructor(playersInfo: Array<any>, clients: Array<any>, mapInfo: any, hostname: string = "",
 		@InjectRepository(GameEntity) private gameRep: Repository<GameEntity>, 
 				private mainServerService : MainServerService,
 				private dataSource : DataSource,

@@ -19,23 +19,33 @@ export function replacer() {
     });
 }
 
-export const PaddleSize = {
-	"Short" : 40,
-	"Normal" : 80,
-	"Long" : 130
-}
+export const PaddleSize = [40, 80, 120];
 
-export const MapSize = {
-	"Small": [200, 300],
-	"Medium": [300, 500],
-	"Large": [400, 700]
-}
+export const MapSize = [
+	[200, 300],
+	[300, 500],
+	[400, 700]
+]
 
-export const PuckSpeed = {
-	"Slow" : 3,
-	"Normal" : 5,
-	"Fast" : 8
-}
+export const PuckSpeed = [3, 8, 13]
+
+// export const PaddleSize = {
+// 	"Short" : 40,
+// 	"Normal" : 80,
+// 	"Long" : 130
+// }
+
+// export const MapSize = {
+// 	"Small": [200, 300],
+// 	"Medium": [300, 500],
+// 	"Large": [400, 700]
+// }
+
+// export const PuckSpeed = {
+// 	"Slow" : 3,
+// 	"Normal" : 5,
+// 	"Fast" : 8
+// }
 
 export const RoomUpdate = {
 	NewRoom: 0,

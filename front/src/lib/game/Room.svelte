@@ -324,32 +324,30 @@ what is this?
 </Modal>
 
 <svelte:window
+	on:keypress={(event) => {
+		if (userType == UserType.Watcher
+		|| (event.code != 'KeyA' && event.code != 'KeyD'))
+			return ;
 
-on:keypress={(event) => {
-	if (userType == UserType.Watcher
-	|| (event.code != 'KeyA' && event.code != 'KeyD'))
-		return ;
+		if (moving) //* TODO should make movement more fluent
+			return ;
 
-	if (moving) //* TODO should make movement more fluent
-		return ;
+		moving = true;
 
-	moving = true;
+		$client.socket.emit("PaddleMove", {
+			room: roomId,
+			left: (userType == UserType.Player1 && event.code == 'KeyD'
+				|| userType == UserType.Player2 && event.code == 'KeyA')
+		});
+	}}
 
-	$client.socket.emit("PaddleMove", {
-		room: roomId,
-		left: (userType == UserType.Player1 && event.code == 'KeyD'
-			|| userType == UserType.Player2 && event.code == 'KeyA')
-	});
-}}
+	on:keyup={(event)=>{
+		if (event.code != 'KeyA' && event.code != 'KeyD')
+			return ;
+		
+		//* TODO some precision to make
+		$client.socket.emit("PaddleStop", roomId);
 
-on:keyup={(event)=>{
-	if (event.code != 'KeyA' && event.code != 'KeyD')
-		return ;
-	
-	//* TODO some precision to make
-	$client.socket.emit("PaddleStop", roomId);
-
-	moving = false;
-}}
-
+		moving = false;
+	}}
 />

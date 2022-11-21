@@ -15,8 +15,5 @@ export class Client {
 		this.state = UserState.Available;
 	}
 
-	broadcast(event: string, data: any) {
-		GameGateway.broadcast(this.sockets.values(), event, data);
-	}
-
+	broadcast(event: string, data: any) { GameGateway.broadcast(this.sockets.values(), event, data); }
 }

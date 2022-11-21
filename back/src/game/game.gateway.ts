@@ -23,6 +23,7 @@ import { ErrorMessage, RoomUpdate, UserState } from "./game.utils";
 
 //TODO Too many connections for a client
 //TODO if the client websocket contains request, handshake..
+//TODO put username_42 inside of client and replace everything with it
 
 @WebSocketGateway({
 	cors: {
@@ -212,28 +213,22 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
 	@SubscribeMessage("CreateRoom")
-	async createRoom(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
-		console.log("CreateRoom", data);
-		
-		// TODO should be able to have client's room state
-		// if (client.room.length)
-		// 	return ;
-		let user = await this.getPlayerInfo(data.username);
-		let room = new Room([user], [client], data.title, data.mapSize, data.maxPoint,
-			data.puckSpeed, data.paddleSize, data.privateMode, data.username,
+	async createRoom(@ConnectedSocket() client: Socket, @MessageBody() data: any, @Request() req) {		
+		// Check if the client is already playing or watching a game
+		let target = this.getClient(req);
+		if (target.state != UserState.Available) {
+			client.emit("CreateRoomError", ErrorMessage.UserNotAvailble);
+			return ;
+		}
+
+		// Create the room with the data
+		let room = new Room([this.getPlayerInfo(target.username)], [target], data, target.username,
 			this.gameRep, this.mainServerService, this.dataSource, this.userService);
 		this.rooms.set(room.id, room);
+		target.state = UserState.Playing;
 
-		// TODO should be able to set client's room state
-		// client.room = room.id;
-
-		client.emit("RoomCreated", room.id);
-		this.updateRooms(RoomUpdate.NewRoom, {
-			id: room.id,
-			players: room.players,
-			title: room.title,
-			mapInfo: room.mapInfo
-		});
+		// Invite the user to the room
+		target.broadcast("RoomCreated", room.id);
 	}
 
 	@SubscribeMessage("JoinRoom")
