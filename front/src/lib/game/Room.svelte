@@ -287,7 +287,7 @@
 				return ;
 			}
 			tryStart = true;
-			$client.socket.emit("StartGame", { roomId: roomId })
+			$client.socket.emit("StartGame", roomId)
 		}}>START</button>
 		{:else}
 		<button class="start loading"></button>
@@ -297,7 +297,7 @@
 		<button class="ready" on:click={()=>{
 			$client.socket.emit("isReady", {
 				roomId: roomId,
-				ready: !ready,
+				isReady: !ready,
 			});
 		}}>{(!ready) ? "READY" : "CANCEL"}</button>
 		{/if}

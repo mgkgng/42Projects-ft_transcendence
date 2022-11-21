@@ -160,7 +160,6 @@
 				<label for="size2">Medium</label>
 				<input class="radio" id="size3" type=radio bind:group={mapSize} name="mapSize" value=2>
 				<label for="size3">Large</label>
-
 			</div>
 		</div>
 		<div class="option">
@@ -186,10 +185,8 @@
 			<div class="flex choice">
 				<input type=radio id="speed1" bind:group={puckSpeed} name="puckSpeed" value=0>
 				<label for="speed1">Slow</label>
-
 				<input type=radio id="speed2" bind:group={puckSpeed} name="puckSpeed" value=1>
 				<label for="speed2">Normal</label>
-
 				<input type=radio id="speed3" bind:group={puckSpeed} name="puckSpeed" value=2>
 				<label for="speed3">Fast</label>
 

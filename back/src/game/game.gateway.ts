@@ -192,11 +192,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		player.control[0] = undefined
 	}
 
-	@SubscribeMessage("RoomList")
+	@SubscribeMessage("RoomListReq")
 	roomList(@ConnectedSocket() client: Socket) {
-		//TODO should check if it still works when the client leaves the modal
-		this.roomlistClients.push(client);
-
 		let allRooms = [];
 		for (let room of this.rooms.values()) {
 			if (room.isPrivate)
@@ -207,7 +204,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				gameInfo: room.gameInfo
 			});
 		}
-		client.emit("roomListRes", { rooms: allRooms });
+		client.emit("RoomListRes", { rooms: allRooms });
 	}
 
 	@SubscribeMessage("CreateRoom")
@@ -281,30 +278,34 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage("isReady")
 	setReady(@MessageBody() data: any, @Request() req) {
-		console.log("ready");
-
-		const user : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
+		// Check if the client is a guest player in the room
+		let target = this.getClient(req);
 		let room = this.getRoom(data.roomId);
-		if (!room || user.username_42 != room.players[1].username_42)//for example
+		if (!room || !room.players.has(target.username) || room.hostname == target.username)
 			return ;
 
-		room.ready = data.ready;
-		room.broadcast("ReadyUpdate", { ready: room.ready });
+		// Set room state and broadcast
+		room.isReady = data.isReady;
+		room.broadcast("ReadyUpdate", room.isReady);
 	}
 
 	@SubscribeMessage("StartGame")
 	startGame(@ConnectedSocket() client: Socket, @MessageBody() data: any, @Request() req) {
-		const user : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
-		let room = this.getRoom(data.roomId);
-		if (!room || user.username_42 != room.players[0].username_42)
+		// Check if the client is a host player in the room and room is full
+		let target = this.getClient(req);
+		let room = this.getRoom(data);
+		if (!room || !room.players.has(target.username) || room.hostname != target.username || room.players.size != 2)
 			return ;
 
-		if (!room.ready) {
-			client.emit("StartGameFail");
+		// Check if the guest player is ready
+		if (!room.isReady) {
+			client.emit("StartGameError", ErrorMessage.RoomNotReady);
 			return ;
 		}
-		room.broadcast("GameStart", undefined);
+
+		// Start game and broadcast
 		room.startPong();
+		room.broadcast("GameStart", undefined);
 	}
 
 	updateRooms(type: number, data: any) { // maybe there could be a better way?

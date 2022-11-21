@@ -52,5 +52,6 @@ export const ErrorMessage = {
 	RoomNotFound: "The room couldn't be found.",
 	AccessNotPermitted: "You cannot access this room unproperly.",
 	RoomDestroyed: "This room doesn't exist anymore.",
-	RoomNotAvailble: "The room is not available."
+	RoomNotAvailble: "The room is not available.",
+	RoomNotReady: "Your opponent should be ready."
 }
