@@ -252,37 +252,35 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage("ExitRoom")
 	exitRoom(@ConnectedSocket() client: Socket, @MessageBody() data: any, @Request() req) {
-		const user : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
+		// Check if the user is in the room
+		let target = this.getClient(req);
 		let room = this.getRoom(data.roomId);
-		if (!room)
+		if (!room || !room.clients.has(target.username))
 			return ;
-
-		let userIndex = (room.players[0].username_42 == user.username_42) ? 0 : 
-			(room.players[1]?.username_42 == user.username_42) ? 1 :
-			-1;
- 		if (userIndex != -1) {
-			room.players.splice(userIndex, 1);
-			if (user.username_42 == room.hostname)
-				room.hostname = room.players[0].username_42;
-			// this.clients.delete() // TODO delete from clients
-			room.broadcast("PlayerUpdate", {
-				join: false,
-				userInfo: user.username_42,
-				hostname: room.hostname
-			});
-		}
-
-		if (!room.players.length) {//TODO or should I wait for every watch client to leave the room?
-			this.updateRooms(RoomUpdate.DeleteRoom, {
-				id: room.id
-			});
-			this.rooms.delete(room.id);
+	
+		// Check if the user is one of the players
+		if (room.players.has(target.username)) {
+			let res = room.playerExit(target);
+			// Destroy the room if the game is finished or there is no more player left.
+			if (!res)
+				this.rooms.delete(room.id);
 		} else {
-			this.updateRooms(RoomUpdate.PlayerExit, {
-				id: room.id,
-				userIndex: userIndex
-			});
+			// if the user is a watcher, remove the user from clients of the room
+			room.clients.delete(target.username);
 		}
+ 
+		// TODO room list
+		// if (!room.players.size) {
+		// 	this.updateRooms(RoomUpdate.DeleteRoom, {
+		// 		id: room.id
+		// 	});
+		// 	this.rooms.delete(room.id);
+		// } else {
+		// 	this.updateRooms(RoomUpdate.PlayerExit, {
+		// 		id: room.id,
+		// 		userIndex: userIndex
+		// 	});
+		// }
 	}
 
 	@SubscribeMessage("isReady")

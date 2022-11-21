@@ -90,13 +90,13 @@ export class Room {
 		this.clients.delete(client.username);
 	}
 
-	playerJoin(player: any, client: Client) {
-		this.players.set(player.username_42, new Player(player, false, 1));
+	playerJoin(playerInfo: any, client: Client) {
+		this.players.set(client.username, new Player(playerInfo, false, 1));
 		this.addClient(client);
 		this.available = false;
 	}
 
-	playerExit(player: any, client: Client) {
+	playerExit(client: Client) {
 		// Remove the user from player and client
 		this.clients.delete(client.username);
 		this.players.delete(client.username);
@@ -109,11 +109,16 @@ export class Room {
 			// If no more user left in the room, broadcast watchers and destroy the room
 			this.broadcast("RoomAlert", ErrorMessage.RoomDestroyed);
 			return (false);
-		} else if (player.username_42 == this.hostname) {
+		} else if (client.username == this.hostname) {
 			// If the user who just quitted was a host, change the host and make room available again
 			this.hostname = this.players.values()[0].username;
 			this.available = true;
 		}
+		this.broadcast("PlayerUpdate", {
+			join: false,
+			userInfo: client.username,
+			hostname: this.hostname
+		});
 		return (true);
 	}
 
