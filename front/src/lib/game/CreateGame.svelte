@@ -214,7 +214,7 @@
 			maxPoint: maxPoint,
 			puckSpeed: puckSpeed,
 			paddleSize: paddleSize,
-			privateMode: privateMode
+			isPrivate: privateMode
 		});
 		itself.close();
 	}}>Create Game</button>

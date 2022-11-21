@@ -15,59 +15,52 @@ import { Player } from "./game.Player";
 export class Room {
 	/* RoomInfo */
 	id: string;
-	mapInfo: any;
+	gameInfo: any;
 	title: string;
 	size: number;
 	maxpoint: number;
 	hostname: string;
 
 	/* RoomState */
-	privateMode: boolean;
-	available: boolean;
-	ready: boolean;
-	started: boolean;
+	isPrivate: boolean;
+	isAvailable: boolean;
+	isReady: boolean;
+	isStarted: boolean;
 
-	/* RoomGame */
+	/* Game */
 	pong: Pong;
+
+	/* Users */
 	players: Map<string, Player>;
-
-	/* RoomConnection */
 	clients: Map<string, Client>;
-	chat: Map<string, string>
-
-	/* Pong Control */
-	// keyControl: Map<string, any>;
-	// mouseControl: Map<string, any>;
 		
-	constructor(playersInfo: Array<any>, clients: Array<any>, mapInfo: any, hostname: string = "",
+	constructor(playersInfo: Array<any>, clients: Array<any>, gameInfo: any, hostname: string = "",
 		@InjectRepository(GameEntity) private gameRep: Repository<GameEntity>, 
 				private mainServerService : MainServerService,
 				private dataSource : DataSource,
 				private userService : UserService) {
+		/* Room Info */
 		this.id = uid();
-		this.title = title;
-		this.maxpoint = maxpoint;
 		this.hostname = hostname;
-		this.mapInfo = [maxpoint.toString(), mapSize, puckSpeed, paddleSize];
+		this.gameInfo = gameInfo;
 
-		this.privateMode = privateMode;
-		this.available = (playersInfo.length < 2) ? true : false;
-		this.ready = false;
-		this.started = false;
+		/* Room State */
+		this.isAvailable = (playersInfo.length < 2) ? true : false;
+		this.isReady = false;
+		this.isStarted = false;
+		this.isPrivate = gameInfo.privateMode;
 
-		this.clients = new Map();
-		this.addClients(clients);
-
-		this.pong = new Pong(MapSize[mapSize], PuckSpeed[puckSpeed], PaddleSize[paddleSize]);
-
+		/* Game */
+		this.pong = new Pong(MapSize[gameInfo.mapSize], PuckSpeed[gameInfo.puckSpeed], PaddleSize[gameInfo.paddleSize]);
+		
+		/* Users */
 		this.players.set(playersInfo[0].username_42, new Player(playersInfo[0], (hostname == playersInfo[0].usename_42) ? true : false, 0));
 		if (playersInfo.length > 1)
 			this.players.set(playersInfo[1].username_42, new Player(playersInfo[1], (hostname == playersInfo[1].usename_42) ? true : false, 1));
+		this.addClients(clients);
 
-		// this.keyControl = new Map<string, any>();
-		// this.mouseControl = new Map<string, any>();
-
-		if (!this.hostname.length)
+		// Start game if it is a random match
+		if (!this.hostname)
 			this.startPong();
 	}
 
@@ -92,7 +85,7 @@ export class Room {
 	playerJoin(playerInfo: any, client: Client) {
 		this.players.set(client.username, new Player(playerInfo, false, 1));
 		this.addClient(client);
-		this.available = false;
+		this.isAvailable = false;
 	}
 
 	playerExit(client: Client) {
@@ -100,7 +93,7 @@ export class Room {
 		this.clients.delete(client.username);
 		this.players.delete(client.username);
 
-		if (this.started) {
+		if (this.isStarted) {
 			// If the game has begun, end the game
 			this.endGame(this.players.values()[0].username); //TODO check if it works well
 			return (false);
@@ -111,7 +104,7 @@ export class Room {
 		} else if (client.username == this.hostname) {
 			// If the user who just quitted was a host, change the host and make room available again
 			this.hostname = this.players.values()[0].username;
-			this.available = true;
+			this.isAvailable = true;
 		}
 		this.broadcast("PlayerUpdate", {
 			join: false,
@@ -145,13 +138,8 @@ export class Room {
 	startPong() { setTimeout(Room.startPong, 1000, this); }
 
 	endGame(winner: any) {
-		this.broadcast("GameResult", {
-			winner: winner
-		});
+		this.broadcast("GameResult", winner);
 		this.storeGame();
-		
-		// Destroy room
-		//this.onEnd?.();
 	}
 
 	async storeGame() {

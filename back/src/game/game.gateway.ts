@@ -19,7 +19,7 @@ import { GameEntity } from "src/entity/Game.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository, DataSource } from "typeorm";
 import { UserService } from "src/user/user.service";
-import { ErrorMessage, RoomUpdate, UserState } from "./game.utils";
+import { ErrorMessage, getRandomInt, RoomUpdate, UserState } from "./game.utils";
 
 //TODO Too many connections for a client
 //TODO if the client websocket contains request, handshake..
@@ -102,10 +102,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 		// Game distribution
 		if (this.queue.length > 1) {
-			// create a room for two players
+			// create a random room for two players
 			let [target1, target2] = [this.getClient(this.queue[0][0]), this.getClient(this.queue[1][0])];
 			let [player1, player2] = [this.getPlayerInfo(target1.username), this.getPlayerInfo(target2.username)];
-			let room = new Room([player1, player2], [target1, target2], "", "Medium", 10, "Normal", "Normal", true, "", this.gameRep, this.mainServerService, this.dataSource, this.userService);
+			let gameInfo = { title: "", mapSize: getRandomInt(3), maxPoint: 10, puckSpeed: getRandomInt(3), paddleSize: getRandomInt(3), isPrivate: true }
+			let room = new Room([player1, player2], [target1, target2], gameInfo, undefined, this.gameRep, this.mainServerService, this.dataSource, this.userService);
 			this.rooms.set(room.id, room);
 		
 			// switch their state into playing then get rid of them from the queue
@@ -147,9 +148,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		target.broadcast("RoomFound", {
 			players: room.players,
 			hostname: room.hostname,
-			maxpoint: room.maxpoint,
-			mapSize: room.pong.mapSize,
-			paddleSize: room.pong.paddles[0].width
+			gameInfo: room.gameInfo
 		});
 	}
 
@@ -193,23 +192,22 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		player.control[0] = undefined
 	}
 
-	@SubscribeMessage("AskRooms")
-	askRooms(@ConnectedSocket() client: Socket) {
+	@SubscribeMessage("RoomList")
+	roomList(@ConnectedSocket() client: Socket) {
 		//TODO should check if it still works when the client leaves the modal
 		this.roomlistClients.push(client);
 
 		let allRooms = [];
 		for (let room of this.rooms.values()) {
-			if (room.privateMode)
+			if (room.isPrivate)
 				continue ;
 			allRooms.push({
 				id: room.id,
 				players: room.players,
-				title: room.title,
-				mapInfo: room.mapInfo
+				gameInfo: room.gameInfo
 			});
 		}
-		client.emit("GetAllRooms", { rooms: allRooms });
+		client.emit("roomListRes", { rooms: allRooms });
 	}
 
 	@SubscribeMessage("CreateRoom")

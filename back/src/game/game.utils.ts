@@ -7,6 +7,8 @@ export function uid() {
 	return (res);
 }
 
+export function getRandomInt(max: number) { return Math.floor(Math.random() * max); }
+
 export function replacer() {
     const visited = new WeakSet();
     return ((key, value) => {
@@ -28,24 +30,6 @@ export const MapSize = [
 ]
 
 export const PuckSpeed = [3, 8, 13]
-
-// export const PaddleSize = {
-// 	"Short" : 40,
-// 	"Normal" : 80,
-// 	"Long" : 130
-// }
-
-// export const MapSize = {
-// 	"Small": [200, 300],
-// 	"Medium": [300, 500],
-// 	"Large": [400, 700]
-// }
-
-// export const PuckSpeed = {
-// 	"Slow" : 3,
-// 	"Normal" : 5,
-// 	"Fast" : 8
-// }
 
 export const RoomUpdate = {
 	NewRoom: 0,
