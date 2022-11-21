@@ -43,3 +43,15 @@ export const RoomUpdate = {
 	PlayerJoin: 2,
 	PlayerExit: 3
 }
+
+export const UserState = {
+	Available: 0,
+	Waiting: 1,
+	Playing: 2,
+	Watching: 3
+}
+
+export const ErrorMessage = {
+	UnknownError: "Unknown Error",
+	JoinQueueError: "You should be available in order to join game."
+}

@@ -8,6 +8,7 @@ import { Repository } from "typeorm";
 import { MainServerService } from "src/mainServer/mainServer.service";
 import { UserService } from "src/user/user.service";
 import { MapSize, PaddleSize, PuckSpeed } from "./game.utils";
+import { Client } from "./game.Client";
 
 
 export class Room {
@@ -30,7 +31,7 @@ export class Room {
 	scores: Array<number>;
 
 	/* RoomConnection */
-	clients: Map<string, any>;
+	clients: Map<string, Client>;
 	chat: Map<string, string>
 		
 	constructor(players: any, clients: any, title:string, mapSize: string, maxpoint: number,
@@ -77,7 +78,10 @@ export class Room {
 	 * Use the static server method to broadcast,
 	 * pass the clients as parameters
 	 */
-	broadcast(event: string, data: any) { GameGateway.broadcast(this.getClients(), event, data); }
+	broadcast(event: string, data: any) {
+		for (let client of this.clients.values())
+			client.broadcast(event, data);
+	}
 
 	addClients(clients: any) {
 		for (let client of clients)

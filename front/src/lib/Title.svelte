@@ -148,8 +148,6 @@
 
 	let login: boolean;
 
-	loginState.subscribe(value => { login = value; })
-
 	function createCircles() {
 		let res = [];
 		let circleNb = Math.floor(Math.random() * 10 + 10);
@@ -182,6 +180,8 @@
 	}
 
 	onMount(() => {
+		loginState.subscribe(value => { login = value; })
+
 		circlesAround = createCircles();
 		blues = createBlueCircles();
 	});

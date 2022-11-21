@@ -19,7 +19,7 @@ import { GameEntity } from "src/entity/Game.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository, DataSource } from "typeorm";
 import { UserService } from "src/user/user.service";
-import { RoomUpdate } from "./game.utils";
+import { ErrorMessage, RoomUpdate, UserState } from "./game.utils";
 
 @WebSocketGateway({
 	cors: {
@@ -28,6 +28,7 @@ import { RoomUpdate } from "./game.utils";
 })
 //export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
+	// connections: Map<string, Socket>;
 	clients: Map<string, Client>;
 	rooms: Map<string, Room>;
 	roomlistClients: Array<any>;
@@ -40,84 +41,93 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				private userService : UserService,
 				private jwtServer: JwtService
 	) {
+		// this.connections = new Map<string, Socket>();
 		this.clients = new Map<string, Client>();
 		this.rooms = new Map<string, Room>();
 		this.roomlistClients = [];
 		this.queue = [];
 		this.control = new Map<string, any>();
-
-		// Testing rooms
-		// this.addRoomsForTest();
 	}
 
 	@WebSocketServer()
 	server: Server;
 
-	// addRoomsForTest() {
-	// 	let room1 = new Room(['testPlayer1'], 'TestRoom1', 25, 5, false,
-	// 		this.gameRep, this.mainServerService, this.dataSource);
-
-	// 	let room2 = new Room(['testPlayer2'], "Welcome to this map", 18, 3, false,
-	// 		this.gameRep, this.mainServerService, this.dataSource);
-	
-	// 	this.rooms.set(room1.id, room1);
-	// 	this.rooms.set(room2.id, room2);
-	// 	console.log(this.rooms);
-	// }
-
 	public handleConnection(client: any, ...args: any[]): void {
 		console.log("Connection!!", client.id);
-		const user: any = (this.jwtService.decode(client.handshake.headers.authorization.split(' ')[1]));
-		let newClient = new Client(client, user.username, {});
-		this.clients.set(newClient.id, newClient);
+		// this.connections.set(client.id, client);
 
-		// Should send it only once
+		// Check the user and if the user is already connected.
+		let userInfo = this.getUserInfo(client);
+		if (this.clients.has(userInfo.username_42))
+			this.clients.get(userInfo.username_42).sockets.set(client.id, client);
+		else
+			this.clients.set(userInfo.username_42, new Client(userInfo.username_42, client));
+
+		// Give user information
 		client.emit("GetConnectionInfo", {
-			id: newClient.id,
 			user: {
-				username: user.username,
-				displayname: user.displayname,
-				image_url: user.image_url,
-				campus_name: user.campus_name,
-				campus_country: user.campus_country
+				username: userInfo.username,
+				displayname: userInfo.displayname,
+				image_url: userInfo.image_url,
+				campus_name: userInfo.campus_name,
+				campus_country: userInfo.campus_country
 			}
 		})
 	}
 
 	public handleDisconnect(client: any): void {
 		console.log("Disconnection...", client.id);
-		this.clients.delete(client.id);
+		// this.connections.delete(client.id);
+
+		let target = this.getClient(client);
+		target.sockets.delete(client.id);
+		if (!target.sockets.size)
+			this.clients.delete(target.username);
     }
 
 	@SubscribeMessage("JoinQueue")
-	async joinQueue(@ConnectedSocket() client: Socket, @MessageBody() data: any, @Request() req) {
-		const user: any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
-		let userInfo = await this.getPlayerInfo(data);
-		if (user.username != userInfo.username)
-			return ;
-		// TODO protection necessaire
-		// let client = this.getClient(data);
-		// //TODO: should maybe optimize the algorithm later -- for includes
-		// if (client && (client.room.length || this.queue.includes(client)))
-		// 	return ;
+	async joinQueue(@ConnectedSocket() client: Socket, @Request() req) {
 
-		this.queue.push([userInfo, client]);
-		console.log("how many?", this.queue.length);
+		// Protection: if client is available (neither waiting nor playing)
+		let target = this.getClient(req);
+		if (target.state != UserState.Available) {
+			client.emit("JoinQueueRes", {
+				allowed: false,
+				error: ErrorMessage.JoinQueueError
+			});
+			return ;
+		}
+
+		// Join Queue
+		this.queue.push([target.username, target]);
+		target.state = UserState.Waiting
+
+		// Game distribution
 		if (this.queue.length > 1) {
-			let room = new Room([this.queue[0][0], this.queue[1][0]], [this.queue[0][1], this.queue[1][1]], "", "Medium", 10, "Normal", "Normal", true, "", this.gameRep, this.mainServerService, this.dataSource, this.userService);
-			// TODO: think about it: if i just join a match randomlmy like this, it could be by default a private game
-			// this.queue[0].room = room.id;
-			// this.queue[1].room = room.id;
-			room.broadcast("MatchFound", room.id);
+
+			// create a room for two players
+			let [target1, target2] = [this.getClient(this.queue[0][0]), this.getClient(this.queue[1][0])];
+			let [player1, player2] = [this.getPlayerInfo(target1.username), this.getPlayerInfo(target2.username)];
+			let room = new Room([player1, player2], [target1, target2], "", "Medium", 10, "Normal", "Normal", true, "", this.gameRep, this.mainServerService, this.dataSource, this.userService);
 			this.rooms.set(room.id, room);
+		
+			// switch their state into playing then get rid of them from the queue
+			[target1.state, target2.state] = [UserState.Playing, UserState.Playing];
 			this.queue.splice(0, 2);
+
+			// broadcast to let them join the game
+			room.broadcast("JoinQueueRes", {
+				allowed: true,
+				roomId: room.id
+			});
 		}
 	}
 
 	@SubscribeMessage("LeaveQueue")
-	leaveQueue(@MessageBody() data: any, @Request() req) {
-		const user: any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
-		let index = this.queue.findIndex(x => x[0].username == user.username);
+	leaveQueue(@Request() req) {
+		let target = this.getClient(req);
+
+		let index = this.queue.findIndex(x => x[0].username == target.username);
 		if (index > -1)
 			this.queue.splice(index, 1);
 		// TODO algo & protection revoir
@@ -238,12 +248,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			// })
 			room.addClient(client);
 		}
-		console.log("reponse ready", data);
 		client.emit("JoinRoomRes", {
 			allowed: true,
 			roomId: data.roomId
-		});	
-
+		});
 	}
 
 	@SubscribeMessage("ExitRoom")
@@ -349,12 +357,22 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		.innerJoin("game.player2", "user2")
 		.where("game.player1.id_g = :u or game.player2.id_g = :u", {u: id_user})
 		.select(["game.player1_score", "game.player2_score", "user1.username", "user2.username", "user1.img_url", "user1.img", "user2.img_url", "user2.img", "game.date_game"]).getMany();
-		
 		client.emit("resHistory", res);
 	}
 
-	getClient(id: string) { return (this.clients.get(id)); }
 	getRoom(id: string) { return (this.rooms.get(id)); }
+
+	getClient(request: any) {
+		const user: any = (this.jwtService.decode(request.handshake.headers.authorization.split(' ')[1]));
+		return this.clients.get(user.username_42);
+	}
+
+	deleteClient(username: any) { this.clients.delete(username); }
+
+	getUserInfo(request: any) {
+		const user: any = (this.jwtService.decode(request.handshake.headers.authorization.split(' ')[1]));	
+		return user;
+	}
 
 	async getPlayerInfo(player: any) {
 		const userdata = await this.userService.findOne(player)

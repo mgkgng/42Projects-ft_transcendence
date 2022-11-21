@@ -34,7 +34,7 @@
 <script lang="ts">
     import { client } from "$lib/stores/client";
 	import { onMount } from "svelte";
-    import { user } from "../stores/user";
+    import { user } from "$lib/stores/user";
 
 	export let itself: any;
 	export let createGameModal: any;
@@ -45,7 +45,7 @@
 	onMount(() => {
 		return (() => {
 			if (loading)
-				$client.socket.emit("LeaveQueue", $client.id);
+				$client.socket.emit("LeaveQueue");
 		});
 	})
 </script>
@@ -60,7 +60,7 @@
 		itself.close();
 	}}>Create Game</button>
 	<button class="random {loading && "loading"}" on:click={()=>{
-		$client.socket.emit((!loading) ? "JoinQueue" : "LeaveQueue", $user.username);
+		$client.socket.emit((!loading) ? "JoinQueue" : "LeaveQueue");
 		loading = !loading;
 	}}>{(!loading) ? "Random Match" : ""}</button>
 </div>

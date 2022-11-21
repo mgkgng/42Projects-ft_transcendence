@@ -52,7 +52,6 @@
 				background-color: transparentize(#fff, .8);
 				}
 			}
-
 		}
 	}
 
