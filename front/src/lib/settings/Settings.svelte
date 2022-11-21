@@ -90,13 +90,15 @@
     import { user } from "$lib/stores/user";
     import { onMount } from "svelte";
     import { client } from "$lib/stores/client";
-    import CloseButton from "$lib/items/CloseButton.svelte";
-
+    import Modal from "$lib/tools/Modal.svelte";
+    import ChangeUsername from "$lib/settings/ChangeUsername.svelte";
+	
 	export let itself: any;
 
-	console.log($user);
+	let changeUsernameModal: any;
 	
 	let double_auth: boolean = $user.is_2fa;
+	let newUsername: string = "";
 
 	console.log(double_auth);
 
@@ -123,6 +125,10 @@
 	});
 </script>
 
+<Modal bind:this={changeUsernameModal} closeOnBgClick={false}>
+	<ChangeUsername itself={changeUsernameModal} bind:newUsername={newUsername}/>
+</Modal>
+
 <div class="vflex window settings">
 	<h2>Settings</h2>
 	<div class="image">
@@ -133,7 +139,7 @@
 		<p>Username:</p>
 		<div class="flex username">
 			<p>{$user.username}</p>
-			<button>modify</button>
+			<button on:click={() => { changeUsernameModal.open(); }}>modify</button>
 		</div>
 	</div>
 	<div class="grid">
