@@ -117,6 +117,7 @@
     import ChatDirectBox from "$lib/chat/ChatDirectBox.svelte";
 	import Friends from "$lib/modals/Friends.svelte"
     import { chatRoom } from "../stores/chatRoom";
+    import Image from "../Image.svelte";
 
 	let profileModal: any;
 	let chatModal: any;
@@ -137,6 +138,8 @@
 		window.location.reload();
 	}
 </script>
+
+<Image />
 
 <Modal bind:this={profileModal} >
 	<UserProfile profileUser={$client.user_info}  />

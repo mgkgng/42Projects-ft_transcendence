@@ -20,6 +20,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository, DataSource } from "typeorm";
 import { UserService } from "src/user/user.service";
 import { RoomUpdate } from "./game.utils";
+import { UserEntity } from "src/entity/User.entity";
 
 @WebSocketGateway({
 	cors: {
@@ -65,22 +66,24 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	// 	console.log(this.rooms);
 	// }
 
-	public handleConnection(client: any, ...args: any[]): void {
+	public async handleConnection(client: any, ...args: any[]) {
 		console.log("Connection!!", client.id);
 		const user: any = (this.jwtService.decode(client.handshake.headers.authorization.split(' ')[1]));
   		console.log("test", user);
 		let newClient = new Client(client, user.username, {});
+		const user_db = await this.dataSource.getRepository(UserEntity).createQueryBuilder("user").
+		where("user.username = :username", {username: user.username_42}).getOne();
 		this.clients.set(newClient.id, newClient);
 
 		// Should send it only once
 		client.emit("GetConnectionInfo", {
 			id: newClient.id,
 			user: {
-				username: user.username,
-				displayname: user.displayname,
-				image_url: user.image_url,
-				campus_name: user.campus_name,
-				campus_country: user.campus_country
+				username: user_db.username,
+				displayname: user_db.display_name,
+				image_url: user_db.img_url,
+				campus_name: user_db.campus_name,
+				campus_country: user_db.campus_country
 			}
 		})
 	}
