@@ -4,7 +4,6 @@
 	import Title from "$lib/Title.svelte";
 	import { client } from "$lib/stores/client";
     import { onMount } from "svelte";
-    import { loginState } from "$lib/stores/var";
     import { browser } from "$app/environment";
     import Header from "$lib/header/Header.svelte";
 	import Modal from '$lib/tools/Modal.svelte';
@@ -14,7 +13,7 @@
     import CreateGame from "$lib/game/CreateGame.svelte";
     import EnterGame from "$lib/game/EnterGame.svelte";
     import JoinGame from "$lib/game/JoinGame.svelte";
-    import NewChatRoom from '$lib/chat/NewChatRoom.svelte';
+    import ChatRoom from '$lib/chat/ChatRoom.svelte';
 
 	let roomModal: any;
 	let roomId: string = "";
@@ -32,8 +31,14 @@
 		if (!browser || !$client.socket)
 			return ;
 
-		$client.socket.on("RoomCreated", (data: any) => {
+		$client.socket.on("CreateRoomError", (data: any) => {
+			modalMessage = data;
+			messageModal.open();
+		});
+
+		$client.socket.on("CreateRoomRes", (data: any) => {
 			console.log("RoomCreated", data);
+			createGameModal.close();
 			roomId = data;
 			roomModal.open();
 		});
@@ -47,24 +52,42 @@
 			} else {
 				modalMessage = "You cannot enter this room";
 				messageModal.open();
-			}	
+			}
 		});
 
 		$client.socket.on("askFriendNotification", (data: any) => {
 			console.log("Notif", data);
-		})
+		});
+
+		$client.socket.on("JoinQueueError", (data: any) => {
+			modalMessage = data;
+			messageModal.open();
+		});
+
+		$client.socket.on("RoomCheckError", (data: any) => {
+			modalMessage = data;
+			messageModal.open();
+		});
 
 		$client.socket.on("MatchFound", (data: any) => {
-			console.log("matchfound", data);
-
 			roomId = data;
 			roomModal.open();
+		});
+
+		return (() => {
+			$client.socket.off("CreateRoomRes");
+			$client.socket.off("JoinRoomRes");
+			$client.socket.off("askFriendNotification");
+			$client.socket.off("JoinQueueError");
+			$client.socket.off("RoomCheckError");
+			$client.socket.off("CreateRoomError");
+			$client.socket.off("MatchFound");
 		});
 	});
 </script>
 
 <Modal bind:this={chatRoomModal}>
-	<NewChatRoom itself={chatRoomModal} />
+	<ChatRoom itself={chatRoomModal} />
 </Modal>
 
 <Modal bind:this={enterModal}>

@@ -54,9 +54,11 @@ export class Room {
 		this.pong = new Pong(MapSize[gameInfo.mapSize], PuckSpeed[gameInfo.puckSpeed], PaddleSize[gameInfo.paddleSize]);
 		
 		/* Users */
+		this.players = new Map<string, Player>();
 		this.players.set(playersInfo[0].username_42, new Player(playersInfo[0], (hostname == playersInfo[0].usename_42) ? true : false, 0));
 		if (playersInfo.length > 1)
 			this.players.set(playersInfo[1].username_42, new Player(playersInfo[1], (hostname == playersInfo[1].usename_42) ? true : false, 1));
+		this.clients = new Map<string, Client>();
 		this.addClients(clients);
 
 		// Start game if it is a random match

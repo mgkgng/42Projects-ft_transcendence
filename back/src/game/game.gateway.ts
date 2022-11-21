@@ -51,8 +51,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	server: Server;
 
 	public handleConnection(client: any, ...args: any[]): void {
-		console.log("Connection!!", client.id);
-
 		// Check the user and if the user is already connected.
 		let userInfo = this.getUserInfo(client);
 		if (this.clients.has(userInfo.username_42))
@@ -73,8 +71,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
 	public handleDisconnect(client: any): void {
-		console.log("Disconnection...", client.id);
-
 		// Get rid of socket from the client instance
 		let target = this.getClient(client);
 		target.sockets.delete(client.id);
@@ -86,7 +82,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage("JoinQueue")
 	async joinQueue(@ConnectedSocket() client: Socket, @Request() req) {
-
 		// Check if client is available
 		let target = this.getClient(req);
 		if (target.state != UserState.Available) {
@@ -192,7 +187,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage("RoomListReq")
 	roomList(@ConnectedSocket() client: Socket) {
-		console.log("test");
 		// Get rooms which are not private
 		let allRooms = [];
 		for (let room of this.rooms.values()) {
@@ -209,6 +203,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage("CreateRoom")
 	async createRoom(@ConnectedSocket() client: Socket, @MessageBody() data: any, @Request() req) {		
+		console.log("CreateRoom", data);
 		// Check if the client is already playing or watching a game
 		let target = this.getClient(req);
 		if (target.state != UserState.Available) {
@@ -223,7 +218,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		target.state = UserState.Playing;
 
 		// Invite the user to the room
-		target.broadcast("RoomCreated", room.id);
+		target.broadcast("CreateRoomRes", room.id);
 	}
 
 	@SubscribeMessage("JoinRoom")
@@ -238,7 +233,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			client.emit("JoinRoomError", ErrorMessage.RoomNotAvailble);
 			return ;
 		}
-		
+
 		// If the user wants to play
 		if (data.play) {
 			// broadcast to the users in the room that there is a new player then add player in the room

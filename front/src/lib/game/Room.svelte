@@ -149,7 +149,6 @@
 	let winner: any;
 
 	onMount(()=> {
-		console.log("Room Mounted", $client.socket);
 		if (!roomId.length)
 			return ;
 		
@@ -239,12 +238,24 @@
 		$client.socket.on("GameStartFail", () => { tryStart = false; });
 		$client.socket.on("GameStart", () => { gameStart = true });
 
-		console.log("here is listeners: ", $client.socket);
-
 		$client.socket.emit("RoomCheck", {
 			client: $client.id,
 			room: roomId
 		});
+
+		return (() => {
+			$client.socket.off("RoomInfo");
+			$client.socket.off("PlayerUpdate");
+			$client.socket.off("PaddleUpdate");
+			$client.socket.off("LoadBall");
+			$client.socket.off("PongStart");
+			$client.socket.off("PuckHit");
+			$client.socket.off("ScoreUpdate");
+			$client.socket.off("ReadyUpdate");
+			$client.socket.off("GameFinished");
+			$client.socket.off("GameStartFail");
+			$client.socket.off("GameStart");
+		})
 	});
 
 </script>

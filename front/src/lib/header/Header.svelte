@@ -116,9 +116,6 @@
 	let login: boolean;
 	let friendsModal: any;
 
-
-	$:console.log($user);
-
 	loginState.subscribe(value => { login = value; })
 
 	function handleLogout() {
@@ -141,11 +138,7 @@
 		<div class="who">?</div>
 		{:else}
 		<div class="summary">
-			{#if !$client.user_info || $client.user_info.img === ""}
-				<img src={$user.image_url} alt="profile" />
-			{:else}
-				<img src={$client.user_info.img} alt="profile" />
-			{/if}
+			<img src={(!$user.img) ? $user.img_url : $user.img} alt="profile" />
 		</div>
 		<div class="menu">
 			<button on:click={()=>{

@@ -47,7 +47,7 @@
 
 	async function connectWithUrlCode(url : any)
 	{
-		try{ 
+		try{
 			const res : any = await fetch("http://localhost:3000/auth42",{
 				method: 'POST',
 				headers: {
@@ -56,7 +56,6 @@
 				body:JSON.stringify({username: "oui", password: url.get('code')}),
 			});
 			let tok = await res.json();
-			console.log("tok1", tok);
 			while (tok.get_code != null)
 			{
 				let ufa_code : any = prompt("Your code is : ");
@@ -69,17 +68,13 @@
 					body:JSON.stringify({username: ufa_code, password: tok.tmp_jwt}),
 				});
 				tok = await res_ufa.json();
-				console.log("tok2", tok);
 			}
-			console.log("res", tok);
 			$client.socket = io("http://localhost:3001",{
 				extraHeaders: {
 					Authorization: "Bearer " + tok.access_token,
 				}
 			});
-			console.log(tok.access_token)
 			localStorage.setItem('transcendence-jwt', tok.access_token);
-			$client.connect();
 			loginState.set(true);
 			goto('/');
 		} catch(e){
@@ -92,13 +87,10 @@
 	onMount(async () => {
 		if (!browser || $client.socket)
 			return ;
-
 		if (!$client.socket) {
-			console.log("Again?", $client.socket);
 			if (localStorage.getItem('transcendence-jwt') != null
 				&& localStorage.getItem('transcendence-jwt') != undefined)
 			{
-				console.log("came here");
 				const tok = localStorage.getItem('transcendence-jwt');
 				{
 					$client.socket = await io("http://localhost:3001",{
@@ -117,37 +109,18 @@
 				await connectWithUrlCode(url);
 
 			if ($client.socket) {
-				$client.socket.on("GetConnectionInfo", (data: any) => {
-					console.log("GetConnectionInfo", data);
-					$client.id = data.id;
-					user.set(data.user);
-					// $client.socket.off("GetConnectionInfo");
-				});	
-
-				$client.socket.on("connection", (data: any) => {
-					console.log("connection", data);
-					$client.connect();
+				$client.socket.on("get_user_info", (data: any) => {
+					console.log(data);
+					user.set(data);
 					loginState.set(true);
 					$chatRoom.LoadMessages($client);
-					// $client.socket.off("connection");
-				});
-				$client.socket.on("get_user_info", (data: any) => {
-					client.update((value) => {
-						value.username = data.username;
-						value.user_info = data;
-						return value;
-					});
-					console.log("DATA: ", data);
-					// $client.socket.off("get_user_info");
 				});
 				$client.socket.emit("get_user_info", {});
 			}
 			tryConnect = true;
-			// if ($client.socket) {
-			// 	goto('/');
-			// }
-			// else
-			// 	return ;
+			return (() => {
+				$client.removeListeners("get_user_info");
+			})
 		}
 	});
 </script>

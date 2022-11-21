@@ -23,7 +23,7 @@
 		position: absolute;
 		top: 1.5em;
 		right: 8em;
-		gap: .2em;
+		gap: .1em;
 
 		label {
 			display: inline-block;
@@ -159,10 +159,7 @@
 		width: 5em;
 		height: 100%;
 
-		padding-top: 8em;
-		padding-bottom: 8em;
-		padding-left: 1em;
-		padding-right: 1em;
+		padding: 12em 1em;
 	}
 
 	.button-back {
@@ -170,14 +167,14 @@
 		height: 100%;
 
 		transition: .3s;
-		border-radius: 2em;
+		border-radius: .6em;
 		border: none;
 		background-color: transparentize(#fff, 1);
 		font-size: 25px;
 
 		&:hover {
 			display: block;
-			background-color: transparentize($submain-bluegreen, 0.5);
+			background-color: transparentize($main-lowshade, 0.3);
 		}
 	}
 

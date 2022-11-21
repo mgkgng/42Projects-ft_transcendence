@@ -57,6 +57,7 @@
 		return (() => {
 			if (loading)
 				$client.socket.emit("LeaveQueue");
+			$client.socket.off("JoinQueueError");
 		});
 	})
 </script>
