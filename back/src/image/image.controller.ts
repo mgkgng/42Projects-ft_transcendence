@@ -26,14 +26,15 @@ export class ImageController {
 
     @Post('uploadimage')
     @UseGuards(AuthGuard('jwt'))
-    @UseInterceptors(FileInterceptor('avatar', {}))
+    @UseInterceptors(FileInterceptor('avatar', {limits: {fileSize: 1024 * 1024 * 8}}))
     async uploadFile(@UploadedFile() file, @Req() request) {
         const token = request.headers.authorization.split(' ')[1];
         const user : any = this.jwtService.decode(token);
         if (!user)
             return { error: "Invalid token" };
+        if (!file)
+            return { error: "Invalid file" };
         if (file.mimetype == "image/jpeg" || file.mimetype == "image/png") {
-            console.log("File is an image", file);
             let imageEntity = new ImageEntity();
             imageEntity.img_uid = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
             imageEntity.img_url = "http://localhost:3000/image/" + imageEntity.img_uid;
