@@ -110,7 +110,7 @@
     import { loginState } from "$lib/stores/var";
     import Modal from "$lib/tools/Modal.svelte";
 	import Friends from "$lib/modals/Friends.svelte"
-    import { chatRoom } from "$lib/stores/chatRoom";
+
 
 	let profileModal: any;
 	let login: boolean;
@@ -141,10 +141,9 @@
 			<img src={(!$user.img) ? $user.img_url : $user.img} alt="profile" />
 		</div>
 		<div class="menu">
-			<button on:click={()=>{
-				profileModal.open(); 
-			}}>Profile</button>
+			<button on:click={()=>{ profileModal.open(); }}>Profile</button>
 			<button on:click={()=>{ friendsModal.open(); }}>Friends</button>
+			<button on:click={()=>{ settingsModal.open(); }}>Settings</button>
 			<button on:click={handleLogout}>Logout</button>
 		</div>
 		{/if}
