@@ -56,5 +56,6 @@ export const ErrorMessage = {
 	AlreadyJoined: "You already asked for joining game.",
 	NotAvailble: "You are actually not available.",
 	RoomNotFound: "The room couldn't be found",
-	AccessNotPermitted: "You cannot access this room unproperly"
+	AccessNotPermitted: "You cannot access this room unproperly",
+	RoomDestroyed: "This room doesn't exist anymore"
 }

@@ -1,6 +1,6 @@
 import {Pong} from "./game.Pong"
 import {GameGateway} from "./game.gateway"
-import {uid} from "./game.utils"
+import {ErrorMessage, uid} from "./game.utils"
 import { DataSource } from "typeorm";
 import { GameEntity } from "src/entity/Game.entity";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -9,6 +9,7 @@ import { MainServerService } from "src/mainServer/mainServer.service";
 import { UserService } from "src/user/user.service";
 import { MapSize, PaddleSize, PuckSpeed } from "./game.utils";
 import { Client } from "./game.Client";
+import { Player } from "./game.Player";
 
 
 export class Room {
@@ -24,21 +25,21 @@ export class Room {
 	privateMode: boolean;
 	available: boolean;
 	ready: boolean;
+	started: boolean;
 
 	/* RoomGame */
 	pong: Pong;
-	players: Array<any>;
-	scores: Array<number>;
+	players: Map<string, Player>;
 
 	/* RoomConnection */
 	clients: Map<string, Client>;
 	chat: Map<string, string>
 
 	/* Pong Control */
-	keyControl: Map<string, any>;
-	mouseControl: Map<string, any>;
+	// keyControl: Map<string, any>;
+	// mouseControl: Map<string, any>;
 		
-	constructor(players: any, clients: any, title:string, mapSize: string, maxpoint: number,
+	constructor(playersInfo: Array<any>, clients: Array<any>, title:string, mapSize: string, maxpoint: number,
 		puckSpeed : string, paddleSize:string, privateMode : boolean = true, hostname: string = "",
 		@InjectRepository(GameEntity) private gameRep: Repository<GameEntity>, 
 				private mainServerService : MainServerService,
@@ -48,75 +49,71 @@ export class Room {
 		this.title = title;
 		this.maxpoint = maxpoint;
 		this.hostname = hostname;
-		this.scores = [0, 0];
 		this.mapInfo = [maxpoint.toString(), mapSize, puckSpeed, paddleSize];
 
 		this.privateMode = privateMode;
-		this.available = (players.length < 2) ? true : false;
+		this.available = (playersInfo.length < 2) ? true : false;
 		this.ready = false;
-	
+		this.started = false;
+
 		this.clients = new Map();
 		this.addClients(clients);
 
 		this.pong = new Pong(MapSize[mapSize], PuckSpeed[puckSpeed], PaddleSize[paddleSize]);
-		this.players = players;
 
-		this.keyControl = new Map<string, any>();
-		this.mouseControl = new Map<string, any>();
+		this.players.set(playersInfo[0].username_42, new Player(playersInfo[0], (hostname == playersInfo[0].usename_42) ? true : false, 0));
+		if (playersInfo.length > 1)
+			this.players.set(playersInfo[1].username_42, new Player(playersInfo[1], (hostname == playersInfo[1].usename_42) ? true : false, 1));
+
+		// this.keyControl = new Map<string, any>();
+		// this.mouseControl = new Map<string, any>();
 
 		if (!this.hostname.length)
 			this.startPong();
 	}
 
-	async getPlayerInfo(player: any) {
-		console.log("getplayerinfo: ", player);
-		const userdata = await this.userService.findOne(player);
-		console.log("userdata: ", userdata);
-		return ({
-			username: userdata.username,
-			displayname: userdata.display_name,
-			image_url: userdata.img_url,
-			campus_name: userdata.campus_name,
-			campus_country: userdata.campus_country,
-		});
-	}
-
-	/**
-	 * Use the static server method to broadcast,
-	 * pass the clients as parameters
-	 */
 	broadcast(event: string, data: any) {
 		for (let client of this.clients.values())
 			client.broadcast(event, data);
 	}
 
-	addClients(clients: any) {
+	addClient(client: Client) {
+		this.clients.set(client.username, client);
+	}
+
+	addClients(clients: Array<Client>) {
 		for (let client of clients)
-		{
 			this.addClient(client);
-		}
 	}
 
-	addMessage(username: string, message: string) {
-		this.chat.set(username, message);
-		this.broadcast("newChatGameMessage", {username, message});
+	removeClient(client: any) {
+		this.clients.delete(client.username);
 	}
 
-	addClient(client: any) {
-		this.clients.set(client.id, client);
-		// this.clients[client.id] = client;
-		//this.chat.append_user_to_room();
-		//console.log('Room -> addClient', this.clients.size);
-		/* TODO IMPORTANT TO REMOVE THE CLIENT */
-		// client.onDisconnect(() => this.removeClient(client));
-	}
-
-	addPlayer(client: any, player: any) {
-		this.players.push(player);
+	playerJoin(player: any, client: Client) {
+		this.players.set(player.username_42, new Player(player, false, 1));
 		this.addClient(client);
 	}
 
-	removeClient(client: any) { this.clients.delete(client.username); }
+	playerExit(player: any, client: Client) {
+		// Remove the user from player and client
+		this.clients.delete(client.username);
+		this.players.delete(client.username);
+
+		if (this.started) {
+			// If the game has begun, end the game
+			this.endGame(this.players.values()[0].username); //TODO check if it works well
+			return (false);
+		} else if (!this.players.size) {
+			// If no more user left in the room, broadcast watchers and destroy the room
+			this.broadcast("RoomAlert", ErrorMessage.RoomDestroyed);
+			return (false);
+		} else if (player.username_42 == this.hostname) {
+			// If the user who just quitted was a host, change the host
+			this.hostname = this.players.values()[0].username;
+		}
+		return (true);
+	}
 
 	getClients() { return (Array.from(this.clients.values())); }
 
@@ -141,16 +138,12 @@ export class Room {
 
 	startPong() { setTimeout(Room.startPong, 1000, this); }
 
-	putScore() {
-
-		// Broadcast let user = new UserEntity;
-		// Store the game in db
-		try {
-			this.storeGame();
-		} 
-		catch(e) {
-			
-		}
+	endGame(winner: any) {
+		this.broadcast("GameResult", {
+			winner: winner
+		});
+		this.storeGame();
+		
 		// Destroy room
 		//this.onEnd?.();
 	}
