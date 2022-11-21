@@ -65,6 +65,7 @@
 		});
 
 		$client.socket.on("RoomCheckError", (data: any) => {
+			roomModal.close();
 			modalMessage = data;
 			messageModal.open();
 		});

@@ -100,7 +100,6 @@
 						autoConnect: false,
 					},);
 					await $client.socket.connect();
-					console.log($client.socket);
 				}
 			}
 
@@ -110,7 +109,6 @@
 
 			if ($client.socket) {
 				$client.socket.on("get_user_info", (data: any) => {
-					console.log(data);
 					user.set(data);
 					loginState.set(true);
 					$chatRoom.LoadMessages($client);

@@ -141,7 +141,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		target.broadcast("RoomFound", {
 			players: room.players,
 			hostname: room.hostname,
-			gameInfo: room.gameInfo
+			gameInfo: room.gameInfo,
+			pong: room.pong
 		});
 	}
 

@@ -152,11 +152,11 @@
 		if (!roomId.length)
 			return ;
 		
-		$client.socket.on("RoomInfo", (data: any) => {
-			console.log("RoomInfo", data);
+		$client.socket.on("RoomFound", (data: any) => {
 			roomFound = true;
-			roomInfo = data; // maybe need some protection?
-			initPos = (roomInfo?.mapSize[0] + roomInfo?.paddleSize) / 2;
+			roomInfo = data;
+
+			// Initialize paddle position
 			paddlePos = [initPos, initPos];
 
 			userType = ($user.username == roomInfo?.players[0].username_42) ? UserType.Player1 :
