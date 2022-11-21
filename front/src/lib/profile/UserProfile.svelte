@@ -145,15 +145,6 @@
 		$client.socket.emit("resHistory", (data: any) => {
 			gameHistory = data.history
 		});
-		// }
-		// console.log("username ", $chatRoom.username_search, $client.user_info.username);
-		// if ($chatRoom.username_search == $client.user_info.username)
-		// {
-		// 	user_info = $client.user_info;
-		// 	client.subscribe(value => {	user_info = value.user_info;	});
-		// }
-		// else
-		// 	$client.socket.emit("get_other_user_info", { username_search: $chatRoom.username_search } );
 	});
 	function changeUsername()
 	{

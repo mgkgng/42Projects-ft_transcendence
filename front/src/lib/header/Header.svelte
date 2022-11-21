@@ -110,11 +110,13 @@
     import { loginState } from "$lib/stores/var";
     import Modal from "$lib/tools/Modal.svelte";
 	import Friends from "$lib/modals/Friends.svelte"
+    import Settings from "../settings/Settings.svelte";
 
 
 	let profileModal: any;
 	let login: boolean;
 	let friendsModal: any;
+	let settingsModal: any;
 
 	loginState.subscribe(value => { login = value; })
 
@@ -125,11 +127,14 @@
 	}
 </script>
 
-<Modal bind:this={profileModal} >
+<Modal bind:this={profileModal}>
 	<UserProfile profileUser={$client.user_info}  />
 </Modal>
 <Modal bind:this={friendsModal}>
 	<Friends itself={friendsModal} />
+</Modal>
+<Modal bind:this={settingsModal} closeOnBgClick={false}>
+	<Settings itself={settingsModal} />
 </Modal>
 
 <header>

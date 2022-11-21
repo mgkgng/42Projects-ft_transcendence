@@ -7,6 +7,8 @@
     import { onMount } from "svelte";
     import { client } from "../stores/client";
 
+	export let itself: any;
+	
 	let newUsername: string = "";
 
 	onMount(() => {

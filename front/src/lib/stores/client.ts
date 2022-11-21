@@ -54,7 +54,7 @@ class Client {
 		return (false);
 	}
 
-	removeListener(listeners: Array<string>) {
+	removeListeners(listeners: Array<string>) {
 		for (let listener of listeners)
 			this.socket.off(listener);
 	}
