@@ -194,6 +194,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage("RoomListReq")
 	roomList(@ConnectedSocket() client: Socket) {
+		// Get rooms which are not private
 		let allRooms = [];
 		for (let room of this.rooms.values()) {
 			if (room.isPrivate)
@@ -306,13 +307,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		// Start game and broadcast
 		room.startPong();
 		room.broadcast("GameStart", undefined);
-	}
-
-	updateRooms(type: number, data: any) { // maybe there could be a better way?
-		this.broadcast(this.roomlistClients, "UpdateRooms", {
-			updateType: type,
-			roomData: data
-		});
 	}
 
 	broadcast(clients: any, event: string, data: any) {

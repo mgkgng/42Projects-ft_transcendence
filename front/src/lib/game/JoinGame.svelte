@@ -213,6 +213,10 @@
     import Modal from "$lib/tools/Modal.svelte";
 	import Message from "$lib/modals/Message.svelte";
 	import { RoomUpdate } from "$lib/stores/var";
+
+	// TODO automatic requests
+	// TODO grey button for host when the room is yet empty
+	// TODO different button options when it is a random game
 	
 	export let itself: any;
 	export let enterGameModal: any;
@@ -246,26 +250,12 @@
 	}
 
 	onMount(() => {
-		$client.socket.emit("AskRooms", { id: $client.id });
+		$client.socket.emit("RoomListReq", { id: $client.id });
 
-		$client.socket.on("GetAllRooms", (data: any) => {
+		$client.socket.on("RoomListRes", (data: any) => {
 			console.log("GetAllRooms");
 			roomArray = data.rooms;
 		});
-		$client.socket.on("UpdateRooms", (data: any) => {
-			console.log("updaterooms", data);
-			if (data.updateType == RoomUpdate.NewRoom)
-				rooms.set(data.roomData.id, data.roomData);
-			else if (data.updateType == RoomUpdate.DeleteRoom)
-				rooms.delete(data.roomData.id);
-			else if (data.updateType == RoomUpdate.PlayerJoin)
-				rooms.get(data.roomData.id).players.push(data.roomData.player);
-			else 
-				rooms.get(data.roomData.id).players.splice(data.roomData.userIndex, 1);
-			rooms = rooms;
-		});
-
-		$client.socket.on("RoomListUpdate", (data: any) => { rooms = data.rooms; });
 	});
 </script>
 
