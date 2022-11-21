@@ -34,7 +34,6 @@ import { ErrorMessage, getRandomInt, RoomUpdate, UserState } from "./game.utils"
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	clients: Map<string, Client>;
 	rooms: Map<string, Room>;
-	roomlistClients: Array<any>;
 	queue: Array<any>;
 
 	constructor(private mainServerService : MainServerService, private jwtService: JwtService, 
@@ -45,7 +44,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	) {
 		this.clients = new Map<string, Client>();
 		this.rooms = new Map<string, Room>();
-		this.roomlistClients = [];
 		this.queue = [];
 	}
 
@@ -71,7 +69,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				campus_name: userInfo.campus_name,
 				campus_country: userInfo.campus_country
 			}
-		})
+		});
 	}
 
 	public handleDisconnect(client: any): void {
@@ -92,7 +90,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		// Check if client is available
 		let target = this.getClient(req);
 		if (target.state != UserState.Available) {
-			client.emit("JoinQueueError", (target.state == UserState.Waiting) ? ErrorMessage.AlreadyJoined : ErrorMessage.NotAvailble);
+			client.emit("JoinQueueError", (target.state == UserState.Waiting) ? ErrorMessage.AlreadyJoined : ErrorMessage.UserNotAvailble);
 			return ;
 		}
 
@@ -194,6 +192,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage("RoomListReq")
 	roomList(@ConnectedSocket() client: Socket) {
+		console.log("test");
 		// Get rooms which are not private
 		let allRooms = [];
 		for (let room of this.rooms.values()) {
@@ -336,8 +335,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		const user: any = (this.jwtService.decode(request.handshake.headers.authorization.split(' ')[1]));
 		return this.clients.get(user.username_42);
 	}
-
-	deleteClient(username: any) { this.clients.delete(username); }
 
 	getUserInfo(request: any) {
 		const user: any = (this.jwtService.decode(request.handshake.headers.authorization.split(' ')[1]));	

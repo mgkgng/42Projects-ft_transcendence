@@ -23,6 +23,7 @@
 		position: absolute;
 		top: 1.5em;
 		right: 8em;
+		gap: .2em;
 
 		label {
 			display: inline-block;
@@ -37,6 +38,14 @@
 		}
 		input { display: none; }
 		input:checked + label { background-color: $main-bright; }
+
+		button {
+			width: 6em;
+			height: 2.5em;
+			background-color: $submain-blue;
+			border: $border;
+			border-radius: .2em;
+		}
 	}
 
 	.room-container {
@@ -228,6 +237,8 @@
 	let roomPage: number = 0;
 	let perPage: number = 3;
 
+	let roomListReqs: any;
+
 	$: roomArray = (showAvailable) ? [...rooms?.values()].filter(room => room.available == true)
 		: [...rooms.values()];
 	$: roomsOnPage = roomArray?.slice(roomPage * perPage, roomPage * perPage + perPage);
@@ -243,19 +254,33 @@
 
 	function joinRoom(roomId: string, playMode: boolean) {
 		$client.socket.emit("JoinRoom", {
-			username: $user.username,
 			roomId: roomId,
 			play: playMode
 		})
 	}
 
-	onMount(() => {
-		$client.socket.emit("RoomListReq", { id: $client.id });
+	// Set automatic refresh for every 30 seconds 
+	function refresh() {
+		$client.socket.emit("RoomListReq");
+		if (roomListReqs)
+			clearInterval(roomListReqs);
+		roomListReqs = setInterval(() => {
+			$client.socket.emit("RoomListReq");
+		}, 30000);
+	}
 
+	onMount(() => {
 		$client.socket.on("RoomListRes", (data: any) => {
 			console.log("GetAllRooms");
 			roomArray = data.rooms;
 		});
+
+		refresh();
+
+		return (() => {
+			$client.socket.off("RoomListRes");
+			clearInterval(roomListReqs);
+		})
 	});
 </script>
 
@@ -269,6 +294,7 @@
 	<div class="flex tools">
 		<input type="checkbox" id="only" bind:checked={showAvailable} />
 		<label for="only">Available</label>
+		<button on:click={() => { refresh(); }}>Refresh</button>
 	</div>
 	<div class="flex room-container">
 		{#each roomsOnPage as room}
