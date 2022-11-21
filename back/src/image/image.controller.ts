@@ -29,7 +29,7 @@ export class ImageController {
     @UseInterceptors(FileInterceptor('avatar', {}))
     async uploadFile(@UploadedFile() file, @Req() request) {
         const token = request.headers.authorization.split(' ')[1];
-        const user = this.jwtService.decode(token);
+        const user : any = this.jwtService.decode(token);
         if (!user)
             return { error: "Invalid token" };
         if (file.mimetype == "image/jpeg" || file.mimetype == "image/png") {
