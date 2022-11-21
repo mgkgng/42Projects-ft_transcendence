@@ -53,5 +53,6 @@ export const UserState = {
 
 export const ErrorMessage = {
 	UnknownError: "Unknown Error",
-	JoinQueueError: "You should be available in order to join game."
+	AlreadyJoined: "You already asked for joining game.",
+	NotAvailble: "You are actually not available."
 }

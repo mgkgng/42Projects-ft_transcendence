@@ -21,6 +21,8 @@ import { Repository, DataSource } from "typeorm";
 import { UserService } from "src/user/user.service";
 import { ErrorMessage, RoomUpdate, UserState } from "./game.utils";
 
+//TODO Too many connections for a client
+
 @WebSocketGateway({
 	cors: {
 	  origin: '*',
@@ -28,7 +30,6 @@ import { ErrorMessage, RoomUpdate, UserState } from "./game.utils";
 })
 //export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
-	// connections: Map<string, Socket>;
 	clients: Map<string, Client>;
 	rooms: Map<string, Room>;
 	roomlistClients: Array<any>;
@@ -41,7 +42,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				private userService : UserService,
 				private jwtServer: JwtService
 	) {
-		// this.connections = new Map<string, Socket>();
 		this.clients = new Map<string, Client>();
 		this.rooms = new Map<string, Room>();
 		this.roomlistClients = [];
@@ -54,7 +54,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	public handleConnection(client: any, ...args: any[]): void {
 		console.log("Connection!!", client.id);
-		// this.connections.set(client.id, client);
 
 		// Check the user and if the user is already connected.
 		let userInfo = this.getUserInfo(client);
@@ -77,10 +76,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	public handleDisconnect(client: any): void {
 		console.log("Disconnection...", client.id);
-		// this.connections.delete(client.id);
 
+		// Get rid of socket from the client instance
 		let target = this.getClient(client);
 		target.sockets.delete(client.id);
+
+		// destory the instance if the client is no more connected
 		if (!target.sockets.size)
 			this.clients.delete(target.username);
     }
@@ -88,12 +89,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage("JoinQueue")
 	async joinQueue(@ConnectedSocket() client: Socket, @Request() req) {
 
-		// Protection: if client is available (neither waiting nor playing)
+		// Check if client is available
 		let target = this.getClient(req);
 		if (target.state != UserState.Available) {
 			client.emit("JoinQueueRes", {
 				allowed: false,
-				error: ErrorMessage.JoinQueueError
+				errorMsg: (target.state == UserState.Waiting) ? ErrorMessage.AlreadyJoined : ErrorMessage.NotAvailble
 			});
 			return ;
 		}
@@ -125,12 +126,16 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage("LeaveQueue")
 	leaveQueue(@Request() req) {
-		let target = this.getClient(req);
 
-		let index = this.queue.findIndex(x => x[0].username == target.username);
-		if (index > -1)
-			this.queue.splice(index, 1);
-		// TODO algo & protection revoir
+		// Check if the target is effectively waiting for the game
+		let target = this.getClient(req);
+		if (target.state != UserState.Waiting)
+			return ;
+
+		// Get rid of the client from the queue and turn them back available
+		let index = this.queue.findIndex(x => x[0] == target.username);
+		this.queue.splice(index, 1);
+		target.state = UserState.Available;
 	}
 
 	@SubscribeMessage("RoomCheck")
