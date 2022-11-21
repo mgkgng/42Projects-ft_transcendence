@@ -221,35 +221,33 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
 	@SubscribeMessage("JoinRoom")
-	async joinRoom(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
-		console.log("JoinRoom", client.id);
+	async joinRoom(@ConnectedSocket() client: Socket, @MessageBody() data: any, @Request() req) {
+		// Check whether the room exists and whether the room is available if the user wants to play
+		let target = this.getClient(req);
 		let room = this.getRoom(data.roomId);
-		if (!room || (room.players.length > 1 && data.play)) {
-			client.emit("JoinRoomRes", {
-				allowed: false, 
-				roomId: undefined });
+		if (!room) {
+			client.emit("JoinRoomError", ErrorMessage.RoomNotFound);
 			return ;
-		} else if (data.play) {
-			const newPlayer = await this.getPlayerInfo(data.username);
-			room.broadcast("PlayerUpdate", {
-				join: true,
-				userInfo: newPlayer
-			});
-			room.addPlayer(client, newPlayer);
-			// this.updateRooms(RoomUpdate.PlayerJoin, {
-			// 	id: room.id,
-			// 	player: newPlayer
-			// });
-		} else { //TODO I DONT UDNERSTAND WHY
-			// room.broadcast("WatcherUpdate", { //TODO potentiellement
-			// 	join: true
-			// })
-			room.addClient(client);
+		} else if (room.players.size > 1 && data.play) {
+			client.emit("JoinRoomError", ErrorMessage.RoomNotAvailble);
+			return ;
 		}
-		client.emit("JoinRoomRes", {
-			allowed: true,
-			roomId: data.roomId
-		});
+		
+		// If the user wants to play
+		if (data.play) {
+			// broadcast to the users in the room that there is a new player then add player in the room
+			const newPlayer = await this.getPlayerInfo(target.username);
+			room.broadcast("PlayerUpdate", newPlayer);
+			target.state = UserState.Playing;
+			room.playerJoin(newPlayer, target);
+		} else {
+			// If the user only wants to watch, add the user in the client list
+			target.state = UserState.Watching;
+			room.addClient(target);
+		}
+
+		// tell either the player or the watcher that they can join the room
+		target.broadcast("JoinRoomRes", data.roomId);
 	}
 
 	@SubscribeMessage("ExitRoom")

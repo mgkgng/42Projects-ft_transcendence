@@ -93,6 +93,7 @@ export class Room {
 	playerJoin(player: any, client: Client) {
 		this.players.set(player.username_42, new Player(player, false, 1));
 		this.addClient(client);
+		this.available = false;
 	}
 
 	playerExit(player: any, client: Client) {
@@ -109,8 +110,9 @@ export class Room {
 			this.broadcast("RoomAlert", ErrorMessage.RoomDestroyed);
 			return (false);
 		} else if (player.username_42 == this.hostname) {
-			// If the user who just quitted was a host, change the host
+			// If the user who just quitted was a host, change the host and make room available again
 			this.hostname = this.players.values()[0].username;
+			this.available = true;
 		}
 		return (true);
 	}
