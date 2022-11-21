@@ -54,5 +54,7 @@ export const UserState = {
 export const ErrorMessage = {
 	UnknownError: "Unknown Error",
 	AlreadyJoined: "You already asked for joining game.",
-	NotAvailble: "You are actually not available."
+	NotAvailble: "You are actually not available.",
+	RoomNotFound: "The room couldn't be found",
+	AccessNotPermitted: "You cannot access this room unproperly"
 }

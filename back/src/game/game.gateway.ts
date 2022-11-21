@@ -22,6 +22,7 @@ import { UserService } from "src/user/user.service";
 import { ErrorMessage, RoomUpdate, UserState } from "./game.utils";
 
 //TODO Too many connections for a client
+//TODO if the client websocket contains request, handshake..
 
 @WebSocketGateway({
 	cors: {
@@ -34,7 +35,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	rooms: Map<string, Room>;
 	roomlistClients: Array<any>;
 	queue: Array<any>;
-	control: Map<string, any>;
 
 	constructor(private mainServerService : MainServerService, private jwtService: JwtService, 
 				@InjectRepository(GameEntity) private gameRep: Repository<GameEntity>,
@@ -46,7 +46,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		this.rooms = new Map<string, Room>();
 		this.roomlistClients = [];
 		this.queue = [];
-		this.control = new Map<string, any>();
 	}
 
 	@WebSocketServer()
@@ -131,17 +130,20 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
 	@SubscribeMessage("RoomCheck")
-	roomCheck(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
-		console.log("RoomCheck", data);
-
+	roomCheck(@ConnectedSocket() client: Socket, @MessageBody() data: any, @Request() req) {
+		// Check if the room exists and if room contains the user as client
+		let target = this.getClient(req);
 		let room = this.getRoom(data.room);
-
 		if (!room) {
-			client.emit("RoomNotFound");
+			client.emit("RoomCheckError", ErrorMessage.RoomNotFound);
+			return ;
+		} else if (!room.clients.has(target.username)) {
+			client.emit("RoomCheckError", ErrorMessage.AccessNotPermitted);
 			return ;
 		}
 
-		client.emit("RoomInfo", {
+		// Give the user the room information
+		target.broadcast("RoomFound", {
 			roomHost: room.hostname,
 			players: room.players,
 			maxpoint: room.maxpoint,
@@ -149,16 +151,15 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			mapSize: [room.pong.size[0], room.pong.size[1]],
 			paddleSize: room.pong.paddleSize
 		});
-
-		console.log("data was sent!");
 	}
 
-	@SubscribeMessage("PaddleMove")
-	paddleMove(@MessageBody() data: any) {
+	@SubscribeMessage("PaddleMoveKey")
+	paddleMove(@MessageBody() data: any, @Request() req) {
+		// Check if the request came from a proper player
+		let target = this.getClient(req);
 		let room = this.getRoom(data.room);
 
-		// calcul algorithm launched here
-
+		// Paddle starts to move, Websocket Messages set with interval
 		let intervalId = setInterval(() => {
 			room.pong.movePaddle(data.player, data.left);
 			room.broadcast("PaddleUpdate", {
@@ -166,13 +167,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				paddlePos: room.pong.paddlePos[data.player]
 			});
 		}, 20);
-		this.control.set(data.client, intervalId);
+		room.keyControl.set(data.client, intervalId);
 	}
 
 	@SubscribeMessage("PaddleStop")
 	paddleStop(@MessageBody() data: any) {
-		clearInterval(this.control.get(data));
-		this.control.delete(data);
+		clearInterval(this.keyControl.get(data));
+		this.keyControl.delete(data);
 	}
 
 	@SubscribeMessage("AskRooms")

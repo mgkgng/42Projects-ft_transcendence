@@ -33,6 +33,10 @@ export class Room {
 	/* RoomConnection */
 	clients: Map<string, Client>;
 	chat: Map<string, string>
+
+	/* Pong Control */
+	keyControl: Map<string, any>;
+	mouseControl: Map<string, any>;
 		
 	constructor(players: any, clients: any, title:string, mapSize: string, maxpoint: number,
 		puckSpeed : string, paddleSize:string, privateMode : boolean = true, hostname: string = "",
@@ -56,6 +60,9 @@ export class Room {
 
 		this.pong = new Pong(MapSize[mapSize], PuckSpeed[puckSpeed], PaddleSize[paddleSize]);
 		this.players = players;
+
+		this.keyControl = new Map<string, any>();
+		this.mouseControl = new Map<string, any>();
 
 		if (!this.hostname.length)
 			this.startPong();
