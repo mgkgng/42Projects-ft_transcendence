@@ -139,7 +139,7 @@
 	}
 </script>
 
-<Image />
+<!-- <Image /> -->
 
 <Modal bind:this={profileModal} >
 	<UserProfile profileUser={$client.user_info}  />
