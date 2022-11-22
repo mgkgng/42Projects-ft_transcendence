@@ -355,7 +355,23 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		
 		client.emit("resHistory", res);
 	}
-
+	@SubscribeMessage("getRankedUsers")
+	async getRankedUsers(@ConnectedSocket() client: Socket) {
+		const res = await this.dataSource.createQueryRunner()
+		.query("SELECT sum(games.is_winner) as nb_victory, count(games.is_winner) as nb_game, \
+				((cast(sum(games.is_winner) as float) / count(games.is_winner)) * 100) as win_rate, \
+				min(user_entity.username) as username, min(user_entity.campus_name) as campus_name, \
+				min(user_entity.campus_country) as campus_country, min(user_entity.img_url) as image_url, \
+				min(user_entity.display_name) as displayname \
+				FROM ( \
+					SELECT \"player1IdG\" as id_player, (CASE WHEN player1_score > player2_score THEN 1 ELSE 0 END) as is_winner FROM game_entity as game1 \
+						UNION \
+					SELECT \"player2IdG\" as id_player, (CASE WHEN player2_score > player2_score THEN 1 ELSE 0 END) as is_winner FROM game_entity as game2) \
+					as games inner join user_entity on games.id_player = user_entity.id_g \
+				GROUP BY id_player \
+				ORDER BY nb_victory DESC, win_rate DESC; ", []);
+		client.emit("getRankedUsers", res);
+	}
 	getClient(id: string) { return (this.clients.get(id)); }
 	getRoom(id: string) { return (this.rooms.get(id)); }
 
