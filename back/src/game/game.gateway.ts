@@ -355,7 +355,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		
 		client.emit("resHistory", res);
 	}
-	@SubscribeMessage("getRankedUsers")
+	@SubscribeMessage("RankingReq")
 	async getRankedUsers(@ConnectedSocket() client: Socket) {
 		const res = await this.dataSource.createQueryRunner()
 		.query("SELECT sum(games.is_winner) as nb_victory, count(games.is_winner) as nb_game, \
@@ -370,7 +370,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					as games inner join user_entity on games.id_player = user_entity.id_g \
 				GROUP BY id_player \
 				ORDER BY nb_victory DESC, win_rate DESC; ", []);
-		client.emit("getRankedUsers", res);
+		client.emit("RankingRes", res);
 	}
 	getClient(id: string) { return (this.clients.get(id)); }
 	getRoom(id: string) { return (this.rooms.get(id)); }
