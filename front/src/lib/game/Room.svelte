@@ -148,20 +148,22 @@
 
 	let winner: any;
 
+	let player1: any;
+	let player2: any;
+
 	onMount(()=> {
 		if (!roomId.length)
 			return ;
 		
 		$client.socket.on("RoomFound", (data: any) => {
-			roomFound = true;
 			roomInfo = data;
 
-			console.log("RoomFound!", data);
-			console.log("playerinfo: ", data.players);
 			// Initialize paddle position
 			paddlePos = [initPos, initPos];
 
-			userType = ($user.username == roomInfo?.players[0].username_42) ? UserType.Player1 :
+			
+
+			userType = ($user.username_42 == roomInfo?.players[0].username_42) ? UserType.Player1 :
 				(roomInfo.players.length > 1 && $user.username == roomInfo.players[1].username_42) ? UserType.Player2 : //TODO 42 wtf???
 				UserType.Player2;
 			
@@ -169,7 +171,8 @@
 				[userIndex, opponentIndex] = [opponentIndex, userIndex];
 				paddlePos[0] -= roomInfo?.paddleSize, paddlePos[1] -= roomInfo?.paddleSize;
 			}
-			scores = roomInfo?.scores;
+
+			roomFound = true;
 		});
 
 		$client.socket.on("PlayerUpdate", (data: any) => {
@@ -260,17 +263,18 @@
 	maxPoint: 10
 	paddleSize: 1
 	puckSpeed: 1
-	title: "adad"
+	title: "asdasd"
 [[Prototype]]: Object
 hostname: "min-kang"
-players:
-[[Prototype]]: Object
+players: Array(1)
+	0: {username: 'min-kang', username_42: 'min-kang', displayname: 'Min Guk Kang', image_url: 'https://cdn.intra.42.fr/users/48665ff8307df349298991deacd1e38e/min-kang.jpg', campus_name: 'Nice', …}
+	length: 1
+[[Prototype]]: Array(0)
 pong:
 	mapSize: (2) [300, 500]
 	paddles: (2) [{…}, {…}]
-	puck: {puckSpeed: 8, vectorX: -4, vectorY: -8, gameWidth: 300, gameHeight: 500, …}
+	puck: {puckSpeed: 8, vectorX: -2, vectorY: 8, gameWidth: 300, gameHeight: 500, …}
 	puckSpeed: 8 -->
-
 {#if !miniMode}
 {#if roomFound}
 <div class="container">

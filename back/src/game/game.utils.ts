@@ -55,3 +55,10 @@ export const ErrorMessage = {
 	RoomNotAvailble: "The room is not available.",
 	RoomNotReady: "Your opponent should be ready."
 }
+
+export const PongConfig = {
+	puckSize: 30,
+	frameDuration: 20,
+	deadZoneHeight: 30,
+	paddleHeight: 12
+}

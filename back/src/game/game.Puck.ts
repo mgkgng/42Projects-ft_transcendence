@@ -1,60 +1,42 @@
 import { Room } from "./game.Room";
+import { PongConfig } from "./game.utils";
 
 export class Puck {
 	puckSpeed: number;
-	posX: number;
-	posY: number;
-	vectorX: number;
-	vectorY: number;
-	gameWidth: number;
-	gameHeight: number;
+	pos: Array<number>;
+	vec: Array<number>;
+	mapSize: Array<number>;
 
-	constructor(gameWidth : number, gameHeight : number,
-		puckSpeed: number) { // temporary test
+	constructor(mapSize : Array<number>, puckSpeed: number) { // temporary test
 		this.puckSpeed = puckSpeed;
-		this.vectorX = (Math.floor(Math.random() * 3) + 1) * ((Math.floor(Math.random() * 2)) ? 2 : -2);
-		this.vectorY = puckSpeed * ((Math.floor(Math.random() * 2)) ? 1 : -1);
-		this.gameWidth = gameWidth;
-		this.gameHeight = gameHeight;
-		this.posX = gameWidth / 2;
-		this.posY = gameHeight / 2;
+		this.vec = [(Math.floor(Math.random() * 3) + 1) * ((Math.floor(Math.random() * 2)) ? 2 : -2),
+			puckSpeed * ((Math.floor(Math.random() * 2)) ? 1 : -1)];
+		this.mapSize = mapSize;
+		this.pos = [mapSize[0] / 2, mapSize[1] / 2];
 	}
 
 	setCheckPuck(room: any) {
-		// calculating the interval
-		let frameDuration = 20;
-		let deadZoneHeight = 30;
-		let paddleHeight = 12;
-		let ballSize = 30;
-
-		let distToDeath = (this.vectorY > 0)
-			? (this.gameHeight - deadZoneHeight - paddleHeight) - this.posY
-			: this.posY - deadZoneHeight - paddleHeight; // it functions well
+		let distToDeath = (this.vec[1] > 0)
+			? (this.mapSize[1] - PongConfig.deadZoneHeight - PongConfig.paddleHeight) - this.pos[1]
+			: this.pos[1] - PongConfig.deadZoneHeight - PongConfig.paddleHeight; // it functions well
 		
-		let frameNb = Math.floor(Math.abs((distToDeath / this.vectorY)));
+		let frameNb = Math.floor(Math.abs((distToDeath / this.vec[1])));
 
-		let timeOut = frameNb * frameDuration;
+		let timeOut = frameNb * PongConfig.frameDuration;
 		let deathPointX = this.calculPosX(frameNb);
 
 		setTimeout(() => {
-			// checking if the paddle hits the puck...
-			// let paddlePos = (this.vectorY > 0) ? room.pong.paddlePos[1] : this.gameWidth - room.pong.paddlePos[0];
-			let paddlePos = (this.vectorY > 0) ? room.pong.paddlePos[1] : room.pong.paddlePos[0];
+			let paddlePos = (this.vec[1] > 0) ? room.pong.paddlePos[1] : room.pong.paddlePos[0];
 			if (deathPointX > paddlePos && deathPointX < paddlePos + room.pong.paddleSize) {
-			// line below is to make the puck bounce permantly
-			// if (this.vectorY) {
-				console.log("Puck Hit.");
-				room.broadcast("PuckHit", undefined);
-
-				this.posX = deathPointX;
-				this.posY = (this.vectorY > 0) ? (this.gameHeight - deadZoneHeight - paddleHeight) : deadZoneHeight + paddleHeight;
-				this.vectorY *= -1;
+				room.broadcast("PuckHit");
+				this.pos[0] = deathPointX;
+				this.pos[1] = (this.vec[1] > 0) ? (this.mapSize[1] - PongConfig.deadZoneHeight - PongConfig.paddleHeight)
+					: PongConfig.deadZoneHeight + PongConfig.paddleHeight;
+				this.vec[1] *= -1;
 				this.setCheckPuck(room);
 				return ;
-			} else {
-				console.log("ScoreUpdate");
-	
-				let winner = (this.vectorY > 0) ? 0 : 1;
+			} else {	
+				let winner = (this.vec[1] > 0) ? 0 : 1;
 				room.broadcast("ScoreUpdate", { scoreTo: winner });
 				room.scores[winner]++;
 
@@ -64,7 +46,7 @@ export class Puck {
 					return ;
 				}
 
-				room.pong.puck = new Puck(room.pong.size[0], room.pong.size[1], room.pong.puckSpeed);
+				room.pong.puck = new Puck(room.pong.size, room.pong.puckSpeed);
 				setTimeout(() => {
 					Room.startPong(room);
 				}, 2000);
@@ -74,13 +56,13 @@ export class Puck {
 
 	calculPosX(frameNb: number) {
 		// TODO precision should be made, it should be because of the css stuff
-		let deathPointX = this.posX;
+		let deathPointX = this.pos[0];
 
 		for (let i = 0; i < frameNb; i++) {
-			deathPointX += this.vectorX;
-			if (deathPointX < 0 || deathPointX > this.gameWidth - 30) {
-				this.vectorX *= -1;
-				deathPointX += this.vectorX;
+			deathPointX += this.vec[0];
+			if (deathPointX < 0 || deathPointX > this.mapSize[0] - PongConfig.puckSize) {
+				this.vec[0] *= -1;
+				deathPointX += this.vec[0];
 			}
 		}
 		return (deathPointX);

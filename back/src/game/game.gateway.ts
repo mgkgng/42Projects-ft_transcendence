@@ -141,11 +141,21 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 
 		// Give the user the room information
+		let players = Array.from(room.players.values());
 		target.broadcast("RoomFound", {
-			players: Array.from(room.players.values(), x => x.info),
+			player1: {
+				info: players[0].info,
+				score: players[0].score,
+				pos: players[0].paddle.pos
+			},
+			players2: (players.length > 1) ? {
+				info: players[1].info,
+				score: players[1].score,
+				pos: players[1].paddle.pos
+			} : undefined,
 			hostname: room.hostname,
 			gameInfo: room.gameInfo,
-			pong: room.pong
+			puck: room.pong.puck.pos
 		});
 	}
 
