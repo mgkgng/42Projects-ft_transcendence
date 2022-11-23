@@ -142,7 +142,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 		// Give the user the room information
 		target.broadcast("RoomFound", {
-			players: room.players,
+			players: Array.from(room.players.values(), x => x.info),
 			hostname: room.hostname,
 			gameInfo: room.gameInfo,
 			pong: room.pong
@@ -215,8 +215,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			return ;
 		}
 
-		// Create the room with the data
-		let room = new Room([this.getPlayerInfo(target.username)], [target], data, target.username,
+		// Get the player's info and create the room with the data
+		let player = await this.getPlayerInfo(target.username);
+		let room = new Room([player], [target], data, target.username,
 			this.gameRep, this.mainServerService, this.dataSource, this.userService);
 		this.rooms.set(room.id, room);
 		target.state = UserState.Playing;

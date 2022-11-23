@@ -139,7 +139,7 @@
 	
 	let gameFinishedModal: any;
 
-	let roomFound: boolean;
+	let roomFound: boolean = false;
 	let miniMode: boolean = false;
 
 	let ready: boolean = false;
@@ -156,6 +156,8 @@
 			roomFound = true;
 			roomInfo = data;
 
+			console.log("RoomFound!", data);
+			console.log("playerinfo: ", data.players);
 			// Initialize paddle position
 			paddlePos = [initPos, initPos];
 
@@ -181,7 +183,7 @@
 				if (roomInfo.roomHost != data.hostname)
 					roomInfo.roomHost = data.hostname;
 			}
-		})
+		});
 		
 		$client.socket.on("PaddleUpdate", (data: any) => {
 			if ((data.player == UserType.Player1 && userIndex == UserType.Player2) ||
@@ -244,21 +246,30 @@
 		});
 
 		return (() => {
-			$client.socket.off("RoomInfo");
-			$client.socket.off("PlayerUpdate");
-			$client.socket.off("PaddleUpdate");
-			$client.socket.off("LoadBall");
-			$client.socket.off("PongStart");
-			$client.socket.off("PuckHit");
-			$client.socket.off("ScoreUpdate");
-			$client.socket.off("ReadyUpdate");
-			$client.socket.off("GameFinished");
-			$client.socket.off("GameStartFail");
-			$client.socket.off("GameStart");
-		})
+			$client.removeListeners("RoomInfo", "PlayerUpdate", "PaddleUpdate",
+				"LoadBall", "PongStart", "PuckHit", "ScoreUpdate",
+				"ReadyUpdate", "GameFinished", "GameStartFail", "GameStart");
+		});
 	});
 
 </script>
+
+<!-- gameInfo:
+	isPrivate: false
+	mapSize: 1
+	maxPoint: 10
+	paddleSize: 1
+	puckSpeed: 1
+	title: "adad"
+[[Prototype]]: Object
+hostname: "min-kang"
+players:
+[[Prototype]]: Object
+pong:
+	mapSize: (2) [300, 500]
+	paddles: (2) [{…}, {…}]
+	puck: {puckSpeed: 8, vectorX: -4, vectorY: -8, gameWidth: 300, gameHeight: 500, …}
+	puckSpeed: 8 -->
 
 {#if !miniMode}
 {#if roomFound}
