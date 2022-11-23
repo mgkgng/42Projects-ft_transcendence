@@ -20,7 +20,6 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository, DataSource } from "typeorm";
 import { UserService } from "src/user/user.service";
 import { ErrorMessage, getRandomInt, RoomUpdate, UserState } from "./game.utils";
-import { RoomUpdate } from "./game.utils";
 import { UserEntity } from "src/entity/User.entity";
 //TODO Too many connections for a client
 //TODO if the client websocket contains request, handshake..
@@ -52,27 +51,24 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	server: Server;
 
 	public async handleConnection(client: any, ...args: any[]) {
-		console.log("Connection!!", client.id);
-		const user: any = (this.jwtService.decode(client.handshake.headers.authorization.split(' ')[1]));
-  		console.log("test", user);
-		let newClient = new Client(client, user.username, {});
+		console.log("Connection socket:", client.id);
+		// Check the user and if the user is already connected.
+		let userInfo = this.getUserInfo(client);
+		if (this.clients.has(userInfo.username_42))
+			this.clients.get(userInfo.username_42).sockets.set(client.id, client);
+		else
+			this.clients.set(userInfo.username_42, new Client(userInfo.username_42, client));
+			
+		// Get the user information from db and pass it to the user
 		const user_db = await this.dataSource.getRepository(UserEntity).createQueryBuilder("user").
-		where("user.username = :username", {username: user.username_42}).getOne();
-		this.clients.set(newClient.id, newClient);
-
+		where("user.username = :username", {username: userInfo.username_42}).getOne();
 		client.emit("GetConnectionInfo", {
-			user: {
-				username: userInfo.username,
-				displayname: userInfo.displayname,
-				image_url: userInfo.image_url,
-				campus_name: userInfo.campus_name,
-				campus_country: userInfo.campus_country
-        // modif
-				//username: user_db.username,
-				//displayname: user_db.display_name,
-				//image_url: user_db.img_url,
-				//campus_name: user_db.campus_name,
-				//campus_country: user_db.campus_country
+			user: {		
+				username: user_db.username,
+				displayname: user_db.display_name,
+				image_url: user_db.img_url,
+				campus_name: user_db.campus_name,
+				campus_country: user_db.campus_country
 			}
 		});
 	}
