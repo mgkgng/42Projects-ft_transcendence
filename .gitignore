@@ -5,5 +5,6 @@ front/node_modules
 **.vscode
 node_modules
 pong_front/node_modules
+.env
 
 npx @nestjs/cli
