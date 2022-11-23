@@ -1,42 +1,20 @@
+import { Paddle } from "./game.Paddle";
 import { Puck } from "./game.Puck"
 
 export class Pong {
-	size: Array<number>;
+	mapSize: Array<number>;
 	puckSpeed: number;
 	puck: Puck;
-	paddleSize: number;
-	paddlePos: Array<number>;
-	moveMin: number;
-	moveMax: number;
+	paddles: Array<Paddle>;
 	scores: Array<number>;
 
-	constructor(size: Array<number>, puckSpeed: number, paddleSize: number) {
-		
-		this.size = size;
+	constructor(mapSize: Array<number>, puckSpeed: number, paddleWidth: number) {
+		this.mapSize = mapSize;
 		this.puckSpeed = puckSpeed;
-		this.puck = new Puck(this.size[0], this.size[1],
+		this.puck = new Puck(this.mapSize[0], this.mapSize[1],
 			this.puckSpeed);
-
-		this.paddleSize = paddleSize // TODO put it into createGame
-		let initPos = (this.size[0] - this.paddleSize) / 2;
-		this.paddlePos = [initPos, initPos];
-
-		this.moveMin = 0;
-		this.moveMax = this.size[0] - this.paddleSize;	
+		this.paddles = [new Paddle(mapSize, paddleWidth, 0), new Paddle(mapSize, paddleWidth, 1)];
 	}
 
-	movePaddle(userIndex: number, left: boolean) {
-		//TODO put the accelerating speed on paddle
-
-		if ((this.paddlePos[userIndex] == this.moveMin && left)
-			|| (this.paddlePos[userIndex] == this.moveMax && !left))
-			return ;
-
-		this.paddlePos[userIndex] += (left) ? -5 : 5;
-
-		if (this.paddlePos[userIndex] <= this.moveMin)
-			this.paddlePos[userIndex] == this.moveMin;
-		else if (this.paddlePos[userIndex] >= this.moveMax)
-			this.paddlePos[userIndex] == this.moveMax;
-	}
+	movePaddle(index: number, left: boolean) { this.paddles[index].move(left); }
 }

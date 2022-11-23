@@ -1,97 +1,199 @@
 <style lang="scss">
-	.container {
-		display: flex;
-		flex-direction: row;
-		margin-top: 3vh;
-		width: 75vw;
-		height: 75%;
-		max-height: 90vh;
-		background-color: transparentize(rgb(255, 0, 0), 0.9);
-		padding: 2em;
-		border-radius: 2em;
+	.chat {
+		width: 960px;
+		height: 640px;
+		padding: 0;
+		gap: 0;
 	}
-	.userRoom-zone{
-		width: 25%;
-		background-color: transparentize(#000, 0.2);
-		border: 2px solid transparentize(#fff, .6);
-		border-radius: 0.5em;
-	}	
-	.room-zone {
-		width: 15%;
-		background-color: transparentize(#000, 0.2);
-		border: 2px solid transparentize(#fff, .6);
-		border-radius: 0.5em;
-	}
-	.message-zone {
-		width: 50%;
-		padding-left: 1em;
-		background-color: transparentize(#000, 0.2);
-		border: 2px solid transparentize(#fff, .6);
-	
-		color: #fff;	
-		display: flex;
-		flex-direction: column;
-		padding: 1em;
-		gap: .5em;
-		overflow-y: scroll;
-	}
-	.new-chat-room-zone{
-		width: 10%;
-		padding-left: 1em;
-		min-height: 500px;
-		background-color: transparentize(#000, 0.2);
-		border: 2px solid transparentize(#fff, .6);
-	
-		display: flex;
-		flex-direction: column;
-		gap: .5em;
 
+	.rooms {
+		width: 23%;
+		padding: 0;
+		margin: 0;
+
+		.tools {
+			width: 100%;
+			height: 7%;
+			gap: .2em;
+			padding-left: 1em;
+			padding-top: 0;
+
+			button {
+				width: 5em;
+				height: 2em;
+				border-radius: 0 0 .2em .2em;
+				// padding-top: .1em;
+				background-color: transparentize(#fff, .6);
+				cursor: pointer;
+				transition: .3s;
+
+				&:nth-child(1) { background-color: $main-bright; }
+				&:nth-child(2) { background-color: $submain-lowshadeblue; }
+			}
+		}
+
+		.list {
+			border-top: $border;
+			border-right: $border;
+			border-radius: 0 1em 0 0;
+			padding-right: .5em;
+			height: 93%;
+			gap: 0.1em;
+
+			p {
+				text-align: center;
+				font-size: 25px;
+				margin: .5em;
+			}
+			
+			.line {
+				position: relative;
+				align-items: center;
+				height: 3em;
+
+				.room {
+					width: 80%;
+					height: 100%;
+					cursor: pointer;
+					border-radius: 0 0em 2em 0;
+					z-index: 2;
+					background-color: #212121;
+					transition: .3s;
+					padding: 1em;
+					border: $border-thin;
+					border-left: none;
+				}
+
+				.choose{
+					background-color: rgba(207, 196, 196, 0.5);
+					text-decoration: underline;
+				}
+
+				&:hover {
+					.room {
+						background-color: rgb(94, 94, 94);
+						width: 83%;
+					}
+					.button {
+						background-color: $main-bright;
+						right: 9%;
+					}
+				}
+
+				.button {
+					z-index: 1;
+					position: absolute;
+					right: 15%;
+					width: 35%;
+					height: 100%;
+					border: $border-thin;
+					border-radius: 0 .2em .2em 0;
+					background-color: transparentize(#fff, .7);
+					cursor: pointer;
+					transition: .3s;
+
+					p {
+						position: absolute;
+						right: 0.2em;
+						bottom: 0.2em;
+						font-size: 15px;
+						opacity: 0;
+						transition: .3s;
+					}
+
+					&:hover {
+						right: 0;
+						p { opacity: .5; }
+					}
+				}
+			}
+
+			.no-room {
+				height: 100%;
+				font-size: 15px;
+				justify-content: center;
+				padding-top: 30%;
+			}
+		}
 	}
-	.btn-new-room{
-		width: 50%;
-		text-align: center;
-		padding: 1em;
-		border-radius: 1em;
-		border: solid #fff;
-		background-color: transparentize($submain, 0.8);
-		color: #fff;
-		cursor: pointer;
+
+	.chatroom {
+		width: 77%;
+
+		.read {
+			overflow-y: scroll;
+			padding: 2em;
+
+			width: 100%;
+			height: 70%;
+
+		}
+		.write {
+			position: relative;
+			width: 100%;
+			height: 30%;
+
+
+			input {
+				padding-left: 1.5em;
+				border-radius: .3em 0 .8em 0;
+
+				width: 100%;
+				height: 100%;
+				background-color: transparentize(#fff, .8	);
+				border-top: $border;
+				border-left: $border;
+			}
+
+			button {
+				position: absolute;
+				right: 0;
+				bottom: 0;
+				width: 3em;
+				height: 2em;
+				cursor: pointer;
+				transition: .3s;
+				border-radius: .2em 0 .8em 0;
+
+				&:hover {
+					background-color: transparentize(#fff, .7);
+				}
+			}
+		}
+
+		.no-select {
+			width: 100%;
+			height: 100%;
+			justify-content: center;
+			align-items: center;
+		}
 	}
-	.submit {
-		padding: 1em;
-		border-radius: 1em;
-		width: 50%;
-		border: solid #fff;
-		text-align: center;
-		background-color: transparentize($submain, 0.8);
-		color: #fff;
-		cursor: pointer;
-	}
-	.btn-room{
-		padding: 1em;
-		width: 100%;
-		color:rgb(255, 255, 255);
-		text-align: center;
-		background-color: rgba(97, 97, 97, 0.5);
-		cursor: pointer;
-	}
-	.search{
-		margin-left: 20%;
-		margin-bottom: 1em;
-		margin-top: 1em;
-		width: 60%;
-		border-style: solid;
-		border-color: rgb(255, 255, 255);
-		border-width: 2px;
-		border-radius: 1em;
-	}
-	.choose{
-		background-color: rgba(207, 196, 196, 0.5);
-		text-decoration: underline;
-	}
-	.text-input {
-		background-color: #fff;
-		color: #000;
+
+	.users {
+		width: 17%;
+		gap: 0;
+
+		p {
+			padding: 1em;
+			text-align: center;
+			border-bottom: $border;
+			background-color: transparentize($submain-blue, .3);
+		}
+
+		.list {
+			padding: .8em .5em;
+			gap: 0;
+			.user {
+				padding-left: .5em;
+				height: 1.8em;
+				cursor: pointer;
+				transition: .1s;
+				border-radius: .2em 0 .5em .2em;
+				&:hover {
+					background-color: transparentize(#fff, .7);
+				}
+			}
+		}
 	}
 </style>
 
@@ -101,26 +203,24 @@
     import { client } from "$lib/stores/client";
     import { chatRoom, ChatRooms, Room } from "$lib/stores/chatRoom";
 	import { onMount, afterUpdate } from "svelte";
-	import { get } from 'svelte/store';
     import ChatRoomMessage from "$lib/tools/chatRoomMessage.svelte";
-    import AllChatRooms from "./AllChatRooms.svelte";
-    import AxelUserProfile from "../modals/AxelUserProfile.svelte";
-	
-	export let itself: any; 
-	export let axelUserProfileModal : any;
-	export let allChatModal: any;
+    import AddRoom from "$lib/chat/AddRoom.svelte";
+    import AllChatRooms from "$lib/chat/AllChatRooms.svelte";
 
-	let newRoomName : string; //Valeur du insert de création de room
-	let newMessage : string;  //Valeur du insert d'envoie de message
-	let newRoomPassword : string; //Valeur du insert, password
+	export let itself: any; 
+	// export let allChatModal: any;
+
+	let newMessage : string;
 
 	let rooms : string[]; //Rooms visibles par le user
 	let actualName: string; //Name de la room selectionnee
 	let actualMessages : Room = new Room("", false, false, false, false);
+	
+	let addRoomModal: any;
+	let allChatRoomModal: any;
 
-	let is_new_room_password_protected : boolean = false; //Si la room est protege par un mot de passe
+	$: console.log($chatRoom);
 
-	let message_zone;
 	//afterUpdate(() => {
 			//message_zone.scroll({top: 1000000000});
 	//});
@@ -163,6 +263,8 @@
 				return (chat);
 			})
 		});
+
+		
 	});
 	function  chooseRoom(room : any){
 		chatRoom.update(chat => { 
@@ -253,39 +355,43 @@
 	};
 </script>
 
-<div class="container">
-	<!--Zone de liste des rooms du user-->
-	<div class="room-zone">
-		<input class="btn-room search" value="search" on:click={() =>{
-			allChatModal.open();
-			itself.close();	
-		}}>
-		<input type="file" bind:files >
-		<button type="submit" on:click={handleSubmits} class="btn-room">upload</button>
-		<ul>
-		{#each ($chatRoom.sortRoomsKeys([...$chatRoom.messages.keys()])) as room}
-			<li>
+<Modal bind:this={addRoomModal}>
+	<AddRoom itself={addRoomModal} />
+</Modal>
+
+<Modal bind:this={allChatRoomModal}>
+	<AllChatRooms itself={allChatRoomModal} />
+</Modal>
+
+<div class="flex window chat">
+	<div class="rooms">
+		<div class="flex tools">
+			<button on:click={() => { addRoomModal.open(); }}>Add</button>
+			<button on:click={() => { allChatRoomModal.open(); }}>Join</button>
+		</div>
+		<div class="vflex list">
+			<p>My Rooms</p>
+			{#if $chatRoom?.rooms.length}
+			{#each ($chatRoom?.sortRoomsKeys([...$chatRoom.messages.keys()])) as room}
+			<div class="flex line">
 				{#if (room != actualName)}
-					<button class="btn-room" on:click={chooseRoom({room})}>{room}</button>
+				<div class="room" on:click={() => chooseRoom({room})}>{room}</div>
 				{:else}
-					<button class="btn-room choose" on:click={chooseRoom({room})}>{room}</button>
+				<div class="room chosen" on:click={() => chooseRoom({room})}>{room}</div>
 				{/if}
-				<button class="btn-room" on:click={setNotVisible({room})}>X</button>
-			</li>
-		{/each}
-		</ul>
+				<div class="button" on:click={() => setNotVisible({room})}>
+				<p>Quit</p>
+				</div>
+			</div>
+			{/each}
+			{:else}
+			<div class="flex no-room">You didn't join any room yet</div>
+			{/if}
+		</div>
 	</div>
-	<div class="userRoom-zone">
-		{#each actualMessages?.usersRoom as actual_user}
-			<input type="button" class="btn-room" value={actual_user.username} />
-			<input type="button" class="btn-room" value="mute" on:click={muteUser(actual_user.username)}/>
-			<input type="button" class="btn-room" value="ban" on:click={banUser(actual_user.username)}/>
-			<input type="button" class="btn-room" value="set Admin" on:click={setAdmin(actual_user.username)}/>
-		{/each}
-	</div>
-	<!--Zone de liste des messages de la room selectionne-->
-	<div class="message-zone" bind:this={message_zone}>
+	<div class="vflex chatroom">
 		{#if ($chatRoom.actualRoomName !== "")}
+			<div class="read">
 			{#if actualMessages.is_owner}
 				{#if actualMessages.is_private}
 					<input class="button" value="Set private" on:click={unset_private_room}>
@@ -298,29 +404,33 @@
 				{:else}
 					<input class="button" value="add password" on:click={set_password_room}>
 				{/if}
-
 			{/if}
 			{#each actualMessages?.messages as message}
-				<ChatRoomMessage username={message.username} content_message={message.message} itself={ itself } axelUserProfileModal={axelUserProfileModal} is_admin={actualMessages.is_admin}/>
+				<!-- <ChatRoomMessage username={message.username} content_message={message.message} itself={ itself } axelUserProfileModal={axelUserProfileModal} is_admin={actualMessages.is_admin}/> -->
 			{/each}
-			<input class="text-input" bind:value={newMessage}>
-			<input type="button" class="submit" value="send" on:click={sendMessage}>
+			</div>
+			<div class="write">
+				<input class="text-input" placeholder="write your message here..." bind:value={newMessage}>
+				<button on:click={sendMessage}>send</button>
+			</div>
+			<div class="vflex users">
+				<p>Online</p>
+				<div class="vflex list">
+					{#each actualMessages?.usersRoom as actual_user}
+					<div class="user">
+						<div>{actual_user.username}</div>
+						<!-- <input type="button" class="btn-room" value="mute" on:click={()=>muteUser(actual_user.username)}/>
+						<input type="button" class="btn-room" value="ban" on:click={()=>banUser(actual_user.username)}/>
+						<input type="button" class="btn-room" value="set Admin" on:click={()=>setAdmin(actual_user.username)}/> -->
+					</div>
+					{/each}
+				</div>
+			</div>
 		{:else}
-			choose a room 
+			<div class="flex no-select">
+				<h2>Please select a room</h2> 
+			</div>
 		{/if}
 	</div>
-	<!--Zone de creation de room -->
-	<div class="new-chat-room-zone">
-		<h5 style="color: white">Add new room :</h5><br>
-		<input class="text-input" placeholder="NameRoom" bind:value={newRoomName}>
-		<div style="display: flex; flex-direction: row;">
-			<p style="color: white">password ?</p>
-			<input type="checkbox" id="is_pass_protected" name="scales" bind:checked={is_new_room_password_protected}>
-		</div>
-		{#if (is_new_room_password_protected == true)}
-			<input class="text-input" placeholder="password" bind:value={newRoomPassword}>
-		{/if}
-		<input type="button" value="+" class="btn-new-room" on:click={createRoom}/>
-	</div>
-
 </div>
+

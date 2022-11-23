@@ -23,31 +23,28 @@
 		position: absolute;
 		top: 1.5em;
 		right: 8em;
-		width: 12em;
-		height: 2.5em;
-		gap: 0;
-
-		border: $border;
-		border-radius: .2em;
-		background-color: #212121;
+		gap: .1em;
 
 		label {
-			width: 49%;
-			height: 100%;
-			font-size: 15px;
+			display: inline-block;
+			border: $border;
+			border-radius: .2em;
+			width: 6em;
+			height: 2.5em;
+			text-align: center;
+			padding: .5em;
+			font-size: 17px;
 			cursor: pointer;
+		}
+		input { display: none; }
+		input:checked + label { background-color: $main-bright; }
 
-			&:nth-child(2) { border-left: $border; }
-		
-			.wrapper {
-				position: absolute;
-				width: 50%;
-				height: 100%;
-				padding-top: .7em;
-			}
-
-			input { display: none;	}
-			input:checked + .wrapper { background-color: $main-lowshade; }
+		button {
+			width: 6em;
+			height: 2.5em;
+			background-color: $submain-blue;
+			border: $border;
+			border-radius: .2em;
 		}
 	}
 
@@ -120,15 +117,9 @@
 				padding: .2em;
 				border-right: $border-thin;
 
-				// &:nth-child(1) {
-				// 	background-color: $red;
-				// }
-
 				&:last-child {
 					border-right: none;
 				}
-
-				
 			}
 		}
 
@@ -168,10 +159,7 @@
 		width: 5em;
 		height: 100%;
 
-		padding-top: 8em;
-		padding-bottom: 8em;
-		padding-left: 1em;
-		padding-right: 1em;
+		padding: 12em 1em;
 	}
 
 	.button-back {
@@ -179,14 +167,14 @@
 		height: 100%;
 
 		transition: .3s;
-		border-radius: 2em;
+		border-radius: .6em;
 		border: none;
 		background-color: transparentize(#fff, 1);
 		font-size: 25px;
 
 		&:hover {
 			display: block;
-			background-color: transparentize($submain-bluegreen, 0.5);
+			background-color: transparentize($main-lowshade, 0.3);
 		}
 	}
 
@@ -231,6 +219,10 @@
     import Modal from "$lib/tools/Modal.svelte";
 	import Message from "$lib/modals/Message.svelte";
 	import { RoomUpdate } from "$lib/stores/var";
+
+	// TODO automatic requests
+	// TODO grey button for host when the room is yet empty
+	// TODO different button options when it is a random game
 	
 	export let itself: any;
 	export let enterGameModal: any;
@@ -241,6 +233,8 @@
 	let showGrid: boolean = false;
 	let roomPage: number = 0;
 	let perPage: number = 3;
+
+	let roomListReqs: any;
 
 	$: roomArray = (showAvailable) ? [...rooms?.values()].filter(room => room.available == true)
 		: [...rooms.values()];
@@ -257,36 +251,33 @@
 
 	function joinRoom(roomId: string, playMode: boolean) {
 		$client.socket.emit("JoinRoom", {
-			username: $user.username,
 			roomId: roomId,
 			play: playMode
 		})
 	}
 
-	onMount(() => {
-		$client.socket.emit("AskRooms", { id: $client.id });
+	// Set automatic refresh for every 30 seconds 
+	function refresh() {
+		$client.socket.emit("RoomListReq");
+		if (roomListReqs)
+			clearInterval(roomListReqs);
+		roomListReqs = setInterval(() => {
+			$client.socket.emit("RoomListReq");
+		}, 30000);
+	}
 
-		$client.socket.on("GetAllRooms", (data: any) => {
+	onMount(() => {
+		$client.socket.on("RoomListRes", (data: any) => {
 			console.log("GetAllRooms");
 			roomArray = data.rooms;
 		});
-		$client.socket.on("UpdateRooms", (data: any) => {
-			console.log("updaterooms", data);
-			if (data.updateType == RoomUpdate.NewRoom)
-				rooms.set(data.roomData.id, data.roomData);
-			else if (data.updateType == RoomUpdate.DeleteRoom)
-				rooms.delete(data.roomData.id);
-			else if (data.updateType == RoomUpdate.PlayerJoin)
-				rooms.get(data.roomData.id).players.push(data.roomData.player);
-			else 
-				rooms.get(data.roomData.id).players.splice(data.roomData.userIndex, 1);
-			rooms = rooms;
-		});
 
-		$client.socket.on("RoomListUpdate", (data: any) => {
-			console.log("Updated", data);
-			rooms = data.rooms;
-		});
+		refresh();
+
+		return (() => {
+			$client.socket.off("RoomListRes");
+			clearInterval(roomListReqs);
+		})
 	});
 </script>
 
@@ -298,14 +289,9 @@
 		}}>&lt</button>
 	</div>
 	<div class="flex tools">
-		<label class="form">
-			<input type="checkbox" bind:checked={showAvailable} />
-			<div class="wrapper">Available</div>
-		</label>
-		<label class="form">
-			<input type="checkbox" bind:checked={showGrid} />
-			<div class="wrapper">Grid</div>
-		</label>
+		<input type="checkbox" id="only" bind:checked={showAvailable} />
+		<label for="only">Available</label>
+		<button on:click={() => { refresh(); }}>Refresh</button>
 	</div>
 	<div class="flex room-container">
 		{#each roomsOnPage as room}
@@ -321,12 +307,6 @@
 				<div class="grey-box">?</div>
 				{/if}
 			</div>
-			<!-- <div class="info"> TODO
-				<div>{room.mapInfo[0]} pts</div>
-				<div>{room.mapInfo[1]} Size</div>
-				<div>{room.mapInfo[2]} Speed</div>
-				<div>{room.mapInfo[3]} Paddle</div>
-			</div> -->
 			<div class="flex buttons">
 				<button class="watch" on:click={()=>joinRoom(room.id, false)}>WATCH</button>
 				<button class="play" on:click={()=>joinRoom(room.id, true)}>PLAY</button>

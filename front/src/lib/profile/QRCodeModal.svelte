@@ -1,4 +1,3 @@
-
 <script type="ts">
 	import { onMount } from "svelte";
     export let src_img : any;

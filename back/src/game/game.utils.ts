@@ -7,6 +7,8 @@ export function uid() {
 	return (res);
 }
 
+export function getRandomInt(max: number) { return Math.floor(Math.random() * max); }
+
 export function replacer() {
     const visited = new WeakSet();
     return ((key, value) => {
@@ -19,27 +21,37 @@ export function replacer() {
     });
 }
 
-export const PaddleSize = {
-	"Short" : 40,
-	"Normal" : 80,
-	"Long" : 130
-}
+export const PaddleSize = [40, 80, 120];
 
-export const MapSize = {
-	"Small": [200, 300],
-	"Medium": [300, 500],
-	"Large": [400, 700]
-}
+export const MapSize = [
+	[200, 300],
+	[300, 500],
+	[400, 700]
+]
 
-export const PuckSpeed = {
-	"Slow" : 3,
-	"Normal" : 5,
-	"Fast" : 8
-}
+export const PuckSpeed = [3, 8, 13]
 
 export const RoomUpdate = {
 	NewRoom: 0,
 	DeleteRoom: 1,
 	PlayerJoin: 2,
 	PlayerExit: 3
+}
+
+export const UserState = {
+	Available: 0,
+	Waiting: 1,
+	Playing: 2,
+	Watching: 3
+}
+
+export const ErrorMessage = {
+	UnknownError: "Unknown Error",
+	AlreadyJoined: "You already asked for joining game.",
+	UserNotAvailble: "You are actually not available.",
+	RoomNotFound: "The room couldn't be found.",
+	AccessNotPermitted: "You cannot access this room unproperly.",
+	RoomDestroyed: "This room doesn't exist anymore.",
+	RoomNotAvailble: "The room is not available.",
+	RoomNotReady: "Your opponent should be ready."
 }

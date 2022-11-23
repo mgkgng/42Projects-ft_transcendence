@@ -33,17 +33,42 @@
 
 <script lang="ts">
     import { client } from "$lib/stores/client";
-   
+	import { onMount } from "svelte";
+    import { user } from "$lib/stores/user";
+    import Modal from "$lib/tools/Modal.svelte";
+	import Message from "$lib/modals/Message.svelte";
+
 	export let itself: any;
 	export let createGameModal: any;
-	export let roomListModal: any;
+	export let joinGameModal: any;
+
+	let messageModal: any;
+	let modalMessage: string;
 
 	let loading = false;
+
+	onMount(() => {
+		$client.socket.on("JoinQueueError", (data: any) => {
+			loading = false;
+			modalMessage = data;
+			messageModal.open();
+		});
+
+		return (() => {
+			if (loading)
+				$client.socket.emit("LeaveQueue");
+			$client.socket.off("JoinQueueError");
+		});
+	})
 </script>
+
+<Modal bind:this={messageModal}>
+	<Message itself={messageModal} msg={modalMessage}/>
+</Modal>
 
 <div class="flex buttons">
 	<button class="join" on:click={()=>{
-		roomListModal.open();
+		joinGameModal.open();
 		itself.close();
 	}}>Join Room</button>
 	<button class="create" on:click={()=>{
@@ -51,7 +76,7 @@
 		itself.close();
 	}}>Create Game</button>
 	<button class="random {loading && "loading"}" on:click={()=>{
-		$client.socket.emit((!loading) ? "JoinQueue" : "LeaveQueue", $client.id);
+		$client.socket.emit((!loading) ? "JoinQueue" : "LeaveQueue");
 		loading = !loading;
 	}}>{(!loading) ? "Random Match" : ""}</button>
 </div>

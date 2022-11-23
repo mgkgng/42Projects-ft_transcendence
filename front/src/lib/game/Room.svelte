@@ -112,7 +112,7 @@
 	import { Puck } from '$lib/pong/Puck';
     import PongPuck from '$lib/game/PongPuck.svelte';
     import Modal from '$lib/tools/Modal.svelte';
-    import GameOver from '$lib/modals/GameOver.svelte';
+    import GameOver from '$lib/game/GameOver.svelte';
     import ConfirmMsg from '$lib/modals/ConfirmMsg.svelte';
     import { user } from '$lib/stores/user';
     import Player from '$lib/game/Player.svelte';
@@ -149,15 +149,14 @@
 	let winner: any;
 
 	onMount(()=> {
-		console.log("Room Mounted", $client.socket);
 		if (!roomId.length)
 			return ;
 		
-		$client.socket.on("RoomInfo", (data: any) => {
-			console.log("RoomInfo", data);
+		$client.socket.on("RoomFound", (data: any) => {
 			roomFound = true;
-			roomInfo = data; // maybe need some protection?
-			initPos = (roomInfo?.mapSize[0] + roomInfo?.paddleSize) / 2;
+			roomInfo = data;
+
+			// Initialize paddle position
 			paddlePos = [initPos, initPos];
 
 			userType = ($user.username == roomInfo?.players[0].username_42) ? UserType.Player1 :
@@ -239,12 +238,24 @@
 		$client.socket.on("GameStartFail", () => { tryStart = false; });
 		$client.socket.on("GameStart", () => { gameStart = true });
 
-		console.log("here is listeners: ", $client.socket);
-
 		$client.socket.emit("RoomCheck", {
 			client: $client.id,
 			room: roomId
 		});
+
+		return (() => {
+			$client.socket.off("RoomInfo");
+			$client.socket.off("PlayerUpdate");
+			$client.socket.off("PaddleUpdate");
+			$client.socket.off("LoadBall");
+			$client.socket.off("PongStart");
+			$client.socket.off("PuckHit");
+			$client.socket.off("ScoreUpdate");
+			$client.socket.off("ReadyUpdate");
+			$client.socket.off("GameFinished");
+			$client.socket.off("GameStartFail");
+			$client.socket.off("GameStart");
+		})
 	});
 
 </script>
@@ -287,7 +298,7 @@
 				return ;
 			}
 			tryStart = true;
-			$client.socket.emit("StartGame", { roomId: roomId })
+			$client.socket.emit("StartGame", roomId)
 		}}>START</button>
 		{:else}
 		<button class="start loading"></button>
@@ -297,7 +308,7 @@
 		<button class="ready" on:click={()=>{
 			$client.socket.emit("isReady", {
 				roomId: roomId,
-				ready: !ready,
+				isReady: !ready,
 			});
 		}}>{(!ready) ? "READY" : "CANCEL"}</button>
 		{/if}
@@ -324,34 +335,30 @@ what is this?
 </Modal>
 
 <svelte:window
+	on:keypress={(event) => {
+		if (userType == UserType.Watcher
+		|| (event.code != 'KeyA' && event.code != 'KeyD'))
+			return ;
 
-on:keypress={(event) => {
-	if (userType == UserType.Watcher
-	|| (event.code != 'KeyA' && event.code != 'KeyD'))
-		return ;
+		if (moving) //* TODO should make movement more fluent
+			return ;
 
-	if (moving) //* TODO should make movement more fluent
-		return ;
+		moving = true;
 
-	moving = true;
+		$client.socket.emit("PaddleMove", {
+			room: roomId,
+			left: (userType == UserType.Player1 && event.code == 'KeyD'
+				|| userType == UserType.Player2 && event.code == 'KeyA')
+		});
+	}}
 
-	$client.socket.emit("PaddleMove", {
-		client: $client.id,
-		player: userType,
-		room: roomId,
-		left: (userType == UserType.Player1 && event.code == 'KeyD'
-			|| userType == UserType.Player2 && event.code == 'KeyA')
-	});
-}}
+	on:keyup={(event)=>{
+		if (event.code != 'KeyA' && event.code != 'KeyD')
+			return ;
+		
+		//* TODO some precision to make
+		$client.socket.emit("PaddleStop", roomId);
 
-on:keyup={(event)=>{
-	if (event.code != 'KeyA' && event.code != 'KeyD')
-		return ;
-	
-	//* TODO some precision to make
-	$client.socket.emit("PaddleStop", $client.id)
-
-	moving = false;
-}}
-
+		moving = false;
+	}}
 />

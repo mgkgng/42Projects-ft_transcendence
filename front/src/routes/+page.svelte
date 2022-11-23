@@ -4,17 +4,16 @@
 	import Title from "$lib/Title.svelte";
 	import { client } from "$lib/stores/client";
     import { onMount } from "svelte";
-    import { loginState } from "$lib/stores/var";
     import { browser } from "$app/environment";
     import Header from "$lib/header/Header.svelte";
 	import Modal from '$lib/tools/Modal.svelte';
 	import Room from "$lib/game/Room.svelte";
 	import Message from '$lib/modals/Message.svelte';
 	import PlayOrChat from "$lib/modals/PlayOrChat.svelte";
-    import CreateGame from "$lib/modals/CreateGame.svelte";
-    import EnterGame from "$lib/modals/EnterGame.svelte";
-    import RoomList from "$lib/modals/RoomList.svelte";
-    import NewChatRoom from '$lib/chat/NewChatRoom.svelte';
+    import CreateGame from "$lib/game/CreateGame.svelte";
+    import EnterGame from "$lib/game/EnterGame.svelte";
+    import JoinGame from "$lib/game/JoinGame.svelte";
+    import ChatRoom from '$lib/chat/ChatRoom.svelte';
 
 	let roomModal: any;
 	let roomId: string = "";
@@ -22,7 +21,7 @@
 	let messageModal: any;
 	let modalMessage: string = "";
 
-	let roomListModal: any;
+	let joinGameModal: any;
 	let enterModal: any;
 	let enterGameModal: any;
 	let createGameModal: any;
@@ -32,8 +31,14 @@
 		if (!browser || !$client.socket)
 			return ;
 
-		$client.socket.on("RoomCreated", (data: any) => {
+		$client.socket.on("CreateRoomError", (data: any) => {
+			modalMessage = data;
+			messageModal.open();
+		});
+
+		$client.socket.on("CreateRoomRes", (data: any) => {
 			console.log("RoomCreated", data);
+			createGameModal.close();
 			roomId = data;
 			roomModal.open();
 		});
@@ -42,23 +47,48 @@
 			console.log('JoinRes', data);
 			if (data.allowed) {
 				roomId = data.roomId;
-				roomListModal.close();
+				joinGameModal.close();
 				roomModal.open();
-				return ;
 			} else {
 				modalMessage = "You cannot enter this room";
 				messageModal.open();
-			}	
+			}
 		});
 
 		$client.socket.on("askFriendNotification", (data: any) => {
 			console.log("Notif", data);
-		})
+		});
+
+		$client.socket.on("JoinQueueError", (data: any) => {
+			modalMessage = data;
+			messageModal.open();
+		});
+
+		$client.socket.on("RoomCheckError", (data: any) => {
+			roomModal.close();
+			modalMessage = data;
+			messageModal.open();
+		});
+
+		$client.socket.on("MatchFound", (data: any) => {
+			roomId = data;
+			roomModal.open();
+		});
+
+		return (() => {
+			$client.socket.off("CreateRoomRes");
+			$client.socket.off("JoinRoomRes");
+			$client.socket.off("askFriendNotification");
+			$client.socket.off("JoinQueueError");
+			$client.socket.off("RoomCheckError");
+			$client.socket.off("CreateRoomError");
+			$client.socket.off("MatchFound");
+		});
 	});
 </script>
 
 <Modal bind:this={chatRoomModal}>
-	<NewChatRoom itself={chatRoomModal} />
+	<ChatRoom itself={chatRoomModal} />
 </Modal>
 
 <Modal bind:this={enterModal}>
@@ -70,11 +100,11 @@
 </Modal>
 
 <Modal bind:this={enterGameModal}>
-	<EnterGame itself={enterGameModal} createGameModal={createGameModal} roomListModal={roomListModal}/>
+	<EnterGame itself={enterGameModal} createGameModal={createGameModal} joinGameModal={joinGameModal}/>
 </Modal>
 
-<Modal bind:this={roomListModal}>
-	<RoomList itself={roomListModal} enterGameModal={enterGameModal}/>
+<Modal bind:this={joinGameModal}>
+	<JoinGame itself={joinGameModal} enterGameModal={enterGameModal}/>
 </Modal>
 
 <Modal bind:this={messageModal}>
@@ -86,5 +116,4 @@
 </Modal>
 
 <Header />
-<Title title={"TRANSCENDENCE"} roomListModal={roomListModal} enterModal={enterModal}
-	enterGameModal={enterGameModal} createGameModal={createGameModal}/>
+<Title title={"TRANSCENDENCE"} enterModal={enterModal}/>

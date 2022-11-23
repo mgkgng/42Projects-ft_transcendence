@@ -1,31 +1,15 @@
 import { writable } from "svelte/store";
-import { browser } from "$app/environment";
 import io from "socket.io-client";
 
 class Client {
-	id: string;
 	socket: any;
-	callbacksOnConnection: Set<Function>;
-	listeners: Map<string, Function>;
-	room: string
-	username: string;
 	user_info : any;
 
 	constructor() {
-		this.id = "";
-		this.listeners = new Map();
-		this.callbacksOnConnection = new Set();
 		this.socket = undefined;
-		this.room = "";
-		this.username = "";
+		this.user_info = undefined;
 	}
 
-	connect() {
-		// TODO should integrate everything into handleConnection
-		if (!browser)
-			return ;
-		this.socket.emit("Connection");
-	}
 	async send42Tok(url: any)
 	{
 		if (localStorage.getItem('transcendence-jwt') != null
@@ -41,7 +25,7 @@ class Client {
 				});
 				console.log(this.socket);
 				return (true);
-			}catch{
+			} catch{
 				console.log("error");
 			}
 		}
@@ -56,20 +40,23 @@ class Client {
 					body:JSON.stringify({username: "ll", password: url.get('code')}),
 				});
 				const tok = await res.json();
-				console.log("TOK:", tok);
 				this.socket = io("http://localhost:3001",{
 					extraHeaders: {
 						Authorization: "Bearer " + tok.access_token,
 					}
 				});
 				localStorage.setItem('transcendence-jwt', tok.access_token);
-				this.connect();
 				return (true);
-			}catch{
+			} catch{
 				return (false);
 			}
 		}
 		return (false);
+	}
+
+	removeListeners(listeners: Array<string>) {
+		for (let listener of listeners)
+			this.socket.off(listener);
 	}
 }
 

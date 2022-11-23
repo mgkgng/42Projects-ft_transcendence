@@ -1,92 +1,81 @@
 <style lang="scss">
 	.add {
-		position: relative;
-		width: 450px;
-		height: 130px;
+		width: 25em;
+		height: 10em;
 		border: $border;
 		background-color: #313131;
 		border-radius: .2em;
-		align-items: center;
 		gap: .5em;
 		padding: 1.2em;
-		padding-bottom: 0;
 
-	
-		.info {
-			align-items: center;
-			gap: 0.3em;
-			width: 100%;
+		.access {
+			gap: .3em;
 
-			p {
-				padding-left: .3em;
-				font-size: 14px;
-			}
-	
-			.text-input {
-				border-radius: .2em;
-				padding-left: .5em;
-	
-				width: 50%;
-				height: 1.8em;
-	
-				background-color: #fff;
-				color: #000;
-			}
-	
-			.empty {
-				border-radius: .2em;
-	
-				width: 50%;
-				height: 1.8em;
-				background-color: #000;
-			}
-		}
+			input[type="radio"] { display: none; }
 
-		.private {
-			position: relative;
-			flex-direction: row-reverse;
-			width: 100%;
-			height: 3em;
-			gap: .2em;
-			align-items: center;
- 
 			label {
-				width: 20%;
-				height: 75%;
-				font-size: 18px;
+				display: inline-block;
+				border: $border-thin;
+				border-radius: .2em;
+				width: 5em;
+				height: 1.8em;
+				text-align: center;
+				padding: .2em;
+				font-size: 17px;
 				cursor: pointer;
-
-				text-align: cetner;
-			
-				.wrapper {
-					position: absolute;
-					width: 20%;
-					height: 75%;
-					padding: .5em;
-					padding-top: .2em;
-					border: $border;
-					border-radius: .2em;
-				}
-
-				input { display: none;	}
-				input:checked + .wrapper { background-color: $submain-blue; }
 			}
-		}
-
-		button {
-			position: absolute;
-			left: 40%;
-			bottom: .5em;
-			width: 4em;
-			height: 2em;
-			font-size: 25px;
-			cursor: pointer;
-			transition: .3s;
-			border: $border;
-			border-radius: .2em;
 			
-			&:hover {
-				background-color: $submain-blue;
+			input[type="radio"]:checked + label { background-color: $main-bright;  }
+			input[id="private"]:checked + label { background-color: $main-bright;  }
+		}
+		.input {
+			gap: 0.5em;
+
+			.info {
+				gap: .3em;
+				width: 78%;
+
+				p {
+					padding-left: .3em;
+					font-size: 14px;
+				}
+		
+				.text-input {
+					border-radius: .2em;
+					padding-left: .5em;
+		
+					width: 100%;
+					height: 1.8em;
+		
+					background-color: #fff;
+					color: #000;
+				}
+		
+				.empty {
+					border-radius: .2em;
+					width: 100%;
+					height: 1.8em;
+					background-color: #000;
+				}
+			}
+			
+			.submit {
+				width: 20%;
+				gap: .5em;
+				align-items: center;
+				
+				button {
+					width: 100%;
+					border: $border;
+					border-radius: .3em;
+					padding: .2em .5em;
+					background-color: $main-bright;
+				}
+				.check {
+					align-items: center;
+					gap: .2em;
+					font-size: 14px;
+				}
 			}
 		}
 	}
@@ -109,23 +98,27 @@
 </script>
 
 <div class="vflex window add">
-	<div class="flex info">
-		<input class="text-input" placeholder="Room Name" bind:value={newRoomName}>
-		{#if (withPassword)}
-		<input class="text-input" placeholder="Password" bind:value={newRoomPassword}>
-		{:else}
-		<div class="empty"></div>
-		{/if}
-		<p>Password</p>
-		<input class="checkbox" type="checkbox" bind:checked={withPassword}>
+	<div class="flex access">
+		<input type="radio" id="public" bind:group={isPrivate} name="isPrivate" value={false}/>
+		<label for="public">Public</label>
+		<input type="radio" id="private" bind:group={isPrivate} name="isPrivate" value={true}/>
+		<label for="private">Private</label>
 	</div>
-	<div class="flex private">
-		<label class="form">
-			<input type="checkbox" bind:checked={isPrivate} />
-			<div class="wrapper">private</div>
-		</label>
+	<div class="flex input">
+		<div class="vflex info">
+			<input class="text-input" placeholder="Room Name" bind:value={newRoomName}>
+			{#if (withPassword)}
+			<input class="text-input" placeholder="Password" bind:value={newRoomPassword}>
+			{:else}
+			<div class="empty"></div>
+			{/if}
+		</div>
+		<div class="vflex submit">
+			<button on:click={() => createRoom()}>ADD</button>
+			<div class="flex check">
+				<input class="checkbox" type="checkbox" bind:checked={withPassword}>
+				<p>Password</p>
+			</div>
+		</div>
 	</div>
-		
-	<button on:click={() => createRoom()}>ADD</button>
-
 </div>

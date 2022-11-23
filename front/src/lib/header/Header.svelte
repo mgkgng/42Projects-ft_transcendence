@@ -104,31 +104,21 @@
 </style>
 
 <script lang="ts">
-    import { goto } from "$app/navigation";
-    import UserProfile from "$lib/modals/UserProfile.svelte";
-    import ChatModal from "$lib/chat/ChatRoom.svelte";
-    import AllChatModal from "$lib/chat/AllChatRooms.svelte";
-    import AxelUserProfile from "$lib/modals/AxelUserProfile.svelte";
+    import UserProfile from "$lib/profile/UserProfile.svelte";
     import { user } from "$lib/stores/user";
     import { client } from "$lib/stores/client";
     import { loginState } from "$lib/stores/var";
     import Modal from "$lib/tools/Modal.svelte";
-    import Setting from "$lib/modals/Setting.svelte";
-    import ChatDirectBox from "$lib/chat/ChatDirectBox.svelte";
-	import Friends from "$lib/modals/Friends.svelte"
+	  import Friends from "$lib/modals/Friends.svelte"
+    import Settings from "../settings/Settings.svelte";
     import { chatRoom } from "../stores/chatRoom";
     import Image from "../Image.svelte";
 
+
 	let profileModal: any;
-	let chatModal: any;
 	let login: boolean;
-	let settingModal: any;
-	let chatDirectModal : any;
 	let friendsModal: any;
-
-	let chatRoomModal: any;
-
-	$:console.log($user);
+	let settingsModal: any;
 
 	loginState.subscribe(value => { login = value; })
 
@@ -139,20 +129,14 @@
 	}
 </script>
 
-<!-- <Image /> -->
-
 <Modal bind:this={profileModal} >
 	<UserProfile profileUser={$client.user_info}  />
 </Modal>
-<Modal bind:this={settingModal} >
-	<Setting itself={settingModal}/>
-</Modal>
-<Modal bind:this={chatDirectModal}>
-	<ChatDirectBox />
-</Modal>
-
 <Modal bind:this={friendsModal}>
 	<Friends itself={friendsModal} />
+</Modal>
+<Modal bind:this={settingsModal} closeOnBgClick={false}>
+	<Settings itself={settingsModal} />
 </Modal>
 
 <header>
@@ -161,16 +145,12 @@
 		<div class="who">?</div>
 		{:else}
 		<div class="summary">
-			{#if !$client.user_info || $client.user_info.img === ""}
-				<img src={$user.image_url} alt="profile" />
-			{:else}
-				<img src={$client.user_info.img} alt="profile" />
-			{/if}
+			<img src={(!$user.img) ? $user.img_url : $user.img} alt="profile" />
 		</div>
 		<div class="menu">
-			<button on:click={()=>{ profileModal.open(); chatRoom.update((chatRoom) => { chatRoom.username_search = $client.username; return (chatRoom); });}}>Profile</button>
+			<button on:click={()=>{ profileModal.open(); }}>Profile</button>
 			<button on:click={()=>{ friendsModal.open(); }}>Friends</button>
-			<button on:click={()=>{ settingModal.open(); }}>Setting</button>
+			<button on:click={()=>{ settingsModal.open(); }}>Settings</button>
 			<button on:click={handleLogout}>Logout</button>
 		</div>
 		{/if}

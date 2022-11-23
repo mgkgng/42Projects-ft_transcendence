@@ -19,8 +19,12 @@ import { GameEntity } from "src/entity/Game.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository, DataSource } from "typeorm";
 import { UserService } from "src/user/user.service";
+import { ErrorMessage, getRandomInt, RoomUpdate, UserState } from "./game.utils";
 import { RoomUpdate } from "./game.utils";
 import { UserEntity } from "src/entity/User.entity";
+//TODO Too many connections for a client
+//TODO if the client websocket contains request, handshake..
+//TODO put username_42 inside of client and replace everything with it
 
 @WebSocketGateway({
 	cors: {
@@ -31,9 +35,7 @@ import { UserEntity } from "src/entity/User.entity";
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	clients: Map<string, Client>;
 	rooms: Map<string, Room>;
-	roomlistClients: Array<any>;
-	queue: Array<Client>;
-	control: Map<string, any>;
+	queue: Array<any>;
 
 	constructor(private mainServerService : MainServerService, private jwtService: JwtService, 
 				@InjectRepository(GameEntity) private gameRep: Repository<GameEntity>,
@@ -43,28 +45,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	) {
 		this.clients = new Map<string, Client>();
 		this.rooms = new Map<string, Room>();
-		this.roomlistClients = [];
 		this.queue = [];
-		this.control = new Map<string, any>();
-
-		// Testing rooms
-		// this.addRoomsForTest();
 	}
 
 	@WebSocketServer()
 	server: Server;
-
-	// addRoomsForTest() {
-	// 	let room1 = new Room(['testPlayer1'], 'TestRoom1', 25, 5, false,
-	// 		this.gameRep, this.mainServerService, this.dataSource);
-
-	// 	let room2 = new Room(['testPlayer2'], "Welcome to this map", 18, 3, false,
-	// 		this.gameRep, this.mainServerService, this.dataSource);
-	
-	// 	this.rooms.set(room1.id, room1);
-	// 	this.rooms.set(room2.id, room2);
-	// 	console.log(this.rooms);
-	// }
 
 	public async handleConnection(client: any, ...args: any[]) {
 		console.log("Connection!!", client.id);
@@ -75,248 +60,255 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		where("user.username = :username", {username: user.username_42}).getOne();
 		this.clients.set(newClient.id, newClient);
 
-		// Should send it only once
 		client.emit("GetConnectionInfo", {
-			id: newClient.id,
 			user: {
-				username: user_db.username,
-				displayname: user_db.display_name,
-				image_url: user_db.img_url,
-				campus_name: user_db.campus_name,
-				campus_country: user_db.campus_country
+				username: userInfo.username,
+				displayname: userInfo.displayname,
+				image_url: userInfo.image_url,
+				campus_name: userInfo.campus_name,
+				campus_country: userInfo.campus_country
+        // modif
+				//username: user_db.username,
+				//displayname: user_db.display_name,
+				//image_url: user_db.img_url,
+				//campus_name: user_db.campus_name,
+				//campus_country: user_db.campus_country
 			}
-		})
+		});
 	}
 
 	public handleDisconnect(client: any): void {
-		console.log("Disconnection...", client.id);
-		this.clients.delete(client.id);
+		// Get rid of socket from the client instance
+		let target = this.getClient(client);
+		target.sockets.delete(client.id);
+
+		// destory the instance if the client is no more connected
+		if (!target.sockets.size)
+			this.clients.delete(target.username);
     }
 
 	@SubscribeMessage("JoinQueue")
-	joinQueue(@MessageBody() data: any) {
-		console.log("Join Queue", data);
-		let client = this.getClient(data);
-		//TODO: should maybe optimize the algorithm later -- for includes
-		if (client && (client.room.length || this.queue.includes(client)))
+	async joinQueue(@ConnectedSocket() client: Socket, @Request() req) {
+		// Check if client is available
+		let target = this.getClient(req);
+		if (target.state != UserState.Available) {
+			client.emit("JoinQueueError", (target.state == UserState.Waiting) ? ErrorMessage.AlreadyJoined : ErrorMessage.UserNotAvailble);
 			return ;
+		}
 
-		this.queue.push(client);
+		// Join Queue
+		this.queue.push([target.username, target]);
+		target.state = UserState.Waiting
 
-		// TODO plus tard
+		// Game distribution
 		if (this.queue.length > 1) {
-			let room = new Room([this.queue[0], this.queue[1]], [], "", "Medium", 10, "Normal", "Normal", true, "", this.gameRep, this.mainServerService, this.dataSource, this.userService);
-			// TODO: think about it: if i just join a match randomlmy like this, it could be by default a private game
-			this.queue[0].room = room.id;
-			this.queue[1].room = room.id;
-
-			room.broadcast('MatchFound', room.id);
-
+			// create a random room for two players
+			let [target1, target2] = [this.getClient(this.queue[0][0]), this.getClient(this.queue[1][0])];
+			let [player1, player2] = [this.getPlayerInfo(target1.username), this.getPlayerInfo(target2.username)];
+			let gameInfo = { title: "", mapSize: getRandomInt(3), maxPoint: 10, puckSpeed: getRandomInt(3), paddleSize: getRandomInt(3), isPrivate: true }
+			let room = new Room([player1, player2], [target1, target2], gameInfo, undefined, this.gameRep, this.mainServerService, this.dataSource, this.userService);
 			this.rooms.set(room.id, room);
-			this.queue = this.queue.slice(2);
+		
+			// switch their state into playing then get rid of them from the queue
+			[target1.state, target2.state] = [UserState.Playing, UserState.Playing];
+			this.queue.splice(0, 2);
+
+			// broadcast to let them join the game
+			room.broadcast("MatchFound", room.id);
 		}
 	}
 
 	@SubscribeMessage("LeaveQueue")
-	leaveQueue(@MessageBody() data: any) {
-		let index = this.queue.indexOf(this.getClient(data));
-		if (index > -1)
-			this.queue.splice(index, 1);
-		// TODO algo & protection revoir
+	leaveQueue(@Request() req) {
+		// Check if the target is effectively waiting for the game
+		let target = this.getClient(req);
+		if (target.state != UserState.Waiting)
+			return ;
+
+		// Get rid of the client from the queue and turn them back available
+		let index = this.queue.findIndex(x => x[0] == target.username);
+		this.queue.splice(index, 1);
+		target.state = UserState.Available;
 	}
 
 	@SubscribeMessage("RoomCheck")
-	roomCheck(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
-		console.log("RoomCheck", data);
-
+	roomCheck(@ConnectedSocket() client: Socket, @MessageBody() data: any, @Request() req) {
+		// Check if the room exists and if room contains the user as client
+		let target = this.getClient(req);
 		let room = this.getRoom(data.room);
-
 		if (!room) {
-			client.emit("RoomNotFound");
+			client.emit("RoomCheckError", ErrorMessage.RoomNotFound);
+			return ;
+		} else if (!room.clients.has(target.username)) {
+			client.emit("RoomCheckError", ErrorMessage.AccessNotPermitted);
 			return ;
 		}
 
-		client.emit("RoomInfo", {
-			roomHost: room.hostname,
+		// Give the user the room information
+		target.broadcast("RoomFound", {
 			players: room.players,
-			maxpoint: room.maxpoint,
-			scores: room.scores,
-			mapSize: [room.pong.size[0], room.pong.size[1]],
-			paddleSize: room.pong.paddleSize
+			hostname: room.hostname,
+			gameInfo: room.gameInfo,
+			pong: room.pong
 		});
-
-		console.log("data was sent!");
 	}
 
-	@SubscribeMessage("PaddleMove")
-	paddleMove(@MessageBody() data: any) {
+	@SubscribeMessage("PaddleMoveKey")
+	paddleMoveKey(@MessageBody() data: any, @Request() req) {
+		// Check if the request came from a proper player
+		let target = this.getClient(req);
 		let room = this.getRoom(data.room);
+		if (!room || !room.players.has(target.username))
+			return ;
 
-		// calcul algorithm launched here
-
-		let intervalId = setInterval(() => {
-			room.pong.movePaddle(data.player, data.left);
+		// Get the player
+		let player = room.players.get(target.username);
+	
+		// TODO protection switching between keyboard and mouse
+		// Paddle starts to move, Websocket Messages set with interval
+		let intervalID = setInterval(() => {
+			room.pong.movePaddle(player.index, data.left);
 			room.broadcast("PaddleUpdate", {
 				player: data.player,
-				paddlePos: room.pong.paddlePos[data.player]
+				paddlePos: room.pong.paddles[player.index].pos
 			});
 		}, 20);
-		this.control.set(data.client, intervalId);
+		player.control[0] = intervalID;
 	}
 
-	@SubscribeMessage("PaddleStop")
-	paddleStop(@MessageBody() data: any) {
-		clearInterval(this.control.get(data));
-		this.control.delete(data);
+	@SubscribeMessage("PaddleStopKey")
+	paddleStopKey(@MessageBody() data: any, @Request() req) {
+		// TODO is there any more efficient way to handle this?
+		// Check if the request came from a proper player
+		let target = this.getClient(req);
+		let room = this.getRoom(data);
+		if (!room || !room.players.has(target.username))
+			return ;
+
+		// Get the player
+		let player = room.players.get(target.username);
+
+		// clear the interval and delete it
+		clearInterval(player.control[0].get(data));
+		player.control[0] = undefined
 	}
 
-	@SubscribeMessage("AskRooms")
-	askRooms(@ConnectedSocket() client: Socket) {
-		//TODO should check if it still works when the client leaves the modal
-		this.roomlistClients.push(client);
-
+	@SubscribeMessage("RoomListReq")
+	roomList(@ConnectedSocket() client: Socket) {
+		// Get rooms which are not private
 		let allRooms = [];
 		for (let room of this.rooms.values()) {
-			if (room.privateMode)
+			if (room.isPrivate)
 				continue ;
 			allRooms.push({
 				id: room.id,
 				players: room.players,
-				title: room.title,
-				mapInfo: room.mapInfo
+				gameInfo: room.gameInfo
 			});
 		}
-		client.emit("GetAllRooms", { rooms: allRooms });
+		client.emit("RoomListRes", { rooms: allRooms });
 	}
 
 	@SubscribeMessage("CreateRoom")
-	async createRoom(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
+	async createRoom(@ConnectedSocket() client: Socket, @MessageBody() data: any, @Request() req) {		
 		console.log("CreateRoom", data);
-		
-		// TODO should be able to have client's room state
-		// if (client.room.length)
-		// 	return ;
-		let user = await this.getPlayerInfo(data.username);
-		let room = new Room([user], [client], data.title, data.mapSize, data.maxPoint,
-			data.puckSpeed, data.paddleSize, data.privateMode, data.username,
+		// Check if the client is already playing or watching a game
+		let target = this.getClient(req);
+		if (target.state != UserState.Available) {
+			client.emit("CreateRoomError", ErrorMessage.UserNotAvailble);
+			return ;
+		}
+
+		// Create the room with the data
+		let room = new Room([this.getPlayerInfo(target.username)], [target], data, target.username,
 			this.gameRep, this.mainServerService, this.dataSource, this.userService);
 		this.rooms.set(room.id, room);
+		target.state = UserState.Playing;
 
-		// TODO should be able to set client's room state
-		// client.room = room.id;
-
-		client.emit("RoomCreated", room.id);
-		this.updateRooms(RoomUpdate.NewRoom, {
-			id: room.id,
-			players: room.players,
-			title: room.title,
-			mapInfo: room.mapInfo
-		});
+		// Invite the user to the room
+		target.broadcast("CreateRoomRes", room.id);
 	}
 
 	@SubscribeMessage("JoinRoom")
-	async joinRoom(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
-		console.log("JoinRoom", client.id);
+	async joinRoom(@ConnectedSocket() client: Socket, @MessageBody() data: any, @Request() req) {
+		// Check whether the room exists and whether the room is available if the user wants to play
+		let target = this.getClient(req);
 		let room = this.getRoom(data.roomId);
-		if (!room || (room.players.length > 1 && data.play)) {
-			client.emit("JoinRoomRes", {
-				allowed: false, 
-				roomId: undefined });
+		if (!room) {
+			client.emit("JoinRoomError", ErrorMessage.RoomNotFound);
 			return ;
-		} else if (data.play) {
-			const newPlayer = await this.getPlayerInfo(data.username);
-			room.broadcast("PlayerUpdate", {
-				join: true,
-				userInfo: newPlayer
-			});
-			room.addPlayer(client, newPlayer);
-			console.log("hahaha");
-			// this.updateRooms(RoomUpdate.PlayerJoin, {
-			// 	id: room.id,
-			// 	player: newPlayer
-			// });
-		} else { //TODO I DONT UDNERSTAND WHY
-			// room.broadcast("WatcherUpdate", { //TODO potentiellement
-			// 	join: true
-			// })
-			room.addClient(client);
+		} else if (room.players.size > 1 && data.play) {
+			client.emit("JoinRoomError", ErrorMessage.RoomNotAvailble);
+			return ;
 		}
-		console.log("reponse ready", data);
-		client.emit("JoinRoomRes", {
-			allowed: true,
-			roomId: data.roomId
-		});	
 
+		// If the user wants to play
+		if (data.play) {
+			// broadcast to the users in the room that there is a new player then add player in the room
+			const newPlayer = await this.getPlayerInfo(target.username);
+			room.broadcast("PlayerUpdate", newPlayer);
+			target.state = UserState.Playing;
+			room.playerJoin(newPlayer, target);
+		} else {
+			// If the user only wants to watch, add the user in the client list
+			target.state = UserState.Watching;
+			room.addClient(target);
+		}
+
+		// tell either the player or the watcher that they can join the room
+		target.broadcast("JoinRoomRes", data.roomId);
 	}
 
 	@SubscribeMessage("ExitRoom")
 	exitRoom(@ConnectedSocket() client: Socket, @MessageBody() data: any, @Request() req) {
-		const user : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
+		// Check if the user is in the room
+		let target = this.getClient(req);
 		let room = this.getRoom(data.roomId);
-		if (!room)
+		if (!room || !room.clients.has(target.username))
 			return ;
-
-		let userIndex = (room.players[0].username_42 == user.username_42) ? 0 : 
-			(room.players[1]?.username_42 == user.username_42) ? 1 :
-			-1;
- 		if (userIndex != -1) {
-			room.players.splice(userIndex, 1);
-			if (user.username_42 == room.hostname)
-				room.hostname = room.players[0].username_42;
-			// this.clients.delete() // TODO delete from clients
-			room.broadcast("PlayerUpdate", {
-				join: false,
-				userInfo: user.username_42,
-				hostname: room.hostname
-			});
-		}
-
-		if (!room.players.length) {//TODO or should I wait for every watch client to leave the room?
-			this.updateRooms(RoomUpdate.DeleteRoom, {
-				id: room.id
-			});
-			this.rooms.delete(room.id);
+	
+		// Check if the user is one of the players
+		if (room.players.has(target.username)) {
+			let res = room.playerExit(target);
+			// Destroy the room if the game is finished or there is no more player left.
+			if (!res)
+				this.rooms.delete(room.id);
 		} else {
-			this.updateRooms(RoomUpdate.PlayerExit, {
-				id: room.id,
-				userIndex: userIndex
-			});
+			// if the user is a watcher, remove the user from clients of the room
+			room.clients.delete(target.username);
 		}
 	}
 
 	@SubscribeMessage("isReady")
 	setReady(@MessageBody() data: any, @Request() req) {
-		console.log("ready");
-
-		const user : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
+		// Check if the client is a guest player in the room
+		let target = this.getClient(req);
 		let room = this.getRoom(data.roomId);
-		if (!room || user.username_42 != room.players[1].username_42)//for example
+		if (!room || !room.players.has(target.username) || room.hostname == target.username)
 			return ;
 
-		room.ready = data.ready;
-		room.broadcast("ReadyUpdate", { ready: room.ready });
+		// Set room state and broadcast
+		room.isReady = data.isReady;
+		room.broadcast("ReadyUpdate", room.isReady);
 	}
 
 	@SubscribeMessage("StartGame")
 	startGame(@ConnectedSocket() client: Socket, @MessageBody() data: any, @Request() req) {
-		const user : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
-		let room = this.getRoom(data.roomId);
-		if (!room || user.username_42 != room.players[0].username_42)
+		// Check if the client is a host player in the room and room is full
+		let target = this.getClient(req);
+		let room = this.getRoom(data);
+		if (!room || !room.players.has(target.username) || room.hostname != target.username || room.players.size != 2)
 			return ;
 
-		if (!room.ready) {
-			client.emit("StartGameFail");
+		// Check if the guest player is ready
+		if (!room.isReady) {
+			client.emit("StartGameError", ErrorMessage.RoomNotReady);
 			return ;
 		}
-		room.broadcast("GameStart", undefined);
-		room.startPong();
-	}
 
-	updateRooms(type: number, data: any) { // maybe there could be a better way?
-		this.broadcast(this.roomlistClients, "UpdateRooms", {
-			updateType: type,
-			roomData: data
-		});
+		// Start game and broadcast
+		room.startPong();
+		room.broadcast("GameStart", undefined);
 	}
 
 	broadcast(clients: any, event: string, data: any) {
@@ -329,21 +321,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			client.emit(event, data);
 	}
 
-	@SubscribeMessage("newChatGameMessage")
-	// {roomId: string, content: string}
-	async newChatGameMessage(@MessageBody() data: any, @Request() req) {
-		let room = this.getRoom(data.roomId);
-		const user : any = (this.jwtService.decode(req.handshake.headers.authorization.split(' ')[1]));
-		
-		room.addMessage(user.username, data.content);
-	}
-
-	@SubscribeMessage("getChatGameMessage")
-	// {roomId: string}
-	async getChatGameMessage(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
-		let room = this.getRoom(data.roomId);
-		client.emit("getChatGameMessage", room.chat);	
-	} 
 	@SubscribeMessage("getHistory")
 	async getHistGame(@MessageBody() data: any, @ConnectedSocket() client: Socket, @Request() req) {
 		let id_user = await this.mainServerService.getIdUser(req);
@@ -352,9 +329,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		.innerJoin("game.player2", "user2")
 		.where("game.player1.id_g = :u or game.player2.id_g = :u", {u: id_user})
 		.select(["game.player1_score", "game.player2_score", "user1.username", "user2.username", "user1.img_url", "user1.img", "user2.img_url", "user2.img", "game.date_game"]).getMany();
-		
 		client.emit("resHistory", res);
 	}
+
 	@SubscribeMessage("RankingReq")
 	async getRankedUsers(@ConnectedSocket() client: Socket) {
 		const res = await this.dataSource.createQueryRunner()
@@ -372,8 +349,18 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				ORDER BY nb_victory DESC, win_rate DESC; ", []);
 		client.emit("RankingRes", res);
 	}
-	getClient(id: string) { return (this.clients.get(id)); }
+
 	getRoom(id: string) { return (this.rooms.get(id)); }
+
+	getClient(request: any) {
+		const user: any = (this.jwtService.decode(request.handshake.headers.authorization.split(' ')[1]));
+		return this.clients.get(user.username_42);
+	}
+
+	getUserInfo(request: any) {
+		const user: any = (this.jwtService.decode(request.handshake.headers.authorization.split(' ')[1]));	
+		return user;
+	}
 
 	async getPlayerInfo(player: any) {
 		const userdata = await this.userService.findOne(player)

@@ -72,7 +72,6 @@
 			label {
 				padding: 0 1em; 
 			}
-
 		}
 	}
 
@@ -99,43 +98,38 @@
 			font-size: 18px;
 			cursor: pointer;
 
-			&:hover { background-color: transparentize($main-bright, 0.4); }
+			&:hover { background-color: transparentize($submain-blue, 0.4); }
 		}
 	}
 
 	.submit {
 		position: absolute;
 		left: 35%;
-		bottom: 1.2em;
+		bottom: .8em;
 		padding: 1em;
 		border-radius: .5em;
 		border: $border;
-		background-color: $main-bright;
+		background-color: $submain-blue;
 		color: #fff;
 		cursor: pointer;
 		transition: .2s;
 
-		&:hover {
-			filter: brightness(80%);
-		}
+		&:hover { filter: brightness(80%); }
 	}
 </style>
 
 <script lang="ts">
 	import { client } from "$lib/stores/client";
-    import { user } from "$lib/stores/user";
 
 	export let itself: any;
 	export let enterGameModal: any;
 
 	let maxPoint: number = 10;
-	let puckSpeed: string = "Normal";
-	let mapSize: string = "Medium";
-	let privateMode: boolean = false;
+	let puckSpeed: number = 1;
+	let mapSize: number = 1;
+	let paddleSize: number = 1;
+	let isPrivate: boolean = false;
 	let roomTitle: string = "";
-	let paddleSize: string = "Normal";
-
-	//TODO radio -> colored block
 </script>
 
 <div class="vflex container">
@@ -155,13 +149,12 @@
 		<div class="option">
 			<p>Size</p>
 			<div class="flex choice">
-				<input class="radio" id="size1" type=radio bind:group={mapSize} name="mapSize" value={"Small"}>
+				<input class="radio" id="size1" type=radio bind:group={mapSize} name="mapSize" value={0}>
 				<label for="size1">Small</label>
-				<input class="radio" id="size2" type=radio bind:group={mapSize} name="mapSize" value={"Medium"}>
+				<input class="radio" id="size2" type=radio bind:group={mapSize} name="mapSize" value={1}>
 				<label for="size2">Medium</label>
-				<input class="radio" id="size3" type=radio bind:group={mapSize} name="mapSize" value={"Large"}>
+				<input class="radio" id="size3" type=radio bind:group={mapSize} name="mapSize" value={2}>
 				<label for="size3">Large</label>
-
 			</div>
 		</div>
 		<div class="option">
@@ -174,25 +167,22 @@
 		<div class="option">
 			<p>Paddle Size</p>
 			<div class="flex choice">
-				<input class="radio" id="paddle1" type=radio bind:group={paddleSize} name="paddleSize" value={"Short"}>
+				<input class="radio" id="paddle1" type=radio bind:group={paddleSize} name="paddleSize" value={0}>
 				<label for="paddle1">Short</label>
-				<input class="radio" id="paddle2" type=radio bind:group={paddleSize} name="paddleSize" value={"Normal"}>
+				<input class="radio" id="paddle2" type=radio bind:group={paddleSize} name="paddleSize" value={1}>
 				<label for="paddle2">Normal</label>
-				<input class="radio" id="paddle3" type=radio bind:group={paddleSize} name="paddleSize" value={"Long"}>
+				<input class="radio" id="paddle3" type=radio bind:group={paddleSize} name="paddleSize" value={2}>
 				<label for="paddle3">Long</label>
-
 			</div>
 		</div>
 		<div class="option">
 			<p>Puck Speed</p>
 			<div class="flex choice">
-				<input type=radio id="speed1" bind:group={puckSpeed} name="puckSpeed" value={"Slow"}>
+				<input type=radio id="speed1" bind:group={puckSpeed} name="puckSpeed" value={0}>
 				<label for="speed1">Slow</label>
-
-				<input type=radio id="speed2" bind:group={puckSpeed} name="puckSpeed" value={"Normal"}>
+				<input type=radio id="speed2" bind:group={puckSpeed} name="puckSpeed" value={1}>
 				<label for="speed2">Normal</label>
-
-				<input type=radio id="speed3" bind:group={puckSpeed} name="puckSpeed" value={"Fast"}>
+				<input type=radio id="speed3" bind:group={puckSpeed} name="puckSpeed" value={2}>
 				<label for="speed3">Fast</label>
 
 			</div>
@@ -200,10 +190,9 @@
 		<div class="option">
 			<p>Mode</p>
 			<div class="flex choice">
-				<input type=radio id="public" bind:group={privateMode} name="privateMode" value={false}> 
+				<input type=radio id="public" bind:group={isPrivate} name="isPrivate" value={false}> 
 				<label for="public">Public</label>
-
-				<input type=radio id="private" bind:group={privateMode} name="privateMode" value={true}> 
+				<input type=radio id="private" bind:group={isPrivate} name="isPrivate" value={true}> 
 				<label for="private">Private</label>
 
 			</div>
@@ -211,15 +200,12 @@
 	</div>
 	<button class="submit" on:click={()=>{
 		$client.socket.emit("CreateRoom", {
-			username: $user.username,
 			title: (roomTitle.length) ? roomTitle : "Let's enjoy pong together!",
 			mapSize: mapSize,
 			maxPoint: maxPoint,
 			puckSpeed: puckSpeed,
 			paddleSize: paddleSize,
-			privateMode: privateMode
+			isPrivate: isPrivate
 		});
-		itself.close();
 	}}>Create Game</button>
-	
 </div>

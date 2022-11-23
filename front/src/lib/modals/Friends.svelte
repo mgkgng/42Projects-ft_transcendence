@@ -142,9 +142,9 @@
     import CloseButton from "$lib/items/CloseButton.svelte";
 	import { client } from "$lib/stores/client";
     import { onMount } from "svelte";
-    import { user } from "../stores/user";
-    import Modal from "../tools/Modal.svelte";
-    import UserProfile from "./UserProfile.svelte";
+    import { user } from "$lib/stores/user";
+    import Modal from "$lib/tools/Modal.svelte";
+    import UserProfile from "$lib/profile/UserProfile.svelte";
 
 	export let itself: any;
 

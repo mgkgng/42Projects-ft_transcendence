@@ -118,7 +118,7 @@
 
 	import { chatRoom } from "$lib/stores/chatRoom.ts";
     import { browser } from '$app/environment';
-	import QrcodeModal from "$lib/modals/qrcodeModal.svelte"
+	import QRCodeModal from "$lib/profile/QRCodeModal.svelte"
     import Modal from "$lib/tools/Modal.svelte";
 
 	export let profileUser: any;
@@ -140,53 +140,16 @@
 			console.log("game history", data);
 			gameHistory = data;
 		});
-		// if ($client.socket._callbacks.$get_other_user_info == null) {
-		// 	$client.socket.on("get_other_user_info", (data) => {
-		// 		console.log(data);
-		// 	});
-
-		// 	$client.socket.on("error_get_other_user_info", (data) => {
-		// 		alert("Error: " + data);	
-		// 	});
-		// 	$client.socket.on("error_change_username", (data) => {
-		// 		alert("Error: " + data);	
-		// 	});
-		// 	$client.socket.on("change_username", (data) => {
-		// 		$client.socket.emit("get_user_info",{});
-		// 		chatRoom.update((value) => {
-		// 			value.username_search = data.new_username;
-		// 			return value;
-		// 		});
-		// 		$client.socket.emit("get_user_info", { } );
-		// 	});
-		// 	$client.socket.on("active_double_auth", (data) => {
-		// 		user_info.is_2fa = true; 
-		// 	});
-		// 	$client.socket.on("disable_double_auth", (data) => {
-		// 		user_info.is_2fa = false; 
-		// 	});
-			// $client.socket.emit("getHistory", { username: profileUser.username });
-			// $client.socket.emit("resHistory", (data: any) => {
-			// 	gameHistory = data.history
-			// });
-		// }
-		// console.log("username ", $chatRoom.username_search, $client.user_info.username);
-		// if ($chatRoom.username_search == $client.user_info.username)
-		// {
-		// 	user_info = $client.user_info;
-		// 	client.subscribe(value => {	user_info = value.user_info;	});
-		// }
-		// else
-		// 	$client.socket.emit("get_other_user_info", { username_search: $chatRoom.username_search } );
+		
+		$client.socket.emit("getHistory", { username: profileUser.username });
+		$client.socket.emit("resHistory", (data: any) => {
+			gameHistory = data.history
+		});
 	});
 	function changeUsername()
 	{
 		new_username = prompt("Enter new username");
 		$client.socket.emit("change_username", { new_username: new_username });
-	}
-	function seeQrcode()
-	{
-		qrcode_modal.open();
 	}
 	function active2FA()
 	{
@@ -247,7 +210,7 @@
 				<input type="button" class="btn-room" name="scales" value="active" on:click={active2FA}>
 			{:else}
 				<p>Double authentification:</p>
-				<input on:click={seeQrcode} class="btn-room" type="button" value="qrcode">
+				<input on:click={() => { qrcode_modal.open(); }} class="btn-room" type="button" value="qrcode">
 				<input type="button" name="scales" class="btn-room" value="disable" on:click={disable2FA}>
 			{/if}
 		{/if} -->
