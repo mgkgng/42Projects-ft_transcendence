@@ -156,12 +156,13 @@
 			return ;
 		
 		$client.socket.on("RoomFound", (data: any) => {
+			console.log("RoomFound", data);
 			roomInfo = data;
 
 			// Initialize paddle position
 			paddlePos = [initPos, initPos];
 
-			
+	
 
 			userType = ($user.username_42 == roomInfo?.players[0].username_42) ? UserType.Player1 :
 				(roomInfo.players.length > 1 && $user.username == roomInfo.players[1].username_42) ? UserType.Player2 : //TODO 42 wtf???

@@ -146,16 +146,19 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			player1: {
 				info: players[0].info,
 				score: players[0].score,
-				pos: players[0].paddle.pos
+				pos: room.pong.paddles[players[0].index].pos
 			},
 			players2: (players.length > 1) ? {
 				info: players[1].info,
 				score: players[1].score,
-				pos: players[1].paddle.pos
+				pos: room.pong.paddles[players[1].index].pos
 			} : undefined,
 			hostname: room.hostname,
 			gameInfo: room.gameInfo,
-			puck: room.pong.puck.pos
+			puck: {
+				pos: room.pong.puck?.pos,
+				vec: room.pong.puck?.vec
+			}
 		});
 	}
 

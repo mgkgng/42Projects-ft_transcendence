@@ -34,3 +34,10 @@ export const RoomUpdate = {
 	PlayerJoin: 2,
 	PlayerExit: 3
 }
+
+export const PongConfig = {
+	PuckSize: 30,
+	FrameDuration: 20,
+	DeadZoneHeight: 30,
+	PaddleHeight: 12
+}

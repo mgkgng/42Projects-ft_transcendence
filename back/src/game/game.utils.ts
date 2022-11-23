@@ -57,8 +57,8 @@ export const ErrorMessage = {
 }
 
 export const PongConfig = {
-	puckSize: 30,
-	frameDuration: 20,
-	deadZoneHeight: 30,
-	paddleHeight: 12
+	PuckSize: 30,
+	FrameDuration: 20,
+	DeadZoneHeight: 30,
+	PaddleHeight: 12
 }

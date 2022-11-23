@@ -1,5 +1,5 @@
-import {Pong} from "./game.Pong"
-import {GameGateway} from "./game.gateway"
+import { Pong } from "./game.Pong"
+import { Puck } from "./game.Puck";
 import {ErrorMessage, uid} from "./game.utils"
 import { DataSource } from "typeorm";
 import { GameEntity } from "src/entity/Game.entity";
@@ -10,7 +10,6 @@ import { UserService } from "src/user/user.service";
 import { MapSize, PaddleSize, PuckSpeed } from "./game.utils";
 import { Client } from "./game.Client";
 import { Player } from "./game.Player";
-
 
 export class Room {
 	/* RoomInfo */
@@ -51,7 +50,7 @@ export class Room {
 		this.isPrivate = gameInfo.privateMode;
 
 		/* Game */
-		this.pong = new Pong(MapSize[gameInfo.mapSize], PuckSpeed[gameInfo.puckSpeed], PaddleSize[gameInfo.paddleSize]);
+		this.pong = new Pong(MapSize[gameInfo.mapSize], PaddleSize[gameInfo.paddleSize]);
 		
 		/* Users */
 		this.players = new Map();
@@ -121,18 +120,16 @@ export class Room {
 	// need static because used often with setTimeOut() func
 	// sent by setTimeOut(), 'this' is initialised by timeOut class
 	static startPong(room: any) {
-		if (!room)
-			return ;
+		// Create the puck and broadcast its information
+		room.pong.puck = new Puck(room.gameInfo.mapSize, room.gameInfo.puckSpeed);
 
 		room.broadcast("LoadBall", {
-			vectorX: room.pong.puck.vectorX,
-			vectorY: room.pong.puck.vectorY,
-			posX: room.pong.puck.posX,
-			posY: room.pong.puck.posY
+			vec: room.pong.puck.vec,
+			pos: room.pong.puck.pos,
 		});
 		
 		setTimeout(() => {
-			room.broadcast("PongStart", { undefined });
+			room.broadcast("PongStart");
 			room.pong.puck.setCheckPuck(room);
 		}, 2000);
 	}

@@ -17,12 +17,12 @@ export class Puck {
 
 	setCheckPuck(room: any) {
 		let distToDeath = (this.vec[1] > 0)
-			? (this.mapSize[1] - PongConfig.deadZoneHeight - PongConfig.paddleHeight) - this.pos[1]
-			: this.pos[1] - PongConfig.deadZoneHeight - PongConfig.paddleHeight; // it functions well
+			? (this.mapSize[1] - PongConfig.DeadZoneHeight - PongConfig.PaddleHeight) - this.pos[1]
+			: this.pos[1] - PongConfig.DeadZoneHeight - PongConfig.PaddleHeight; // it functions well
 		
 		let frameNb = Math.floor(Math.abs((distToDeath / this.vec[1])));
 
-		let timeOut = frameNb * PongConfig.frameDuration;
+		let timeOut = frameNb * PongConfig.FrameDuration;
 		let deathPointX = this.calculPosX(frameNb);
 
 		setTimeout(() => {
@@ -30,8 +30,8 @@ export class Puck {
 			if (deathPointX > paddlePos && deathPointX < paddlePos + room.pong.paddleSize) {
 				room.broadcast("PuckHit");
 				this.pos[0] = deathPointX;
-				this.pos[1] = (this.vec[1] > 0) ? (this.mapSize[1] - PongConfig.deadZoneHeight - PongConfig.paddleHeight)
-					: PongConfig.deadZoneHeight + PongConfig.paddleHeight;
+				this.pos[1] = (this.vec[1] > 0) ? (this.mapSize[1] - PongConfig.DeadZoneHeight - PongConfig.PaddleHeight)
+					: PongConfig.DeadZoneHeight + PongConfig.PaddleHeight;
 				this.vec[1] *= -1;
 				this.setCheckPuck(room);
 				return ;
@@ -60,7 +60,7 @@ export class Puck {
 
 		for (let i = 0; i < frameNb; i++) {
 			deathPointX += this.vec[0];
-			if (deathPointX < 0 || deathPointX > this.mapSize[0] - PongConfig.puckSize) {
+			if (deathPointX < 0 || deathPointX > this.mapSize[0] - PongConfig.PuckSize) {
 				this.vec[0] *= -1;
 				deathPointX += this.vec[0];
 			}
