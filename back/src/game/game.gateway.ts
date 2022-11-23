@@ -19,7 +19,7 @@ import { GameEntity } from "src/entity/Game.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository, DataSource } from "typeorm";
 import { UserService } from "src/user/user.service";
-import { ErrorMessage, getRandomInt, RoomUpdate, UserState } from "./game.utils";
+import { ErrorMessage, getRandomInt, MapSize, PaddleSize, RoomUpdate, UserState } from "./game.utils";
 import { UserEntity } from "src/entity/User.entity";
 //TODO Too many connections for a client
 //TODO if the client websocket contains request, handshake..
@@ -155,10 +155,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			} : undefined,
 			hostname: room.hostname,
 			gameInfo: room.gameInfo,
-			puck: {
+			puck: (room.pong.puck) ? {
 				pos: room.pong.puck?.pos,
 				vec: room.pong.puck?.vec
-			}
+			} : undefined
 		});
 	}
 
@@ -172,14 +172,14 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 		// Get the player
 		let player = room.players.get(target.username);
-	
+
 		// TODO protection switching between keyboard and mouse
 		// Paddle starts to move, Websocket Messages set with interval
 		let intervalID = setInterval(() => {
 			room.pong.movePaddle(player.index, data.left);
 			room.broadcast("PaddleUpdate", {
-				player: data.player,
-				paddlePos: room.pong.paddles[player.index].pos
+				player: player.username,
+				pos: room.pong.paddles[player.index].pos
 			});
 		}, 20);
 		player.control[0] = intervalID;
@@ -256,7 +256,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		if (data.play) {
 			// broadcast to the users in the room that there is a new player then add player in the room
 			const newPlayer = await this.getPlayerInfo(target.username);
-			room.broadcast("PlayerUpdate", newPlayer);
+			room.broadcast("PlayerUpdate", {
+				info: newPlayer,
+				score: 0,
+				pos: (MapSize[room.gameInfo.mapSize][0] - PaddleSize[room.gameInfo.paddleSize]) / 2
+			});
 			target.state = UserState.Playing;
 			room.playerJoin(newPlayer, target);
 		} else {

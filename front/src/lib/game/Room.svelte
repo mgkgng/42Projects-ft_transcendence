@@ -107,20 +107,19 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { client } from "$lib/stores/client";
-	import { UserType } from '$lib/stores/var';
+	import { UserType, MapSize, PaddleSize } from '$lib/stores/var';
 	import Paddle from '$lib/game/Paddle.svelte';
 	import { Puck } from '$lib/pong/Puck';
-    import PongPuck from '$lib/game/PongPuck.svelte';
+    import PPuck from '$lib/game/PPuck.svelte';
     import Modal from '$lib/tools/Modal.svelte';
     import GameOver from '$lib/game/GameOver.svelte';
     import ConfirmMsg from '$lib/modals/ConfirmMsg.svelte';
     import { user } from '$lib/stores/user';
     import Player from '$lib/game/Player.svelte';
 
+
 	export let roomId: string;
 	export let itself: any;	
-
-	let roomInfo: any;
 
 	let puck: any = undefined;
 	let scores: Array<number> = [0, 0];
@@ -139,7 +138,7 @@
 	
 	let gameFinishedModal: any;
 
-	let roomFound: boolean = false;
+	let roomFound: boolean;
 	let miniMode: boolean = false;
 
 	let ready: boolean = false;
@@ -148,8 +147,15 @@
 
 	let winner: any;
 
+	/* Room Info */
+	let gameInfo: any;
+	let hostname: string;
 	let player1: any;
 	let player2: any;
+
+	let switchPlace: boolean = false;
+
+	$:console.log("mounted?", roomFound, gameInfo);
 
 	onMount(()=> {
 		if (!roomId.length)
@@ -157,56 +163,50 @@
 		
 		$client.socket.on("RoomFound", (data: any) => {
 			console.log("RoomFound", data);
-			roomInfo = data;
-
-			// Initialize paddle position
-			paddlePos = [initPos, initPos];
-
-	
-
-			userType = ($user.username_42 == roomInfo?.players[0].username_42) ? UserType.Player1 :
-				(roomInfo.players.length > 1 && $user.username == roomInfo.players[1].username_42) ? UserType.Player2 : //TODO 42 wtf???
-				UserType.Player2;
-			
-			if (userType == UserType.Player2) {
-				[userIndex, opponentIndex] = [opponentIndex, userIndex];
-				paddlePos[0] -= roomInfo?.paddleSize, paddlePos[1] -= roomInfo?.paddleSize;
-			}
-
 			roomFound = true;
+
+			// Get room information
+			gameInfo = data.gameInfo;
+			hostname = data.hostname;
+			player1 = data.player1;
+			player2 = data.player2;
+			initPos = (MapSize[gameInfo?.mapSize][0] - PaddleSize[gameInfo?.paddleSize]) / 2;
+
+			console.log("wtf");
+			// By default, player1 is on the right side unless user is the player2
+			switchPlace = ($user.username_42 == player2.info.username);
+
+			console.log("shit");
+			
+			console.log("????");
 		});
 
 		$client.socket.on("PlayerUpdate", (data: any) => {
 			console.log("PlayerUpdate", data);
 			if (data.join) {
-				roomInfo.players.push(data.userInfo);
-				roomInfo = roomInfo;
+				player2 = data.userInfo;
 			} else {
-				let userIndex = (roomInfo.players[0].username_42 == user.username_42) ? 0 : 1;
-				roomInfo.players = roomInfo.players.splice(userIndex, 1);
-				if (roomInfo.roomHost != data.hostname)
-					roomInfo.roomHost = data.hostname;
+				if (data.username == player1.info.username)
+					player1 = undefined;
+				else
+					player2 = undefined;
+				hostname = data.hostname;
 			}
 		});
 		
 		$client.socket.on("PaddleUpdate", (data: any) => {
-			if ((data.player == UserType.Player1 && userIndex == UserType.Player2) ||
-				(data.player == UserType.Player2 && userIndex == UserType.Player2))
-				paddlePos[data.player] = data.paddlePos;
+			if (data.player == player1.info.username && !switchPlace)
+				player1.pos = data.pos;
 			else
-				paddlePos[data.player] = roomInfo?.mapSize[0] - data.paddlePos;
+				player2.pos = gameInfo.mapSize[0] - data.pos;
 		});
 
 		$client.socket.on("LoadBall", (data: any) => {
 			console.log("LoadBall");
-			puck = new Puck(roomInfo?.mapSize[0], roomInfo?.mapSize[1], data.vectorX, data.vectorY);
+			puck = new Puck(data.vec, data.pos, gameInfo.mapSize);
 		});
 
 		$client.socket.on("PongStart", () => {
-			console.log("PongStart");
-			if (!puck)
-				console.log("Pongstart Error!");
-
 			puckMoving = setInterval(() => {
 				puck.move();
 				puck = puck;
@@ -221,23 +221,24 @@
 		$client.socket.on("ScoreUpdate", (data: any) => {
 			console.log("ScoreUpdate", data);
 
+			// Destroy puck
 			clearInterval(puckMoving);
-			scores[data.scoreTo]++;
-			scores = scores;
-
 			puck = undefined;
+
+			// Update Score
+			if (player1.info.username == data)
+				player1.score++;
+			else
+				player2.score++;
 		});
 
 		$client.socket.on("ReadyUpdate", (data: any) => {
-			console.log("ReadyUpdate??", ready);
-
-			ready = data.ready;
+			ready = data;
 		});
 
 		$client.socket.on("GameFinished", (data: any) => {
-			console.log("GameFinished");
-			winner = roomInfo.players[data.winner];
 			puck = undefined;
+			winner = data;
 			gameFinishedModal.open();
 		});
 
@@ -258,47 +259,35 @@
 
 </script>
 
-<!-- gameInfo:
-	isPrivate: false
-	mapSize: 1
-	maxPoint: 10
-	paddleSize: 1
-	puckSpeed: 1
-	title: "asdasd"
-[[Prototype]]: Object
-hostname: "min-kang"
-players: Array(1)
-	0: {username: 'min-kang', username_42: 'min-kang', displayname: 'Min Guk Kang', image_url: 'https://cdn.intra.42.fr/users/48665ff8307df349298991deacd1e38e/min-kang.jpg', campus_name: 'Nice', …}
-	length: 1
-[[Prototype]]: Array(0)
-pong:
-	mapSize: (2) [300, 500]
-	paddles: (2) [{…}, {…}]
-	puck: {puckSpeed: 8, vectorX: -2, vectorY: 8, gameWidth: 300, gameHeight: 500, …}
-	puckSpeed: 8 -->
 {#if !miniMode}
 {#if roomFound}
 <div class="container">
-	{#if roomInfo}
-	<div class="flex pong" style="width: {roomInfo.mapSize[1] + 200}px; height: {roomInfo.mapSize[0]}px;">
+	{#if gameInfo}
+	<div class="flex pong" style="width: {MapSize[gameInfo.mapSize][1] + 200}px; height: {MapSize[gameInfo.mapSize][0]}px;">
 		<div class="vflex side">
-			<Player userInfo={(roomInfo.players.length > 1) ? roomInfo.players[opponentIndex] : undefined} left={true} host={(roomInfo.players[opponentIndex]?.username_42 == roomInfo.roomHost) ? true : false} ready={ready}/>	
-			<h1>{scores[opponentIndex]}</h1>
+			<Player userInfo={(!switchPlace) ? player2 : player1} left={true} host={(hostname == ((!switchPlace) ? player2?.info.username : player1?.info.username))} ready={ready}/>	
+			<h1>{(!switchPlace) ? player1.score : player2.score}</h1>
 		</div>
-		<div class="pong-game" style="min-width: {roomInfo.mapSize[1]}px; min-height: {roomInfo.mapSize[0]}px;">
-			<Paddle pos={paddlePos[opponentIndex]} paddleWidth={roomInfo.paddleSize}
-				gameHeight={roomInfo.mapSize[1]} user={false}
-				userIndex={userIndex} userPresent={(roomInfo.players.length > 1) ? true : false}/>
+		<div class="pong-game" style="min-width: {MapSize[gameInfo.mapSize][1]}px; min-height: {MapSize[gameInfo.mapSize][0]}px;">
+			<Paddle pos={(switchPlace) ? player1?.pos : player2?.pos} paddleWidth={PaddleSize[gameInfo.paddleSize]}
+				gameHeight={MapSize[gameInfo.mapSize][1]}
+				switchPlace={switchPlace}
+				playerType={(switchPlace) ? 1 : 2}
+				user={(!switchPlace) ? player2 : player1}
+				initPos={initPos}/>
 			{#if puck}
-			<PongPuck posX={(userIndex == UserType.Player1) ? roomInfo.mapSize[0] - puck.posX : puck.posX}
-				posY={(userIndex == UserType.Player1) ? roomInfo.mapSize[1] - puck.posY : puck.posY} />
+			<PPuck pos={[(!switchPlace) ? MapSize[gameInfo.mapSize][0] - puck.pos[0] : puck.pos[0],
+				(!switchPlace) ? MapSize[gameInfo.mapSize][1] - puck.pos[1] : puck.pos[1]]} />
 			{/if}
-			<Paddle pos={paddlePos[userIndex]} paddleWidth={roomInfo.paddleSize}
-				gameHeight={roomInfo.mapSize[1]}
-				user={true} userIndex={userIndex} userPresent={true}/>
+			<Paddle pos={(switchPlace) ? player2?.pos : player1?.pos} paddleWidth={PaddleSize[gameInfo.paddleSize]}
+				gameHeight={MapSize[gameInfo.mapSize][1]}
+				switchPlace={switchPlace}
+				playerType={(switchPlace) ? 2 : 1}
+				user={(switchPlace) ? player2 : player1}
+				initPos={initPos}/>
 		</div>
 		<div class="vflex side right">
-			<Player userInfo={roomInfo.players[userIndex]} left={false} host={(roomInfo.players[userIndex]?.username_42 == roomInfo.roomHost) ? true : false} ready={ready}/>
+			<Player userInfo={(!switchPlace) ? player1 : player2} left={false} host={(hostname == ((!switchPlace) ? player1?.info.username : player2?.info.username))} ready={ready}/>
 			<h1>{scores[userIndex]}</h1>
 		</div>
 	</div>
@@ -306,7 +295,7 @@ pong:
 	<div class="button-container">
 		<!-- there should be a difference between host-guest mode and random matching mode -->
 		{#if !gameStart}
-		{#if $user.username == roomInfo.roomHost}
+		{#if $user.username == hostname}
 		{#if !tryStart}
 		<button class="start" on:click={()=>{
 			if (!ready) {

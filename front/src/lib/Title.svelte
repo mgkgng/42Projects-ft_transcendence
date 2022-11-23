@@ -128,6 +128,7 @@
     import { loginState } from "$lib/stores/var";
     import { goto } from "$app/navigation";
 	import MainCircle from '$lib/MainCircle.svelte';
+    import { user } from "./stores/user";
  
 	type Circle = {
 		size: number;
@@ -200,7 +201,7 @@
 	{/each}
 
 	<div class="click-bg"></div>
-	{#if !login}
+	{#if !$user}
 	<button on:click={() => {
 		goto("https://api.intra.42.fr/oauth/authorize?client_id=7e2bea32b8d407dab9d25b1ab4ff8ec14118a99e50807a191bc47334ed598658&redirect_uri=http%3A%2F%2Flocalhost%3A3002&response_type=code");
 	}}>Login</button>

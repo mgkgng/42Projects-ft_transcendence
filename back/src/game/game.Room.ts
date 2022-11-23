@@ -31,6 +31,7 @@ export class Room {
 
 	/* Users */
 	players: Map<string, Player>;
+	playerIndex: Array<string>;
 	clients: Map<string, Client>;
 		
 	constructor(playersInfo: Array<any>, clients: Array<any>, gameInfo: any, hostname: string = "",
@@ -54,10 +55,11 @@ export class Room {
 		
 		/* Users */
 		this.players = new Map();
+		this.clients = new Map<string, Client>();
+		this.playerIndex = [playersInfo[0].username_42, (playersInfo.length > 1) ? playersInfo[1].username_42 : undefined];
 		this.players.set(playersInfo[0].username_42, new Player(playersInfo[0], (hostname == playersInfo[0].usename_42) ? true : false, 0));
 		if (playersInfo.length > 1)
 			this.players.set(playersInfo[1].username_42, new Player(playersInfo[1], (hostname == playersInfo[1].usename_42) ? true : false, 1));
-		this.clients = new Map<string, Client>();
 		this.addClients(clients);
 
 		// Start game if it is a random match

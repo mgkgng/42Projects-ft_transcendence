@@ -36,13 +36,13 @@ export class Puck {
 				this.setCheckPuck(room);
 				return ;
 			} else {	
-				let winner = (this.vec[1] > 0) ? 0 : 1;
-				room.broadcast("ScoreUpdate", { scoreTo: winner });
-				room.scores[winner]++;
+				let winner = (this.vec[1] > 0) ? room.players.get(room.playersIndex[0]) : room.players.get(room.playersIndex[1]);
+				room.broadcast("ScoreUpdate", winner.username);
+				winner.score++;
 
-				if (room.scores[0] == room.maxpoint || room.scores[1] == room.maxpoint) {
-					room.broadcast("GameFinished", { winner: winner });
-					room.putScore();
+				if (winner.score == room.maxpoint) {
+					room.broadcast("GameFinished",  winner.username);
+					room.putScore(); //TODO put username
 					return ;
 				}
 
