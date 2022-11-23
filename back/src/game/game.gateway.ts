@@ -20,7 +20,8 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository, DataSource } from "typeorm";
 import { UserService } from "src/user/user.service";
 import { ErrorMessage, getRandomInt, RoomUpdate, UserState } from "./game.utils";
-
+import { RoomUpdate } from "./game.utils";
+import { UserEntity } from "src/entity/User.entity";
 //TODO Too many connections for a client
 //TODO if the client websocket contains request, handshake..
 //TODO put username_42 inside of client and replace everything with it
@@ -50,15 +51,15 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@WebSocketServer()
 	server: Server;
 
-	public handleConnection(client: any, ...args: any[]): void {
-		// Check the user and if the user is already connected.
-		let userInfo = this.getUserInfo(client);
-		if (this.clients.has(userInfo.username_42))
-			this.clients.get(userInfo.username_42).sockets.set(client.id, client);
-		else
-			this.clients.set(userInfo.username_42, new Client(userInfo.username_42, client));
+	public async handleConnection(client: any, ...args: any[]) {
+		console.log("Connection!!", client.id);
+		const user: any = (this.jwtService.decode(client.handshake.headers.authorization.split(' ')[1]));
+  		console.log("test", user);
+		let newClient = new Client(client, user.username, {});
+		const user_db = await this.dataSource.getRepository(UserEntity).createQueryBuilder("user").
+		where("user.username = :username", {username: user.username_42}).getOne();
+		this.clients.set(newClient.id, newClient);
 
-		// Give user information
 		client.emit("GetConnectionInfo", {
 			user: {
 				username: userInfo.username,
@@ -66,6 +67,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				image_url: userInfo.image_url,
 				campus_name: userInfo.campus_name,
 				campus_country: userInfo.campus_country
+        // modif
+				//username: user_db.username,
+				//displayname: user_db.display_name,
+				//image_url: user_db.img_url,
+				//campus_name: user_db.campus_name,
+				//campus_country: user_db.campus_country
 			}
 		});
 	}
@@ -323,6 +330,24 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		.where("game.player1.id_g = :u or game.player2.id_g = :u", {u: id_user})
 		.select(["game.player1_score", "game.player2_score", "user1.username", "user2.username", "user1.img_url", "user1.img", "user2.img_url", "user2.img", "game.date_game"]).getMany();
 		client.emit("resHistory", res);
+	}
+
+	@SubscribeMessage("RankingReq")
+	async getRankedUsers(@ConnectedSocket() client: Socket) {
+		const res = await this.dataSource.createQueryRunner()
+		.query("SELECT sum(games.is_winner) as nb_victory, count(games.is_winner) as nb_game, \
+				((cast(sum(games.is_winner) as float) / count(games.is_winner)) * 100) as win_rate, \
+				min(user_entity.username) as username, min(user_entity.campus_name) as campus_name, \
+				min(user_entity.campus_country) as campus_country, min(user_entity.img_url) as image_url, \
+				min(user_entity.display_name) as displayname \
+				FROM ( \
+					SELECT \"player1IdG\" as id_player, (CASE WHEN player1_score > player2_score THEN 1 ELSE 0 END) as is_winner FROM game_entity as game1 \
+						UNION \
+					SELECT \"player2IdG\" as id_player, (CASE WHEN player2_score > player2_score THEN 1 ELSE 0 END) as is_winner FROM game_entity as game2) \
+					as games inner join user_entity on games.id_player = user_entity.id_g \
+				GROUP BY id_player \
+				ORDER BY nb_victory DESC, win_rate DESC; ", []);
+		client.emit("RankingRes", res);
 	}
 
 	getRoom(id: string) { return (this.rooms.get(id)); }

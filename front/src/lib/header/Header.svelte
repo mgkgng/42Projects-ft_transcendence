@@ -109,8 +109,10 @@
     import { client } from "$lib/stores/client";
     import { loginState } from "$lib/stores/var";
     import Modal from "$lib/tools/Modal.svelte";
-	import Friends from "$lib/modals/Friends.svelte"
+	  import Friends from "$lib/modals/Friends.svelte"
     import Settings from "../settings/Settings.svelte";
+    import { chatRoom } from "../stores/chatRoom";
+    import Image from "../Image.svelte";
 
 
 	let profileModal: any;
@@ -127,7 +129,7 @@
 	}
 </script>
 
-<Modal bind:this={profileModal}>
+<Modal bind:this={profileModal} >
 	<UserProfile profileUser={$client.user_info}  />
 </Modal>
 <Modal bind:this={friendsModal}>
