@@ -9,8 +9,6 @@ export const UserType = {
 	Watcher: 2
 }
 
-export const frameDuration = 20;
-
 export const PaddleSize = [40, 80, 120];
 
 export const MapSize = [

@@ -72,23 +72,25 @@
 </style>
 
 <script lang="ts">
-	export let userInfo: any;
+	export let player: any;
 	export let left: boolean;
 	export let host: boolean;
 	export let ready: boolean;
+
+	console.log("check", player);
 </script>
 
 <div class="vflex player {(left) ? "left" : ""}">
-	{#if userInfo}
+	{#if player}
 	<div class="img-box">
 		{#if host}
 		<span class="host">HOST</span>
 		{:else if ready}
 		<span class="ready">READY</span>
 		{/if}
-		<img src={userInfo.img_url} alt="profile"/>
+		<img src={player.info.img_url} alt="profile"/>
 	</div>
-	<div class="username">{userInfo.username_42}</div>
+	<div class="username">{player.info.username_42}</div>
 	{:else}
 	<div class="who">?</div>
 	{/if}

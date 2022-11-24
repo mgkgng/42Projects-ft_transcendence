@@ -126,7 +126,6 @@
 
 	let userType: number;
 	let initPos: number;
-	let paddlePos: Array<number>;
 
 	let quitConfirmMsgModal: any;
 
@@ -151,6 +150,7 @@
 
 	let switchPlace: boolean = false;
 
+	
 	onMount(()=> {
 		if (!roomID.length)
 			return ;
@@ -165,20 +165,22 @@
 			player1 = data.player1;
 			player2 = data.player2;
 			initPos = (MapSize[gameInfo?.mapSize][0] - PaddleSize[gameInfo?.paddleSize]) / 2;
-			userType = (player1.info.username == $user.username_42) ? UserType.Player1 :
-				(player2.info.username == $user.username_42) ? UserType.Player2 :
+			userType = (player1?.info.username_42 == $user.username) ? UserType.Player1 :
+				(player2?.info.username_42 == $user.username) ? UserType.Player2 :
 				UserType.Watcher;
+			
+			console.log(userType, $user);
 
 			// By default, player1 is on the right side unless user is the player2
-			switchPlace = ($user.username_42 == player2.info.username);
+			switchPlace = ($user.username_42 == player2?.info.username_42);
 		});
 
 		$client.socket.on("PlayerUpdate", (data: any) => {
 			console.log("PlayerUpdate", data);
 			if (data.join) {
-				player2 = data.userInfo;
+				player2 = data;
 			} else {
-				if (data.username == player1.info.username)
+				if (data.username == player1.info.username_42)
 					player1 = undefined;
 				else
 					player2 = undefined;
@@ -259,7 +261,7 @@
 	{#if gameInfo}
 	<div class="flex pong" style="width: {MapSize[gameInfo.mapSize][1] + 200}px; height: {MapSize[gameInfo.mapSize][0]}px;">
 		<div class="vflex side">
-			<Player userInfo={(!switchPlace) ? player2 : player1} left={true} host={(hostname == ((!switchPlace) ? player2?.info.username : player1?.info.username))} ready={ready}/>	
+			<Player player={(!switchPlace) ? player2 : player1} left={true} host={(hostname == ((!switchPlace) ? player2?.info.username : player1?.info.username))} ready={ready}/>	
 			<h1>{(!switchPlace) ? player1.score : player2.score}</h1>
 		</div>
 		<div class="pong-game" style="min-width: {MapSize[gameInfo.mapSize][1]}px; min-height: {MapSize[gameInfo.mapSize][0]}px;">
@@ -281,7 +283,7 @@
 				initPos={initPos}/>;
 		</div>
 		<div class="vflex side right">
-			<Player userInfo={(!switchPlace) ? player1 : player2} left={false} host={(hostname == ((!switchPlace) ? player1?.info.username : player2?.info.username))} ready={ready}/>
+			<Player player={(!switchPlace) ? player1 : player2} left={false} host={(hostname == ((!switchPlace) ? player1?.info.username : player2?.info.username))} ready={ready}/>
 			<h1>{(!switchPlace) ? player1.score : player2.score}</h1>
 		</div>
 	</div>
