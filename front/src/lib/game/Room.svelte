@@ -241,7 +241,7 @@
 		</div>
 		<div class="pong-game" style="min-width: {MapSize[gameInfo.mapSize][1]}px; min-height: {MapSize[gameInfo.mapSize][0]}px;">
 			<Paddle pos={(!switched) ? player2?.pos : player1?.pos} paddleWidth={PaddleSize[gameInfo.paddleSize]}
-				gameHeight={MapSize[gameInfo.mapSize][1]}
+				mapSize={MapSize[gameInfo.mapSize]}
 				switched={switched}
 				playerType={(!switched) ? 2 : 1}
 				user={(!switched) ? player2 : player1}
@@ -251,7 +251,7 @@
 				(!switched) ? MapSize[gameInfo.mapSize][1] - puck.pos[1] : puck.pos[1]]} />
 			{/if}
 			<Paddle pos={(!switched) ? player1?.pos : player2?.pos} paddleWidth={PaddleSize[gameInfo.paddleSize]}
-				gameHeight={MapSize[gameInfo.mapSize][1]}
+				mapSize={MapSize[gameInfo.mapSize]}
 				switched={switched}
 				playerType={(!switched) ? 1 : 2}
 				user={(!switched) ? player1 : player2}

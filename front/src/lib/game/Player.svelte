@@ -77,12 +77,13 @@
 	export let ready: boolean;
 
 	console.log("check", player);
+	//TODO precision username_42 & username
 </script>
 
 <div class="vflex player {(left) ? "left" : ""}">
 	{#if player}
 	<div class="img-box">
-		{#if player.username == hostname}
+		{#if player.info.username == hostname}
 		<span class="host">HOST</span>
 		{:else if ready}
 		<span class="ready">READY</span>
