@@ -89,9 +89,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage("CheckOnGoing")
 	checkOnGoing(@ConnectedSocket() client: Socket, @Request() req) {
-		console.log("received");
 		let target = this.getClient(req);
-		console.log(target);
 		if (target.state == UserState.Playing)
 				client.emit("OnGoingRes", target.room);
 	}
@@ -225,7 +223,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				continue ;
 			allRooms.push({
 				id: room.id,
-				players: room.players,
+				players: Array.from(room.players.values(), x => x.info),
 				gameInfo: room.gameInfo
 			});
 		}

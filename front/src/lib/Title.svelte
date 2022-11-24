@@ -131,8 +131,6 @@
     import { client } from "./stores/client";
     import { UserState } from "./stores/user";
  
-	$:console.log("what is wrong?", $login);
-
 	let userState: any;
 
 	type Circle = {
@@ -192,9 +190,7 @@
 		userState = +$login;
 
 		if (userState) {
-			console.log("hello?");
 			$client.socket.on("OnGoingRes", (data: any) => {
-				console.log("OnGoingTest");
 				userState = UserState.Playing;
 				roomID = data;
 			});
@@ -229,7 +225,7 @@
 		{:else if userState == UserState.Playing}
 		<button on:click={() => {
 			roomModal.open();
-		}}>Join Room</button>
+		}}>Back to Game</button>
 		{:else}
 		<button on:click={() => {
 			enterModal.open();
