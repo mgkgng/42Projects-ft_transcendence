@@ -86,7 +86,7 @@
 		{:else if ready}
 		<span class="ready">READY</span>
 		{/if}
-		<img src={userInfo.image_url} alt="profile"/>
+		<img src={userInfo.img_url} alt="profile"/>
 	</div>
 	<div class="username">{userInfo.username_42}</div>
 	{:else}

@@ -42,7 +42,7 @@ export class OAuthStrategy extends PassportStrategy(Strategy, "oauth") {
 		const user : any = {
 			login: data.username_42,
 			displayname: data.displayname,
-			image_url: data.image.link,
+			img_url: data.image.link,
 			campus_name: data.campus[0].name,
 			campus_country: data.campus[0].country
 		};
@@ -53,7 +53,7 @@ export class OAuthStrategy extends PassportStrategy(Strategy, "oauth") {
 				username: user_bd.username,
 				username_42: data.login,
 				displayname: data.displayname,
-				image_url: user_bd.img_url,
+				img_url: user_bd.img_url,
 				campus_name: data.campus[0].name,
 				campus_country: data.campus[0].country,
 				email: data.email,
@@ -89,7 +89,7 @@ export class OAuthStrategy extends PassportStrategy(Strategy, "oauth") {
 				return ({username: data.login,
 					username_42 : data.login,
 					displayname: data.displayname,
-					image_url: data.image.link,
+					img_url: data.image.link,
 					campus_name: data.campus[0].name,
 					campus_country: data.campus[0].country,
 					email: data.email

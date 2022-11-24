@@ -26,7 +26,8 @@ export class Puck {
 		let deathPointX = this.calculPosX(frameNb);
 
 		setTimeout(() => {
-			let paddlePos = (this.vec[1] > 0) ? room.pong.paddlePos[1] : room.pong.paddlePos[0];
+			console.log("settimeout?", this.vec);
+			let paddlePos = (this.vec[1] > 0) ? room.pong.paddles[1].pos : room.pong.paddles[0].pos;
 			if (deathPointX > paddlePos && deathPointX < paddlePos + room.pong.paddleSize) {
 				room.broadcast("PuckHit");
 				this.pos[0] = deathPointX;
@@ -36,7 +37,7 @@ export class Puck {
 				this.setCheckPuck(room);
 				return ;
 			} else {	
-				let winner = (this.vec[1] > 0) ? room.players.get(room.playersIndex[0]) : room.players.get(room.playersIndex[1]);
+				let winner = (this.vec[1] > 0) ? room.players.get(room.playerIndex[0]) : room.players.get(room.playerIndex[1]);
 				room.broadcast("ScoreUpdate", winner.username);
 				winner.score++;
 
@@ -46,7 +47,7 @@ export class Puck {
 					return ;
 				}
 
-				room.pong.puck = new Puck(room.pong.size, room.pong.puckSpeed);
+				room.pong.puck = new Puck(room.pong.mapSize, room.pong.puckSpeed);
 				setTimeout(() => {
 					Room.startPong(room);
 				}, 2000);

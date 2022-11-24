@@ -197,7 +197,7 @@
 
 		$client.socket.on("LoadBall", (data: any) => {
 			console.log("LoadBall");
-			puck = new Puck(data.vec, data.pos, gameInfo.mapSize);
+			puck = new Puck(data.vec, data.pos, MapSize[gameInfo.mapSize]);
 		});
 
 		$client.socket.on("PongStart", () => {

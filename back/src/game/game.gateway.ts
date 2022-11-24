@@ -61,14 +61,14 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			user: {		
 				username: user_db.username,
 				displayname: user_db.display_name,
-				image_url: user_db.img_url,
+				img_url: user_db.img_url,
 				campus_name: user_db.campus_name,
 				campus_country: user_db.campus_country
 			}
 		});
 
 		// Check the user and if the user is already connected
-		if (!this.clients.has(userInfo.username_42)) {
+		if (!this.clients.has(userInfo.username_42)) {	
 			this.clients.set(userInfo.username_42, new Client(userInfo.username_42, client));
 		} else {
 			let target = this.clients.get(userInfo.username_42);
@@ -81,10 +81,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		// Get rid of socket from the client instance
 		let target = this.getClient(client);
 		target.sockets.delete(client.id);
-
-		// destory the instance if the client is no more connected
-		// if (!target.sockets.size)
-		// 	this.clients.delete(target.username);
     }
 
 	@SubscribeMessage("CheckOnGoing")
@@ -110,18 +106,18 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		// Game distribution
 		if (this.queue.length > 1) {
 			// create a random room for two players
-			let [target1, target2] = [this.getClient(this.queue[0][0]), this.getClient(this.queue[1][0])];
+			let [target1, target2] = [this.clients.get(this.queue[0][0]), this.clients.get(this.queue[1][0])];
 			let [player1, player2] = [this.getPlayerInfo(target1.username), this.getPlayerInfo(target2.username)];
 			let gameInfo = { title: "", mapSize: getRandomInt(3), maxPoint: 10, puckSpeed: getRandomInt(3), paddleSize: getRandomInt(3), isPrivate: true }
 			let room = new Room([player1, player2], [target1, target2], gameInfo, undefined, this.gameRep, this.mainServerService, this.dataSource, this.userService);
 			this.rooms.set(room.id, room);
 		
-			// switch their state into playing then get rid of them from the queue
+			// Switch their state into playing then get rid of them from the queue
 			target1.isPlaying(room.id);
 			target2.isPlaying(room.id);
 			this.queue.splice(0, 2);
 
-			// broadcast to let them join the game
+			// Broadcast to let them join the game
 			room.broadcast("MatchFound", room.id);
 		}
 	}
@@ -366,7 +362,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		.query("SELECT sum(games.is_winner) as nb_victory, count(games.is_winner) as nb_game, \
 				((cast(sum(games.is_winner) as float) / count(games.is_winner)) * 100) as win_rate, \
 				min(user_entity.username) as username, min(user_entity.campus_name) as campus_name, \
-				min(user_entity.campus_country) as campus_country, min(user_entity.img_url) as image_url, \
+				min(user_entity.campus_country) as campus_country, min(user_entity.img_url) as img_url, \
 				min(user_entity.display_name) as displayname \
 				FROM ( \
 					SELECT \"player1IdG\" as id_player, (CASE WHEN player1_score > player2_score THEN 1 ELSE 0 END) as is_winner FROM game_entity as game1 \
@@ -396,7 +392,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			username: userdata.username,
 			username_42: userdata.username_42,
 			displayname: userdata.display_name,
-			image_url: userdata.img_url,
+			img_url: userdata.img_url,
 			campus_name: userdata.campus_name,
 			campus_country: userdata.campus_country,
 		});

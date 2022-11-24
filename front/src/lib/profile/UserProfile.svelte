@@ -164,7 +164,7 @@
 <div class="vflex window profile">
 	<div class="flex info">
 		<div class="photo">
-			<img src={profileUser.image_url} alt="grosse-tete">
+			<img src={profileUser.img_url} alt="grosse-tete">
 		</div>
 		<div class="vflex data">
 			<p class="username">{profileUser.displayname} a.k.a. {profileUser.username}</p>

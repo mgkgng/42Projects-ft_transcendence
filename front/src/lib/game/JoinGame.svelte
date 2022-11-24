@@ -300,9 +300,9 @@
 				{room.title}
 			</div>
 			<div class="flex players">
-				<img src={room.players[0].image_url} alt="player1" />
+				<img src={room.players[0].img_url} alt="player1" />
 				{#if room.players.length > 1}
-				<img src={room.players[1].image_url} alt="player2" />
+				<img src={room.players[1].img_url} alt="player2" />
 				{:else}
 				<div class="grey-box">?</div>
 				{/if}
