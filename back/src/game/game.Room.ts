@@ -86,7 +86,9 @@ export class Room {
 	}
 
 	playerJoin(playerInfo: any, client: Client) {
-		this.players.set(client.username, new Player(playerInfo, false, 1));
+		let index = (this.playerIndex[0]) ? 1 : 0;
+		this.players.set(client.username, new Player(playerInfo, false, index));
+		this.playerIndex[index] = client.username;
 		this.addClient(client);
 		this.isAvailable = false;
 		client.broadcast("JoinRoomRes", {
@@ -114,6 +116,12 @@ export class Room {
 			this.hostname = this.players.values()[0].username;
 			this.isAvailable = true;
 		}
+		// Player index update
+		if (client.username == this.playerIndex[0])
+			this.playerIndex[0] = undefined;
+		else
+			this.playerIndex[1] = undefined;
+		// Broadcast
 		this.broadcast("PlayerUpdate", {
 			join: false,
 			username: client.username,

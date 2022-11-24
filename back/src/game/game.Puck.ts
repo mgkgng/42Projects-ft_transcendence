@@ -38,11 +38,11 @@ export class Puck {
 				return ;
 			} else {	
 				let winner = (this.vec[1] > 0) ? room.players.get(room.playerIndex[0]) : room.players.get(room.playerIndex[1]);
-				room.broadcast("ScoreUpdate", winner.username);
+				room.broadcast("ScoreUpdate", winner.info.username);
 				winner.score++;
 
 				if (winner.score == room.maxpoint) {
-					room.broadcast("GameFinished",  winner.username);
+					room.broadcast("GameFinished",  winner.info.username);
 					room.putScore(); //TODO put username
 					return ;
 				}
