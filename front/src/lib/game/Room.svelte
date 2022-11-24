@@ -118,16 +118,13 @@
     import Player from '$lib/game/Player.svelte';
 
 
-	export let roomId: string;
+	export let roomID: string;
 	export let itself: any;	
 
 	let puck: any = undefined;
 	let scores: Array<number> = [0, 0];
 
 	let userType: number;
-	let userIndex: number = UserType.Player1;
-	let opponentIndex: number = UserType.Player2;
-
 	let initPos: number;
 	let paddlePos: Array<number>;
 
@@ -138,8 +135,7 @@
 	
 	let gameFinishedModal: any;
 
-	let roomFound: boolean;
-	let miniMode: boolean = false;
+	let roomFound: boolean = false;
 
 	let ready: boolean = false;
 	let tryStart: boolean = false;
@@ -158,7 +154,7 @@
 	$:console.log("mounted?", roomFound, gameInfo);
 
 	onMount(()=> {
-		if (!roomId.length)
+		if (!roomID.length)
 			return ;
 		
 		$client.socket.on("RoomFound", (data: any) => {
@@ -171,8 +167,10 @@
 			player1 = data.player1;
 			player2 = data.player2;
 			initPos = (MapSize[gameInfo?.mapSize][0] - PaddleSize[gameInfo?.paddleSize]) / 2;
+			userType = (player1.info.username == $user.username_42) ? UserType.Player1 :
+				(player2.info.username == $user.username_42) ? UserType.Player2 :
+				UserType.Watcher;
 
-			console.log("sa", player1.pos, initPos);
 			// By default, player1 is on the right side unless user is the player2
 			switchPlace = ($user.username_42 == player2.info.username);
 		});
@@ -243,7 +241,7 @@
 
 		$client.socket.emit("RoomCheck", {
 			client: $client.id,
-			room: roomId
+			room: roomID
 		});
 
 		return (() => {
@@ -255,7 +253,6 @@
 
 </script>
 
-{#if !miniMode}
 {#if roomFound}
 <div class="container">
 	{#if gameInfo}
@@ -284,7 +281,7 @@
 		</div>
 		<div class="vflex side right">
 			<Player userInfo={(!switchPlace) ? player1 : player2} left={false} host={(hostname == ((!switchPlace) ? player1?.info.username : player2?.info.username))} ready={ready}/>
-			<h1>{scores[userIndex]}</h1>
+			<h1>{(!switchPlace) ? player1.score : player2.score}</h1>
 		</div>
 	</div>
 	{/if}
@@ -299,7 +296,7 @@
 				return ;
 			}
 			tryStart = true;
-			$client.socket.emit("StartGame", roomId)
+			$client.socket.emit("StartGame", roomID)
 		}}>START</button>
 		{:else}
 		<button class="start loading"></button>
@@ -308,7 +305,7 @@
 		{#if userType == UserType.Player2}
 		<button class="ready" on:click={()=>{
 			$client.socket.emit("isReady", {
-				roomId: roomId,
+				roomID: roomID,
 				isReady: !ready,
 			});
 		}}>{(!ready) ? "READY" : "CANCEL"}</button>
@@ -316,15 +313,11 @@
 		{/if}
 		<button class="exit" on:click={()=>{ quitConfirmMsgModal.open(); }}>EXIT</button>
 	</div>
-	<div class="mini-mode" on:click={()=>{ miniMode = true; }}>_</div>
 </div>
 {:else}
 <div class="loading-box">
 	<h1 class="msg">LOADING...</h1>
 </div>
-{/if}
-{:else}
-what is this?
 {/if}
 
 <Modal bind:this={gameFinishedModal} closeOnBgClick={true}>
@@ -332,12 +325,12 @@ what is this?
 </Modal>
 
 <Modal bind:this={quitConfirmMsgModal} closeOnBgClick={false}>
-	<ConfirmMsg msg={"Are you sure you want to quit?"} toQuit={itself} roomId={roomId} itself={quitConfirmMsgModal}/>
+	<ConfirmMsg msg={"Are you sure you want to quit?"} toQuit={itself} roomID={roomID} itself={quitConfirmMsgModal}/>
 </Modal>
 
 <svelte:window
 	on:keypress={(event) => {
-		if (userType == UserType.Watcher
+		if ((userType == UserType.Watcher)
 		|| (event.code != 'KeyA' && event.code != 'KeyD'))
 			return ;
 
@@ -347,8 +340,8 @@ what is this?
 		moving = true;
 
 		$client.socket.emit("PaddleMove", {
-			room: roomId,
-			left: (userType == UserType.Player1 && event.code == 'KeyD'
+			room: roomID,
+			left: ((userType == UserType.Player1 && !switchPlace) && event.code == 'KeyD'
 				|| userType == UserType.Player2 && event.code == 'KeyA')
 		});
 	}}
@@ -358,7 +351,7 @@ what is this?
 			return ;
 		
 		//* TODO some precision to make
-		$client.socket.emit("PaddleStop", roomId);
+		$client.socket.emit("PaddleStop", roomID);
 
 		moving = false;
 	}}

@@ -250,9 +250,9 @@
 			roomPage++;
 	}
 
-	function joinRoom(roomId: string, playMode: boolean) {
+	function joinRoom(roomID: string, playMode: boolean) {
 		$client.socket.emit("JoinRoom", {
-			roomId: roomId,
+			roomID: roomID,
 			play: playMode
 		})
 	}

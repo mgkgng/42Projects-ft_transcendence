@@ -160,7 +160,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				score: players[0].score,
 				pos: room.pong.paddles[players[0].index].pos
 			},
-			players2: (players.length > 1) ? {
+			player2: (players.length > 1) ? {
 				info: players[1].info,
 				score: players[1].score,
 				pos: room.pong.paddles[players[1].index].pos
@@ -257,7 +257,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	async joinRoom(@ConnectedSocket() client: Socket, @MessageBody() data: any, @Request() req) {
 		// Check whether the room exists and whether the room is available if the user wants to play
 		let target = this.getClient(req);
-		let room = this.getRoom(data.roomId);
+		let room = this.getRoom(data.roomID);
 		if (!room) {
 			client.emit("JoinRoomError", ErrorMessage.RoomNotFound);
 			return ;
@@ -284,14 +284,14 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 
 		// tell either the player or the watcher that they can join the room
-		target.broadcast("JoinRoomRes", data.roomId);
+		target.broadcast("JoinRoomRes", data.roomID);
 	}
 
 	@SubscribeMessage("ExitRoom")
 	exitRoom(@ConnectedSocket() client: Socket, @MessageBody() data: any, @Request() req) {
 		// Check if the user is in the room
 		let target = this.getClient(req);
-		let room = this.getRoom(data.roomId);
+		let room = this.getRoom(data.roomID);
 		if (!room || !room.clients.has(target.username))
 			return ;
 	
@@ -311,7 +311,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	setReady(@MessageBody() data: any, @Request() req) {
 		// Check if the client is a guest player in the room
 		let target = this.getClient(req);
-		let room = this.getRoom(data.roomId);
+		let room = this.getRoom(data.roomID);
 		if (!room || !room.players.has(target.username) || room.hostname == target.username)
 			return ;
 

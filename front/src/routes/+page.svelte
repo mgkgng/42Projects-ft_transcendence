@@ -17,7 +17,7 @@
     import { loaded } from '../lib/stores/var';
 
 	let roomModal: any;
-	let roomId: string = "";
+	let roomID: string = "";
 
 	let messageModal: any;
 	let modalMessage: string = "";
@@ -40,14 +40,14 @@
 		$client.socket.on("CreateRoomRes", (data: any) => {
 			console.log("RoomCreated", data);
 			createGameModal.close();
-			roomId = data;
+			roomID = data;
 			roomModal.open();
 		});
 
 		$client.socket.on("JoinRoomRes", (data: any) => {
 			console.log('JoinRes', data);
 			if (data.allowed) {
-				roomId = data.roomId;
+				roomID = data.roomID;
 				joinGameModal.close();
 				roomModal.open();
 			} else {
@@ -72,7 +72,7 @@
 		});
 
 		$client.socket.on("MatchFound", (data: any) => {
-			roomId = data;
+			roomID = data;
 			roomModal.open();
 		});
 
@@ -110,10 +110,10 @@
 </Modal>
 
 <Modal bind:this={roomModal} closeOnBgClick={false}>
-	<Room itself={roomModal} roomId={roomId}/>
+	<Room itself={roomModal} roomID={roomID}/>
 </Modal>
 
 {#if $loaded}
 <Header />
-<Title title={"TRANSCENDENCE"} enterModal={enterModal} roomModal={roomModal} bind:roomID={roomId}/>
+<Title title={"TRANSCENDENCE"} enterModal={enterModal} roomModal={roomModal} bind:roomID={roomID}/>
 {/if}

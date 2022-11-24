@@ -89,6 +89,10 @@ export class Room {
 		this.players.set(client.username, new Player(playerInfo, false, 1));
 		this.addClient(client);
 		this.isAvailable = false;
+		client.broadcast("JoinRoomRes", {
+			allowed: true,
+			roomID: this.id
+		})
 	}
 
 	playerExit(client: Client) {

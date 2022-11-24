@@ -21,14 +21,14 @@ export class Client {
 		this.room = "";
 	}
 
-	isPlaying(roomId: string) {
+	isPlaying(roomID: string) {
 		this.state = UserState.Playing;
-		this.room = roomId;
+		this.room = roomID;
 	}
 
-	isWatching(roomId: string) {
+	isWatching(roomID: string) {
 		this.state = UserState.Watching;
-		this.room = roomId;
+		this.room = roomID;
 	}
 
 	broadcast(event: string, data: any) { GameGateway.broadcast(this.sockets.values(), event, data); }
