@@ -128,7 +128,7 @@ export class Room {
 	// sent by setTimeOut(), 'this' is initialised by timeOut class
 	static startPong(room: any) {
 		// Create the puck and broadcast its information
-		room.pong.puck = new Puck(MapSize[room.gameInfo.mapSize], room.gameInfo.puckSpeed);
+		room.pong.puck = new Puck(MapSize[room.gameInfo.mapSize], PuckSpeed[room.gameInfo.puckSpeed]);
 		console.log("pongpuck", room.pong.puck);
 		room.broadcast("LoadBall", {
 			vec: room.pong.puck.vec,

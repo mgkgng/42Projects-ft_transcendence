@@ -106,6 +106,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		// Game distribution
 		if (this.queue.length > 1) {
 			// create a random room for two players
+			console.log(this.queue);
 			let [target1, target2] = [this.clients.get(this.queue[0][0]), this.clients.get(this.queue[1][0])];
 			let [player1, player2] = [this.getPlayerInfo(target1.username), this.getPlayerInfo(target2.username)];
 			let gameInfo = { title: "", mapSize: getRandomInt(3), maxPoint: 10, puckSpeed: getRandomInt(3), paddleSize: getRandomInt(3), isPrivate: true }

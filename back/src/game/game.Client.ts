@@ -10,6 +10,7 @@ export class Client {
 	room: string;
 
 	constructor(username: string, socket: Socket) {
+		this.id = socket.id;
 		this.username = username;
 		this.sockets = new Map<string, Socket>();
 		this.sockets.set(socket.id, socket);

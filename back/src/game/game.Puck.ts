@@ -1,5 +1,5 @@
 import { Room } from "./game.Room";
-import { PongConfig } from "./game.utils";
+import { PongConfig, PuckSpeed } from "./game.utils";
 
 export class Puck {
 	puckSpeed: number;

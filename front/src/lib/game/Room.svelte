@@ -82,26 +82,6 @@
 		.ready:hover { background-color: $yellow; }
 		.exit:hover { background-color: $main-dark; }
 	}
-
-	.mini-mode {
-		position: absolute;
-		right: .5em;
-		top: 0;
-		width: 25px;
-		height: 30px;
-		aspect-ratio: 1 / 1;
-		border-radius: 0 0 .2em .2em;
-		transition: .4s;
-		font-size: 25px;
-		padding-bottom: .5em;
-		text-align: center;
-		cursor: pointer;
-
-		&:hover {
-			color: #fff;
-			background-color: transparentize(#fff, 0.8);
-		}
-	}
 </style>
 
 <script lang="ts">
@@ -122,7 +102,6 @@
 	export let itself: any;	
 
 	let puck: any = undefined;
-	let scores: Array<number> = [0, 0];
 
 	let userType: number;
 	let initPos: number;
@@ -133,8 +112,6 @@
 	let puckMoving: any;
 	
 	let gameFinishedModal: any;
-
-	let roomFound: boolean = false;
 
 	let ready: boolean = false;
 	let tryStart: boolean = false;
@@ -149,7 +126,6 @@
 	let player2: any;
 
 	let switchPlace: boolean = false;
-
 	
 	onMount(()=> {
 		if (!roomID.length)
@@ -157,7 +133,6 @@
 		
 		$client.socket.on("RoomFound", (data: any) => {
 			console.log("RoomFound", data);
-			roomFound = true;
 
 			// Get room information
 			gameInfo = data.gameInfo;
@@ -168,8 +143,6 @@
 			userType = (player1?.info.username_42 == $user.username) ? UserType.Player1 :
 				(player2?.info.username_42 == $user.username) ? UserType.Player2 :
 				UserType.Watcher;
-			
-			console.log(userType, $user);
 
 			// By default, player1 is on the right side unless user is the player2
 			switchPlace = ($user.username_42 == player2?.info.username_42);
@@ -256,9 +229,8 @@
 
 </script>
 
-{#if roomFound}
+{#if gameInfo}
 <div class="container">
-	{#if gameInfo}
 	<div class="flex pong" style="width: {MapSize[gameInfo.mapSize][1] + 200}px; height: {MapSize[gameInfo.mapSize][0]}px;">
 		<div class="vflex side">
 			<Player player={(!switchPlace) ? player2 : player1} left={true} host={(hostname == ((!switchPlace) ? player2?.info.username : player1?.info.username))} ready={ready}/>	
@@ -287,7 +259,6 @@
 			<h1>{(!switchPlace) ? player1.score : player2.score}</h1>
 		</div>
 	</div>
-	{/if}
 	<div class="button-container">
 		<!-- there should be a difference between host-guest mode and random matching mode -->
 		{#if !gameStart}
@@ -324,7 +295,7 @@
 {/if}
 
 <Modal bind:this={gameFinishedModal} closeOnBgClick={true}>
-	<GameOver winner={winner} gameModal={itself} itself={gameFinishedModal} scores={scores}/>
+	<GameOver winner={winner} gameModal={itself} itself={gameFinishedModal} scores={[player1.score, player2.score]}/>
 </Modal>
 
 <Modal bind:this={quitConfirmMsgModal} closeOnBgClick={false}>
