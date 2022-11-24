@@ -37,13 +37,8 @@
 	import { client } from "$lib/stores/client";
     import { onMount } from "svelte";
 	import { browser } from "$app/environment";
-    import { loginState } from "$lib/stores/var";
+    import { loaded, login } from "$lib/stores/var";
     import { chatRoom } from '$lib/stores/chatRoom';
-
-	let login: boolean;
-	let tryConnect: boolean = false;
-
-	loginState.subscribe(value => { login = value; });
 
 	async function connectWithUrlCode(url : any)
 	{
@@ -59,7 +54,6 @@
 			while (tok.get_code != null)
 			{
 				let ufa_code : any = prompt("Your code is : ");
-				console.log(ufa_code);
 				const res_ufa : any = await fetch("http://localhost:3000/auth42",{
 					method: 'POST',
 					headers: {
@@ -75,11 +69,10 @@
 				}
 			});
 			localStorage.setItem('transcendence-jwt', tok.access_token);
-			loginState.set(true);
+			login.set(true);
 			goto('/');
 		} catch(e){
 			console.log("NOT CONNECTED");
-			loginState.set(false);
 			localStorage.removeItem('transcendence-jwt');
 		}
 	}
@@ -110,21 +103,23 @@
 			if ($client.socket) {
 				$client.socket.on("get_user_info", (data: any) => {
 					user.set(data);
-					loginState.set(true);
+					login.set(true);
 					$chatRoom.LoadMessages($client);
 				});
 				$client.socket.emit("get_user_info", {});
 			}
-			tryConnect = true;
-			return (() => {
-				$client.removeListeners("get_user_info");
-			})
+
+			setTimeout(() => {
+				loaded.set(true);
+			}, 1000);
+			
+			return (() => { $client.removeListeners("get_user_info"); });
 		}
 	});
 </script>
 
 <main>
-	{#if tryConnect}
+	{#if $loaded}
 	<slot />
 	{:else}
 	<div class="load">

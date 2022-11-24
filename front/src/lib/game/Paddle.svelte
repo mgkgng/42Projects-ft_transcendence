@@ -36,15 +36,14 @@
 
 	export let pos : number;
 	export let initPos: number;
-	export let userPresent: boolean;
 
 	if (!pos)
 		pos = initPos;
 
 </script>
 
-<div class="paddle {(user) ? "user" : ""} {(!userPresent) ? "absent" : ""}"
-	style="left: {(!switchPlace) ? PongConfig.deadZoneHeight: gameHeight - PongConfig.deadZoneHeight}px;
-		top: {((playerType === 1 && !switchPlace) || (playerType === 2 && switchPlace)) ? pos - paddleWidth : pos}px;
+<div class="paddle {(playerType == 1) ? "user" : ""} {(!user) ? "absent" : ""}"
+	style="left: {((playerType === 1 && switchPlace) || (playerType === 2 && !switchPlace)) ? PongConfig.DeadZoneHeight : gameHeight - PongConfig.DeadZoneHeight - PongConfig.PaddleHeight}px;
+		top: {((playerType === 1 && switchPlace) || (playerType === 2 && switchPlace)) ? pos - paddleWidth : pos}px;
 		height: {paddleWidth}px">
 </div>

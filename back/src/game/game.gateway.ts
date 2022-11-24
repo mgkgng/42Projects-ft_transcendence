@@ -52,14 +52,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	public async handleConnection(client: any, ...args: any[]) {
 		console.log("Connection socket:", client.id);
-		// Check the user and if the user is already connected.
-		let userInfo = this.getUserInfo(client);
-		if (this.clients.has(userInfo.username_42))
-			this.clients.get(userInfo.username_42).sockets.set(client.id, client);
-		else
-			this.clients.set(userInfo.username_42, new Client(userInfo.username_42, client));
-			
+		
 		// Get the user information from db and pass it to the user
+		let userInfo = this.getUserInfo(client);
 		const user_db = await this.dataSource.getRepository(UserEntity).createQueryBuilder("user").
 		where("user.username = :username", {username: userInfo.username_42}).getOne();
 		client.emit("GetConnectionInfo", {
@@ -71,6 +66,17 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				campus_country: user_db.campus_country
 			}
 		});
+
+		// Check the user and if the user is already connected
+		if (!this.clients.has(userInfo.username_42)) {
+			this.clients.set(userInfo.username_42, new Client(userInfo.username_42, client));
+		} else {
+			let target = this.clients.get(userInfo.username_42);
+			target.sockets.set(client.id, client);
+			// Send user the room id if the user is in an on-going game
+			if (target.state == UserState.Playing)
+				client.emit("GameOnGoing", target.room);
+		}
 	}
 
 	public handleDisconnect(client: any): void {
@@ -106,7 +112,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			this.rooms.set(room.id, room);
 		
 			// switch their state into playing then get rid of them from the queue
-			[target1.state, target2.state] = [UserState.Playing, UserState.Playing];
+			target1.isPlaying(room.id);
+			target2.isPlaying(room.id);
 			this.queue.splice(0, 2);
 
 			// broadcast to let them join the game
@@ -124,7 +131,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		// Get rid of the client from the queue and turn them back available
 		let index = this.queue.findIndex(x => x[0] == target.username);
 		this.queue.splice(index, 1);
-		target.state = UserState.Available;
+		target.isAvailable();
 	}
 
 	@SubscribeMessage("RoomCheck")
@@ -220,9 +227,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage("CreateRoom")
 	async createRoom(@ConnectedSocket() client: Socket, @MessageBody() data: any, @Request() req) {		
-		console.log("CreateRoom", data);
+		// console.log("CreateRoom", data);
 		// Check if the client is already playing or watching a game
 		let target = this.getClient(req);
+		console.log("Why didn't it work?", target.state, target.room);
 		if (target.state != UserState.Available) {
 			client.emit("CreateRoomError", ErrorMessage.UserNotAvailble);
 			return ;
@@ -233,7 +241,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		let room = new Room([player], [target], data, target.username,
 			this.gameRep, this.mainServerService, this.dataSource, this.userService);
 		this.rooms.set(room.id, room);
-		target.state = UserState.Playing;
+		target.isPlaying(room.id);
 
 		// Invite the user to the room
 		target.broadcast("CreateRoomRes", room.id);
@@ -261,11 +269,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				score: 0,
 				pos: (MapSize[room.gameInfo.mapSize][0] - PaddleSize[room.gameInfo.paddleSize]) / 2
 			});
-			target.state = UserState.Playing;
+			target.isPlaying(room.id);
 			room.playerJoin(newPlayer, target);
 		} else {
 			// If the user only wants to watch, add the user in the client list
-			target.state = UserState.Watching;
+			target.isWatching(room.id);
 			room.addClient(target);
 		}
 

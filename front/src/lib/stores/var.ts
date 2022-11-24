@@ -1,6 +1,7 @@
 import { writable } from 'svelte/store';
 
-export const loginState = writable(false);
+export const loaded = writable(false);
+export const login = writable(false);
 
 export const UserType = {
 	Player1: 0,

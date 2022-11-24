@@ -309,7 +309,6 @@ export class ChatRoomService {
 	async getMyRoom(@MessageBody() data, @ConnectedSocket() client: Socket)
 	{
 		const res : any = await this.mainServer.getNamesRoomsForUser(client);
-		console.log("My rooms:", res);
 		client.emit("get_my_rooms", res);
 	}
 	//OK

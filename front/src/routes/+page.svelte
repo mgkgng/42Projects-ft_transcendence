@@ -14,6 +14,7 @@
     import EnterGame from "$lib/game/EnterGame.svelte";
     import JoinGame from "$lib/game/JoinGame.svelte";
     import ChatRoom from '$lib/chat/ChatRoom.svelte';
+    import { loaded } from '../lib/stores/var';
 
 	let roomModal: any;
 	let roomId: string = "";
@@ -75,14 +76,11 @@
 			roomModal.open();
 		});
 
+
 		return (() => {
-			$client.socket.off("CreateRoomRes");
-			$client.socket.off("JoinRoomRes");
-			$client.socket.off("askFriendNotification");
-			$client.socket.off("JoinQueueError");
-			$client.socket.off("RoomCheckError");
-			$client.socket.off("CreateRoomError");
-			$client.socket.off("MatchFound");
+			$client.socket.off("CreateRoomRes", "JoinRoomRes", "JoinQueueError",
+				"askFriendNotification", "MatchFound", "CreateRoomError",
+				"RoomCheckError");
 		});
 	});
 </script>
@@ -115,5 +113,7 @@
 	<Room itself={roomModal} roomId={roomId}/>
 </Modal>
 
+{#if $loaded}
 <Header />
 <Title title={"TRANSCENDENCE"} enterModal={enterModal}/>
+{/if}

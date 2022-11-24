@@ -172,13 +172,9 @@
 			player2 = data.player2;
 			initPos = (MapSize[gameInfo?.mapSize][0] - PaddleSize[gameInfo?.paddleSize]) / 2;
 
-			console.log("wtf");
+			console.log("sa", player1.pos, initPos);
 			// By default, player1 is on the right side unless user is the player2
 			switchPlace = ($user.username_42 == player2.info.username);
-
-			console.log("shit");
-			
-			console.log("????");
 		});
 
 		$client.socket.on("PlayerUpdate", (data: any) => {
@@ -272,7 +268,7 @@
 			<Paddle pos={(switchPlace) ? player1?.pos : player2?.pos} paddleWidth={PaddleSize[gameInfo.paddleSize]}
 				gameHeight={MapSize[gameInfo.mapSize][1]}
 				switchPlace={switchPlace}
-				playerType={(switchPlace) ? 1 : 2}
+				playerType={(!switchPlace) ? 2 : 1}
 				user={(!switchPlace) ? player2 : player1}
 				initPos={initPos}/>
 			{#if puck}
@@ -282,9 +278,9 @@
 			<Paddle pos={(switchPlace) ? player2?.pos : player1?.pos} paddleWidth={PaddleSize[gameInfo.paddleSize]}
 				gameHeight={MapSize[gameInfo.mapSize][1]}
 				switchPlace={switchPlace}
-				playerType={(switchPlace) ? 2 : 1}
+				playerType={(!switchPlace) ? 1 : 2}
 				user={(switchPlace) ? player2 : player1}
-				initPos={initPos}/>
+				initPos={initPos}/>;
 		</div>
 		<div class="vflex side right">
 			<Player userInfo={(!switchPlace) ? player1 : player2} left={false} host={(hostname == ((!switchPlace) ? player1?.info.username : player2?.info.username))} ready={ready}/>

@@ -1,6 +1,6 @@
 import { Pong } from "./game.Pong"
 import { Puck } from "./game.Puck";
-import {ErrorMessage, uid} from "./game.utils"
+import {ErrorMessage, uid, UserState} from "./game.utils"
 import { DataSource } from "typeorm";
 import { GameEntity } from "src/entity/Game.entity";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -95,6 +95,7 @@ export class Room {
 		// Remove the user from player and client
 		this.clients.delete(client.username);
 		this.players.delete(client.username);
+		client.isAvailable();
 
 		if (this.isStarted) {
 			// If the game has begun, end the game
