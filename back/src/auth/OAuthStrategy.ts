@@ -42,7 +42,7 @@ export class OAuthStrategy extends PassportStrategy(Strategy, "oauth") {
 		const user : any = {
 			login: data.username_42,
 			displayname: data.displayname,
-			image_url: data.image_url,
+			image_url: data.image.link,
 			campus_name: data.campus[0].name,
 			campus_country: data.campus[0].country
 		};
@@ -80,7 +80,7 @@ export class OAuthStrategy extends PassportStrategy(Strategy, "oauth") {
 			new_user.campus_name = data.campus[0].name;
 			new_user.campus_country = data.campus[0].country;
 			new_user.is_42_user = true;
-			new_user.img_url = data.image_url;
+			new_user.img_url = data.image.link;
 			new_user.is_2fa = false;
 			new_user.secret_2fa = authenticator.generateSecret(); //Create a secret for 2FA
 			new_user.otpauthUrl_2fa = authenticator.keyuri(new_user.email, 'Tanscendence', new_user.secret_2fa); //Create a Key URI code for 2FA => QR code
@@ -89,7 +89,7 @@ export class OAuthStrategy extends PassportStrategy(Strategy, "oauth") {
 				return ({username: data.login,
 					username_42 : data.login,
 					displayname: data.displayname,
-					image_url: data.image_url,
+					image_url: data.image.link,
 					campus_name: data.campus[0].name,
 					campus_country: data.campus[0].country,
 					email: data.email
