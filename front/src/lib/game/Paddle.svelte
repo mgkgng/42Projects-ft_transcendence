@@ -20,7 +20,7 @@
 
 	.user {
 		margin: 0;
-		box-shadow: 0px 0px 5px 5px $submain-blue;
+		box-shadow: 0px 0px 5px 5px $red;
 	}
 </style>
 
@@ -29,7 +29,7 @@
 
 	export let user: any;
 	export let playerType: number;
-	export let switchPlace: boolean;
+	export let switched: boolean;
 
 	export let gameHeight : number;
 	export let paddleWidth : number;
@@ -43,7 +43,7 @@
 </script>
 
 <div class="paddle {(playerType == 1) ? "user" : ""} {(!user) ? "absent" : ""}"
-	style="left: {((playerType === 1 && switchPlace) || (playerType === 2 && !switchPlace)) ? PongConfig.DeadZoneHeight : gameHeight - PongConfig.DeadZoneHeight - PongConfig.PaddleHeight}px;
-		top: {((playerType === 1 && switchPlace) || (playerType === 2 && switchPlace)) ? pos - paddleWidth : pos}px;
+	style="left: {((playerType === 1 && switched) || (playerType === 2 && !switched)) ? PongConfig.DeadZoneHeight : gameHeight - PongConfig.DeadZoneHeight - PongConfig.PaddleHeight}px;
+		top: {((playerType === 1 && !switched) || (playerType === 2 && !switched)) ? pos : pos + paddleWidth}px;
 		height: {paddleWidth}px">
 </div>

@@ -191,6 +191,7 @@
 
 		if (userState) {
 			$client.socket.on("OnGoingRes", (data: any) => {
+				console.log("ongoingres", data);
 				userState = UserState.Playing;
 				roomID = data;
 			});

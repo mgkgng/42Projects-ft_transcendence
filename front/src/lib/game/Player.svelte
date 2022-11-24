@@ -12,7 +12,6 @@
 			position: relative; 
 			margin-top: 5px;
 
-
 			img {
 				border-radius: .2em;
 				width: 80px;
@@ -74,7 +73,7 @@
 <script lang="ts">
 	export let player: any;
 	export let left: boolean;
-	export let host: boolean;
+	export let hostname: string;
 	export let ready: boolean;
 
 	console.log("check", player);
@@ -83,7 +82,7 @@
 <div class="vflex player {(left) ? "left" : ""}">
 	{#if player}
 	<div class="img-box">
-		{#if host}
+		{#if player.username == hostname}
 		<span class="host">HOST</span>
 		{:else if ready}
 		<span class="ready">READY</span>

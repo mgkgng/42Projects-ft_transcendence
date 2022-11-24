@@ -125,8 +125,10 @@
 	let player1: any;
 	let player2: any;
 
-	let switchPlace: boolean = false;
+	let switched: boolean = false;
 	
+	$: console.log(switched);
+	$: console.log("player2", player2);
 	onMount(()=> {
 		if (!roomID.length)
 			return ;
@@ -145,13 +147,13 @@
 				UserType.Watcher;
 
 			// By default, player1 is on the right side unless user is the player2
-			switchPlace = ($user.username_42 == player2?.info.username_42);
+			switched = ($user.username == player2?.info.username_42);
 		});
 
 		$client.socket.on("PlayerUpdate", (data: any) => {
 			console.log("PlayerUpdate", data);
 			if (data.join) {
-				player2 = data;
+				player2 = data.player;
 			} else {
 				if (data.username == player1.info.username_42)
 					player1 = undefined;
@@ -162,7 +164,7 @@
 		});
 		
 		$client.socket.on("PaddleUpdate", (data: any) => {
-			if (data.player == player1.info.username && !switchPlace)
+			if (data.player == player1.info.username && !switched)
 				player1.pos = data.pos;
 			else
 				player2.pos = gameInfo.mapSize[0] - data.pos;
@@ -224,6 +226,7 @@
 			$client.removeListeners("RoomInfo", "PlayerUpdate", "PaddleUpdate",
 				"LoadBall", "PongStart", "PuckHit", "ScoreUpdate",
 				"ReadyUpdate", "GameFinished", "GameStartFail", "GameStart");
+			$client.socket.emit("CheckOnGoing");
 		});
 	});
 
@@ -233,30 +236,30 @@
 <div class="container">
 	<div class="flex pong" style="width: {MapSize[gameInfo.mapSize][1] + 200}px; height: {MapSize[gameInfo.mapSize][0]}px;">
 		<div class="vflex side">
-			<Player player={(!switchPlace) ? player2 : player1} left={true} host={(hostname == ((!switchPlace) ? player2?.info.username : player1?.info.username))} ready={ready}/>	
-			<h1>{(!switchPlace) ? player1.score : player2.score}</h1>
+			<Player player={(!switched) ? player2 : player1} left={true} hostname={hostname} ready={ready}/>	
+			<h1>{(!switched && player2) ? player2.score : (!switched && !player2) ? "0" : player1?.score}</h1>
 		</div>
 		<div class="pong-game" style="min-width: {MapSize[gameInfo.mapSize][1]}px; min-height: {MapSize[gameInfo.mapSize][0]}px;">
-			<Paddle pos={(switchPlace) ? player1?.pos : player2?.pos} paddleWidth={PaddleSize[gameInfo.paddleSize]}
+			<Paddle pos={(!switched) ? player2?.pos : player1?.pos} paddleWidth={PaddleSize[gameInfo.paddleSize]}
 				gameHeight={MapSize[gameInfo.mapSize][1]}
-				switchPlace={switchPlace}
-				playerType={(!switchPlace) ? 2 : 1}
-				user={(!switchPlace) ? player2 : player1}
+				switched={switched}
+				playerType={(!switched) ? 2 : 1}
+				user={(!switched) ? player2 : player1}
 				initPos={initPos}/>
 			{#if puck}
-			<PPuck pos={[(!switchPlace) ? MapSize[gameInfo.mapSize][0] - puck.pos[0] : puck.pos[0],
-				(!switchPlace) ? MapSize[gameInfo.mapSize][1] - puck.pos[1] : puck.pos[1]]} />
+			<PPuck pos={[(!switched) ? MapSize[gameInfo.mapSize][0] - puck.pos[0] : puck.pos[0],
+				(!switched) ? MapSize[gameInfo.mapSize][1] - puck.pos[1] : puck.pos[1]]} />
 			{/if}
-			<Paddle pos={(switchPlace) ? player2?.pos : player1?.pos} paddleWidth={PaddleSize[gameInfo.paddleSize]}
+			<Paddle pos={(!switched) ? player1?.pos : player2?.pos} paddleWidth={PaddleSize[gameInfo.paddleSize]}
 				gameHeight={MapSize[gameInfo.mapSize][1]}
-				switchPlace={switchPlace}
-				playerType={(!switchPlace) ? 1 : 2}
-				user={(switchPlace) ? player2 : player1}
+				switched={switched}
+				playerType={(!switched) ? 1 : 2}
+				user={(!switched) ? player1 : player2}
 				initPos={initPos}/>;
 		</div>
 		<div class="vflex side right">
-			<Player player={(!switchPlace) ? player1 : player2} left={false} host={(hostname == ((!switchPlace) ? player1?.info.username : player2?.info.username))} ready={ready}/>
-			<h1>{(!switchPlace) ? player1.score : player2.score}</h1>
+			<Player player={(!switched) ? player1 : player2} left={false} hostname={hostname} ready={ready}/>
+			<h1>{(!switched) ? player1?.score : (player2) ? player2.score : "0"}</h1>
 		</div>
 	</div>
 	<div class="button-container">
@@ -295,7 +298,7 @@
 {/if}
 
 <Modal bind:this={gameFinishedModal} closeOnBgClick={true}>
-	<GameOver winner={winner} gameModal={itself} itself={gameFinishedModal} scores={[player1.score, player2.score]}/>
+	<GameOver winner={winner} gameModal={itself} itself={gameFinishedModal} scores={[player1?.score, player2?.score]}/>
 </Modal>
 
 <Modal bind:this={quitConfirmMsgModal} closeOnBgClick={false}>
@@ -315,7 +318,7 @@
 
 		$client.socket.emit("PaddleMove", {
 			room: roomID,
-			left: ((userType == UserType.Player1 && !switchPlace) && event.code == 'KeyD'
+			left: ((userType == UserType.Player1 && !switched) && event.code == 'KeyD'
 				|| userType == UserType.Player2 && event.code == 'KeyA')
 		});
 	}}

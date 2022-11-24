@@ -110,6 +110,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			let [target1, target2] = [this.clients.get(this.queue[0][0]), this.clients.get(this.queue[1][0])];
 			let [player1, player2] = [this.getPlayerInfo(target1.username), this.getPlayerInfo(target2.username)];
 			let gameInfo = { title: "", mapSize: getRandomInt(3), maxPoint: 10, puckSpeed: getRandomInt(3), paddleSize: getRandomInt(3), isPrivate: true }
+			console.log("targets", target1, target2);
+			console.log("players", player1, player2);
 			let room = new Room([player1, player2], [target1, target2], gameInfo, undefined, this.gameRep, this.mainServerService, this.dataSource, this.userService);
 			this.rooms.set(room.id, room);
 		
@@ -268,9 +270,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			// broadcast to the users in the room that there is a new player then add player in the room
 			const newPlayer = await this.getPlayerInfo(target.username);
 			room.broadcast("PlayerUpdate", {
-				info: newPlayer,
-				score: 0,
-				pos: (MapSize[room.gameInfo.mapSize][0] - PaddleSize[room.gameInfo.paddleSize]) / 2
+				join: true,
+				player: {
+					info: newPlayer,
+					score: 0,
+					pos: (MapSize[room.gameInfo.mapSize][0] - PaddleSize[room.gameInfo.paddleSize]) / 2
+				}
 			});
 			target.isPlaying(room.id);
 			room.playerJoin(newPlayer, target);
