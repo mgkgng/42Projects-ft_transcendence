@@ -1,31 +1,23 @@
+import { PongConfig } from "$lib/stores/var";
+
 export class Puck {
-	posX: number;
-	posY: number;
-	vectorX: number;
-	vectorY: number;
-	gameWidth: number;
-	gameHeight: number;
+	pos: Array<number>;
+	vec: Array<number>;
+	mapSize: Array<number>;
 
-	constructor(gameWidth : number, gameHeight : number, vectorX : number = 0, vectorY : number = 1) { // temporary test
-		this.vectorX = vectorX;
-		this.vectorY = vectorY;
-		this.gameWidth = gameWidth;
-		this.gameHeight = gameHeight;
-		this.posX = gameWidth / 2;
-		this.posY = gameHeight / 2;
+	constructor(vec: Array<number>, pos: Array<number>, mapSize: Array<number>) {
+		this.vec = vec;
+		this.pos = pos;
+		this.mapSize = mapSize;
 	}
 
-	// this is the callBack function 
 	move() {
-		if (this.posX < 0 || this.posX > this.gameWidth - 30) //puck size counted
-		this.vectorX *= -1;
+		// If the puck has hit the wall, change the direction on X vector
+		if (this.pos[0] < 0 || this.pos[0] > this.mapSize[0] - PongConfig.PuckSize) //puck size counted
+			this.vec[0] *= -1;
 
-		this.posX += this.vectorX;
-		this.posY += this.vectorY;
-	}
-
-	getHit(vectorX: number, vectorY: number) {
-		this.vectorX = vectorX;
-		this.vectorY = vectorY;
+		// Move
+		this.pos[0] += this.vec[0];
+		this.pos[1] += this.vec[1];
 	}
 }

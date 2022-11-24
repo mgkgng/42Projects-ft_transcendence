@@ -4,7 +4,6 @@ export class Player {
 	username: string;
 	info: any;
 	isHost: boolean;
-	paddle: Paddle;
 	score: number;
 	index: number;
 	control: Array<any>;

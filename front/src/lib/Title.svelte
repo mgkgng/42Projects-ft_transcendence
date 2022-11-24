@@ -125,28 +125,29 @@
 
 <script lang="ts">
 	import { onMount } from "svelte";
-    import { loginState } from "$lib/stores/var";
+    import { login, loaded } from "$lib/stores/var";
     import { goto } from "$app/navigation";
 	import MainCircle from '$lib/MainCircle.svelte';
+    import { client } from "./stores/client";
+    import { UserState } from "./stores/user";
  
+	let userState: any;
+
 	type Circle = {
 		size: number;
 		duration: number;
 		angle: number;
 	};
 
+	export let roomModal: any;
 	export let enterModal: any;
-
 	export let title: string;
+	export let roomID: string;
 
 	let circlesAround: Array<Circle> = [];
 	let circleRadius = 250;
 
 	let blues: Array<Circle> = [];
-
-	let message = "";
-
-	let login: boolean;
 
 	function createCircles() {
 		let res = [];
@@ -180,10 +181,26 @@
 	}
 
 	onMount(() => {
-		loginState.subscribe(value => { login = value; })
-
 		circlesAround = createCircles();
 		blues = createBlueCircles();
+
+		if (!$loaded)
+			return ;
+
+		userState = +$login;
+
+		if (userState) {
+			$client.socket.on("OnGoingRes", (data: any) => {
+				userState = UserState.Playing;
+				roomID = data;
+			});
+	
+			$client.socket.emit("CheckOnGoing");
+		}
+		
+		return (() => {
+			$client.socket.off("OnGoingRes");
+		})
 	});
 
 </script>
@@ -199,15 +216,21 @@
 	<div class="circle-around" style="--dist: {circleRadius + 85}px; --size: {circleInfo.size}px; --duration: {circleInfo.duration}s; --angle: {circleInfo.angle}deg; --angle2: {circleInfo.angle + 360}deg"></div>
 	{/each}
 
+	{#if userState !== undefined}
 	<div class="click-bg"></div>
-	{#if !login}
-	<button on:click={() => {
-		goto("https://api.intra.42.fr/oauth/authorize?client_id=7e2bea32b8d407dab9d25b1ab4ff8ec14118a99e50807a191bc47334ed598658&redirect_uri=http%3A%2F%2Flocalhost%3A3002&response_type=code");
-	}}>Login</button>
-	{:else}
-	<button on:click={() => {
-		enterModal.open();
-	}}>Enter</button>
+		{#if !$login}
+		<button on:click={() => {
+			goto("https://api.intra.42.fr/oauth/authorize?client_id=7e2bea32b8d407dab9d25b1ab4ff8ec14118a99e50807a191bc47334ed598658&redirect_uri=http%3A%2F%2Flocalhost%3A3002&response_type=code");
+		}}>Login</button>
+		{:else if userState == UserState.Playing}
+		<button on:click={() => {
+			roomModal.open();
+		}}>Back to Game</button>
+		{:else}
+		<button on:click={() => {
+			enterModal.open();
+		}}>Enter</button>
+		{/if}
 	{/if}
 	<h1 class="title">{title}</h1>
 </div>

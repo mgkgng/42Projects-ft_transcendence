@@ -227,20 +227,21 @@
 	export let itself: any;
 	export let enterGameModal: any;
 
-	let rooms: Map<string, any> = new Map();
-	let roomArray: Array<any>;
+	let rooms: Array<any> = [];
+	let roomArray: Array<any> = [];
+	let roomsOnPage: Array<any> = [];
 	let showAvailable: boolean = true;
-	let showGrid: boolean = false;
 	let roomPage: number = 0;
 	let perPage: number = 3;
 
 	let roomListReqs: any;
 
-	$: roomArray = (showAvailable) ? [...rooms?.values()].filter(room => room.available == true)
-		: [...rooms.values()];
+	$: roomArray = (showAvailable) ? rooms?.filter(room => room.players.length < 2) : rooms;
 	$: roomsOnPage = roomArray?.slice(roomPage * perPage, roomPage * perPage + perPage);
 	$: roomPageNb = Math.ceil(roomArray?.length / perPage);
-	$: console.log(roomsOnPage);
+	$: console.log("rooms", rooms)
+	$: console.log("Array: ", roomArray)
+	$: console.log("onpage:", roomsOnPage);
 
 	function movePage(left: boolean){
 		if (left && (roomPage - 1) * perPage >= 0)
@@ -249,9 +250,9 @@
 			roomPage++;
 	}
 
-	function joinRoom(roomId: string, playMode: boolean) {
+	function joinRoom(roomID: string, playMode: boolean) {
 		$client.socket.emit("JoinRoom", {
-			roomId: roomId,
+			roomID: roomID,
 			play: playMode
 		})
 	}
@@ -268,8 +269,7 @@
 
 	onMount(() => {
 		$client.socket.on("RoomListRes", (data: any) => {
-			console.log("GetAllRooms");
-			roomArray = data.rooms;
+			rooms = data;
 		});
 
 		refresh();

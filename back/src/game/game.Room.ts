@@ -1,6 +1,6 @@
-import {Pong} from "./game.Pong"
-import {GameGateway} from "./game.gateway"
-import {ErrorMessage, uid} from "./game.utils"
+import { Pong } from "./game.Pong"
+import { Puck } from "./game.Puck";
+import {ErrorMessage, uid, UserState} from "./game.utils"
 import { DataSource } from "typeorm";
 import { GameEntity } from "src/entity/Game.entity";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -10,7 +10,6 @@ import { UserService } from "src/user/user.service";
 import { MapSize, PaddleSize, PuckSpeed } from "./game.utils";
 import { Client } from "./game.Client";
 import { Player } from "./game.Player";
-
 
 export class Room {
 	/* RoomInfo */
@@ -32,6 +31,7 @@ export class Room {
 
 	/* Users */
 	players: Map<string, Player>;
+	playerIndex: Array<string>;
 	clients: Map<string, Client>;
 		
 	constructor(playersInfo: Array<any>, clients: Array<any>, gameInfo: any, hostname: string = "",
@@ -51,14 +51,15 @@ export class Room {
 		this.isPrivate = gameInfo.privateMode;
 
 		/* Game */
-		this.pong = new Pong(MapSize[gameInfo.mapSize], PuckSpeed[gameInfo.puckSpeed], PaddleSize[gameInfo.paddleSize]);
+		this.pong = new Pong(MapSize[gameInfo.mapSize], PaddleSize[gameInfo.paddleSize]);
 		
 		/* Users */
-		this.players = new Map<string, Player>();
+		this.players = new Map();
+		this.clients = new Map<string, Client>();
+		this.playerIndex = [playersInfo[0].username_42, (playersInfo.length > 1) ? playersInfo[1].username_42 : undefined];
 		this.players.set(playersInfo[0].username_42, new Player(playersInfo[0], (hostname == playersInfo[0].usename_42) ? true : false, 0));
 		if (playersInfo.length > 1)
 			this.players.set(playersInfo[1].username_42, new Player(playersInfo[1], (hostname == playersInfo[1].usename_42) ? true : false, 1));
-		this.clients = new Map<string, Client>();
 		this.addClients(clients);
 
 		// Start game if it is a random match
@@ -88,12 +89,17 @@ export class Room {
 		this.players.set(client.username, new Player(playerInfo, false, 1));
 		this.addClient(client);
 		this.isAvailable = false;
+		client.broadcast("JoinRoomRes", {
+			allowed: true,
+			roomID: this.id
+		})
 	}
 
 	playerExit(client: Client) {
 		// Remove the user from player and client
 		this.clients.delete(client.username);
 		this.players.delete(client.username);
+		client.isAvailable();
 
 		if (this.isStarted) {
 			// If the game has begun, end the game
@@ -121,18 +127,16 @@ export class Room {
 	// need static because used often with setTimeOut() func
 	// sent by setTimeOut(), 'this' is initialised by timeOut class
 	static startPong(room: any) {
-		if (!room)
-			return ;
+		// Create the puck and broadcast its information
+		room.pong.puck = new Puck(room.gameInfo.mapSize, room.gameInfo.puckSpeed);
 
 		room.broadcast("LoadBall", {
-			vectorX: room.pong.puck.vectorX,
-			vectorY: room.pong.puck.vectorY,
-			posX: room.pong.puck.posX,
-			posY: room.pong.puck.posY
+			vec: room.pong.puck.vec,
+			pos: room.pong.puck.pos,
 		});
 		
 		setTimeout(() => {
-			room.broadcast("PongStart", { undefined });
+			room.broadcast("PongStart");
 			room.pong.puck.setCheckPuck(room);
 		}, 2000);
 	}

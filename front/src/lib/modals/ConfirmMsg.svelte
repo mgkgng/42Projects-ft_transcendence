@@ -40,7 +40,7 @@
 
 	export let msg: string;
 	export let toQuit: any;
-	export let roomId: string;
+	export let roomID: string;
 	export let itself: any;
 </script>
 
@@ -51,7 +51,7 @@
 			itself.close();
 		}}>Cancel</button>
 		<button class="quit" on:click={()=>{
-			$client.socket.emit("ExitRoom", { roomId: roomId });
+			$client.socket.emit("ExitRoom", { roomID: roomID });
 			toQuit.close();
 		}}>Quit</button>
 	</div>

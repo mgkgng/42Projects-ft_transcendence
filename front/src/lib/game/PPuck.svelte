@@ -13,10 +13,9 @@
 </style>
 
 <script lang="ts">
-	export let posX: number;
-	export let posY: number;
+	export let pos: Array<number>;
 </script>
 
 <div class="puck"
-	style="top: {posX}px; left: {posY}px;">
+	style="top: {pos[0]}px; left: {pos[1]}px;">
 </div>
