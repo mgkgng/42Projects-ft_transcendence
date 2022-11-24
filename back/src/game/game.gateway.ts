@@ -227,7 +227,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				gameInfo: room.gameInfo
 			});
 		}
-		client.emit("RoomListRes", { rooms: allRooms });
+		client.emit("RoomListRes", allRooms);
 	}
 
 	@SubscribeMessage("CreateRoom")
