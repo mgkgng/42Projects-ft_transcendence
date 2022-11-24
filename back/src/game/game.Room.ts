@@ -129,7 +129,7 @@ export class Room {
 	static startPong(room: any) {
 		// Create the puck and broadcast its information
 		room.pong.puck = new Puck(MapSize[room.gameInfo.mapSize], room.gameInfo.puckSpeed);
-
+		console.log("pongpuck", room.pong.puck);
 		room.broadcast("LoadBall", {
 			vec: room.pong.puck.vec,
 			pos: room.pong.puck.pos,

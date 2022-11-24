@@ -151,8 +151,6 @@
 
 	let switchPlace: boolean = false;
 
-	$:console.log("mounted?", roomFound, gameInfo);
-
 	onMount(()=> {
 		if (!roomID.length)
 			return ;
@@ -196,11 +194,12 @@
 		});
 
 		$client.socket.on("LoadBall", (data: any) => {
-			console.log("LoadBall");
+			console.log("LoadBall", data);
 			puck = new Puck(data.vec, data.pos, MapSize[gameInfo.mapSize]);
 		});
 
 		$client.socket.on("PongStart", () => {
+			console.log("PongStart");
 			puckMoving = setInterval(() => {
 				puck.move();
 				puck = puck;
@@ -245,6 +244,8 @@
 		});
 
 		return (() => {
+			if (puckMoving)
+				clearInterval(puckMoving);
 			$client.removeListeners("RoomInfo", "PlayerUpdate", "PaddleUpdate",
 				"LoadBall", "PongStart", "PuckHit", "ScoreUpdate",
 				"ReadyUpdate", "GameFinished", "GameStartFail", "GameStart");
