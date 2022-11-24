@@ -115,5 +115,5 @@
 
 {#if $loaded}
 <Header />
-<Title title={"TRANSCENDENCE"} enterModal={enterModal}/>
+<Title title={"TRANSCENDENCE"} enterModal={enterModal} roomModal={roomModal} bind:roomID={roomId}/>
 {/if}

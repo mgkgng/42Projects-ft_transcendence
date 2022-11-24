@@ -141,8 +141,10 @@
 		angle: number;
 	};
 
+	export let roomModal: any;
 	export let enterModal: any;
 	export let title: string;
+	export let roomID: string;
 
 	let circlesAround: Array<Circle> = [];
 	let circleRadius = 250;
@@ -186,12 +188,15 @@
 
 		if (!$loaded)
 			return ;
-			
+
 		userState = +$login;
 
 		if (userState) {
-			$client.socket.on("OnGoingRes", (res: boolean) => {
-				userState = (res) ? UserState.Playing : UserState.Connected;
+			console.log("hello?");
+			$client.socket.on("OnGoingRes", (data: any) => {
+				console.log("OnGoingTest");
+				userState = UserState.Playing;
+				roomID = data;
 			});
 	
 			$client.socket.emit("CheckOnGoing");
@@ -221,6 +226,10 @@
 		<button on:click={() => {
 			goto("https://api.intra.42.fr/oauth/authorize?client_id=7e2bea32b8d407dab9d25b1ab4ff8ec14118a99e50807a191bc47334ed598658&redirect_uri=http%3A%2F%2Flocalhost%3A3002&response_type=code");
 		}}>Login</button>
+		{:else if userState == UserState.Playing}
+		<button on:click={() => {
+			roomModal.open();
+		}}>Join Room</button>
 		{:else}
 		<button on:click={() => {
 			enterModal.open();

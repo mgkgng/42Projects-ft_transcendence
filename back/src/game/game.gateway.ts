@@ -74,8 +74,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			let target = this.clients.get(userInfo.username_42);
 			target.sockets.set(client.id, client);
 			// Send user the room id if the user is in an on-going game
-			if (target.state == UserState.Playing)
-				client.emit("GameOnGoing", target.room);
 		}
 	}
 
@@ -85,9 +83,18 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		target.sockets.delete(client.id);
 
 		// destory the instance if the client is no more connected
-		if (!target.sockets.size)
-			this.clients.delete(target.username);
+		// if (!target.sockets.size)
+		// 	this.clients.delete(target.username);
     }
+
+	@SubscribeMessage("CheckOnGoing")
+	checkOnGoing(@ConnectedSocket() client: Socket, @Request() req) {
+		console.log("received");
+		let target = this.getClient(req);
+		console.log(target);
+		if (target.state == UserState.Playing)
+				client.emit("OnGoingRes", target.room);
+	}
 
 	@SubscribeMessage("JoinQueue")
 	async joinQueue(@ConnectedSocket() client: Socket, @Request() req) {
@@ -242,6 +249,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			this.gameRep, this.mainServerService, this.dataSource, this.userService);
 		this.rooms.set(room.id, room);
 		target.isPlaying(room.id);
+		console.log("created", target);
 
 		// Invite the user to the room
 		target.broadcast("CreateRoomRes", room.id);
