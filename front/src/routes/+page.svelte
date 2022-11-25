@@ -1,7 +1,7 @@
 <script lang="ts">
 	import '$lib/stores/client';
 	import '$lib/scss/app.scss';
-	import Title from "$lib/Title.svelte";
+	import Title from "$lib/home/Title.svelte";
 	import { client } from "$lib/stores/client";
     import { onMount } from "svelte";
     import { browser } from "$app/environment";
