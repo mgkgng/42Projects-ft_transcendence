@@ -13,7 +13,7 @@ export class Puck {
 			puckSpeed * ((Math.floor(Math.random() * 2)) ? 1 : -1)];
 		this.mapSize = mapSize;
 		this.pos = [mapSize[0] / 2, mapSize[1] / 2];
-	}
+	} 
 
 	setCheckPuck(room: any) {
 		let distToDeath = (this.vec[1] > 0)
