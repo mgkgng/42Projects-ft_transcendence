@@ -69,7 +69,10 @@
 						width: 8px;
 						height: 8px;
 						border-radius: 50%;
+						background-color: $grey;
 					}
+					.online { background-color: $green; }
+					.playing { background-color: $red; }
 
 					&:hover { background-color: transparentize($main-dark, .7); }
 				}
@@ -171,7 +174,9 @@
 			console.log(data);
 		});
 
-		$client.socket.on("success_getUserinDB", (data: any) => { userSearchList = data.users; });
+		$client.socket.on("success_getUserinDB", (data: any) => {
+			console.log(data);
+			userSearchList = data.users; });
 		$client.socket.on("error_getUserinDB", (data: any) => { userSearchList = []; });
 
 		$client.socket.on("resUserProfile", (data: any) => {
@@ -203,7 +208,7 @@
 				}}>
 					<img src="{user.img_url}" alt="user">
 					<div class="user">{user.username}</div>
-					<div class="status" style="background-color: {(user.status == "online") ? "$green" : (user.status == "in game") ? "$red" : "grey"}"></div>
+					<div class="status {(user.status == "online") ? "online" : (user.status == "in game") ? "playing" : ""}"></div>
 				</div>
 				{/each}
 				{:else if searchUser.length && !userSearchList.length}
