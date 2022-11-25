@@ -120,7 +120,25 @@
 	let changeUsernameModal: any;
 	let confirmLeaveModal: any;
 
+		// chatRoom.subscribe(value => {	username = value.username_search;	});
+	// client.subscribe(value => {	local_username = value.username; });
+
+	// function changeUsername()
+	// {
+	// 	new_username = prompt("Enter new username");
+	// 	$client.socket.emit("change_username", { new_username: new_username });
+	// }
+	// function active2FA()
+	// {
+	// 	$client.socket.emit("active_double_auth");
+	// }
+	// function disable2FA()
+	// {
+	// 	$client.socket.emit("disable_double_auth");
+	// }
 	onMount(() => {
+
+		
 
 		// 	$client.socket.on("active_double_auth", (data) => {
 		// 		user_info.is_2fa = true; 
