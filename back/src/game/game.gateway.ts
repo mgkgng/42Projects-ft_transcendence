@@ -80,6 +80,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	public handleDisconnect(client: any): void {
 		// Get rid of socket from the client instance
 		let target = this.getClient(client);
+		if (!target)
+			return ;
 		target.sockets.delete(client.id);
     }
 
@@ -106,12 +108,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		// Game distribution
 		if (this.queue.length > 1) {
 			// create a random room for two players
-			console.log(this.queue);
 			let [target1, target2] = [this.clients.get(this.queue[0][0]), this.clients.get(this.queue[1][0])];
 			let [player1, player2] = [await this.getPlayerInfo(target1.username), await this.getPlayerInfo(target2.username)];
 			let gameInfo = { title: "", mapSize: getRandomInt(3), maxPoint: 10, puckSpeed: getRandomInt(3), paddleSize: getRandomInt(3), isPrivate: true }
-			console.log("targets", target1, target2);
-			console.log("players", player1, player2);
 			let room = new Room([player1, player2], [target1, target2], gameInfo, undefined, 
 				this,
 				this.gameRep, this.mainServerService, this.dataSource, this.userService);
@@ -299,15 +298,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			return ;
 	
 		// Check if the user is one of the players
-		if (room.players.has(target.username)) {
-			let res = room.playerExit(target);
-			// Destroy the room if the game is finished or there is no more player left.
-			// if (!res)
-			// 	this.rooms.delete(room.id);
-		} else {
-			// if the user is a watcher, remove the user from clients of the room
+		if (room.players.has(target.username)) 
+			room.playerExit(target);
+		else // if the user is a watcher, remove the user from clients of the room
 			room.clients.delete(target.username);
-		}
 	}
 
 	@SubscribeMessage("isReady")
@@ -338,6 +332,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 
 		// Start game and broadcast
+		room.isStarted = true;
 		room.startPong();
 		room.broadcast("GameStart", undefined);
 	}
