@@ -216,9 +216,6 @@
 	import { onMount } from "svelte";
 	import { client } from "$lib/stores/client";
     import { user } from "$lib/stores/user";
-    import Modal from "$lib/tools/Modal.svelte";
-	import Message from "$lib/modals/Message.svelte";
-	import { RoomUpdate } from "$lib/stores/var";
 
 	// TODO automatic requests
 	// TODO grey button for host when the room is yet empty
@@ -297,7 +294,7 @@
 		{#each roomsOnPage as room}
 		<div class="vflex room-card">
 			<div class="title">
-				{room.title}
+				{room.gameInfo.title}
 			</div>
 			<div class="flex players">
 				<img src={room.players[0].img_url} alt="player1" />
@@ -320,7 +317,6 @@
 		</div>
 		{/each}
 		{/if}
-		<!-- if less than perPage, gray card -->
 	</div>
 	<div class="flex page">
 		<button on:click={()=>movePage(true)}>&lt;</button>

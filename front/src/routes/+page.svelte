@@ -45,15 +45,9 @@
 		});
 
 		$client.socket.on("JoinRoomRes", (data: any) => {
-			console.log('JoinRes', data);
-			if (data.allowed) {
-				roomID = data.roomID;
-				joinGameModal.close();
-				roomModal.open();
-			} else {
-				modalMessage = "You cannot enter this room";
-				messageModal.open();
-			}
+			roomID = data;
+			joinGameModal.close();
+			roomModal.open();
 		});
 
 		$client.socket.on("askFriendNotification", (data: any) => {
