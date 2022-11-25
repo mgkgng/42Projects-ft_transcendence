@@ -1,7 +1,7 @@
 <script lang="ts">
 	import '$lib/stores/client';
 	import '$lib/scss/app.scss';
-	import Title from "$lib/Title.svelte";
+	import Title from "$lib/home/Title.svelte";
 	import { client } from "$lib/stores/client";
     import { onMount } from "svelte";
     import { browser } from "$app/environment";
@@ -45,15 +45,9 @@
 		});
 
 		$client.socket.on("JoinRoomRes", (data: any) => {
-			console.log('JoinRes', data);
-			if (data.allowed) {
-				roomID = data.roomID;
-				joinGameModal.close();
-				roomModal.open();
-			} else {
-				modalMessage = "You cannot enter this room";
-				messageModal.open();
-			}
+			roomID = data;
+			joinGameModal.close();
+			roomModal.open();
 		});
 
 		$client.socket.on("askFriendNotification", (data: any) => {

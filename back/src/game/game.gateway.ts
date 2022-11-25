@@ -60,7 +60,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		client.emit("GetConnectionInfo", {
 			user: {		
 				username: user_db.username,
-				displayname: user_db.display_name,
+				displayname: user_db.displayname,
 				img_url: user_db.img_url,
 				campus_name: user_db.campus_name,
 				campus_country: user_db.campus_country
@@ -112,7 +112,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			let gameInfo = { title: "", mapSize: getRandomInt(3), maxPoint: 10, puckSpeed: getRandomInt(3), paddleSize: getRandomInt(3), isPrivate: true }
 			console.log("targets", target1, target2);
 			console.log("players", player1, player2);
-			let room = new Room([player1, player2], [target1, target2], gameInfo, undefined, this.gameRep, this.mainServerService, this.dataSource, this.userService);
+			let room = new Room([player1, player2], [target1, target2], gameInfo, undefined, 
+				this,
+				this.gameRep, this.mainServerService, this.dataSource, this.userService);
 			this.rooms.set(room.id, room);
 		
 			// Switch their state into playing then get rid of them from the queue
@@ -242,6 +244,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		// Get the player's info and create the room with the data
 		let player = await this.getPlayerInfo(target.username);
 		let room = new Room([player], [target], data, target.username,
+			this,
 			this.gameRep, this.mainServerService, this.dataSource, this.userService);
 		this.rooms.set(room.id, room);
 		target.isPlaying(room.id);
@@ -299,8 +302,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		if (room.players.has(target.username)) {
 			let res = room.playerExit(target);
 			// Destroy the room if the game is finished or there is no more player left.
-			if (!res)
-				this.rooms.delete(room.id);
+			// if (!res)
+			// 	this.rooms.delete(room.id);
 		} else {
 			// if the user is a watcher, remove the user from clients of the room
 			room.clients.delete(target.username);
@@ -367,7 +370,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				((cast(sum(games.is_winner) as float) / count(games.is_winner)) * 100) as win_rate, \
 				min(user_entity.username) as username, min(user_entity.campus_name) as campus_name, \
 				min(user_entity.campus_country) as campus_country, min(user_entity.img_url) as img_url, \
-				min(user_entity.display_name) as displayname \
+				min(user_entity.displayname) as displayname \
 				FROM ( \
 					SELECT \"player1IdG\" as id_player, (CASE WHEN player1_score > player2_score THEN 1 ELSE 0 END) as is_winner FROM game_entity as game1 \
 						UNION \
@@ -395,7 +398,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		return ({
 			username: userdata.username,
 			username_42: userdata.username_42,
-			displayname: userdata.display_name,
+			displayname: userdata.displayname,
 			img_url: userdata.img_url,
 			campus_name: userdata.campus_name,
 			campus_country: userdata.campus_country,

@@ -127,9 +127,9 @@
 	import { onMount } from "svelte";
     import { login, loaded } from "$lib/stores/var";
     import { goto } from "$app/navigation";
-	import MainCircle from '$lib/MainCircle.svelte';
-    import { client } from "./stores/client";
-    import { UserState } from "./stores/user";
+	import MainCircle from '$lib/home/MainCircle.svelte';
+    import { client } from "$lib/stores/client";
+    import { UserState } from "$lib/stores/user";
  
 	let userState: any;
 
@@ -177,7 +177,6 @@
 			res.push(circle);
 		}
 		return (res)
-
 	}
 
 	onMount(() => {

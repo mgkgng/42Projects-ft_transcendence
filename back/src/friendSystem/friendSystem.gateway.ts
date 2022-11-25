@@ -62,7 +62,7 @@ export class friendSystemGateway {
 		const id_user = await this.mainServerService.getIdUserByUsername(data.username);
 		const res = await this.dataSource.getRepository(UserEntity).createQueryBuilder("user")
 					.where("id_g = :id", {id : id_user})
-					.select(["user.email", "user.username", "user.img", "user.img_url", "user.display_name", "user.campus_name", "user.campus_country", "user.is_2fa", "user.otpauthUrl_2fa" ]).getOne();
+					.select(["user.email", "user.username", "user.img", "user.img_url", "user.displayname", "user.campus_name", "user.campus_country", "user.is_2fa", "user.otpauthUrl_2fa" ]).getOne();
 		client.emit("resUserProfile", res)
 	}
 

@@ -96,7 +96,8 @@
     import ConfirmMsg from '$lib/modals/ConfirmMsg.svelte';
     import { user } from '$lib/stores/user';
     import Player from '$lib/game/Player.svelte';
-
+	//TODO room title front
+	//TODO room watch number front-back
 
 	export let roomID: string;
 	export let itself: any;	
@@ -168,10 +169,7 @@
 				player2.pos = data.pos;
 		});
 
-		$client.socket.on("LoadBall", (data: any) => {
-			console.log("LoadBall", data);
-			puck = new Puck(data.vec, data.pos, MapSize[gameInfo.mapSize]);
-		});
+		$client.socket.on("LoadBall", (data: any) => { puck = new Puck(data.vec, data.pos, MapSize[gameInfo.mapSize]); });
 
 		$client.socket.on("PongStart", () => {
 			console.log("PongStart");
@@ -181,14 +179,9 @@
 			}, 20);
 		});
 
-		$client.socket.on("PuckHit", (data: any) => {
-			console.log("PuckHit");
-			puck.vec[1] *= -1;
-		});
+		$client.socket.on("PuckHit", (data: any) => { puck.vec[1] *= -1; });
 
 		$client.socket.on("ScoreUpdate", (data: any) => {
-			console.log("ScoreUpdate", data);
-
 			// Destroy puck
 			clearInterval(puckMoving);
 			puck = undefined;
@@ -200,9 +193,7 @@
 				player2.score++;
 		});
 
-		$client.socket.on("ReadyUpdate", (data: any) => {
-			ready = data;
-		});
+		$client.socket.on("ReadyUpdate", (data: any) => { ready = data; });
 
 		$client.socket.on("GameFinished", (data: any) => {
 			if (puckMoving)
@@ -297,8 +288,8 @@
 </div>
 {/if}
 
-<Modal bind:this={gameFinishedModal} closeOnBgClick={true}>
-	<GameOver winner={winner} gameModal={itself} itself={gameFinishedModal} scores={[player1?.score, player2?.score]}/>
+<Modal bind:this={gameFinishedModal} closeOnBgClick={false}>
+	<GameOver winner={(winner == player1.username) ? player1 : player2} gameModal={itself} itself={gameFinishedModal} scores={[player1?.score, player2?.score]}/>
 </Modal>
 
 <Modal bind:this={quitConfirmMsgModal} closeOnBgClick={false}>
