@@ -60,7 +60,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		client.emit("GetConnectionInfo", {
 			user: {		
 				username: user_db.username,
-				displayname: user_db.display_name,
+				displayname: user_db.displayname,
 				img_url: user_db.img_url,
 				campus_name: user_db.campus_name,
 				campus_country: user_db.campus_country
@@ -367,7 +367,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				((cast(sum(games.is_winner) as float) / count(games.is_winner)) * 100) as win_rate, \
 				min(user_entity.username) as username, min(user_entity.campus_name) as campus_name, \
 				min(user_entity.campus_country) as campus_country, min(user_entity.img_url) as img_url, \
-				min(user_entity.display_name) as displayname \
+				min(user_entity.displayname) as displayname \
 				FROM ( \
 					SELECT \"player1IdG\" as id_player, (CASE WHEN player1_score > player2_score THEN 1 ELSE 0 END) as is_winner FROM game_entity as game1 \
 						UNION \
@@ -395,7 +395,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		return ({
 			username: userdata.username,
 			username_42: userdata.username_42,
-			displayname: userdata.display_name,
+			displayname: userdata.displayname,
 			img_url: userdata.img_url,
 			campus_name: userdata.campus_name,
 			campus_country: userdata.campus_country,

@@ -47,7 +47,7 @@ export class UserEntity
 	password: string;
 
 	@Column()
-	display_name:string;
+	displayname:string;
 
 	@Column()
 	campus_name: string;

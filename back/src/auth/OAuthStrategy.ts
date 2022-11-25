@@ -76,7 +76,7 @@ export class OAuthStrategy extends PassportStrategy(Strategy, "oauth") {
 			new_user.username_42 = user.login;
 			new_user.email = data.email;
 			new_user.password = "42"; 
-			new_user.display_name = data.displayname;
+			new_user.displayname = data.displayname;
 			new_user.campus_name = data.campus[0].name;
 			new_user.campus_country = data.campus[0].country;
 			new_user.is_42_user = true;

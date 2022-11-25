@@ -186,7 +186,7 @@
 				<img src={user_info.img_url} alt="grosse-tete">
 			</div>
 			<div class="vflex data">
-				<p class="username">{user_info.display_name} a.k.a. {user_info.username}</p>
+				<p class="username">{user_info.displayname} a.k.a. {user_info.username}</p>
 				<p class="campus">Campus: {user_info.campus_name}, {user_info.campus_country}</p>
 			</div>
 			{#if user_info.username == $client.username}

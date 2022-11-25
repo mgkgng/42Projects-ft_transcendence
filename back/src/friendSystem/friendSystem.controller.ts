@@ -58,7 +58,7 @@ export class friendSystemController {
         let user = new UserEntity;
         user.username = "test";
 		user.username_42 = "test";
-		user.display_name = "test";
+		user.displayname = "test";
 		user.campus_country = "France";
 		user.campus_name = "42Nice";
         user.password = "testpass";
@@ -72,7 +72,7 @@ export class friendSystemController {
 		let user = new UserEntity;
 		user.username = "mohamed";
 		user.username_42 = "mohamed";
-		user.display_name = "mohamed";
+		user.displayname = "mohamed";
 		user.campus_country = "France";
 		user.campus_name = "42Nice";
 		user.password = "mohamedpass";
@@ -81,7 +81,7 @@ export class friendSystemController {
 		let user2 = new UserEntity;
 		user2.username = "timmy";
 		user2.username_42 = "timmy";
-		user2.display_name = "timmy";
+		user2.displayname = "timmy";
 		user2.campus_country = "France";
 		user2.campus_name = "42Nice";
 		user2.password = "timmypass";
@@ -90,7 +90,7 @@ export class friendSystemController {
 		let user3 = new UserEntity;
 		user3.username = "lisa";
 		user3.username_42 = "lisa";
-		user3.display_name = "lisa";
+		user3.displayname = "lisa";
 		user3.campus_country = "France";
 		user3.campus_name = "42Nice";
 		user3.password = "lisapass";
@@ -99,7 +99,7 @@ export class friendSystemController {
 		let user4 = new UserEntity;
 		user4.username = "clara";
 		user4.username_42 = "clara";
-		user4.display_name = "clara";
+		user4.displayname = "clara";
 		user4.campus_country = "France";
 		user4.campus_name = "42Nice";
 		user4.password = "clarapass";
@@ -108,7 +108,7 @@ export class friendSystemController {
 		let user5 = new UserEntity;
 		user5.username = "anthony";
 		user5.username_42 = "anthony";
-		user5.display_name = "anthony";
+		user5.displayname = "anthony";
 		user5.campus_country = "France";
 		user5.campus_name = "42Nice";
 		user5.password = "anthonypass";

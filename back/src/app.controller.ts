@@ -23,7 +23,6 @@ export class AppController {
       return (this.authService.login(req.user));
   }
 
-
   @UseGuards(AuthGuard('oauth'))
   @Post("/auth42")
   async login42(@Request() req)
