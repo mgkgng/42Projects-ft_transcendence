@@ -25,10 +25,7 @@ export class Puck {
 		let deathPointX = this.calculPosX(frameNb);
 
 		setTimeout(() => {
-			let player = room.players.get(room.playerIndex[(this.vec[1] > 0) ? 1 : 0]);
-			let paddlePos = player.paddle.pos;
-			console.log("It's for ", player.info.username);
-			console.log("check", deathPointX, paddlePos);
+			let paddlePos = room.players.get(room.playerIndex[(this.vec[1] > 0) ? 1 : 0]).paddle.pos;
 			if (deathPointX > paddlePos && deathPointX < paddlePos + PaddleSize[room.gameInfo.paddleSize]) {
 				// if paddle hits the puck
 				room.broadcast("PuckHit");
@@ -66,6 +63,7 @@ export class Puck {
 				deathPointX += this.vec[0];
 			}
 		}
-		return (deathPointX);
+		console.log("check deathpoint", this.mapSize[0] - deathPointX);
+		return (this.mapSize[0] - deathPointX);
 	}
 }

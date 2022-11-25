@@ -162,7 +162,6 @@
 		});
 		
 		$client.socket.on("PaddleUpdate", (data: any) => {
-			console.log(data);
 			if (data.type == 0)
 				player1.pos = data.pos;
 			else
@@ -184,7 +183,7 @@
 
 		$client.socket.on("PuckHit", (data: any) => {
 			console.log("PuckHit");
-			puck.vectorY *= -1;
+			puck.vec[1] *= -1;
 		});
 
 		$client.socket.on("ScoreUpdate", (data: any) => {
