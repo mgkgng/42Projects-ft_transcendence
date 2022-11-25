@@ -93,22 +93,31 @@ export class Room {
 		})
 	}
 
-	playerExit(client: Client) {
+	deleteClient(client: Client) {
 		// Remove the user from player and client
 		this.clients.delete(client.username);
 		this.players.delete(client.username);
 		client.isAvailable();
+	}
 
+	playerExit(client: Client) {
 		if (this.isStarted) {
 			// If the game has begun, end the game
 			this.endGame(this.players.values()[0].username); //TODO check if it works well
+			this.deleteClient(client);
 			return (false);
-		} else if (!this.players.size) {
+		} else if (this.players.size == 1) {
 			// If no more user left in the room, broadcast watchers and destroy the room
 			this.broadcast("RoomAlert", ErrorMessage.RoomDestroyed);
+			this.deleteClient(client);
 			return (false);
-		} else if (client.username == this.hostname) {
-			// If the user who just quitted was a host, change the host and make room available again
+		} 
+		
+		// get rid of the user from the room
+		this.deleteClient(client);
+
+		// If the user who just quitted was a host, change the host and make room available again
+		if (client.username == this.hostname) {
 			this.hostname = this.players.values()[0].username;
 			this.isAvailable = true;
 		}
@@ -152,13 +161,11 @@ export class Room {
 	}
 
 	async storeGame() {
-		let players = this.players.values();
-		
-		const id_player1 : any = await this.mainServerService.getIdUserByUsername(this.players[0].username);
-		const id_player2 : any = await this.mainServerService.getIdUserByUsername(this.players[1].username);
+		const id_player1 : any = await this.mainServerService.getIdUserByUsername(this.players.get(this.playerIndex[0]).username);
+		const id_player2 : any = await this.mainServerService.getIdUserByUsername(this.players.get(this.playerIndex[1]).username);
 		const res_user_chat_room = await this.dataSource.createQueryBuilder().insert().into(GameEntity).values
 			([ 
-				{ player1: id_player1, player2: id_player2, is_finished: true, player1_score: players[0].score, player2_score: players[1].score, date_game: new Date() }
+				{ player1: id_player1, player2: id_player2, is_finished: true, player1_score: this.players.get(this.playerIndex[0]).score, player2_score: this.players.get(this.playerIndex[1]).score, date_game: new Date() }
 			]).execute();
 	}
 }

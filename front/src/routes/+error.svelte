@@ -16,7 +16,7 @@
 </style>
 
 <script>
-    import Title from "$lib/Title.svelte";
+    import Title from "$lib/home/Title.svelte";
 </script>
 
 
