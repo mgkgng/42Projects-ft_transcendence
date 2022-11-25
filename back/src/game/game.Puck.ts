@@ -28,13 +28,15 @@ export class Puck {
 		setTimeout(() => {
 			let paddlePos = room.players.get(room.playerIndex[(this.vec[1] > 0) ? 1 : 0]).paddle.pos;
 			if (deathPointX > paddlePos && deathPointX < paddlePos + PaddleSize[room.gameInfo.paddleSize]) {
+				// if paddle hits the puck
 				this.pos[0] = deathPointX;
 				this.pos[1] = (this.vec[1] > 0) ? (this.mapSize[1] - PongConfig.DeadZoneHeight - PongConfig.PaddleHeight)
 					: PongConfig.DeadZoneHeight + PongConfig.PaddleHeight;
 				this.vec[1] *= -1;
 				this.setCheckPuck(room);
 				return ;
-			} else {	
+			} else {
+				// if not, update the score, if the score reached the max point, finish the match
 				let winner = (this.vec[1] > 0) ? room.players.get(room.playerIndex[0]) : room.players.get(room.playerIndex[1]);
 				room.broadcast("ScoreUpdate", winner.info.username);
 				winner.score++;
@@ -45,10 +47,7 @@ export class Puck {
 					return ;
 				}
 
-				// room.pong.puck = new Puck(room.pong.puck.mapSize, room.pong.puck.puckSpeed);
-				setTimeout(() => {
-					Room.startPong(room);
-				}, 2000);
+				setTimeout(() => { Room.startPong(room); }, 2000);
 			}
 		}, timeOut);
 	}
