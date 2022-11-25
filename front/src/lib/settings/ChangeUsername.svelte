@@ -48,8 +48,8 @@
     import { client } from "../stores/client";
 
 	export let itself: any;
-	
-	let newUsername: string = "";
+
+	let username = $user.username;
 	let message: string = "coucou";
 
 	onMount(() => {
@@ -74,7 +74,7 @@
 		coucou
 	</div>
 	<div class="flex input">
-		<input type="text-input" placeholder="Put your new username here" bind:value={newUsername}>
+		<input type="text-input" placeholder="Put your new username here" bind:value={username}>
 		<button on:click={() => {
 			console.log("test");
 			// $client.socket.emit("change_username", newUsername);

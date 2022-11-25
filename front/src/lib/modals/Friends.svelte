@@ -154,6 +154,8 @@
 	let userProfileModal: any;
 	let profileUser: any;
 
+	$: console.log(userSearchList);
+
 	$: searchUser = "";
 	$: searchUser = searchUser.toLowerCase();
 	$: { $client.socket.emit("getUserinDB", {username: searchUser}); }
@@ -169,15 +171,8 @@
 			console.log(data);
 		});
 
-		$client.socket.on("success_getUserinDB", (data: any) => {
-			console.log("success", data);
-			userSearchList = data.users;
-		});
-
-		$client.socket.on("error_getUserinDB", (data: any) => {
-			console.log("error", data);
-			userSearchList = [];
-		});
+		$client.socket.on("success_getUserinDB", (data: any) => { userSearchList = data.users; });
+		$client.socket.on("error_getUserinDB", (data: any) => { userSearchList = []; });
 
 		$client.socket.on("resUserProfile", (data: any) => {
 			profileUser = data;
@@ -185,11 +180,8 @@
 		});
 
 		return (() => {
-			$client.socket.off("error_getFriendList");
-			$client.socket.off("success_getFriendList");
-			$client.socket.off("success_getUserinDB");
-			$client.socket.off("error_getUserinDB");
-			$client.socket.off("resUserProfile");
+			$client.removeListeners("error_getFriendList", "success_getFriendList", "success_getUserinDB",
+				"error_getUserinDB", "resUserProfile");
 		});
 	});
 </script>
@@ -211,7 +203,7 @@
 				}}>
 					<img src="{user.img_url}" alt="user">
 					<div class="user">{user.username}</div>
-					<!-- <div class="status" style="background-color: {()}"></div> -->
+					<div class="status" style="background-color: {(user.status == "online") ? "$green" : (user.status == "in game") ? "$red" : "grey"}"></div>
 				</div>
 				{/each}
 				{:else if searchUser.length && !userSearchList.length}

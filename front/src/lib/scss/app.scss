@@ -56,6 +56,12 @@ h1 { font-size: $h1; font-weight: bold; }
 	color: #fff;
 }
 
+.no-active {
+	background-color: $grey !important;
+	cursor: not-allowed;
+
+}
+
 @font-face {
 	font-family: 'alpha-prota';
 	src: URL('/fonts/AlphaProta.ttf') format('truetype');
