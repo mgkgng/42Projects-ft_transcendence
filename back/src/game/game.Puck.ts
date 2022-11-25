@@ -18,17 +18,20 @@ export class Puck {
 	setCheckPuck(room: any) {
 		let distToDeath = (this.vec[1] > 0)
 			? (this.mapSize[1] - PongConfig.DeadZoneHeight - PongConfig.PaddleHeight) - this.pos[1]
-			: this.pos[1] - PongConfig.DeadZoneHeight - PongConfig.PaddleHeight; // it functions well
-		
+			: this.pos[1] - PongConfig.DeadZoneHeight - PongConfig.PaddleHeight;
 		let frameNb = Math.floor(Math.abs((distToDeath / this.vec[1])));
 
 		let timeOut = frameNb * PongConfig.FrameDuration;
 		let deathPointX = this.calculPosX(frameNb);
 
 		setTimeout(() => {
-			let paddlePos = room.players.get(room.playerIndex[(this.vec[1] > 0) ? 1 : 0]).paddle.pos;
+			let player = room.players.get(room.playerIndex[(this.vec[1] > 0) ? 1 : 0]);
+			let paddlePos = player.paddle.pos;
+			console.log("It's for ", player.info.username);
+			console.log("check", deathPointX, paddlePos);
 			if (deathPointX > paddlePos && deathPointX < paddlePos + PaddleSize[room.gameInfo.paddleSize]) {
 				// if paddle hits the puck
+				room.broadcast("PuckHit");
 				this.pos[0] = deathPointX;
 				this.pos[1] = (this.vec[1] > 0) ? (this.mapSize[1] - PongConfig.DeadZoneHeight - PongConfig.PaddleHeight)
 					: PongConfig.DeadZoneHeight + PongConfig.PaddleHeight;

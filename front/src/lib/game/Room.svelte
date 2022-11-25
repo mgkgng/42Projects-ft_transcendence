@@ -127,8 +127,6 @@
 
 	let switched: boolean = false;
 	
-	$: console.log(switched);
-	$: console.log("player2", player2);
 	onMount(()=> {
 		if (!roomID.length)
 			return ;
@@ -164,10 +162,11 @@
 		});
 		
 		$client.socket.on("PaddleUpdate", (data: any) => {
-			if (data.player == player1.info.username && !switched)
+			console.log(data);
+			if (data.type == 0)
 				player1.pos = data.pos;
 			else
-				player2.pos = gameInfo.mapSize[0] - data.pos;
+				player2.pos = data.pos;
 		});
 
 		$client.socket.on("LoadBall", (data: any) => {
@@ -309,12 +308,13 @@
 
 <svelte:window
 	on:keypress={(event) => {
+		console.log("there");
 		if (userType == UserType.Watcher || !['KeyA', 'KeyD'].includes(event.code))
 			return ;
 		if (moving) //* TODO should make movement more fluent
 			return ;
 		moving = true;
-
+		console.log("here");
 		$client.socket.emit("PaddleMoveKey", {
 			room: roomID,
 			left: ((userType == UserType.Player1 && !switched) && event.code == 'KeyD'

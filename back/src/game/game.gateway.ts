@@ -189,7 +189,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		let intervalID = setInterval(() => {
 			player.paddle.move(data.left);
 			room.broadcast("PaddleUpdate", {
-				player: player.username,
+				type: player.index,
 				pos: player.paddle.pos
 			});
 		}, 20);
