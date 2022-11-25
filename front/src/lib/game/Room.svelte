@@ -82,26 +82,6 @@
 		.ready:hover { background-color: $yellow; }
 		.exit:hover { background-color: $main-dark; }
 	}
-
-	.mini-mode {
-		position: absolute;
-		right: .5em;
-		top: 0;
-		width: 25px;
-		height: 30px;
-		aspect-ratio: 1 / 1;
-		border-radius: 0 0 .2em .2em;
-		transition: .4s;
-		font-size: 25px;
-		padding-bottom: .5em;
-		text-align: center;
-		cursor: pointer;
-
-		&:hover {
-			color: #fff;
-			background-color: transparentize(#fff, 0.8);
-		}
-	}
 </style>
 
 <script lang="ts">
@@ -122,11 +102,9 @@
 	export let itself: any;	
 
 	let puck: any = undefined;
-	let scores: Array<number> = [0, 0];
 
 	let userType: number;
 	let initPos: number;
-	let paddlePos: Array<number>;
 
 	let quitConfirmMsgModal: any;
 
@@ -134,8 +112,6 @@
 	let puckMoving: any;
 	
 	let gameFinishedModal: any;
-
-	let roomFound: boolean = false;
 
 	let ready: boolean = false;
 	let tryStart: boolean = false;
@@ -149,17 +125,14 @@
 	let player1: any;
 	let player2: any;
 
-	let switchPlace: boolean = false;
-
-	$:console.log("mounted?", roomFound, gameInfo);
-
+	let switched: boolean = false;
+	
 	onMount(()=> {
 		if (!roomID.length)
 			return ;
 		
 		$client.socket.on("RoomFound", (data: any) => {
 			console.log("RoomFound", data);
-			roomFound = true;
 
 			// Get room information
 			gameInfo = data.gameInfo;
@@ -167,20 +140,20 @@
 			player1 = data.player1;
 			player2 = data.player2;
 			initPos = (MapSize[gameInfo?.mapSize][0] - PaddleSize[gameInfo?.paddleSize]) / 2;
-			userType = (player1.info.username == $user.username_42) ? UserType.Player1 :
-				(player2.info.username == $user.username_42) ? UserType.Player2 :
+			userType = (player1?.info.username_42 == $user.username) ? UserType.Player1 :
+				(player2?.info.username_42 == $user.username) ? UserType.Player2 :
 				UserType.Watcher;
 
 			// By default, player1 is on the right side unless user is the player2
-			switchPlace = ($user.username_42 == player2.info.username);
+			switched = ($user.username == player2?.info.username_42);
 		});
 
 		$client.socket.on("PlayerUpdate", (data: any) => {
 			console.log("PlayerUpdate", data);
 			if (data.join) {
-				player2 = data.userInfo;
+				player2 = data.player;
 			} else {
-				if (data.username == player1.info.username)
+				if (data.username == player1.info.username_42)
 					player1 = undefined;
 				else
 					player2 = undefined;
@@ -189,18 +162,19 @@
 		});
 		
 		$client.socket.on("PaddleUpdate", (data: any) => {
-			if (data.player == player1.info.username && !switchPlace)
+			if (data.type == 0)
 				player1.pos = data.pos;
 			else
-				player2.pos = gameInfo.mapSize[0] - data.pos;
+				player2.pos = data.pos;
 		});
 
 		$client.socket.on("LoadBall", (data: any) => {
-			console.log("LoadBall");
-			puck = new Puck(data.vec, data.pos, gameInfo.mapSize);
+			console.log("LoadBall", data);
+			puck = new Puck(data.vec, data.pos, MapSize[gameInfo.mapSize]);
 		});
 
 		$client.socket.on("PongStart", () => {
+			console.log("PongStart");
 			puckMoving = setInterval(() => {
 				puck.move();
 				puck = puck;
@@ -209,7 +183,7 @@
 
 		$client.socket.on("PuckHit", (data: any) => {
 			console.log("PuckHit");
-			puck.vectorY *= -1;
+			puck.vec[1] *= -1;
 		});
 
 		$client.socket.on("ScoreUpdate", (data: any) => {
@@ -231,6 +205,8 @@
 		});
 
 		$client.socket.on("GameFinished", (data: any) => {
+			if (puckMoving)
+				clearInterval(puckMoving);
 			puck = undefined;
 			winner = data;
 			gameFinishedModal.open();
@@ -245,46 +221,47 @@
 		});
 
 		return (() => {
+			if (puckMoving)
+				clearInterval(puckMoving);
 			$client.removeListeners("RoomInfo", "PlayerUpdate", "PaddleUpdate",
 				"LoadBall", "PongStart", "PuckHit", "ScoreUpdate",
 				"ReadyUpdate", "GameFinished", "GameStartFail", "GameStart");
+			$client.socket.emit("CheckOnGoing");
 		});
 	});
 
 </script>
 
-{#if roomFound}
+{#if gameInfo}
 <div class="container">
-	{#if gameInfo}
 	<div class="flex pong" style="width: {MapSize[gameInfo.mapSize][1] + 200}px; height: {MapSize[gameInfo.mapSize][0]}px;">
 		<div class="vflex side">
-			<Player userInfo={(!switchPlace) ? player2 : player1} left={true} host={(hostname == ((!switchPlace) ? player2?.info.username : player1?.info.username))} ready={ready}/>	
-			<h1>{(!switchPlace) ? player1.score : player2.score}</h1>
+			<Player player={(!switched) ? player2 : player1} left={true} hostname={hostname} ready={ready}/>	
+			<h1>{(!switched && player2) ? player2.score : (!switched && !player2) ? "0" : player1?.score}</h1>
 		</div>
 		<div class="pong-game" style="min-width: {MapSize[gameInfo.mapSize][1]}px; min-height: {MapSize[gameInfo.mapSize][0]}px;">
-			<Paddle pos={(switchPlace) ? player1?.pos : player2?.pos} paddleWidth={PaddleSize[gameInfo.paddleSize]}
-				gameHeight={MapSize[gameInfo.mapSize][1]}
-				switchPlace={switchPlace}
-				playerType={(!switchPlace) ? 2 : 1}
-				user={(!switchPlace) ? player2 : player1}
+			<Paddle pos={(!switched) ? player2?.pos : player1?.pos} paddleWidth={PaddleSize[gameInfo.paddleSize]}
+				mapSize={MapSize[gameInfo.mapSize]}
+				switched={switched}
+				playerType={(!switched) ? 2 : 1}
+				user={(!switched) ? player2 : player1}
 				initPos={initPos}/>
 			{#if puck}
-			<PPuck pos={[(!switchPlace) ? MapSize[gameInfo.mapSize][0] - puck.pos[0] : puck.pos[0],
-				(!switchPlace) ? MapSize[gameInfo.mapSize][1] - puck.pos[1] : puck.pos[1]]} />
+			<PPuck pos={[(!switched) ? MapSize[gameInfo.mapSize][0] - puck.pos[0] : puck.pos[0],
+				(!switched) ? MapSize[gameInfo.mapSize][1] - puck.pos[1] : puck.pos[1]]} />
 			{/if}
-			<Paddle pos={(switchPlace) ? player2?.pos : player1?.pos} paddleWidth={PaddleSize[gameInfo.paddleSize]}
-				gameHeight={MapSize[gameInfo.mapSize][1]}
-				switchPlace={switchPlace}
-				playerType={(!switchPlace) ? 1 : 2}
-				user={(switchPlace) ? player2 : player1}
+			<Paddle pos={(!switched) ? player1?.pos : player2?.pos} paddleWidth={PaddleSize[gameInfo.paddleSize]}
+				mapSize={MapSize[gameInfo.mapSize]}
+				switched={switched}
+				playerType={(!switched) ? 1 : 2}
+				user={(!switched) ? player1 : player2}
 				initPos={initPos}/>;
 		</div>
 		<div class="vflex side right">
-			<Player userInfo={(!switchPlace) ? player1 : player2} left={false} host={(hostname == ((!switchPlace) ? player1?.info.username : player2?.info.username))} ready={ready}/>
-			<h1>{(!switchPlace) ? player1.score : player2.score}</h1>
+			<Player player={(!switched) ? player1 : player2} left={false} hostname={hostname} ready={ready}/>
+			<h1>{(!switched) ? player1?.score : (player2) ? player2.score : "0"}</h1>
 		</div>
 	</div>
-	{/if}
 	<div class="button-container">
 		<!-- there should be a difference between host-guest mode and random matching mode -->
 		{#if !gameStart}
@@ -321,7 +298,7 @@
 {/if}
 
 <Modal bind:this={gameFinishedModal} closeOnBgClick={true}>
-	<GameOver winner={winner} gameModal={itself} itself={gameFinishedModal} scores={scores}/>
+	<GameOver winner={winner} gameModal={itself} itself={gameFinishedModal} scores={[player1?.score, player2?.score]}/>
 </Modal>
 
 <Modal bind:this={quitConfirmMsgModal} closeOnBgClick={false}>
@@ -330,28 +307,26 @@
 
 <svelte:window
 	on:keypress={(event) => {
-		if ((userType == UserType.Watcher)
-		|| (event.code != 'KeyA' && event.code != 'KeyD'))
+		console.log("there");
+		if (userType == UserType.Watcher || !['KeyA', 'KeyD'].includes(event.code))
 			return ;
-
 		if (moving) //* TODO should make movement more fluent
 			return ;
-
 		moving = true;
-
-		$client.socket.emit("PaddleMove", {
+		console.log("here");
+		$client.socket.emit("PaddleMoveKey", {
 			room: roomID,
-			left: ((userType == UserType.Player1 && !switchPlace) && event.code == 'KeyD'
+			left: ((userType == UserType.Player1 && !switched) && event.code == 'KeyD'
 				|| userType == UserType.Player2 && event.code == 'KeyA')
 		});
 	}}
 
 	on:keyup={(event)=>{
-		if (event.code != 'KeyA' && event.code != 'KeyD')
+		if (userType == UserType.Watcher || !['KeyA', 'KeyD'].includes(event.code))
 			return ;
 		
 		//* TODO some precision to make
-		$client.socket.emit("PaddleStop", roomID);
+		$client.socket.emit("PaddleStopKey", roomID);
 
 		moving = false;
 	}}

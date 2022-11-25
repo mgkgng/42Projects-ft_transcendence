@@ -6,8 +6,6 @@ import { AuthService } from './auth/auth.service';
 export class AppController {
   constructor(private readonly appService: AppService,
               private authService : AuthService) {}
-  // constructor(private readonly appService: AppService){}
-
 
   @Get("/")
   getHello(): string {

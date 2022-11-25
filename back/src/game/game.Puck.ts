@@ -1,5 +1,5 @@
 import { Room } from "./game.Room";
-import { PongConfig } from "./game.utils";
+import { PaddleSize, PongConfig, PuckSpeed } from "./game.utils";
 
 export class Puck {
 	puckSpeed: number;
@@ -13,21 +13,21 @@ export class Puck {
 			puckSpeed * ((Math.floor(Math.random() * 2)) ? 1 : -1)];
 		this.mapSize = mapSize;
 		this.pos = [mapSize[0] / 2, mapSize[1] / 2];
-	}
+	} 
 
 	setCheckPuck(room: any) {
 		let distToDeath = (this.vec[1] > 0)
 			? (this.mapSize[1] - PongConfig.DeadZoneHeight - PongConfig.PaddleHeight) - this.pos[1]
-			: this.pos[1] - PongConfig.DeadZoneHeight - PongConfig.PaddleHeight; // it functions well
-		
+			: this.pos[1] - PongConfig.DeadZoneHeight - PongConfig.PaddleHeight;
 		let frameNb = Math.floor(Math.abs((distToDeath / this.vec[1])));
 
 		let timeOut = frameNb * PongConfig.FrameDuration;
 		let deathPointX = this.calculPosX(frameNb);
 
 		setTimeout(() => {
-			let paddlePos = (this.vec[1] > 0) ? room.pong.paddlePos[1] : room.pong.paddlePos[0];
-			if (deathPointX > paddlePos && deathPointX < paddlePos + room.pong.paddleSize) {
+			let paddlePos = room.players.get(room.playerIndex[(this.vec[1] > 0) ? 1 : 0]).paddle.pos;
+			if (deathPointX > paddlePos && deathPointX < paddlePos + PaddleSize[room.gameInfo.paddleSize]) {
+				// if paddle hits the puck
 				room.broadcast("PuckHit");
 				this.pos[0] = deathPointX;
 				this.pos[1] = (this.vec[1] > 0) ? (this.mapSize[1] - PongConfig.DeadZoneHeight - PongConfig.PaddleHeight)
@@ -35,21 +35,19 @@ export class Puck {
 				this.vec[1] *= -1;
 				this.setCheckPuck(room);
 				return ;
-			} else {	
-				let winner = (this.vec[1] > 0) ? room.players.get(room.playersIndex[0]) : room.players.get(room.playersIndex[1]);
-				room.broadcast("ScoreUpdate", winner.username);
+			} else {
+				// if not, update the score, if the score reached the max point, finish the match
+				let winner = (this.vec[1] > 0) ? room.players.get(room.playerIndex[0]) : room.players.get(room.playerIndex[1]);
+				room.broadcast("ScoreUpdate", winner.info.username);
 				winner.score++;
 
-				if (winner.score == room.maxpoint) {
-					room.broadcast("GameFinished",  winner.username);
-					room.putScore(); //TODO put username
+				if (winner.score == room.gameInfo.maxPoint) {
+					room.broadcast("GameFinished",  winner.info.username);
+					room.endGame(winner.info.username);
 					return ;
 				}
 
-				room.pong.puck = new Puck(room.pong.size, room.pong.puckSpeed);
-				setTimeout(() => {
-					Room.startPong(room);
-				}, 2000);
+				setTimeout(() => { Room.startPong(room); }, 2000);
 			}
 		}, timeOut);
 	}
@@ -65,6 +63,7 @@ export class Puck {
 				deathPointX += this.vec[0];
 			}
 		}
-		return (deathPointX);
+		console.log("check deathpoint", this.mapSize[0] - deathPointX);
+		return (this.mapSize[0] - deathPointX);
 	}
 }

@@ -73,6 +73,7 @@
 
 		$client.socket.on("MatchFound", (data: any) => {
 			roomID = data;
+			enterGameModal.close();
 			roomModal.open();
 		});
 

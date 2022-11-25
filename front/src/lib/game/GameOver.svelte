@@ -52,15 +52,14 @@
 <div class="vflex window result">
 	<div class="vflex msg">
 		<h2>THE WINNER IS ...</h2>
-		<h3>Congratulations {winner.username_42}!</h3>
-		<img src="{winner.image_url}" alt="winner" />
+		<h3>Congratulations {winner.info.username}!</h3>
+		<img src="{winner.info.img_url}" alt="winner" />
 		<div class="flex score">
 			<p>{scores[0]}</p>
 			<p>:{scores[1]}</p>
 		</div>
 	</div>
 	<div class="flex buttons">
-		<button on:click = {() => { itself.close(); }}>Close</button>
 		<button on:click={() => { gameModal.close(); }}>Home</button>
 	</div>
 </div>

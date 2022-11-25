@@ -43,7 +43,7 @@ export class AuthService {
 			username: user.username,
 			username_42: user.username_42,
 			displayname: user.displayname,
-			image_url: user.image_url,
+			img_url: user.img_url,
 			campus_name: user.campus_name,
 			campus_country: user.campus_country,
 			double_auth_ok : true
@@ -57,7 +57,7 @@ export class AuthService {
 			username: user.username,
 			username_42: user.username_42,
 			displayname: user.displayname,
-			image_url: user.image_url,
+			img_url: user.img_url,
 			campus_name: user.campus_name,
 			campus_country: user.campus_country,
 		};
@@ -81,7 +81,7 @@ export class AuthService {
 		console.log("get_valid_username");
 		let i : number = 0;
 		let user : UserEntity;
-		do{
+		do {
 			user = await this.userService.findOneByUsername(username + (i ? i + "" : "" ));
 			if (user)
 				i++;
