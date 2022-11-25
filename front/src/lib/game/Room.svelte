@@ -309,16 +309,13 @@
 
 <svelte:window
 	on:keypress={(event) => {
-		if ((userType == UserType.Watcher)
-		|| (event.code != 'KeyA' && event.code != 'KeyD'))
+		if (userType == UserType.Watcher || !['KeyA', 'KeyD'].includes(event.code))
 			return ;
-
 		if (moving) //* TODO should make movement more fluent
 			return ;
-
 		moving = true;
 
-		$client.socket.emit("PaddleMove", {
+		$client.socket.emit("PaddleMoveKey", {
 			room: roomID,
 			left: ((userType == UserType.Player1 && !switched) && event.code == 'KeyD'
 				|| userType == UserType.Player2 && event.code == 'KeyA')
@@ -326,11 +323,11 @@
 	}}
 
 	on:keyup={(event)=>{
-		if (event.code != 'KeyA' && event.code != 'KeyD')
+		if (userType == UserType.Watcher || !['KeyA', 'KeyD'].includes(event.code))
 			return ;
 		
 		//* TODO some precision to make
-		$client.socket.emit("PaddleStop", roomID);
+		$client.socket.emit("PaddleStopKey", roomID);
 
 		moving = false;
 	}}

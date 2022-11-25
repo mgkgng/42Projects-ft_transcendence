@@ -209,7 +209,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		let player = room.players.get(target.username);
 
 		// clear the interval and delete it
-		clearInterval(player.control[0].get(data));
+		clearInterval(player.control[0]);
 		player.control[0] = undefined
 	}
 
