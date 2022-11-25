@@ -112,7 +112,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			let gameInfo = { title: "", mapSize: getRandomInt(3), maxPoint: 10, puckSpeed: getRandomInt(3), paddleSize: getRandomInt(3), isPrivate: true }
 			console.log("targets", target1, target2);
 			console.log("players", player1, player2);
-			let room = new Room([player1, player2], [target1, target2], gameInfo, undefined, this.gameRep, this.mainServerService, this.dataSource, this.userService);
+			let room = new Room([player1, player2], [target1, target2], gameInfo, undefined, 
+				this,
+				this.gameRep, this.mainServerService, this.dataSource, this.userService);
 			this.rooms.set(room.id, room);
 		
 			// Switch their state into playing then get rid of them from the queue
@@ -242,6 +244,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		// Get the player's info and create the room with the data
 		let player = await this.getPlayerInfo(target.username);
 		let room = new Room([player], [target], data, target.username,
+			this,
 			this.gameRep, this.mainServerService, this.dataSource, this.userService);
 		this.rooms.set(room.id, room);
 		target.isPlaying(room.id);
@@ -299,8 +302,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		if (room.players.has(target.username)) {
 			let res = room.playerExit(target);
 			// Destroy the room if the game is finished or there is no more player left.
-			if (!res)
-				this.rooms.delete(room.id);
+			// if (!res)
+			// 	this.rooms.delete(room.id);
 		} else {
 			// if the user is a watcher, remove the user from clients of the room
 			room.clients.delete(target.username);
