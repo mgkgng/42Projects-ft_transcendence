@@ -52,7 +52,8 @@
 				align-items: center;
 
 				button {
-					padding: .2em .5em;
+					width: 4em;
+					height: 2em;
 					border: $border-thin;
 					border-radius: .2em;
 					transition: .2s;
@@ -93,10 +94,7 @@
 				&:first-child { background-color: $submain-blue; }
 				&:not(.no-active):hover { filter: brightness(80%); }
 			}
-		}
-		
-
-		
+		}		
 	}
 </style>
 
