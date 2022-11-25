@@ -157,18 +157,18 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			player1: {
 				info: players[0].info,
 				score: players[0].score,
-				pos: room.pong.paddles[players[0].index].pos
+				pos: players[0].paddle.pos
 			},
 			player2: (players.length > 1) ? {
 				info: players[1].info,
 				score: players[1].score,
-				pos: room.pong.paddles[players[1].index].pos
+				pos: players[1].paddle.pos
 			} : undefined,
 			hostname: room.hostname,
 			gameInfo: room.gameInfo,
-			puck: (room.pong.puck) ? {
-				pos: room.pong.puck?.pos,
-				vec: room.pong.puck?.vec
+			puck: (room.puck) ? {
+				pos: room.puck.pos,
+				vec: room.puck.vec
 			} : undefined
 		});
 	}
@@ -187,10 +187,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		// TODO protection switching between keyboard and mouse
 		// Paddle starts to move, Websocket Messages set with interval
 		let intervalID = setInterval(() => {
-			room.pong.movePaddle(player.index, data.left);
+			player.paddle.move(data.left);
 			room.broadcast("PaddleUpdate", {
 				player: player.username,
-				pos: room.pong.paddles[player.index].pos
+				pos: player.paddle.pos
 			});
 		}, 20);
 		player.control[0] = intervalID;
@@ -234,7 +234,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		// console.log("CreateRoom", data);
 		// Check if the client is already playing or watching a game
 		let target = this.getClient(req);
-		console.log("Why didn't it work?", target.state, target.room);
 		if (target.state != UserState.Available) {
 			client.emit("CreateRoomError", ErrorMessage.UserNotAvailble);
 			return ;
@@ -246,7 +245,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			this.gameRep, this.mainServerService, this.dataSource, this.userService);
 		this.rooms.set(room.id, room);
 		target.isPlaying(room.id);
-		console.log("created", target);
 
 		// Invite the user to the room
 		target.broadcast("CreateRoomRes", room.id);

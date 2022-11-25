@@ -207,6 +207,8 @@
 		});
 
 		$client.socket.on("GameFinished", (data: any) => {
+			if (puckMoving)
+				clearInterval(puckMoving);
 			puck = undefined;
 			winner = data;
 			gameFinishedModal.open();

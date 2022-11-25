@@ -1,5 +1,5 @@
 import { Room } from "./game.Room";
-import { PongConfig, PuckSpeed } from "./game.utils";
+import { PaddleSize, PongConfig, PuckSpeed } from "./game.utils";
 
 export class Puck {
 	puckSpeed: number;
@@ -26,10 +26,8 @@ export class Puck {
 		let deathPointX = this.calculPosX(frameNb);
 
 		setTimeout(() => {
-			console.log("settimeout?", this.vec);
-			let paddlePos = (this.vec[1] > 0) ? room.pong.paddles[1].pos : room.pong.paddles[0].pos;
-			if (deathPointX > paddlePos && deathPointX < paddlePos + room.pong.paddleSize) {
-				room.broadcast("PuckHit");
+			let paddlePos = room.players.get(room.playerIndex[(this.vec[1] > 0) ? 1 : 0]).paddle.pos;
+			if (deathPointX > paddlePos && deathPointX < paddlePos + PaddleSize[room.gameInfo.paddleSize]) {
 				this.pos[0] = deathPointX;
 				this.pos[1] = (this.vec[1] > 0) ? (this.mapSize[1] - PongConfig.DeadZoneHeight - PongConfig.PaddleHeight)
 					: PongConfig.DeadZoneHeight + PongConfig.PaddleHeight;
@@ -41,13 +39,13 @@ export class Puck {
 				room.broadcast("ScoreUpdate", winner.info.username);
 				winner.score++;
 
-				if (winner.score == room.maxpoint) {
+				if (winner.score == room.gameInfo.maxPoint) {
 					room.broadcast("GameFinished",  winner.info.username);
-					room.putScore(); //TODO put username
+					room.endGame(winner.info.username);
 					return ;
 				}
 
-				room.pong.puck = new Puck(room.pong.mapSize, room.pong.puckSpeed);
+				// room.pong.puck = new Puck(room.pong.puck.mapSize, room.pong.puck.puckSpeed);
 				setTimeout(() => {
 					Room.startPong(room);
 				}, 2000);
