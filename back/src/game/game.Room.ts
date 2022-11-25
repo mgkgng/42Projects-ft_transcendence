@@ -48,7 +48,7 @@ export class Room {
 		/* Room State */
 		this.isAvailable = (playersInfo.length < 2) ? true : false;
 		this.isReady = false;
-		this.isStarted = false;
+		this.isStarted = !(hostname.length > 0);
 		this.isPrivate = gameInfo.privateMode;
 
 		/* Game */
@@ -106,21 +106,18 @@ export class Room {
 		// get rid of the user from the room
 		this.deleteClient(client);
 
-		if (this.isStarted) {
-			// If the game has begun, end the game
-			this.endGame(this.players.values()[0].username); //TODO check if it works well
-			// this.deleteClient(client);
-			// return (false);
+		if (this.isStarted) { // If the game has begun, end the game
+			console.log("test: ", this.players, this.players.keys());
+			this.endGame(this.players.keys()[0]); //TODO check if it works well
 			return ;
-		} else if (!this.players.size) {
-			// If no more user left in the room, broadcast watchers and destroy the room
+		} else if (!this.players.size) { // If no more user left in the room, broadcast watchers and destroy the room
 			this.broadcast("RoomAlert", ErrorMessage.RoomDestroyed);
 			this.destroyRoom();
 			return ;
 		} 
 		
 		// If the user who just quitted was a host, change the host and make room available again
-		if (client.username == this.hostname) {
+		if (this.hostname.length && client.username == this.hostname) {
 			this.hostname = this.players.values()[0].username;
 			this.isAvailable = true;
 		}
@@ -159,8 +156,13 @@ export class Room {
 	startPong() { setTimeout(Room.startPong, 1000, this); }
 
 	endGame(winner: any) {
-		this.broadcast("GameResult", winner);
+		this.broadcast("GameFinished", winner);
 		this.storeGame();
+
+		// make every client in the room available
+		for (let client of this.clients.values())
+			client.isAvailable();
+
 		this.destroyRoom(); // TODO check
 	}
 
@@ -173,5 +175,11 @@ export class Room {
 			]).execute();
 	}
 
-	destroyRoom() { this.gameServer.rooms.delete(this.id); }
+	destroyRoom() {
+		// make every client in the room available
+		for (let client of this.clients.values())
+			client.isAvailable();
+	
+		this.gameServer.rooms.delete(this.id);
+	}
 }

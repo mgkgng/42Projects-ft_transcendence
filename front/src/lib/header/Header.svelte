@@ -106,14 +106,10 @@
 <script lang="ts">
     import UserProfile from "$lib/profile/UserProfile.svelte";
     import { user } from "$lib/stores/user";
-    import { client } from "$lib/stores/client";
     import { login } from "$lib/stores/var";
     import Modal from "$lib/tools/Modal.svelte";
 	  import Friends from "$lib/modals/Friends.svelte"
     import Settings from "../settings/Settings.svelte";
-    import { chatRoom } from "../stores/chatRoom";
-    import Image from "../Image.svelte";
-
 
 	let profileModal: any;
 	let friendsModal: any;
@@ -122,7 +118,7 @@
 </script>
 
 <Modal bind:this={profileModal} >
-	<UserProfile profileUser={$client.user_info}  />
+	<UserProfile profileUser={$user}  />
 </Modal>
 <Modal bind:this={friendsModal}>
 	<Friends itself={friendsModal} />

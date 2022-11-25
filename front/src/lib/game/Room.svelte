@@ -116,7 +116,7 @@
 
 	let ready: boolean = false;
 	let tryStart: boolean = false;
-	let gameStart: boolean = false;
+	let started: boolean = false;
 
 	let winner: any;
 
@@ -138,6 +138,8 @@
 			// Get room information
 			gameInfo = data.gameInfo;
 			hostname = data.hostname;
+			if (!hostname.length)
+				started = true;
 			player1 = data.player1;
 			player2 = data.player2;
 			initPos = (MapSize[gameInfo?.mapSize][0] - PaddleSize[gameInfo?.paddleSize]) / 2;
@@ -154,6 +156,8 @@
 			if (data.join) {
 				player2 = data.player;
 			} else {
+				if (started)
+					return ;
 				if (data.username == player1.info.username_42)
 					player1 = undefined;
 				else
@@ -196,6 +200,7 @@
 		$client.socket.on("ReadyUpdate", (data: any) => { ready = data; });
 
 		$client.socket.on("GameFinished", (data: any) => {
+			console.log("???", data);
 			if (puckMoving)
 				clearInterval(puckMoving);
 			puck = undefined;
@@ -204,7 +209,7 @@
 		});
 
 		$client.socket.on("GameStartFail", () => { tryStart = false; });
-		$client.socket.on("GameStart", () => { gameStart = true });
+		$client.socket.on("GameStart", () => { started = true });
 
 		$client.socket.emit("RoomCheck", {
 			client: $client.id,
@@ -255,29 +260,24 @@
 	</div>
 	<div class="button-container">
 		<!-- there should be a difference between host-guest mode and random matching mode -->
-		{#if !gameStart}
-		{#if $user.username == hostname}
-		{#if !tryStart}
-		<button class="start" on:click={()=>{
-			if (!ready) {
-				// TODO message appear
-				return ;
-			}
-			tryStart = true;
-			$client.socket.emit("StartGame", roomID)
-		}}>START</button>
-		{:else}
-		<button class="start loading"></button>
-		{/if}
-		{/if}
-		{#if userType == UserType.Player2}
-		<button class="ready" on:click={()=>{
-			$client.socket.emit("isReady", {
-				roomID: roomID,
-				isReady: !ready,
-			});
-		}}>{(!ready) ? "READY" : "CANCEL"}</button>
-		{/if}
+		{#if !started && hostname.length}
+			{#if $user.username == hostname}
+			<button class="start" on:click={()=>{
+				if (!ready) {
+					// TODO message appear
+					return ;
+				}
+				tryStart = true;
+				$client.socket.emit("StartGame", roomID)
+			}}>START</button>
+			{:else}
+			<button class="ready" on:click={()=>{
+				$client.socket.emit("isReady", {
+					roomID: roomID,
+					isReady: !ready,
+				});
+			}}>{(!ready) ? "READY" : "CANCEL"}</button>
+			{/if}
 		{/if}
 		<button class="exit" on:click={()=>{ quitConfirmMsgModal.open(); }}>EXIT</button>
 	</div>
