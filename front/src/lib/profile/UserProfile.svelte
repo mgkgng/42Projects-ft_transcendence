@@ -114,7 +114,7 @@
 <script lang="ts">
     import { user } from "$lib/stores/user";
     import { onMount } from "svelte";
-    import { client } from "../stores/client";
+    import { client } from "$lib/stores/client";
 
 	export let profileUser: any;
 

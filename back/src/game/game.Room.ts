@@ -161,6 +161,11 @@ export class Room {
 	endGame(winner: any) {
 		this.broadcast("GameResult", winner);
 		this.storeGame();
+
+		// make every client in the room available
+		for (let client of this.clients.values())
+			client.isAvailable();
+
 		this.destroyRoom(); // TODO check
 	}
 
@@ -173,5 +178,11 @@ export class Room {
 			]).execute();
 	}
 
-	destroyRoom() { this.gameServer.rooms.delete(this.id); }
+	destroyRoom() {
+		// make every client in the room available
+		for (let client of this.clients.values())
+			client.isAvailable();
+	
+		this.gameServer.rooms.delete(this.id);
+	}
 }
