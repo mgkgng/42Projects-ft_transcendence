@@ -105,20 +105,56 @@
     import Modal from "$lib/tools/Modal.svelte";
     import ChangeUsername from "$lib/settings/ChangeUsername.svelte";
     import ConfirmLeave from "$lib/settings/ConfirmLeave.svelte";
+
+	//TODO limit the image size
 	
 	export let itself: any;
 
-	let img: any = ($user.img) ? $user.img : $user.img_url;
+	let image: any = ($user.img) ? $user.img : $user.img_url;
 	let username = $user.username
 	let doubleAuth: boolean = $user.is_2fa;
 
-	let original = [img, username, doubleAuth]
+	let original = [image, username, doubleAuth]
 	let modified: boolean = false;
-	$: modified = !original.every((v, i) => { return v === Array(img, username, doubleAuth)[i]})
-	$: console.log("modify check", modified);
+	$: modified = !original.every((v, i) => { return v === Array(image, username, doubleAuth)[i]})
 
 	let changeUsernameModal: any;
 	let confirmLeaveModal: any;
+
+	/* Image */
+	let fileInput: any;
+
+	const onFileSelected = (e: any) => {
+		console.log("data", e);
+		let file = e.target.files[0];
+		let reader = new FileReader();
+			reader.readAsDataURL(file);
+			reader.onload = e => {
+				image = e.target?.result
+			};
+		console.log("coucou", file, reader);
+		// image = file;
+	}
+
+	const uploadImage = async () => {
+		let formData = new FormData();
+		formData.append("image", image);
+		formData.append("avatar", fileInput.files[0]);
+
+		// Formdata with jwt token
+		let jwt = localStorage.getItem("transcendence-jwt");
+
+		let response = await fetch("http://localhost:3000/uploadimage", {
+			method: "POST",
+			body: formData,
+			headers: new Headers({ "Authorization": `Bearer ${jwt}` })
+		});
+
+		let result = await response.json();
+		console.log("uploadImage",result);
+	}
+
+	/* Image end */
 
 		// chatRoom.subscribe(value => {	username = value.username_search;	});
 	// client.subscribe(value => {	local_username = value.username; });
@@ -138,7 +174,14 @@
 	// }
 	onMount(() => {
 
-		
+					// $client.socket.on("change_username", (data) => {
+			// confirmed = true;
+			// 	chatRoom.update((value) => {
+			// 		value.username_search = data.new_username;
+			// 		return value;
+			// 	}); 
+			// });
+
 
 		// 	$client.socket.on("active_double_auth", (data) => {
 		// 		user_info.is_2fa = true; 
@@ -169,12 +212,12 @@
 	<ConfirmLeave itself={confirmLeaveModal} settingModal={itself} />
 </Modal>
 
-
 <div class="vflex window settings">
 	<h2>Settings</h2>
 	<div class="image">
-		<img src="{((!$user.img) ? $user.img_url : $user.img)}" alt="profile">
-		<button>modify</button>
+		<img src="{image}" alt="profile">
+		<button on:click={() => { fileInput.click(); }}>modify</button>
+		<input style="display:none" type="file" accept=".jpg, .jpeg, .png" on:change={(e) => onFileSelected(e)} bind:this={fileInput}/>
 	</div>
 	<div class="vflex options">
 		<h4>Username:</h4>
@@ -197,8 +240,9 @@
 			confirmLeaveModal.open();
 		}}>Close</button>
 		<button class="{(modified) ? "" : "no-active"}" on:click={() => {
-			if (modified)
-				$client.socket.emit("get_user_info");
+			// uploadImage();
+			// if (modified)
+			// 	$client.socket.emit("get_user_info");
 		}}>Save Changes</button>
 	</div>
 </div>

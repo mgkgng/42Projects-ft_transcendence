@@ -42,7 +42,7 @@
 <script lang="ts">
     import { user } from "$lib/stores/user";
     import { onMount } from "svelte";
-    import { client } from "../stores/client";
+    import { client } from "$lib/stores/client";
 
 	export let itself: any;
 
@@ -74,15 +74,8 @@
 			message = (data.msg) ? data.msg : "You can use this username!";
 		});
 
-			// $client.socket.on("change_username", (data) => {
-			// confirmed = true;
-			// 	chatRoom.update((value) => {
-			// 		value.username_search = data.new_username;
-			// 		return value;
-			// 	}); 
-			// });
 		return (() => {
-			$client.removeListeners("CheckNewUsernameRes", "change_username");
+			$client.removeListeners("CheckNewUsernameRes");
 		});
 	});
 </script>
