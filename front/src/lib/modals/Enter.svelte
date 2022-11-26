@@ -43,7 +43,7 @@
 	<button class="rank" on:click={()=>{
 		rankModal.open();
 		itself.close();
-	}}>Ranking</button>
+	}}>Rank</button>
 	<button class="chat" on:click={()=>{
 		chatRoomModal.open();
 		itself.close();

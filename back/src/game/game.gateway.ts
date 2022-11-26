@@ -365,7 +365,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				((cast(sum(games.is_winner) as float) / count(games.is_winner)) * 100) as win_rate, \
 				min(user_entity.username) as username, min(user_entity.campus_name) as campus_name, \
 				min(user_entity.campus_country) as campus_country, min(user_entity.img_url) as img_url, \
-				min(user_entity.displayname) as displayname \
+				min(user_entity.img) as img, min(user_entity.displayname) as displayname, \
+				min(user_entity.created_at) as created_at, min(user_entity.last_connection) as last_connection \
 				FROM ( \
 					SELECT \"player1IdG\" as id_player, (CASE WHEN player1_score > player2_score THEN 1 ELSE 0 END) as is_winner FROM game_entity as game1 \
 						UNION \

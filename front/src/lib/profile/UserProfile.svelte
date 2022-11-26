@@ -98,7 +98,9 @@
     import { user } from "$lib/stores/user";
     import { onMount } from "svelte";
     import { client } from "$lib/stores/client";
+    import CloseButton from "$lib/items/CloseButton.svelte";
 
+	export let itself: any;
 	export let profileUser: any;
 
 	let gameHistory: Array<any> = [];
@@ -162,4 +164,5 @@
 		<p>No Game History Yet</p>
 		{/if}
 	</div>
+	<CloseButton window={itself}/>
 </div>
