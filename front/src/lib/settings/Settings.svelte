@@ -154,9 +154,7 @@
 		console.log("uploadImage",result);
 	}
 
-	/* Image end */
-
-		// chatRoom.subscribe(value => {	username = value.username_search;	});
+	// chatRoom.subscribe(value => {	username = value.username_search;	});
 	// client.subscribe(value => {	local_username = value.username; });
 
 	// function changeUsername()
@@ -222,7 +220,7 @@
 	<div class="vflex options">
 		<h4>Username:</h4>
 		<div class="flex username">
-			<p>{$user.username}</p>
+			<p>{username}</p>
 			<button on:click={() => { changeUsernameModal.open(); }}>modify</button>
 		</div>
 		<h4>Double Authentification (QR Code):</h4>

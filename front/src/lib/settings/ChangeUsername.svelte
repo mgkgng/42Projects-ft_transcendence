@@ -64,6 +64,10 @@
 			message = "Your ID should have between 6 and 15 characters.";
 			err = true;
 			return ;
+		} else if (now == $user.username) {
+			message = "You can use this username!";
+			err = false;
+			return ;
 		}
 		$client.socket.emit("CheckNewUsername", now);
 	}
