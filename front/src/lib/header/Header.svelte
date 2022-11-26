@@ -108,8 +108,8 @@
     import { user } from "$lib/stores/user";
     import { login } from "$lib/stores/var";
     import Modal from "$lib/tools/Modal.svelte";
-	  import Friends from "$lib/modals/Friends.svelte"
-    import Settings from "../settings/Settings.svelte";
+	import Friends from "$lib/modals/Friends.svelte"
+    import Settings from "$lib/settings/Settings.svelte";
 
 	let profileModal: any;
 	let friendsModal: any;

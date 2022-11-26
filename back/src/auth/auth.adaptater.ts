@@ -29,7 +29,6 @@ import { verify } from 'jsonwebtoken';
 import { HttpException, UnauthorizedException } from '@nestjs/common';
 import { throwError } from 'rxjs';
 
-
 export class WsAdapter extends IoAdapter {
   createIOServer(port: number, options?: any) {
     const server = super.createIOServer(port, options);
@@ -37,7 +36,7 @@ export class WsAdapter extends IoAdapter {
 	  verify(socket.handshake.headers.authorization.split(' ')[1] as string, process.env.SECRET, (err, decoded : any) => { 
 		if (err)
 		{
-			console.log("ERROR");
+			console.log("ERROR", err);
 			socket.emit("errors", {message: "UnauthorizedJwt"});
 			return (null);
 		}

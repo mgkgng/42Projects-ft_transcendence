@@ -157,8 +157,6 @@
 	let userProfileModal: any;
 	let profileUser: any;
 
-	$: console.log(userSearchList);
-
 	$: searchUser = "";
 	$: searchUser = searchUser.toLowerCase();
 	$: { $client.socket.emit("getUserinDB", {username: searchUser}); }
@@ -175,7 +173,6 @@
 		});
 
 		$client.socket.on("success_getUserinDB", (data: any) => {
-			console.log(data);
 			userSearchList = data.users; });
 		$client.socket.on("error_getUserinDB", (data: any) => { userSearchList = []; });
 

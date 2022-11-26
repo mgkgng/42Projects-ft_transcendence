@@ -354,7 +354,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		.innerJoin("game.player1", "user1")
 		.innerJoin("game.player2", "user2")
 		.where("game.player1.id_g = :u or game.player2.id_g = :u", {u: id_user})
-		.select(["game.player1_score", "game.player2_score", "user1.username", "user2.username", "user1.img_url", "user1.img", "user2.img_url", "user2.img", "game.date_game"]).getMany();
+		.select(["game.player1_score", "game.player2_score", "user1.username", "user2.username", "game.date_game"]).getMany();
 		client.emit("resHistory", res);
 	}
 

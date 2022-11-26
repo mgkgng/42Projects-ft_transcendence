@@ -62,8 +62,8 @@
 				transition: .1s;
 	
 				&:nth-child(1):hover { background-color: $main-bright;}
-				&:nth-child(2):hover { background-color: $submain-blue;}
-				&:nth-child(3):hover { background-color: $green;}
+				&:nth-child(2):hover { background-color: $red;}
+				&:nth-child(3):hover { background-color: $submain-lowshadeblue;}
 			}
 		}
 
@@ -100,18 +100,25 @@
     import { client } from "$lib/stores/client";
 
 	export let profileUser: any;
-	console.log("profileUSer: ", profileUser);
 
 	let gameHistory: Array<any> = [];
 
 	onMount(() => {
 		$client.socket.emit("getHistory", { username: profileUser.username });
+
+		$client.socket.on("error_askFriend", (data: any) => {
+			console.log("error", data)
+		});
+		$client.socket.on("success_askFriend", (data: any) => {
+			console.log("success", data);
+		});
+
 		$client.socket.on("resHistory", (data: any) => {
 			gameHistory = data;
 		});
 
 		return (() => {
-			$client.removeListeners("resHistory");
+			$client.socket.off("resHistory");
 		})
 	});
 </script>
@@ -131,6 +138,7 @@
 	{#if profileUser.username != $user.username}
 	<div class="flex tools">
 		<button on:click={() => {
+			console.log("testing");
 			$client.socket.emit("askFriend", {
 				username: profileUser.username
 			});
@@ -143,12 +151,10 @@
 		{#if gameHistory.length}
 		{#each gameHistory as game}
 		<div class="flex line">
-			<img src="{(game.player1.img_url) ? game.player1.img_url : game.player1.img}" alt="player1">
 			<div class="vflex result">
 				<div>{game.player1.username} vs {game.player2.username}</div>
 				<div>{game.player1_score} : {game.player2_score}</div>
 			</div>
-			<img src="{(game.player2.img_url) ? game.player2.img_url : game.player2.img}" alt="player2">
 			<div>{game.date_game.split("T")[0]}</div>
 		</div>
 		{/each}
