@@ -201,7 +201,7 @@
 	// export let userInfo;
 	import Modal from "$lib/tools/Modal.svelte";
     import { client } from "$lib/stores/client";
-    import { chatRoom, ChatRooms, Room } from "$lib/stores/chatRoom";
+    // import { chatRoom, ChatRooms, Room } from "$lib/stores/chatRoom";
 	import { onMount, afterUpdate } from "svelte";
     import ChatRoomMessage from "$lib/tools/chatRoomMessage.svelte";
     import AddRoom from "$lib/chat/AddRoom.svelte";
@@ -214,12 +214,12 @@
 
 	let rooms : string[]; //Rooms visibles par le user
 	let actualName: string; //Name de la room selectionnee
-	let actualMessages : Room = new Room("", false, false, false, false);
+	// let actualMessages : Room = new Room("", false, false, false, false);
 	
 	let addRoomModal: any;
 	let allChatRoomModal: any;
 
-	$: console.log($chatRoom);
+	// $: console.log($chatRoom);
 
 	//afterUpdate(() => {
 			//message_zone.scroll({top: 1000000000});
@@ -230,129 +230,129 @@
 	//	}
 
 	//Liens entre les variables de ce fichier et les variables dans le stores "/src/stores/chatRoom.ts"
-	chatRoom.subscribe(chat  => { actualMessages = chat.actualRoom;});
-	chatRoom.subscribe(chat => { actualName = chat.actualRoomName;});
-	chatRoom.subscribe(chat => { rooms = chat.rooms;});
-	chatRoom.subscribe(chat => { actualName = chat.actualRoomName;});
+	// chatRoom.subscribe(chat  => { actualMessages = chat.actualRoom;});
+	// chatRoom.subscribe(chat => { actualName = chat.actualRoomName;});
+	// chatRoom.subscribe(chat => { rooms = chat.rooms;});
+	// chatRoom.subscribe(chat => { actualName = chat.actualRoomName;});
 	onMount (() => {
-		$client.socket.on("set_room_private", (data) =>
-		{
-			chatRoom.update((chat) =>{
-				chat.messages.get(data.room_name).is_private = true;
-				return (chat);
-			})
-		});
-		$client.socket.on("unset_room_private", (data) =>
-		{
-			chatRoom.update((chat) =>{
-				chat.messages.get(data.room_name).is_private = false;
-				return (chat);
-			})
-		});
-		$client.socket.on("set_password_room", (data) =>
-		{
-			chatRoom.update((chat) =>{
-				chat.messages.get(data.room_name).is_password_protected = true;
-				return (chat);
-			})
-		});
-		$client.socket.on("unset_password_room", (data) =>
-		{
-			chatRoom.update((chat) =>{
-				chat.messages.get(data.room_name).is_password_protected = false;
-				return (chat);
-			})
-		});
+		// $client.socket.on("set_room_private", (data) =>
+		// {
+		// 	chatRoom.update((chat) =>{
+		// 		chat.messages.get(data.room_name).is_private = true;
+		// 		return (chat);
+		// 	})
+		// });
+		// $client.socket.on("unset_room_private", (data) =>
+		// {
+		// 	chatRoom.update((chat) =>{
+		// 		chat.messages.get(data.room_name).is_private = false;
+		// 		return (chat);
+		// 	})
+		// });
+		// $client.socket.on("set_password_room", (data) =>
+		// {
+		// 	chatRoom.update((chat) =>{
+		// 		chat.messages.get(data.room_name).is_password_protected = true;
+		// 		return (chat);
+		// 	})
+		// });
+		// $client.socket.on("unset_password_room", (data) =>
+		// {
+		// 	chatRoom.update((chat) =>{
+		// 		chat.messages.get(data.room_name).is_password_protected = false;
+		// 		return (chat);
+		// 	})
+		// });
 
 		
 	});
-	function  chooseRoom(room : any){
-		chatRoom.update(chat => { 
-			chat.actualRoom = chat.messages.get(room.room);
-			chat.actualRoomName = room.room;
-			message_zone.scrollTo({top: 1000000000});
-			return (chat);
-		});
-	}
-	function sendMessage(){
-		$client.socket.emit("new_message_room", {room_name: actualName, content_message: newMessage});
-	}
-	function setNotVisible(room : any) { //Supprime un room des rooms visibles
-		$client.socket.emit("set_room_not_visible", {room_name: room.room });
-		$chatRoom.deleteRoom(room.room);
-	}
-	function createRoom()
-	{
-		if (newRoomPassword == null)
-			newRoomPassword = ""
-		$client.socket.emit("new_room", {room_name: newRoomName, is_password_protected: is_new_room_password_protected, room_password: newRoomPassword, is_private: false});
-	}
-	function set_private_room()
-	{
-		$client.socket.emit("set_room_private", {room_name: $chatRoom.actualRoomName});
-	}
-	function unset_private_room()
-	{
-		$client.socket.emit("unset_room_private", {room_name: $chatRoom.actualRoomName});
-	}
-	function set_password_room()
-	{
-		let password = prompt("Enter the new passwod's room: ");
-		$client.socket.emit("set_password_room", {room_name: $chatRoom.actualRoomName, password: password});
-	}
-	function unset_password_room()
-	{
-		$client.socket.emit("unset_password_room", {room_name: actualName});
-	}
-	function banUser(username)
-	{
-		let date : any = prompt("Date: ")
-		let res : Date;
-		if (date)
-		{
-			res = new Date(date);
-			console.log(res);
-			if (isNaN(res.getTime()))
-				alert("Bad date");
-			else 
-				$client.socket.emit("ban_user", { room_name : $chatRoom.actualRoomName, username_ban: username, ban_end: res});
-		}
-	}
-	function setAdmin(username)
-	{
-		$client.socket.emit("set_admin", { room_name : $chatRoom.actualRoomName, username_new_admin: username});
-	}
-	function muteUser(username)
-	{
-		let date : any = prompt("Date: ")
-		let res : Date;
-		if (date)
-		{
-			res = new Date(date);
-			console.log(res);
-			if (isNaN(res.getTime()))
-				alert("Bad date");
-			else 
-				$client.socket.emit("mute_user", { room_name : $chatRoom.actualRoomName, username_ban: username, mute_end: res});
-		}
-	}
-	let files : any;
+	// function  chooseRoom(room : any){
+	// 	chatRoom.update(chat => { 
+	// 		chat.actualRoom = chat.messages.get(room.room);
+	// 		chat.actualRoomName = room.room;
+	// 		message_zone.scrollTo({top: 1000000000});
+	// 		return (chat);
+	// 	});
+	// }
+	// function sendMessage(){
+	// 	$client.socket.emit("new_message_room", {room_name: actualName, content_message: newMessage});
+	// }
+	// function setNotVisible(room : any) { //Supprime un room des rooms visibles
+	// 	$client.socket.emit("set_room_not_visible", {room_name: room.room });
+	// 	$chatRoom.deleteRoom(room.room);
+	// }
+	// function createRoom()
+	// {
+	// 	if (newRoomPassword == null)
+	// 		newRoomPassword = ""
+	// 	$client.socket.emit("new_room", {room_name: newRoomName, is_password_protected: is_new_room_password_protected, room_password: newRoomPassword, is_private: false});
+	// }
+	// function set_private_room()
+	// {
+	// 	$client.socket.emit("set_room_private", {room_name: $chatRoom.actualRoomName});
+	// }
+	// function unset_private_room()
+	// {
+	// 	$client.socket.emit("unset_room_private", {room_name: $chatRoom.actualRoomName});
+	// }
+	// function set_password_room()
+	// {
+	// 	let password = prompt("Enter the new passwod's room: ");
+	// 	$client.socket.emit("set_password_room", {room_name: $chatRoom.actualRoomName, password: password});
+	// }
+	// function unset_password_room()
+	// {
+	// 	$client.socket.emit("unset_password_room", {room_name: actualName});
+	// }
+	// function banUser(username)
+	// {
+	// 	let date : any = prompt("Date: ")
+	// 	let res : Date;
+	// 	if (date)
+	// 	{
+	// 		res = new Date(date);
+	// 		console.log(res);
+	// 		if (isNaN(res.getTime()))
+	// 			alert("Bad date");
+	// 		else 
+	// 			$client.socket.emit("ban_user", { room_name : $chatRoom.actualRoomName, username_ban: username, ban_end: res});
+	// 	}
+	// }
+	// function setAdmin(username)
+	// {
+	// 	$client.socket.emit("set_admin", { room_name : $chatRoom.actualRoomName, username_new_admin: username});
+	// }
+	// function muteUser(username)
+	// {
+	// 	let date : any = prompt("Date: ")
+	// 	let res : Date;
+	// 	if (date)
+	// 	{
+	// 		res = new Date(date);
+	// 		console.log(res);
+	// 		if (isNaN(res.getTime()))
+	// 			alert("Bad date");
+	// 		else 
+	// 			$client.socket.emit("mute_user", { room_name : $chatRoom.actualRoomName, username_ban: username, mute_end: res});
+	// 	}
+	// }
+	// let files : any;
 	
-	function handleSubmits(event) {
-		console.log(event)
-  		let image = files[0];
-		const data = new FormData();
-		data.append('file', image);
-		console.log(data, image);
+	// function handleSubmits(event) {
+	// 	console.log(event)
+  	// 	let image = files[0];
+	// 	const data = new FormData();
+	// 	data.append('file', image);
+	// 	console.log(data, image);
 		
-		fetch("http://localhost:3000/upload_image", {
-			method: "POST",
-			body: data,
-			headers: {
-				"Authorization": "Bearer " + localStorage.getItem("transcendence-jwt"),
-			}
-		})
-	};
+	// 	fetch("http://localhost:3000/upload_image", {
+	// 		method: "POST",
+	// 		body: data,
+	// 		headers: {
+	// 			"Authorization": "Bearer " + localStorage.getItem("transcendence-jwt"),
+	// 		}
+	// 	})
+	// };
 </script>
 
 <Modal bind:this={addRoomModal}>
@@ -371,7 +371,7 @@
 		</div>
 		<div class="vflex list">
 			<p>My Rooms</p>
-			{#if $chatRoom?.rooms.length}
+			<!-- {#if $chatRoom?.rooms.length}
 			{#each ($chatRoom?.sortRoomsKeys([...$chatRoom.messages.keys()])) as room}
 			<div class="flex line">
 				{#if (room != actualName)}
@@ -386,11 +386,11 @@
 			{/each}
 			{:else}
 			<div class="flex no-room">You didn't join any room yet</div>
-			{/if}
+			{/if} -->
 		</div>
 	</div>
 	<div class="vflex chatroom">
-		{#if ($chatRoom.actualRoomName !== "")}
+		<!-- {#if ($chatRoom.actualRoomName !== "")}
 			<div class="read">
 			{#if actualMessages.is_owner}
 				{#if actualMessages.is_private}
@@ -406,7 +406,7 @@
 				{/if}
 			{/if}
 			{#each actualMessages?.messages as message}
-				<!-- <ChatRoomMessage username={message.username} content_message={message.message} itself={ itself } axelUserProfileModal={axelUserProfileModal} is_admin={actualMessages.is_admin}/> -->
+				<ChatRoomMessage username={message.username} content_message={message.message} itself={ itself } axelUserProfileModal={axelUserProfileModal} is_admin={actualMessages.is_admin}/>
 			{/each}
 			</div>
 			<div class="write">
@@ -419,9 +419,9 @@
 					{#each actualMessages?.usersRoom as actual_user}
 					<div class="user">
 						<div>{actual_user.username}</div>
-						<!-- <input type="button" class="btn-room" value="mute" on:click={()=>muteUser(actual_user.username)}/>
+						<input type="button" class="btn-room" value="mute" on:click={()=>muteUser(actual_user.username)}/>
 						<input type="button" class="btn-room" value="ban" on:click={()=>banUser(actual_user.username)}/>
-						<input type="button" class="btn-room" value="set Admin" on:click={()=>setAdmin(actual_user.username)}/> -->
+						<input type="button" class="btn-room" value="set Admin" on:click={()=>setAdmin(actual_user.username)}/>
 					</div>
 					{/each}
 				</div>
@@ -430,7 +430,7 @@
 			<div class="flex no-select">
 				<h2>Please select a room</h2> 
 			</div>
-		{/if}
+		{/if} -->
 	</div>
 </div>
 

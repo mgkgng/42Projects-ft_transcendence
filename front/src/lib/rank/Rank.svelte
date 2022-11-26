@@ -37,6 +37,13 @@
 				&:nth-child(3) { background-color: $grey; }
 				&:nth-child(4) { background-color: $red; }
 			}
+			.no-match {
+				width: 100%;
+				height: 50%;
+				align-items: center;
+				justify-content: center;
+				font-size: 25px;
+			}
 		}
 	}
 </style>
@@ -49,11 +56,11 @@
     import Modal from "../tools/Modal.svelte";
     import UserProfile from "../profile/UserProfile.svelte";
 
-
 	export let itself: any;
 	
 	let userProfileModal: any;
 	let profileUser: any;
+	let myPos: number = -1;
 
 	let rankList: Array<any> = [];
 
@@ -61,8 +68,8 @@
 		$client.socket.emit("RankingReq");
 
 		$client.socket.on("RankingRes", (data: any) => {
-			console.log("rankList", data);
 			rankList = data;
+			myPos = data.map((x: any) => x.username).indexOf($user.username);
 		});
 
 		return (() => {
@@ -77,7 +84,7 @@
 
 <div class="vflex window rank">
 	<h1>Global Ranking</h1>
-	<h3>You are situated at</h3>
+	<h3>{(myPos != -1) ? "You are situated at " + myPos : "Try any game to find yourself in the rank!"}</h3>
 	<div class="vflex list">
 		<div class="flex line">
 			<p>Rank</p>
@@ -102,7 +109,9 @@
 			</div>
 			{/each}
 		{:else}
-		<div>No match has been made!</div>
+		<div class="flex no-match">
+			<p>No match has been made</p>
+		</div>
 		{/if}
 	</div>
 	<CloseButton window={itself} />

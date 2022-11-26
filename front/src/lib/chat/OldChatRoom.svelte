@@ -99,7 +99,6 @@
 	// export let userInfo;
 	import Modal from "$lib/tools/Modal.svelte";
     import { client } from "$lib/stores/client";
-    import { chatRoom, ChatRooms, Room } from "$lib/stores/chatRoom";
 	import { onMount, afterUpdate } from "svelte";
 	import { get } from 'svelte/store';
     import ChatRoomMessage from "$lib/tools/chatRoomMessage.svelte";

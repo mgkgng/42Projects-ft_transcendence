@@ -80,7 +80,7 @@
 <script lang="ts">
 
     import { client } from "$lib/stores/client";
-    import { chatRoom } from "$lib/stores/chatRoom";
+    // import { chatRoom } from "$lib/stores/chatRoom";
 	import { onMount, beforeUpdate } from "svelte";
 	
 	export let itself: any; 
@@ -88,7 +88,7 @@
 	let rooms : string[];
 	let all_rooms : Map<string, boolean> = new Map();
 	chatRoom.subscribe(chat => { rooms = chat.rooms;});
-	chatRoom.subscribe(chat => { all_rooms= chat.all_rooms;});
+	// chatRoom.subscribe(chat => { all_rooms= chat.all_rooms;});
 
 	let research : string = "";
 	onMount(() => {

@@ -38,7 +38,6 @@
     import { onMount } from "svelte";
 	import { browser } from "$app/environment";
     import { loaded, login } from "$lib/stores/var";
-    import { chatRoom } from '$lib/stores/chatRoom';
 
 	async function connectWithUrlCode(url : any)
 	{
@@ -104,7 +103,7 @@
 				$client.socket.on("get_user_info", (data: any) => {
 					user.set(data);
 					login.set(true);
-					$chatRoom.LoadMessages($client);
+					// $chatRoom.LoadMessages($client);
 				});
 				$client.socket.emit("get_user_info", {});
 			}
