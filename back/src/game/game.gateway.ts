@@ -354,7 +354,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		.innerJoin("game.player1", "user1")
 		.innerJoin("game.player2", "user2")
 		.where("game.player1.id_g = :u or game.player2.id_g = :u", {u: id_user})
-		.select(["game.player1_score", "game.player2_score", "user1.username", "user2.username", "user1.img_url", "user1.img", "user2.img_url", "user2.img", "game.date_game"]).getMany();
+		.select(["game.player1_score", "game.player2_score", "user1.username", "user2.username", "game.date_game"]).getMany();
 		client.emit("resHistory", res);
 	}
 
@@ -365,7 +365,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				((cast(sum(games.is_winner) as float) / count(games.is_winner)) * 100) as win_rate, \
 				min(user_entity.username) as username, min(user_entity.campus_name) as campus_name, \
 				min(user_entity.campus_country) as campus_country, min(user_entity.img_url) as img_url, \
-				min(user_entity.displayname) as displayname \
+				min(user_entity.img) as img, min(user_entity.displayname) as displayname, \
+				min(user_entity.created_at) as created_at, min(user_entity.last_connection) as last_connection \
 				FROM ( \
 					SELECT \"player1IdG\" as id_player, (CASE WHEN player1_score > player2_score THEN 1 ELSE 0 END) as is_winner FROM game_entity as game1 \
 						UNION \
@@ -375,6 +376,57 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				ORDER BY nb_victory DESC, win_rate DESC; ", []);
 		client.emit("RankingRes", res);
 	}
+
+	@SubscribeMessage('CheckNewUsername')
+	async checkNewUsername(@ConnectedSocket() client: Socket, @MessageBody() data)
+	{
+		try {
+			const res = await this.dataSource.getRepository(UserEntity)
+			.createQueryBuilder("user")
+			.select(["user.username"])
+			.where("user.username = :u", { u: data }).getOneOrFail();
+			client.emit("CheckNewUsernameRes", {
+				err: true,
+				msg: ErrorMessage.TakenUsername
+			});
+		} catch(e){
+			client.emit("CheckNewUsernameRes", {
+				err: false
+			})
+		}
+	}
+
+	// @SubscribeMessage('CheckNewUsername')
+	// async checkNewUsername(@ConnectedSocket() client: Socket, @MessageBody() data, @Request() req)
+	// {
+	// 	try {
+	// 		const id_user = await this.mainServerService.getIdUser(req);
+	// 		try{
+	// 			const res = await this.dataSource.getRepository(UserEntity)
+	// 			.createQueryBuilder("user")
+	// 			.select(["user.username"])
+	// 			.where("user.username = :u", {u: data.new_username}).getOneOrFail();
+	// 			client.emit("error_change_username", "Username already taken");
+	// 			console.log("Username already taken ", client.id);
+	// 			return;
+	// 		} catch(e){
+	// 			if (data.new_username.length == 0 || data.new_username.length > 20)
+	// 			{
+	// 				client.emit("error_change_username", "Username not in good fromat");
+	// 				return;
+	// 			}
+	// 			const res = await this.dataSource.createQueryBuilder().update(UserEntity)
+	// 			.where("id_g = :u", {u: id_user})
+	// 			.set({username: data.new_username}).execute();
+	// 			client.emit("change_username", {new_username: data.new_username});
+	// 			console.log("Username changed ", client.id);
+	// 			return;
+	// 		}
+	// 	} catch(e){
+	// 		client.emit("error_change_username", "Data error");
+	// 		console.log("Data error ", client.id);
+	// 	}
+	// }
 
 	getRoom(id: string) { return (this.rooms.get(id)); }
 
@@ -386,6 +438,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	getUserInfo(request: any) {
 		const user: any = (this.jwtService.decode(request.handshake.headers.authorization.split(' ')[1]));	
 		return user;
+	}
+
+	getUsername(request: any) {
+
 	}
 
 	async getPlayerInfo(player: any) {

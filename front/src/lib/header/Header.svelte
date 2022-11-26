@@ -108,17 +108,17 @@
     import { user } from "$lib/stores/user";
     import { login } from "$lib/stores/var";
     import Modal from "$lib/tools/Modal.svelte";
-	  import Friends from "$lib/modals/Friends.svelte"
-    import Settings from "../settings/Settings.svelte";
+	import Friends from "$lib/modals/Friends.svelte"
+    import Settings from "$lib/settings/Settings.svelte";
 
-	let profileModal: any;
+	let userProfileModal: any;
 	let friendsModal: any;
 	let settingsModal: any;
 
 </script>
 
-<Modal bind:this={profileModal} >
-	<UserProfile profileUser={$user}  />
+<Modal bind:this={userProfileModal} >
+	<UserProfile itself={userProfileModal} profileUser={$user} />
 </Modal>
 <Modal bind:this={friendsModal}>
 	<Friends itself={friendsModal} />
@@ -136,7 +136,7 @@
 			<img src={(!$user.img) ? $user.img_url : $user.img} alt="profile" />
 		</div>
 		<div class="menu">
-			<button on:click={() => { profileModal.open(); }}>Profile</button>
+			<button on:click={() => { userProfileModal.open(); }}>Profile</button>
 			<button on:click={() => { friendsModal.open(); }}>Friends</button>
 			<button on:click={() => { settingsModal.open(); }}>Settings</button>
 			<button on:click={() => {

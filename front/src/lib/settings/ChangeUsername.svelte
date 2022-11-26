@@ -1,36 +1,29 @@
 <style lang="scss">
 	.modify {
 		width: 18em;
-		height: 9em;
-		padding: 1em;
-		padding-left: 1.5em;
-		padding-top: 2.5em;
+		height: 12em;
+		justify-content: space-around;
+		align-items: center;
+		
+		gap: .2em;
 
 		.message {
-			position: absolute;
-			top: .6em;
-			left: 20%;
-			color: $red;
-			// make font bold
+			height: 2em;
+			color: #fff;
+			text-align: center;
 		}
-		.input {
+		.err { color: $red; }
+
+		input {
 			width: 100%;
-			height: 40%;
-			gap: .5em;
-		
-			input {
-				width: 13.3em;
-				background-color: #fff;
-				padding-left: .5em;
-				border-radius: .2em;
-				color: #000;
-			}
-			
+			height: 2em;
+			background-color: #fff;
+			padding-left: .5em;
+			border-radius: .2em;
+			color: #000;
 		}
+			
 		.buttons {
-			position: absolute;
-			left: 4em;
-			bottom: 1em;
 			gap: .2em;
 	
 			button {
@@ -49,7 +42,7 @@
 <script lang="ts">
     import { user } from "$lib/stores/user";
     import { onMount } from "svelte";
-    import { client } from "../stores/client";
+    import { client } from "$lib/stores/client";
 
 	export let itself: any;
 
@@ -58,45 +51,51 @@
 	let modified: boolean = false;
 	let confirmed: boolean = false;
 	$: modified = !(username == now);
+	$: checkNewUsername(now);
 
-	let errMsg: string = "";
+	let message: string = "Try your new username";
+	let err: boolean = false;
+
+	function checkNewUsername(now: string) {
+		if (!modified) {
+			message = "Try your new username";
+			return ;
+		} else if (now.length < 6 || now.length > 15) {
+			message = "Your ID should have between 6 and 15 characters.";
+			err = true;
+			return ;
+		} else if (now == $user.username) {
+			message = "You can use this username!";
+			err = false;
+			return ;
+		}
+		$client.socket.emit("CheckNewUsername", now);
+	}
 
 	onMount(() => {
-		$client.socket.on("error_change_username", (data: any) => {
-			errMsg = data;
+		$client.socket.on("CheckNewUsernameRes", (data: any) => {
+			err = data.err;
+			message = (data.msg) ? data.msg : "You can use this username!";
 		});
 
-			// $client.socket.on("change_username", (data) => {
-			// confirmed = true;
-			// 	chatRoom.update((value) => {
-			// 		value.username_search = data.new_username;
-			// 		return value;
-			// 	}); 
-			// });
 		return (() => {
-			$client.removeListeners("error_change_username", "change_username");
+			$client.removeListeners("CheckNewUsernameRes");
 		});
 	});
 </script>
 
-<div class="flex window modify">
-	{#if errMsg}
+<div class="vflex window modify">
 	<div class="message">
-		{errMsg}
+		{#if message}
+		<p class="{(err) ? "err" : ""}">{message}</p>
+		{/if}
 	</div>
-	{/if}
-	<div class="flex input">
-		<input type="text-input" placeholder="Put your new username here" bind:value={username}>
-		<button style="display: {(modified) ? "block" : "none"}" on:click={() => {
-			errMsg = "";
-			// $client.socket.emit("change_username", newUsername);
-		}}>Try</button>
-	</div>
+	<input type="text-input" placeholder="Put your new username here" bind:value={now}>
 	<div class="flex buttons">
 		<button on:click={() => {
 			itself.close();
 		}}>Cancel</button>
-		<button class="{(modified && confirmed) ? "" : "no-active"}" on:click={() => {
+		<button class="{(modified && !err) ? "" : "no-active"}" on:click={() => {
 			username = now;
 			itself.close();
 		}}>Select</button>

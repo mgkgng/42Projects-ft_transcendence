@@ -22,8 +22,8 @@
 			transform: translateY(-5px);
 		}
 	}
-
 	.play { background-color: $main-bright; }
+	.rank { background-color: $main-light; }
 	.chat { background-color: $submain-lowshadeblue; }
 </style>
 
@@ -31,6 +31,7 @@
 	export let itself: any;
 	export let enterGameModal: any;
 	export let chatRoomModal: any;
+	export let rankModal: any;
 	
 </script>
 
@@ -39,6 +40,10 @@
 		enterGameModal.open();
 		itself.close();
 	}}>Play</button>
+	<button class="rank" on:click={()=>{
+		rankModal.open();
+		itself.close();
+	}}>Rank</button>
 	<button class="chat" on:click={()=>{
 		chatRoomModal.open();
 		itself.close();

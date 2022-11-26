@@ -1,11 +1,109 @@
-<style>
+<style lang="scss">
+	.rank {
+		width: 640px;
+		height: 800px;
 
+		padding: 1.5em 2em;
+
+		align-items: center;
+
+		.list {
+			width: 100%;
+			height: 90%;
+			padding: 1em 2em;
+			text-align: center;
+			gap: 0;
+
+			border: $border;
+			border-radius: .4em;
+
+			overflow-y: scroll;
+
+			.line {
+				border-radius: .3em;
+				padding: .5em 0;
+				width: 100%;
+				gap: 0;
+				display: grid;
+				grid-template-columns: 10% 30% 20% 13% 13% 13%;
+				border-bottom: $border-thin;
+				align-items: center;
+				.user {
+					cursor: pointer;
+					transition: .2s;
+				}
+
+				&:nth-child(2) { background-color: $yellow; }
+				&:nth-child(3) { background-color: $grey; }
+				&:nth-child(4) { background-color: $red; }
+			}
+		}
+	}
 </style>
 
-<script>
+<script lang="ts">
+	import { onMount } from "svelte";
+    import { client } from "$lib/stores/client";
+    import { user } from "$lib/stores/user";
+    import CloseButton from "$lib/items/CloseButton.svelte";
+    import Modal from "../tools/Modal.svelte";
+    import UserProfile from "../profile/UserProfile.svelte";
 
+
+	export let itself: any;
+	
+	let userProfileModal: any;
+	let profileUser: any;
+
+	let rankList: Array<any> = [];
+
+	onMount(() => {
+		$client.socket.emit("RankingReq");
+
+		$client.socket.on("RankingRes", (data: any) => {
+			console.log("rankList", data);
+			rankList = data;
+		});
+
+		return (() => {
+			$client.socket.off("RankingRes");
+		});
+	});
 </script>
 
-<div class="window">
+<Modal bind:this={userProfileModal}>
+	<UserProfile itself={userProfileModal} profileUser={profileUser}/>
+</Modal>
 
+<div class="vflex window rank">
+	<h1>Global Ranking</h1>
+	<h3>You are situated at</h3>
+	<div class="vflex list">
+		<div class="flex line">
+			<p>Rank</p>
+			<p>Player</p>
+			<p>Campus</p>
+			<p>Wins</p>
+			<p>Games</p>
+			<p>Rate</p>
+		</div>
+		{#if rankList.length}
+			{#each rankList as rank, i}
+			<div class="flex line">
+				<h3>#{i + 1}</h3>
+				<p class="user" on:click={() => {
+					profileUser = rank;
+					userProfileModal.open();
+				}}>{rank.username}</p>
+				<p>{rank.campus_name}, {rank.campus_country}</p>
+				<p>{rank.nb_victory}</p>
+				<p>{rank.nb_game}</p>
+				<p>{rank.win_rate}%</p>
+			</div>
+			{/each}
+		{:else}
+		<div>No match has been made!</div>
+		{/if}
+	</div>
+	<CloseButton window={itself} />
 </div>

@@ -157,8 +157,6 @@
 	let userProfileModal: any;
 	let profileUser: any;
 
-	$: console.log(userSearchList);
-
 	$: searchUser = "";
 	$: searchUser = searchUser.toLowerCase();
 	$: { $client.socket.emit("getUserinDB", {username: searchUser}); }
@@ -175,13 +173,12 @@
 		});
 
 		$client.socket.on("success_getUserinDB", (data: any) => {
-			console.log(data);
 			userSearchList = data.users; });
 		$client.socket.on("error_getUserinDB", (data: any) => { userSearchList = []; });
 
 		$client.socket.on("resUserProfile", (data: any) => {
-			profileUser = data;
-			userProfileModal.open();
+			// profileUser = data;
+			// userProfileModal.open();
 		});
 
 		return (() => {
@@ -204,7 +201,8 @@
 				{#if userSearchList.length}
 				{#each userSearchList as user}
 				<div class="flex line" on:click={() => {
-					$client.socket.emit("getUserProfile", { username: user.username });
+					profileUser = user;
+					userProfileModal.open();
 				}}>
 					<img src="{user.img_url}" alt="user">
 					<div class="user">{user.username}</div>

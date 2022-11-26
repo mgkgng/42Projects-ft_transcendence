@@ -9,12 +9,13 @@
 	import Modal from '$lib/tools/Modal.svelte';
 	import Room from "$lib/game/Room.svelte";
 	import Message from '$lib/modals/Message.svelte';
-	import PlayOrChat from "$lib/modals/PlayOrChat.svelte";
+	import Enter from "$lib/modals/Enter.svelte";
     import CreateGame from "$lib/game/CreateGame.svelte";
     import EnterGame from "$lib/game/EnterGame.svelte";
     import JoinGame from "$lib/game/JoinGame.svelte";
     import ChatRoom from '$lib/chat/ChatRoom.svelte';
     import { loaded } from '../lib/stores/var';
+    import Rank from '$lib/rank/Rank.svelte';
 
 	let roomModal: any;
 	let roomID: string = "";
@@ -27,6 +28,7 @@
 	let enterGameModal: any;
 	let createGameModal: any;
 	let chatRoomModal: any;
+	let rankModal: any;
 
 	onMount(() => {
 		if (!browser || !$client.socket)
@@ -71,7 +73,6 @@
 			roomModal.open();
 		});
 
-
 		return (() => {
 			$client.socket.off("CreateRoomRes", "JoinRoomRes", "JoinQueueError",
 				"askFriendNotification", "MatchFound", "CreateRoomError",
@@ -84,8 +85,12 @@
 	<ChatRoom itself={chatRoomModal} />
 </Modal>
 
+<Modal bind:this={rankModal}>
+	<Rank itself={rankModal} />
+</Modal>
+
 <Modal bind:this={enterModal}>
-	<PlayOrChat itself={enterModal} enterGameModal={enterGameModal} chatRoomModal={chatRoomModal}/>
+	<Enter itself={enterModal} enterGameModal={enterGameModal} rankModal={rankModal} chatRoomModal={chatRoomModal}/>
 </Modal>
 
 <Modal bind:this={createGameModal}>
