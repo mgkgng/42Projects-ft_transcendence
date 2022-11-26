@@ -376,6 +376,57 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		client.emit("RankingRes", res);
 	}
 
+	@SubscribeMessage('CheckNewUsername')
+	async checkNewUsername(@ConnectedSocket() client: Socket, @MessageBody() data)
+	{
+		try {
+			const res = await this.dataSource.getRepository(UserEntity)
+			.createQueryBuilder("user")
+			.select(["user.username"])
+			.where("user.username = :u", { u: data }).getOneOrFail();
+			client.emit("CheckNewUsernameRes", {
+				err: true,
+				msg: ErrorMessage.TakenUsername
+			});
+		} catch(e){
+			client.emit("CheckNewUsernameRes", {
+				err: false
+			})
+		}
+	}
+
+	// @SubscribeMessage('CheckNewUsername')
+	// async checkNewUsername(@ConnectedSocket() client: Socket, @MessageBody() data, @Request() req)
+	// {
+	// 	try {
+	// 		const id_user = await this.mainServerService.getIdUser(req);
+	// 		try{
+	// 			const res = await this.dataSource.getRepository(UserEntity)
+	// 			.createQueryBuilder("user")
+	// 			.select(["user.username"])
+	// 			.where("user.username = :u", {u: data.new_username}).getOneOrFail();
+	// 			client.emit("error_change_username", "Username already taken");
+	// 			console.log("Username already taken ", client.id);
+	// 			return;
+	// 		} catch(e){
+	// 			if (data.new_username.length == 0 || data.new_username.length > 20)
+	// 			{
+	// 				client.emit("error_change_username", "Username not in good fromat");
+	// 				return;
+	// 			}
+	// 			const res = await this.dataSource.createQueryBuilder().update(UserEntity)
+	// 			.where("id_g = :u", {u: id_user})
+	// 			.set({username: data.new_username}).execute();
+	// 			client.emit("change_username", {new_username: data.new_username});
+	// 			console.log("Username changed ", client.id);
+	// 			return;
+	// 		}
+	// 	} catch(e){
+	// 		client.emit("error_change_username", "Data error");
+	// 		console.log("Data error ", client.id);
+	// 	}
+	// }
+
 	getRoom(id: string) { return (this.rooms.get(id)); }
 
 	getClient(request: any) {
@@ -386,6 +437,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	getUserInfo(request: any) {
 		const user: any = (this.jwtService.decode(request.handshake.headers.authorization.split(' ')[1]));	
 		return user;
+	}
+
+	getUsername(request: any) {
+
 	}
 
 	async getPlayerInfo(player: any) {

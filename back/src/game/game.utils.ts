@@ -53,7 +53,8 @@ export const ErrorMessage = {
 	AccessNotPermitted: "You cannot access this room unproperly.",
 	RoomDestroyed: "This room doesn't exist anymore.",
 	RoomNotAvailble: "The room is not available.",
-	RoomNotReady: "Your opponent should be ready."
+	RoomNotReady: "Your opponent should be ready.",
+	TakenUsername: "The username is already taken."
 }
 
 export const PongConfig = {

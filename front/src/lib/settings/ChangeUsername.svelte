@@ -58,12 +58,28 @@
 	let modified: boolean = false;
 	let confirmed: boolean = false;
 	$: modified = !(username == now);
+	$: checkNewUsername(now);
 
-	let errMsg: string = "";
+	let message: string = "";
+	let err: boolean = false;
+
+	function checkNewUsername(now: string) {
+		console.log("???");
+		if (!modified) {
+			message = "";
+			return ;
+		} else if (now.length < 6 || now.length > 15) {
+			message = "Your ID should have have between 6 and 15 characters.";
+			err = true;
+			return ;
+		}
+		$client.socket.emit("CheckNewUsername", now);
+	}
 
 	onMount(() => {
-		$client.socket.on("error_change_username", (data: any) => {
-			errMsg = data;
+		$client.socket.on("CheckNewUsernameRes", (data: any) => {
+			err = data.err;
+			message = (data.msg) ? data.msg : "You can use this username!";
 		});
 
 			// $client.socket.on("change_username", (data) => {
@@ -74,21 +90,21 @@
 			// 	}); 
 			// });
 		return (() => {
-			$client.removeListeners("error_change_username", "change_username");
+			$client.removeListeners("CheckNewUsernameRes", "change_username");
 		});
 	});
 </script>
 
 <div class="flex window modify">
-	{#if errMsg}
+	{#if message}
 	<div class="message">
-		{errMsg}
+		{message}
 	</div>
 	{/if}
 	<div class="flex input">
-		<input type="text-input" placeholder="Put your new username here" bind:value={username}>
+		<input type="text-input" placeholder="Put your new username here" bind:value={now}>
 		<button style="display: {(modified) ? "block" : "none"}" on:click={() => {
-			errMsg = "";
+			message = "";
 			// $client.socket.emit("change_username", newUsername);
 		}}>Try</button>
 	</div>
