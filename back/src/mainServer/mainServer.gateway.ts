@@ -73,7 +73,10 @@ export class MainServerGateway {
 		else
 		{
 			const parsedList = users.map((user) => {
-				return {username: user.username, img_url: user.img_url, last_connection: user.last_connection, created_at: user.created_at,status: this.mainServerService.getUserStatus(user.username)}});
+				return {username: user.username, displayname: user.displayname, img_url: user.img_url,
+					campus_name: user.campus_name, campus_country: user.campus_country,
+					last_connection: user.last_connection, created_at: user.created_at,
+					status: this.mainServerService.getUserStatus(user.username)}});
 			const index = parsedList.indexOf(this.mainServerService.getUserConnectedBySocketId(client.id).username);
 			if (index > -1) {
 				parsedList.splice(index, 1);

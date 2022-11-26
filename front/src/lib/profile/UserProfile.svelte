@@ -3,7 +3,7 @@
 		width: 550px;
 		height: 650px;
 		padding: 1.8em 1.5em;
-		gap: .5em;
+		gap: 0;
 
 		.info {
 			position: relative;
@@ -12,9 +12,7 @@
 			max-height: 400px;
 			border-radius: .4em;
 			border: $border-thin;
-	
-			text-align: center;
-	
+		
 			padding: 1em;
 	
 			color: #e6e6e6;
@@ -45,50 +43,35 @@
 				}
 
 			}
-			.tools {
-				position: absolute;
-
-				right: 0;
-				bottom: .6em;
-				padding: .3em;
-
-				
-				gap: .5em;
-
+		}
+		.tools {
+			width: 100%;
+			align-items: center;
+			justify-content: center;
+			gap: 2em;
+			
+			button {
+				width: 5em;
+				height: 2em;
+				aspect-ratio: 1 / 1;
 				border: $border-thin;
-				border-right: none;
-				border-radius: .2em 0 0 .2em;
+				border-top: none;
 
-				transition: .2s;
-		
-				button {
-					width: 1.5em;
-					aspect-ratio: 1 / 1;
-					border-radius: 1em;
-					border: 2px solid transparentize(#fff, .5);
-					cursor: pointer;
-					transition: .2s;
-		
-					&:hover {
-						transform: scale(1.05);
-
-					}
-
-					&:nth-child(1):hover { background-color: $main-bright;}
-					&:nth-child(2):hover { background-color: $submain-blue;}
-					&:nth-child(3):hover { background-color: $green;}
-				}
-
-				&:hover {
-					background-color: transparentize(#fff, 0.9);
-				}
+				border-radius: 0 0 .3em .3em;
+				cursor: pointer;
+				transition: .1s;
+	
+				&:nth-child(1):hover { background-color: $main-bright;}
+				&:nth-child(2):hover { background-color: $submain-blue;}
+				&:nth-child(3):hover { background-color: $green;}
 			}
 		}
 
 		.history {
 			width: 100%;
-			min-height: 200px;
+			min-height: 60%;
 			border-radius: .3em;
+			margin-top: 1em;
 	
 			text-align: center;
 	
@@ -117,20 +100,19 @@
     import { client } from "$lib/stores/client";
 
 	export let profileUser: any;
+	console.log("profileUSer: ", profileUser);
 
 	let gameHistory: Array<any> = [];
 
 	onMount(() => {
 		$client.socket.emit("getHistory", { username: profileUser.username });
 		$client.socket.on("resHistory", (data: any) => {
-			console.log("game history", data);
 			gameHistory = data;
 		});
-		
-		$client.socket.emit("getHistory", { username: profileUser.username });
-		$client.socket.emit("resHistory", (data: any) => {
-			gameHistory = data.history
-		});
+
+		return (() => {
+			$client.removeListeners("resHistory");
+		})
 	});
 </script>
 
@@ -142,20 +124,21 @@
 		<div class="vflex data">
 			<p class="username">{profileUser.displayname} a.k.a. {profileUser.username}</p>
 			<p class="campus">Campus: {profileUser.campus_name}, {profileUser.campus_country}</p>
+			<p>Joined: {profileUser.created_at.split('T')[0]}</p>
+			<p>Connected: {(profileUser.status == "online") ? "Online" : profileUser.last_connection.split('T'[0])}</p>
 		</div>
-
-		{#if profileUser.username != $user.username}
-		<div class="flex tools">
-			<button on:click={() => {
-				$client.socket.emit("askFriend", {
-					username: profileUser.username
-				});
-			}}>A</button>
-			<button>B</button>
-			<button>M</button>
-		</div>
-		{/if} 
 	</div>
+	{#if profileUser.username != $user.username}
+	<div class="flex tools">
+		<button on:click={() => {
+			$client.socket.emit("askFriend", {
+				username: profileUser.username
+			});
+		}}>Add</button>
+		<button>Block</button>
+		<button>Message</button>
+	</div>
+	{/if} 
 	<div class="history">
 		{#if gameHistory.length}
 		{#each gameHistory as game}
