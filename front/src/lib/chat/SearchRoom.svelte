@@ -82,22 +82,18 @@
     import { client } from "$lib/stores/client";
     // import { chatRoom } from "$lib/stores/chatRoom";
 	import { onMount, beforeUpdate } from "svelte";
+    import { Chat } from "../chatt/Chat";
 	
 	export let itself: any; 
+	export let chat: Chat;
 
 	let rooms : string[];
 	let all_rooms : Map<string, boolean> = new Map();
-	chatRoom.subscribe(chat => { rooms = chat.rooms;});
 	// chatRoom.subscribe(chat => { all_rooms= chat.all_rooms;});
 
 	let research : string = "";
 	onMount(() => {
-		$client.socket.emit("get_all_rooms_begin_by", {research: research});
 
-		return (() => {
-			$client.socket.off("get_all_rooms_begin_by");
-			// $client
-		})
 	});
 
 	function addToTheRoom(room : any)
@@ -124,8 +120,8 @@
 		<button on:click={researchRooms}>Search</button>
 	</div>
 	<div class="vflex result">
-		{#each ([...all_rooms.keys()].sort()) as room_name}
-			{#if (!rooms.includes(room_name))}
+		{#each ([...chat.all_rooms.keys()].sort()) as room_name}
+			{#if (!chat.my_roomlist.includes(room_name))}
 				<div class="flex list">
 					<p>{room_name}</p>
 					<button on:click={() => addToTheRoom(room_name)}>Join</button>

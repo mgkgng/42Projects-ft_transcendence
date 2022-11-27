@@ -2,42 +2,25 @@ import { browser } from "$app/environment";
 import { ChatRoom } from "$lib/chatt/chatRoom";
 
 export class Chat {
-	all_rooms: Array<ChatRoom>;	//toutes les rooms (utilisées pour s'ajouter a une room)
-	rooms: Array<string>;				//room visibles pour l'utilisateur
-	messages : Map<string, ChatRoom>;	//les messages de chaques room
-	actualRoom : any;
-	actualRoomName : string;			//room selectionnee 
+	all_rooms: Map<string, ChatRoom>;	//toutes les rooms (utilisées pour s'ajouter a une room) // TODO a modifier
+	my_roomlist: Array<string>;				//room visibles pour l'utilisateur
+	my_rooms : Map<string, ChatRoom>;	//les messages de chaques room
 	username_search : string;			//username search profile
 
 	constructor(rooms: any) {
-		for (let room of rooms)
-			
-			
-		this.rooms = [];
-		this.messages = new Map<string, ChatRoom>();
-		this.actualRoomName = "";
+		// this.all_rooms = rooms;
+		this.all_rooms = new Map<string, ChatRoom>();
+		this.my_roomlist = [];
+		this.my_rooms = new Map<string, ChatRoom>();
 		this.username_search = "";
 	}
 	
 	loadMessages(client : any) {
-		if (!browser)
-			return ;
-
-		console.log("Try load messages");
-		client.socket.emit("get_my_rooms", {});
-		
-		client.socket.on("set_room_not_visible", (data) => {
-			client.socket.emit("get_my_rooms", {});
-		});
-		client.socket.on("set_room_visible", (data) => {
-			client.socket.emit("get_my_rooms", {});
-		});
-
 		// socket_event_update_front(client);			
 	}
 
 	deleteRoom(room : any) {
-		this.messages.delete(room);
+		this.my_rooms.delete(room);
 	}
 
 	sortRoomsKeys(keys : string[]) {

@@ -205,21 +205,19 @@
 	import { onMount, afterUpdate } from "svelte";
     import ChatRoomMessage from "$lib/tools/chatRoomMessage.svelte";
     import AddRoom from "$lib/chat/AddRoom.svelte";
-    import AllChatRooms from "$lib/chat/AllChatRooms.svelte";
     import { Chat } from "$lib/chatt/Chat";
+    import SearchRoom from "$lib/chat/SearchRoom.svelte";
 
 	let chat: Chat;
 	export let itself: any; 
-	// export let allChatModal: any;
 
 	let newMessage : string;
 
 	let rooms : string[]; //Rooms visibles par le user
 	let roomSelected: string;
-	// let actualMessages : Room = new Room("", false, false, false, false);
 	
 	let addRoomModal: any;
-	let allChatRoomModal: any;
+	let searchRoomModal: any;
  
 	//afterUpdate(() => {
 			//message_zone.scroll({top: 1000000000});
@@ -229,12 +227,6 @@
 	//		message_zone.scroll({top: 1000000000});
 	//	}
 
-	//Liens entre les variables de ce fichier et les variables dans le stores "/src/stores/chatRoom.ts"
-	// chatRoom.subscribe(chat  => { actualMessages = chat.actualRoom;});
-	// chatRoom.subscribe(chat => { actualName = chat.actualRoomName;});
-	// chatRoom.subscribe(chat => { rooms = chat.rooms;});
-	// chatRoom.subscribe(chat => { actualName = chat.actualRoomName;});
-
 	onMount (() => {
 		$client.socket.emit("get_my_rooms");
 
@@ -243,49 +235,24 @@
 			console.log("my_rooms: ", data);
 
 			chat = new Chat(data);
-		})
-
-		return(() => {
-			$client.socket.off("get_my_rooms_res");
 		});
 
-		// $client.socket.on("set_room_private", (data) =>
-		// {
-		// 	chatRoom.update((chat) =>{
-		// 		chat.messages.get(data.room_name).is_private = true;
-		// 		return (chat);
-		// 	})
-		// });
-		// $client.socket.on("unset_room_private", (data) =>
-		// {
-		// 	chatRoom.update((chat) =>{
-		// 		chat.messages.get(data.room_name).is_private = false;
-		// 		return (chat);
-		// 	})
-		// });
-		// $client.socket.on("set_password_room", (data) =>
-		// {
-		// 	chatRoom.update((chat) =>{
-		// 		chat.messages.get(data.room_name).is_password_protected = true;
-		// 		return (chat);
-		// 	})
-		// });
-		// $client.socket.on("unset_password_room", (data) =>
-		// {
-		// 	chatRoom.update((chat) =>{
-		// 		chat.messages.get(data.room_name).is_password_protected = false;
-		// 		return (chat);
-		// 	})
-		// });
+		/* Chat Updates*/
+		$client.socket.on("set_room_not_visible", (data: any) => { client.socket.emit("get_my_rooms"); });
+		$client.socket.on("set_room_visible", (data: any) => { client.socket.emit("get_my_rooms"); });
+		$client.socket.on("set_room_private", (data: any) => { chat.my_rooms.get(data.room_name).is_private = true; });
+		$client.socket.on("unset_room_private", (data: any) => { chat.my_rooms.get(data.room_name).is_private = false; });
+		$client.socket.on("set_password_room", (data: any) => { chat.my_rooms.get(data.room_name).is_password_protected = true; });
+		$client.socket.on("unset_password_room", (data: any) => { chat.my_rooms.get(data.room_name).is_password_protected = false; });
+
+		return(() => {
+			$client.removeListeners("get_my_rooms_res", "set_room_not_visible", "set_room_visible",
+				"set_room_private", "unset_room_private", "set_password_room", "unset_password_room");
+		});
+
+		
 	});
-	// function  chooseRoom(room : any){
-	// 	chatRoom.update(chat => { 
-	// 		chat.actualRoom = chat.messages.get(room.room);
-	// 		chat.actualRoomName = room.room;
-	// 		message_zone.scrollTo({top: 1000000000});
-	// 		return (chat);
-	// 	});
-	// }
+	
 	// function sendMessage(){
 	// 	$client.socket.emit("new_message_room", {room_name: actualName, content_message: newMessage});
 	// }
@@ -371,15 +338,15 @@
 	<AddRoom itself={addRoomModal} />
 </Modal>
 
-<Modal bind:this={allChatRoomModal}>
-	<AllChatRooms itself={allChatRoomModal} />
+<Modal bind:this={searchRoomModal}>
+	<SearchRoom itself={searchRoomModal} chat={chat}/>
 </Modal>
 
 <div class="flex window chat">
 	<div class="rooms">
 		<div class="flex tools">
 			<button on:click={() => { addRoomModal.open(); }}>Add</button>
-			<button on:click={() => { allChatRoomModal.open(); }}>Join</button>
+			<button on:click={() => { searchRoomModal.open(); }}>Join</button>
 		</div>
 		<div class="vflex list">
 			<p>My Rooms</p>
