@@ -209,8 +209,9 @@
     import SearchRoom from "$lib/chat/SearchRoom.svelte";
 	import { ChatRoom } from "$lib/chatt/ChatRoom";
     import CloseButton from "$lib/items/CloseButton.svelte";
+    import RoomPassword from "./RoomPassword.svelte";
 
-	let chat: Chat;
+	let chat: Chat = new Chat();
 	export let itself: any; 
 
 	let newMessage : string;
@@ -239,19 +240,19 @@
 		$client.socket.on("unset_password_room", (data: any) => { chat.my_rooms.get(data.room_name).is_password_protected = false; });
 
 		$client.socket.on("get_all_rooms_res", (data : any) => {
-			console.log(data);
+			for (let room of data)
+				chat.rooms.set(room.name, room.is_password_protected);
 		});
 
 		$client.socket.on("get_my_rooms_res", (data: any) => {
-			console.log("my_rooms: ", data);
-			chat = new Chat(data);
+			chat.my_rooms = data;
 		});
 
 		$client.socket.on("new_room_res", (data : any) => {
 			console.log("something received");
 			chat.rooms.set(data.room_name, new ChatRoom(data.room_name, data.is_password_protected, data.is_private, data.is_admin, true))
+			chat.my_rooms.push(data.room_name);
 			chat = chat;
-			console.log("chat", chat);
 		});
 
 		$client.socket.emit("get_my_rooms");
@@ -354,11 +355,9 @@
 			{#if chat?.my_rooms.length}
 			{#each (chat.sortRoomsKeys([...chat.rooms.keys()])) as room}
 			<div class="flex line">
-				{#if (room != roomSelected)}
-				<div class="room" on:click={() => roomSelected = room}>{room}</div>
-				{:else}
-				<div class="room chosen">{room}</div>
-				{/if}
+				<div class="room {(room == roomSelected) ? "chosen" : ""}" on:click={() => {
+					roomSelected = room;
+				}}>{room}</div>
 				<div class="button"><p>Quit</p></div>
 			</div>
 			{/each}

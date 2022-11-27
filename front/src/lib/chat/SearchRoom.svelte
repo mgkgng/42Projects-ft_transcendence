@@ -91,19 +91,22 @@
 	let passwordModal: any;
 
 	let research : string = "";
+	let searchResult: Array<string> = [];
 
 	let roomName: string = "";
 
-	onMount(() => {
+	$: $client.socket.emit("get_all_rooms_begin_by", { research: research });
 
+	onMount(() => {
+		console.log("ccc", [...chat.rooms.keys()].sort());
+		console.log("ttt", chat.my_rooms);
+		$client.socket.on("get_all_rooms_begin_by_res", (data: any) => {
+			console.log("test", data);
+		});
+
+		return (() => { $client.socket.off("get_all_rooms_begin_by_res"); });
 	});
 
-	function researchRooms()
-	{
-		// console.log("changed")
-		$client.socket.emit("get_all_rooms_begin_by", {research: research});
-
-	}
 </script>
 
 <Modal bind:this={passwordModal}>
@@ -113,7 +116,6 @@
 <div class="vflex window rooms">
 	<div class="flex research">
 		<input class="text-input" placeholder="Search Room Name ..." bind:value={research}>
-		<button on:click={researchRooms}>Search</button>
 	</div>
 	<div class="vflex result">
 		{#each ([...chat.rooms.keys()].sort()) as room_name}

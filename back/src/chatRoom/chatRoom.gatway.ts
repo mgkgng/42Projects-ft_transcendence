@@ -49,13 +49,12 @@ export class ChatRoomService {
 	@SubscribeMessage('new_room')
 	async creat_room(@MessageBody() data: any, @Request() req, @ConnectedSocket() client : Socket)
 	{
-		//console.log("new room");
+		console.log("new room", data);
 		const id_user = await this.mainServer.getIdUser(req);
-		const is_password_protected : boolean = data.is_password_protected;	
+		// const is_password_protected : boolean = data.is_password_protected;	
 		// const password : string = is_password_protected ? 
 		// await bcrypt.hash(data.room_password, 10) 
 		//   	: "";
-		const password = "non"
 		const name : string = data.room_name;
 		const date_creation : Date = new Date();
 		const  querry = this.dataSource.createQueryRunner(); 
@@ -63,8 +62,8 @@ export class ChatRoomService {
 			const new_chat_room = new ChatRoomEntity();
 			new_chat_room.name = name;
 			new_chat_room.date_creation = date_creation;
-			new_chat_room.is_password_protected = is_password_protected;
-			new_chat_room.password = password;
+			new_chat_room.is_password_protected = data.is_password_protected;
+			new_chat_room.password = data.password;
 			new_chat_room.is_private = data.is_private;
 			const res_chat_room : any = await this.dataSource.getRepository(ChatRoomEntity).save(new_chat_room);
 			const new_user_chat_room = new UserChatRoomEntity();
@@ -77,7 +76,7 @@ export class ChatRoomService {
 			const res_user_chat_room = await this.dataSource.getRepository(UserChatRoomEntity).save(new_user_chat_room);
 			client.join(name);
 			console.log("Create room finish");
-			client.emit("new_room_res", { room_name: name, is_password_protected: is_password_protected, is_admin: true, is_private: data.is_private });
+			client.emit("new_room_res", { room_name: name, is_password_protected: data.is_password_protected, is_admin: true, is_private: data.is_private });
 		} catch (e) {
 			console.log("Create room error");
 			client.emit("error_new_room", {error: "Room already exist"});
@@ -318,18 +317,17 @@ export class ChatRoomService {
 	@SubscribeMessage('get_all_rooms')
 	async getAllRooms(@MessageBody() data, @ConnectedSocket() client: Socket)
 	{
-		const res = await this.dataSource.getRepository(MessageChatRoomEntity)
-		.createQueryBuilder("messages")
-		.innerJoin("messages.id_chat_room", "room")
-		.groupBy("room.id_g")
-		.where("room.is_private = :p", {p: false})
-		.select(["Sum(1) as nb_users", "room.name", "room.is_password_protected"]).getMany();
+		// const res = await this.dataSource.getRepository(MessageChatRoomEntity)
+		// .createQueryBuilder("messages")
+		// .innerJoin("messages.id_chat_room", "room")
+		// .groupBy("room.id_g")
+		// .where("room.is_private = :p", {p: false})
+		// .select(["Sum(1) as nb_users", "room.name", "room.is_password_protected"]).getMany();
 
-		// const res = await this.dataSource.getRepository(ChatRoomEntity)
-		// .createQueryBuilder("chatRoom")
-		// .where("chatRoom.is_private = :p", {p: false})
-		// .select(["chatRoom.name", "chatRoom.is_password_protected"]).getMany();
-		console.log("get_all_rooms: ", res)
+		const res = await this.dataSource.getRepository(ChatRoomEntity)
+		.createQueryBuilder("chatRoom")
+		.where("chatRoom.is_private = :p", {p: false})
+		.select(["chatRoom.name", "chatRoom.is_password_protected"]).getMany();
 		client.emit("get_all_rooms_res", res);
 	}
 	//OK
@@ -338,7 +336,6 @@ export class ChatRoomService {
 	@SubscribeMessage('get_all_rooms_begin_by')
 	async getAllRoomsBeginBy(@MessageBody() data, @ConnectedSocket() client: Socket)
 	{
-
 		// const res = await this.dataSource.getRepository(MessageChatRoomEntity)
 		// .createQueryBuilder("messages")
 		// .innerJoin("messages.id_chat_room", "room")
@@ -352,8 +349,7 @@ export class ChatRoomService {
 		.where("substr(chatRoom.name, 1, :l) = :s", {l: data.research.length, s: data.research})
 		.andWhere("chatRoom.is_private = :p", {p: false})
 		.getMany();
-		console.log(res);
-		client.emit("get_all_rooms_res", res);
+		client.emit("get_all_rooms_begin_by_res", res);
 	}
 	//Ban a user if current socket user is Admin on the room 
 	//{room_name:string, username_ban: string, ban_end: Date}
