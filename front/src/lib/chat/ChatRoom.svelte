@@ -207,7 +207,8 @@
     import AddRoom from "$lib/chat/AddRoom.svelte";
     import { Chat } from "$lib/chatt/Chat";
     import SearchRoom from "$lib/chat/SearchRoom.svelte";
-	import { ChatRoom } from "$lib/chatt/ChatRoom"
+	import { ChatRoom } from "$lib/chatt/ChatRoom";
+    import CloseButton from "$lib/items/CloseButton.svelte";
 
 	let chat: Chat;
 	export let itself: any; 
@@ -332,22 +333,6 @@
 	// 	}
 	// }
 	// let files : any;
-	
-	// function handleSubmits(event) {
-	// 	console.log(event)
-  	// 	let image = files[0];
-	// 	const data = new FormData();
-	// 	data.append('file', image);
-	// 	console.log(data, image);
-		
-	// 	fetch("http://localhost:3000/upload_image", {
-	// 		method: "POST",
-	// 		body: data,
-	// 		headers: {
-	// 			"Authorization": "Bearer " + localStorage.getItem("transcendence-jwt"),
-	// 		}
-	// 	})
-	// };
 </script>
 
 <Modal bind:this={addRoomModal}>
@@ -425,5 +410,6 @@
 			</div>
 		{/if} -->
 	</div>
+	<CloseButton window={itself}/>
 </div>
 

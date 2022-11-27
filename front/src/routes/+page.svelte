@@ -80,7 +80,7 @@
 	});
 </script>
 
-<Modal bind:this={chatRoomModal}>
+<Modal bind:this={chatRoomModal} closeOnBgClick={false}>
 	<ChatRoom itself={chatRoomModal} />
 </Modal>
 

@@ -84,7 +84,7 @@
 
 <div class="vflex window rank">
 	<h1>Global Ranking</h1>
-	<h3>{(myPos != -1) ? "You are situated at " + myPos : "Try any game to find yourself in the rank!"}</h3>
+	<h3>{(myPos != -1) ? "You are situated at #" + myPos + " !": "Try any game to find yourself in the rank!"}</h3>
 	<div class="vflex list">
 		<div class="flex line">
 			<p>Rank</p>

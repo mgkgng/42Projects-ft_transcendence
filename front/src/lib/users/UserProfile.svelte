@@ -128,12 +128,12 @@
 			$client.socket.off("resHistory");
 			$client.socket.off("error_askFriend");
 			$client.socket.off("success_askFriend");
-		})
+		});
 	});
 </script>
 
 <Modal bind:this={writeMessageModal}>
-	<WriteMessage itself={writeMessageModal} sendTo={profileUser.username}/>
+	<WriteMessage itself={writeMessageModal} sendTo={[profileUser.username]}/>
 </Modal>
 
 <div class="vflex window profile">
