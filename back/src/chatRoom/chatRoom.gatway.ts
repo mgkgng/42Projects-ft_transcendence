@@ -309,7 +309,7 @@ export class ChatRoomService {
 	async getMyRoom(@MessageBody() data, @ConnectedSocket() client: Socket)
 	{
 		const res : any = await this.mainServer.getNamesRoomsForUser(client);
-		client.emit("get_my_rooms", res);
+		client.emit("get_my_rooms_res", res);
 	}
 	//OK
 	//Get all rooms in the databases

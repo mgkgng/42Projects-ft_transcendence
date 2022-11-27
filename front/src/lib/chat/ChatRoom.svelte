@@ -206,21 +206,21 @@
     import ChatRoomMessage from "$lib/tools/chatRoomMessage.svelte";
     import AddRoom from "$lib/chat/AddRoom.svelte";
     import AllChatRooms from "$lib/chat/AllChatRooms.svelte";
+    import { Chat } from "$lib/chatt/Chat";
 
+	let chat: Chat;
 	export let itself: any; 
 	// export let allChatModal: any;
 
 	let newMessage : string;
 
 	let rooms : string[]; //Rooms visibles par le user
-	let actualName: string; //Name de la room selectionnee
+	let roomSelected: string;
 	// let actualMessages : Room = new Room("", false, false, false, false);
 	
 	let addRoomModal: any;
 	let allChatRoomModal: any;
-
-	// $: console.log($chatRoom);
-
+ 
 	//afterUpdate(() => {
 			//message_zone.scroll({top: 1000000000});
 	//});
@@ -234,7 +234,21 @@
 	// chatRoom.subscribe(chat => { actualName = chat.actualRoomName;});
 	// chatRoom.subscribe(chat => { rooms = chat.rooms;});
 	// chatRoom.subscribe(chat => { actualName = chat.actualRoomName;});
+
 	onMount (() => {
+		$client.socket.emit("get_my_rooms");
+
+		$client.socket.on("get_my_rooms_res", (data: any) => {
+			// Get the list of rooms
+			console.log("my_rooms: ", data);
+
+			chat = new Chat(data);
+		})
+
+		return(() => {
+			$client.socket.off("get_my_rooms_res");
+		});
+
 		// $client.socket.on("set_room_private", (data) =>
 		// {
 		// 	chatRoom.update((chat) =>{
@@ -263,8 +277,6 @@
 		// 		return (chat);
 		// 	})
 		// });
-
-		
 	});
 	// function  chooseRoom(room : any){
 	// 	chatRoom.update(chat => { 

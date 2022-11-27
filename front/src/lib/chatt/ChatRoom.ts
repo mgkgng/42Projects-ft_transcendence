@@ -21,7 +21,6 @@ export class ChatRoom {
 	}
 }
 
-
 //Ici les evenements qui changent les attributs de chatRoom et qui sont suscribe dans le front
 // (obligation d'utiliser update() pour un rafraichissement du front)
 function socket_event_update_front(client : any) {

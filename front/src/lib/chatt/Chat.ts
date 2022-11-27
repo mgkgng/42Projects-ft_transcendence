@@ -1,17 +1,18 @@
-import { writable } from "svelte/store";
 import { browser } from "$app/environment";
 import { ChatRoom } from "$lib/chatt/chatRoom";
 
-export class ChatRoomList {
-	all_rooms: Map<string, boolean>; //toutes les rooms (utilisées pour s'ajouter a une room)
-	rooms: Array<string>;					//room visibles pour l'utilisateur
-	messages : Map<string, ChatRoom>;		//les messages de chaques room
+export class Chat {
+	all_rooms: Array<ChatRoom>;	//toutes les rooms (utilisées pour s'ajouter a une room)
+	rooms: Array<string>;				//room visibles pour l'utilisateur
+	messages : Map<string, ChatRoom>;	//les messages de chaques room
 	actualRoom : any;
-	actualRoomName : string;				//room selectionnee 
-	username_search : string;		//username search profile
+	actualRoomName : string;			//room selectionnee 
+	username_search : string;			//username search profile
 
-	constructor() {
-		this.all_rooms = new Map<string, boolean>();
+	constructor(rooms: any) {
+		for (let room of rooms)
+			
+			
 		this.rooms = [];
 		this.messages = new Map<string, ChatRoom>();
 		this.actualRoomName = "";
@@ -25,17 +26,12 @@ export class ChatRoomList {
 		console.log("Try load messages");
 		client.socket.emit("get_my_rooms", {});
 		
-		client.socket.off("set_room_not_visible", (data) => {
-		});
 		client.socket.on("set_room_not_visible", (data) => {
 			client.socket.emit("get_my_rooms", {});
-		});
-		client.socket.off("set_room_visible", (data) => {
 		});
 		client.socket.on("set_room_visible", (data) => {
 			client.socket.emit("get_my_rooms", {});
 		});
-
 
 		// socket_event_update_front(client);			
 	}
@@ -65,5 +61,3 @@ export class ChatRoomList {
 		return(keys);
 	}
 }
-
-export const chatRoom = writable(new ChatRoomList());
