@@ -90,11 +90,6 @@
 	let newRoomPassword: string = "";
 	let withPassword: boolean = false;
 	let isPrivate: boolean = false;
-
-	function createRoom() {
-		$client.socket.emit("new_room", {room_name: newRoomName, is_password_protected: withPassword, room_password: newRoomPassword, is_private: false});
-		itself.close();
-	}
 </script>
 
 <div class="vflex window add">
@@ -114,7 +109,15 @@
 			{/if}
 		</div>
 		<div class="vflex submit">
-			<button on:click={() => createRoom()}>ADD</button>
+			<button on:click={() => {
+				$client.socket.emit("new_room", {
+					room_name: newRoomName, 
+					is_password_protected: withPassword, 
+					room_password: newRoomPassword, 
+					is_private: isPrivate
+				});
+				itself.close();
+			}}>ADD</button>
 			<div class="flex check">
 				<input class="checkbox" type="checkbox" bind:checked={withPassword}>
 				<p>Password</p>

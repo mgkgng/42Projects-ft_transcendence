@@ -77,7 +77,7 @@ export class ChatRoomService {
 			const res_user_chat_room = await this.dataSource.getRepository(UserChatRoomEntity).save(new_user_chat_room);
 			client.join(name);
 			console.log("Create room finish");
-			client.emit("new_room", {	room_name: name, is_password_protected: is_password_protected, is_admin: true, is_private: data.is_private	});
+			client.emit("new_room_res", { room_name: name, is_password_protected: is_password_protected, is_admin: true, is_private: data.is_private });
 		} catch (e) {
 			console.log("Create room error");
 			client.emit("error_new_room", {error: "Room already exist"});
@@ -127,7 +127,8 @@ export class ChatRoomService {
 				{id_user: id_user, room: id_room, is_admin: false, is_banned: false, is_muted: false}
 			]).execute(); //Add user to the room
 			client.emit("set_room_visible", {room_name: room.name});
-			client.emit("append_user_to_room", {room_name: room.name, is_admin: false, username: user.username});
+			client.emit("success_append_user_to_room");
+			client.emit("append_user_to_room_res", {room_name: room.name, is_admin: false, username: user.username});
 		}
 		catch(e){
 			console.log("getMessage Error: bad data");
@@ -319,7 +320,7 @@ export class ChatRoomService {
 	{
 		const res = await this.dataSource.getRepository(MessageChatRoomEntity)
 		.createQueryBuilder("messages")
-		.innerJoin("messages.id_chat", "room")
+		.innerJoin("messages.id_chat_room", "room")
 		.groupBy("room.id_g")
 		.where("room.is_private = :p", {p: false})
 		.select(["Sum(1) as nb_users", "room.name", "room.is_password_protected"]).getMany();
@@ -329,7 +330,7 @@ export class ChatRoomService {
 		// .where("chatRoom.is_private = :p", {p: false})
 		// .select(["chatRoom.name", "chatRoom.is_password_protected"]).getMany();
 		console.log("get_all_rooms: ", res)
-		client.emit("get_all_rooms", res);
+		client.emit("get_all_rooms_res", res);
 	}
 	//OK
 	//Get all rooms in the databases
@@ -352,7 +353,7 @@ export class ChatRoomService {
 		.andWhere("chatRoom.is_private = :p", {p: false})
 		.getMany();
 		console.log(res);
-		client.emit("get_all_rooms", res);
+		client.emit("get_all_rooms_res", res);
 	}
 	//Ban a user if current socket user is Admin on the room 
 	//{room_name:string, username_ban: string, ban_end: Date}

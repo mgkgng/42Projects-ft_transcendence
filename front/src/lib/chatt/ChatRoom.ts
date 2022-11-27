@@ -9,13 +9,14 @@ export class ChatRoom {
 	is_owner : boolean = false;
 	messages : Array<Message>;
 	usersRoom : any[];
-	constructor(room_name : string, is_password_protected : boolean, is_private : boolean, are_you_admin : boolean, are_you_owner : boolean)
+	
+	constructor(room_name : string, is_password_protected : boolean, is_private : boolean, is_admin : boolean, is_owner : boolean)
 	{
 		this.room_name = room_name;
 		this.is_password_protected = is_password_protected;
 		this.is_private = is_private;
-		this.is_admin = are_you_admin;
-		this.is_owner = are_you_owner;
+		this.is_admin = is_admin;
+		this.is_owner = is_owner;
 		this.messages = [];	
 		this.usersRoom = [];
 	}
@@ -24,14 +25,6 @@ export class ChatRoom {
 //Ici les evenements qui changent les attributs de chatRoom et qui sont suscribe dans le front
 // (obligation d'utiliser update() pour un rafraichissement du front)
 function socket_event_update_front(client : any) {
-	client.socket.on("get_all_rooms", (data : any) => {
-		chatRoom.update((chatRoom: any) => {
-			chatRoom.all_rooms = new Map();
-			for (let r of data)
-				chatRoom.all_rooms.set(r.name, r.is_password_protected);
-			return (chatRoom);
-		});
-	});
 	client.socket.on("get_my_rooms", (data : any) => { //HAVE TO OPTIMIZE : NOT REALOAD ALL MESSAGE WHEN A ROOM IS ADDED OR DELETED
 		chatRoom.update((chatRoom: any) => {
 			chatRoom.rooms = [];
@@ -79,15 +72,7 @@ function socket_event_update_front(client : any) {
 			return (chat);
 		});
 	});
-	client.socket.on("new_room", (data : any) =>
-	{
-		chatRoom.update( chat => {
-			chat.rooms.push(data.room_name);
-			const mess : Message[] = [];
-			chat.messages.set(data.room_name, new Room(data.room_name, data.is_password_protected, data.is_private, data.is_admin, true));
-			return (chat);
-		});
-	});
+	
 	client.socket.on("error_new_message_room", (data : any) =>{
 		alert(data.error);
 	});

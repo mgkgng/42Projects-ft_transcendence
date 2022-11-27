@@ -83,29 +83,22 @@
     // import { chatRoom } from "$lib/stores/chatRoom";
 	import { onMount, beforeUpdate } from "svelte";
     import { Chat } from "../chatt/Chat";
+    import RoomPassword from "$lib/chat/RoomPassword.svelte";
+    import Modal from "../tools/Modal.svelte";
 	
 	export let itself: any; 
 	export let chat: Chat;
 
-	let rooms : string[];
-	let all_rooms : Map<string, boolean> = new Map();
-	// chatRoom.subscribe(chat => { all_rooms= chat.all_rooms;});
+	let passwordModal: any;
 
 	let research : string = "";
+
+	let roomName: string = "";
+
 	onMount(() => {
 
 	});
 
-	function addToTheRoom(room : any)
-	{
-		let user_password : string = "";
-		if (all_rooms.get(room) == true && user_password == "")
-		{
-			user_password = prompt("Please enter the password", "");
-		}
-		$client.socket.emit("append_user_to_room", {room_name: room, room_password: user_password});				
-	}
-	
 	function researchRooms()
 	{
 		// console.log("changed")
@@ -114,17 +107,27 @@
 	}
 </script>
 
+<Modal bind:this={passwordModal}>
+	<RoomPassword itself={passwordModal} roomName={roomName}/>
+</Modal>
+
 <div class="vflex window rooms">
 	<div class="flex research">
 		<input class="text-input" placeholder="Search Room Name ..." bind:value={research}>
 		<button on:click={researchRooms}>Search</button>
 	</div>
 	<div class="vflex result">
-		{#each ([...chat.all_rooms.keys()].sort()) as room_name}
-			{#if (!chat.my_roomlist.includes(room_name))}
+		{#each ([...chat.rooms.keys()].sort()) as room_name}
+			{#if (!chat.my_rooms.includes(room_name))}
 				<div class="flex list">
 					<p>{room_name}</p>
-					<button on:click={() => addToTheRoom(room_name)}>Join</button>
+					<button on:click={() => {
+						if (chat.rooms.get(room_name).is_password_protected) {
+							roomName = room_name;
+							passwordModal.open();
+						} else
+							$client.socket.emit("append_user_to_room", {room_name: room_name, room_password: ""});
+					}}>Join</button>
 				</div>
 			{/if}
 		{/each}
