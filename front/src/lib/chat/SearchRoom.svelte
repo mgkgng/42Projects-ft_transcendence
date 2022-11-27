@@ -80,11 +80,10 @@
 <script lang="ts">
 
     import { client } from "$lib/stores/client";
-    // import { chatRoom } from "$lib/stores/chatRoom";
 	import { onMount, beforeUpdate } from "svelte";
-    import { Chat } from "../chatt/Chat";
+    import { Chat } from "$lib/chatt/Chat";
     import RoomPassword from "$lib/chat/RoomPassword.svelte";
-    import Modal from "../tools/Modal.svelte";
+    import Modal from "$lib/tools/Modal.svelte";
 	
 	export let itself: any; 
 	export let chat: Chat;

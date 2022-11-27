@@ -14,7 +14,7 @@
     import EnterGame from "$lib/game/EnterGame.svelte";
     import JoinGame from "$lib/game/JoinGame.svelte";
     import ChatRoom from '$lib/chat/ChatRoom.svelte';
-    import { loaded } from '../lib/stores/var';
+    import { loaded } from '$lib/stores/var';
     import Rank from '$lib/rank/Rank.svelte';
 
 	let roomModal: any;
@@ -52,10 +52,6 @@
 			roomModal.open();
 		});
 
-		$client.socket.on("askFriendNotification", (data: any) => {
-			console.log("Notif", data);
-		});
-
 		$client.socket.on("JoinQueueError", (data: any) => {
 			modalMessage = data;
 			messageModal.open();
@@ -74,9 +70,12 @@
 		});
 
 		return (() => {
-			$client.socket.off("CreateRoomRes", "JoinRoomRes", "JoinQueueError",
-				"askFriendNotification", "MatchFound", "CreateRoomError",
-				"RoomCheckError");
+			$client.socket.off("CreateRoomRes"), 
+			$client.socket.off("JoinRoomRes"), 
+			$client.socket.off("JoinQueueError"),
+			$client.socket.off("MatchFound"), 
+			$client.socket.off("CreateRoomError"), 
+			$client.socket.off("RoomCheckError");
 		});
 	});
 </script>

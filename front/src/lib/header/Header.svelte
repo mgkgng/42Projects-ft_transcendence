@@ -104,17 +104,37 @@
 </style>
 
 <script lang="ts">
-    import UserProfile from "$lib/profile/UserProfile.svelte";
+    import UserProfile from "$lib/users/UserProfile.svelte";
     import { user } from "$lib/stores/user";
     import { login } from "$lib/stores/var";
     import Modal from "$lib/tools/Modal.svelte";
-	import Friends from "$lib/modals/Friends.svelte"
+	import Friends from "$lib/users/Friends.svelte"
     import Settings from "$lib/settings/Settings.svelte";
+	import { onMount } from "svelte";
+    import { client } from "$lib/stores/client";
+
 
 	let userProfileModal: any;
 	let friendsModal: any;
 	let settingsModal: any;
 
+	let notifMsg: any;
+	let notifFriend: any;
+
+	onMount(() => {
+		$client.socket.on("newDirectMessage", (data: any) => {
+			console.log("message arrived", data); 
+		});
+
+		$client.socket.on("askFriendNotification", (data: any) => {
+			console.log("Notif", data);
+		});
+
+		return(() => {
+			$client.socket.off("newDirectMessage");
+			$client.socket.off("askFriendNotification");
+		});
+	});
 </script>
 
 <Modal bind:this={userProfileModal} >

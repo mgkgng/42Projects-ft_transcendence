@@ -229,9 +229,6 @@
 	//	}
 
 	onMount (() => {
-
-		
-
 		/* Chat Updates*/
 		$client.socket.on("set_room_not_visible", (data: any) => { client.socket.emit("get_my_rooms"); });
 		$client.socket.on("set_room_visible", (data: any) => { client.socket.emit("get_my_rooms"); });
@@ -253,6 +250,7 @@
 			console.log("something received");
 			chat.rooms.set(data.room_name, new ChatRoom(data.room_name, data.is_password_protected, data.is_private, data.is_admin, true))
 			chat = chat;
+			console.log("chat", chat);
 		});
 
 		$client.socket.emit("get_my_rooms");
@@ -269,8 +267,6 @@
 			$client.socket.off("unset_password_room");
 			$client.socket.off("new_room_res");
 		});
-
-		
 	});
 	
 	// function sendMessage(){

@@ -53,8 +53,8 @@
     import { client } from "$lib/stores/client";
     import { user } from "$lib/stores/user";
     import CloseButton from "$lib/items/CloseButton.svelte";
-    import Modal from "../tools/Modal.svelte";
-    import UserProfile from "../profile/UserProfile.svelte";
+    import Modal from "$lib/tools/Modal.svelte";
+    import UserProfile from "$lib/users/UserProfile.svelte";
 
 	export let itself: any;
 	

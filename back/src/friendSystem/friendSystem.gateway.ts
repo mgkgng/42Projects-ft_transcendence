@@ -58,7 +58,6 @@ export class friendSystemGateway {
 	@SubscribeMessage('getUserProfile')
 	async getUserProfile(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
 		// const user = await this.userRepository.findOne({where: {username: this.mainServerService.getUserConnectedBySocketId(client.id).username}});
-		console.log("bonjour??", data);
 		const id_user = await this.mainServerService.getIdUserByUsername(data.username);
 		const res = await this.dataSource.getRepository(UserEntity).createQueryBuilder("user")
 					.where("id_g = :id", {id : id_user})

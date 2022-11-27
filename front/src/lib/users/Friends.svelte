@@ -147,7 +147,7 @@
     import { onMount } from "svelte";
     import { user } from "$lib/stores/user";
     import Modal from "$lib/tools/Modal.svelte";
-    import UserProfile from "$lib/profile/UserProfile.svelte";
+    import UserProfile from "$lib/users/UserProfile.svelte";
 
 	export let itself: any;
 
