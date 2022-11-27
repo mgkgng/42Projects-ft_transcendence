@@ -122,6 +122,9 @@
 	let notifFriend: any;
 
 	onMount(() => {
+		if (!$client.socket)
+			return ;
+
 		$client.socket.on("newDirectMessage", (data: any) => {
 			console.log("message arrived", data); 
 		});
