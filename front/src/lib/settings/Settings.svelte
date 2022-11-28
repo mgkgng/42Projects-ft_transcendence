@@ -116,7 +116,7 @@
 
 	let original = [image, username, doubleAuth]
 	let modified: boolean = false;
-	$: modified = !original.every((v, i) => { return v === Array(image, username, doubleAuth)[i]})
+	$: modified = !original.every((v, i) => { return v === Array(image, username, doubleAuth)[i]});
 
 	let changeUsernameModal: any;
 	let confirmLeaveModal: any;

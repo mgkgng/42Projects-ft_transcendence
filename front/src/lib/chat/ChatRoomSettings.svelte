@@ -4,6 +4,7 @@
 		height: 320px;
 		justify-content: space-around;
 		align-items: center;
+		gap: .3em;
 
 		.private {
 			margin-bottom: 1em;
@@ -23,6 +24,46 @@
 				font-size: 17px;
 				cursor: pointer;
 			}
+		}
+		.password {
+			gap: .2em;
+			input { display: none; }
+			input[id="with"]:checked+label { background-color: $yellow; }
+			input[id="without"]:checked+label { background-color: $red; }
+
+			label {
+				display: inline-block;
+				border: $border-thin;
+				border-radius: .2em;
+				width: 7em;
+				height: 3em;
+				text-align: center;
+				padding: .3em;
+				font-size: 17px;
+				cursor: pointer;
+			}
+		}
+
+		.input {
+			width: 80%;
+
+			input {
+					border-radius: .2em;
+					padding-left: .5em;
+		
+					width: 100%;
+					height: 1.8em;
+		
+					background-color: #fff;
+					color: #000;
+				}
+		
+				.empty {
+					border-radius: .2em;
+					width: 100%;
+					height: 1.8em;
+					background-color: #000;
+				}
 		}
 
 		.buttons {
@@ -52,8 +93,12 @@
 
 	let isPrivate: boolean = chatRoom.is_private;
 	let withPassword: boolean = chatRoom.is_password_protected;
+	let password: string = (withPassword) ? "default-password" : "";
 
+	let original = [isPrivate, withPassword, password];
 	let modified: boolean = false;
+	$: modified = !original.every((v, i) => { return v === Array(isPrivate, withPassword, password)[i]});
+
 </script>
 
 <Modal bind:this={confirmLeaveModal} closeOnBgClick={false}>
@@ -61,19 +106,25 @@
 </Modal>
 
 <div class="vflex window settings">
-	<h1>ChatRoom Settings</h1>
+	<h1>Settings</h1>
 	<div class="flex private">
 		<input type="radio" id="private" bind:group={isPrivate} name="isPrivate" value={true}>
 		<label for="private">Private</label>
 		<input type="radio" id="public" bind:group={isPrivate} name="isPrivate" value={false}>
 		<label for="public">Public</label>
 	</div>
-
 	<div class="flex password">
 		<input type="radio" id="with" bind:group={withPassword} name="withPassword" value={true}>
 		<label for="with">With Password</label>
 		<input type="radio" id="without" bind:group={withPassword} name="withPassword" value={false}>
 		<label for="without">Without Password</label>
+	</div>
+	<div class="input">
+		{#if (withPassword)}
+		<input type="password" placeholder="Password" bind:value={password}>
+		{:else}
+		<div class="empty"></div>
+		{/if}
 	</div>
 
 
