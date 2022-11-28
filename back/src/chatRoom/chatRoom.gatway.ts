@@ -443,12 +443,13 @@ export class ChatRoomService {
 	//{room_name:string}
 	@SubscribeMessage("set_room_not_visible")
 	async setRoomNotVisible(@MessageBody() data, @ConnectedSocket() client: Socket, @Request() req) {
+		console.log(data);
 		const user = await this.mainServer.getIdUser(req);
 		const room : any = await this.dataSource.getRepository(ChatRoomEntity).find({where: {name: data.room_name}});
 		const res = await this.dataSource.createQueryBuilder().update(UserChatRoomEntity)
 				.where("id_user = :u AND room = :r", {u: user, r: room[0].id_g})
 				.set({is_visible: false}).execute();
-		client.emit("set_room_not_visible", {});
+		client.emit("set_room_not_visible_res", data.room_name);
 	}
 	//Put a room in state "visible" for a user
 	//{room_name:string}

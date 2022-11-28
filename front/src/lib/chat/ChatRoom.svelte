@@ -216,8 +216,7 @@
 
 	let newMessage : string;
 
-	let rooms : string[]; //Rooms visibles par le user
-	let roomSelected: string;
+	let roomSelected: string = "";
 	
 	let addRoomModal: any;
 	let searchRoomModal: any;
@@ -232,7 +231,11 @@
 
 	onMount (() => {
 		/* Chat Updates*/
-		$client.socket.on("set_room_not_visible", (data: any) => { client.socket.emit("get_my_rooms"); });
+		$client.socket.on("set_room_not_visible_res", (data: any) => {
+			chat.my_rooms.delete(data);
+			chat = chat;
+		});
+
 		$client.socket.on("set_room_visible", (data: any) => { client.socket.emit("get_my_rooms"); });
 		$client.socket.on("set_room_private", (data: any) => { chat.my_rooms.get(data.room_name).is_private = true; });
 		$client.socket.on("unset_room_private", (data: any) => { chat.my_rooms.get(data.room_name).is_private = false; });
@@ -242,10 +245,12 @@
 		$client.socket.on("get_all_rooms_res", (data : any) => {
 			for (let room of data)
 				chat.rooms.set(room.name, room.is_password_protected);
+			chat = chat;
 		});
-
 		$client.socket.on("get_my_rooms_res", (data: any) => {
-			chat.my_rooms = data;
+			for (let x of data)
+				chat.my_rooms.set(x.room.name, new ChatRoom(x.room.name, x.room.is_password_protected, x.room.is_private, x.is_admin, x.is_owner));
+			chat = chat;
 		});
 
 		$client.socket.on("new_room_res", (data : any) => {
@@ -261,7 +266,7 @@
 		return(() => {
 			$client.socket.off("get_my_rooms_res");
 			$client.socket.off("get_all_rooms_res");
-			$client.socket.off("set_room_not_visible");
+			$client.socket.off("set_room_not_visible_res");
 			$client.socket.off("set_room_visible");
 			$client.socket.off("set_room_private");
 			$client.socket.off("unset_room_private");
@@ -273,16 +278,6 @@
 	
 	// function sendMessage(){
 	// 	$client.socket.emit("new_message_room", {room_name: actualName, content_message: newMessage});
-	// }
-	// function setNotVisible(room : any) { //Supprime un room des rooms visibles
-	// 	$client.socket.emit("set_room_not_visible", {room_name: room.room });
-	// 	$chatRoom.deleteRoom(room.room);
-	// }
-	// function createRoom()
-	// {
-	// 	if (newRoomPassword == null)
-	// 		newRoomPassword = ""
-	// 	$client.socket.emit("new_room", {room_name: newRoomName, is_password_protected: is_new_room_password_protected, room_password: newRoomPassword, is_private: false});
 	// }
 	// function set_private_room()
 	// {
@@ -352,13 +347,15 @@
 		</div>
 		<div class="vflex list">
 			<p>My Rooms</p>
-			{#if chat?.my_rooms.length}
-			{#each (chat.sortRoomsKeys([...chat.rooms.keys()])) as room}
+			{#if chat?.my_rooms.size}
+			{#each (chat.sortRoomsKeys([...chat.my_rooms.keys()])) as room}
 			<div class="flex line">
 				<div class="room {(room == roomSelected) ? "chosen" : ""}" on:click={() => {
 					roomSelected = room;
 				}}>{room}</div>
-				<div class="button"><p>Quit</p></div>
+				<div class="button" on:click={() => {
+					$client.socket.emit("set_room_not_visible", { room_name: room });
+				}}><p>Quit</p></div>
 			</div>
 			{/each}
 			{:else}
@@ -367,38 +364,38 @@
 		</div>
 	</div>
 	<div class="vflex chatroom">
-		<!-- {#if ($chatRoom.actualRoomName !== "")}
+		{#if (roomSelected.length)}
 			<div class="read">
-			{#if actualMessages.is_owner}
-				{#if actualMessages.is_private}
+			{#if chat.my_rooms.get(roomSelected).is_owner}
+				<!-- {#if chat.my_rooms.get(roomSelected).is_owner.is_private}
 					<input class="button" value="Set private" on:click={unset_private_room}>
 				{:else}
 					<input class="button" value="Set private" on:click={set_private_room}>
 				{/if}
-				{#if actualMessages.is_password_protected}
+				{#if chat.my_rooms.get(roomSelected).is_owner.is_password_protected}
 					<input class="button" value="delete password" on:click={unset_password_room}>
 					<input class="button" value="Change password" on:click={set_password_room}>
 				{:else}
 					<input class="button" value="add password" on:click={set_password_room}>
-				{/if}
+				{/if} -->
 			{/if}
-			{#each actualMessages?.messages as message}
-				<ChatRoomMessage username={message.username} content_message={message.message} itself={ itself } axelUserProfileModal={axelUserProfileModal} is_admin={actualMessages.is_admin}/>
+			{#each chat.my_rooms.get(roomSelected)?.messages as message}
+				<!-- <ChatRoomMessage username={message.username} content_message={message.message} itself={ itself } axelUserProfileModal={axelUserProfileModal} is_admin={actualMessages.is_admin}/> -->
 			{/each}
 			</div>
 			<div class="write">
 				<input class="text-input" placeholder="write your message here..." bind:value={newMessage}>
-				<button on:click={sendMessage}>send</button>
+				<!-- <button on:click={sendMessage}>send</button> -->
 			</div>
 			<div class="vflex users">
 				<p>Online</p>
 				<div class="vflex list">
-					{#each actualMessages?.usersRoom as actual_user}
+					{#each chat.my_rooms.get(roomSelected)?.usersRoom as actual_user}
 					<div class="user">
 						<div>{actual_user.username}</div>
-						<input type="button" class="btn-room" value="mute" on:click={()=>muteUser(actual_user.username)}/>
+						<!-- <input type="button" class="btn-room" value="mute" on:click={()=>muteUser(actual_user.username)}/>
 						<input type="button" class="btn-room" value="ban" on:click={()=>banUser(actual_user.username)}/>
-						<input type="button" class="btn-room" value="set Admin" on:click={()=>setAdmin(actual_user.username)}/>
+						<input type="button" class="btn-room" value="set Admin" on:click={()=>setAdmin(actual_user.username)}/> -->
 					</div>
 					{/each}
 				</div>
@@ -407,7 +404,7 @@
 			<div class="flex no-select">
 				<h2>Please select a room</h2> 
 			</div>
-		{/if} -->
+		{/if}
 	</div>
 	<CloseButton window={itself}/>
 </div>

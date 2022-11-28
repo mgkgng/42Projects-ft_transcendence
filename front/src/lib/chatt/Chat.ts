@@ -3,27 +3,25 @@ import { ChatRoom } from "$lib/chatt/ChatRoom";
 
 export class Chat {
 	rooms: Map<string, boolean>;
-	my_rooms: Array<string>;
+	my_rooms: Map<string, ChatRoom>;
 
 	constructor() {
-		this.rooms = new Map<string, ChatRoom>();
-		this.my_rooms = [];
+		this.rooms = new Map<string, boolean>();
+		this.my_rooms = new Map<string, ChatRoom>();
 	}
 
 	sortRoomsKeys(keys : string[]) {
 		keys.sort((a: string, b: string) => {
 			let res : number   = 0;
-			console.log(a, b);
-			console.log(this.rooms);
-			if (!this.rooms.get(a).messages.length && this.rooms.get(b).messages.length)
+			if (!this.my_rooms.get(a).messages.length && this.my_rooms.get(b).messages.length)
 				return (-1);
-			else if (this.rooms.get(a).messages.length && !this.rooms.get(b).messages.length)
+			else if (this.my_rooms.get(a).messages.length && !this.my_rooms.get(b).messages.length)
 				return (1);
-			else if (!this.rooms.get(a).messages.length && !this.rooms.get(b).messages.length)
+			else if (!this.my_rooms.get(a).messages.length && !this.my_rooms.get(b).messages.length)
 				return (0);
-			if (this.rooms.get(a).messages[this.rooms.get(a).messages.length - 1].date > this.rooms.get(b).messages[this.rooms.get(b).messages.length - 1].date)
+			if (this.my_rooms.get(a).messages[this.my_rooms.get(a).messages.length - 1].date > this.my_rooms.get(b).messages[this.my_rooms.get(b).messages.length - 1].date)
 				res = -1;
-			else if (this.rooms.get(a).messages[this.rooms.get(a).messages.length - 1].date < this.rooms.get(b).messages[this.rooms.get(b).messages.length - 1].date)
+			else if (this.my_rooms.get(a).messages[this.my_rooms.get(a).messages.length - 1].date < this.my_rooms.get(b).messages[this.my_rooms.get(b).messages.length - 1].date)
 				res = 1;
 			return (res);
 		});
