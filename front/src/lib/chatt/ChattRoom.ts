@@ -1,7 +1,7 @@
 import { Message } from "$lib/chatt/Message";
 import { UserRoom } from "$lib/chatt/UserRoom";
 
-export class ChatRoom {
+export class ChattRoom {
 	room_name : string = "";
 	is_password_protected : boolean = false;
 	is_private : boolean = false;

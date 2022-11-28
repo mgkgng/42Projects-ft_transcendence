@@ -1,13 +1,13 @@
 import { browser } from "$app/environment";
 import { ChatRoom } from "$lib/chatt/ChatRoom";
 
-export class Chat {
+export class Chatt {
 	rooms: Map<string, boolean>;
-	my_rooms: Map<string, ChatRoom>;
+	my_rooms: Map<string, ChattRoom>;
 
 	constructor() {
 		this.rooms = new Map<string, boolean>();
-		this.my_rooms = new Map<string, ChatRoom>();
+		this.my_rooms = new Map<string, ChattRoom>();
 	}
 
 	sortRoomsKeys(keys : string[]) {
