@@ -230,7 +230,7 @@ export class ChatRoomService {
 	{
 		try{
 			const id_user = await this.mainServer.getIdUser(req);
-			const id_room = await this.mainServer.getIdRoom(data);
+			const id_room = await this.mainServer.getIdRoom(data.room_name);
 			try{
 				const res_is_in_room = await this.dataSource.getRepository(UserChatRoomEntity).createQueryBuilder("userChat")
 				.where("userChat.id_user = :u", {u : id_user})
@@ -297,7 +297,7 @@ export class ChatRoomService {
 			newMessage.date_message = date_creation;
 			const res_insert_message = await this.dataSource.getRepository(MessageChatRoomEntity).save(newMessage);
 			//await querry.commitTransaction();
-			this.server.to(data.room_name).emit('new_message_room', {room_name : data.room_name, content_message: data.content_message, username: client_username, date_message: date_creation});
+			this.server.to(data.room_name).emit('new_message_room_res', {room_name : data.room_name, content_message: data.content_message, username: client_username, date_message: date_creation});
 		} catch (e) {
 			//await querry.rollbackTransaction();
 			console.log("Can't create message");

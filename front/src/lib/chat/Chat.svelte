@@ -141,6 +141,8 @@
     import CloseButton from "$lib/items/CloseButton.svelte";
     import RoomPassword from "./RoomPassword.svelte";
     import ChatRoom from "$lib/chat/ChatRoom.svelte";
+    import Room from "../game/Room.svelte";
+    import { Message } from "../chatt/Message";
 
 	export let itself: any; 
 
@@ -169,19 +171,39 @@
 		});
 
 		$client.socket.on("set_room_visible", (data: any) => { client.socket.emit("get_my_rooms"); });
-		$client.socket.on("set_room_private_res", (data: any) => { chat.my_rooms.get(data.room_name).is_private = true; });
-		$client.socket.on("unset_room_private_res", (data: any) => { chat.my_rooms.get(data.room_name).is_private = false; });
-		$client.socket.on("set_password_room", (data: any) => { chat.my_rooms.get(data.room_name).is_password_protected = true; });
-		$client.socket.on("unset_password_room", (data: any) => { chat.my_rooms.get(data.room_name).is_password_protected = false; });
+
+		$client.socket.on("set_room_private_res", (data: any) => {
+			chat.my_rooms.get(data.room_name).is_private = true;
+			chat = chat
+		});
+
+		$client.socket.on("unset_room_private_res", (data: any) => {
+			chat.my_rooms.get(data.room_name).is_private = false;
+			chat = chat;
+		});
+
+		$client.socket.on("set_password_room", (data: any) => {
+			chat.my_rooms.get(data.room_name).is_password_protected = true;
+			chat = chat;
+		});
+
+		$client.socket.on("unset_password_room", (data: any) => {
+			chat.my_rooms.get(data.room_name).is_password_protected = false;
+			chat = chat;
+		});
 
 		$client.socket.on("get_all_rooms_res", (data : any) => {
 			for (let room of data)
 				chat.rooms.set(room.name, room.is_password_protected);
 			chat = chat;
 		});
+
 		$client.socket.on("get_my_rooms_res", (data: any) => {
-			for (let x of data)
+			for (let x of data) {
 				chat.my_rooms.set(x.room.name, new ChattRoom(x.room.name, x.room.is_password_protected, x.room.is_private, x.is_admin, x.is_owner));
+				$client.socket.emit("get_message_room", { room_name: x.room.name });
+				$client.socket.emit("get_users_room", {room_name: x.room.name })
+			}
 			chat = chat;
 		});
 
@@ -198,7 +220,29 @@
 			chat = chat;
 
 			console.log("appended result", chat);
-		})
+		});
+
+		$client.socket.on("get_message_room_res", (data: any) => {
+			console.log("message_room", data);
+
+			let chatRoom = chat.my_rooms.get(data.room_name);
+			console.log("in room: ", data.room_name, "messages: ", data.messages);
+			// chatRoom.messages = data.messages;
+			chatRoom = chatRoom;
+			// console.log("check get_message", chatRoom);
+		});
+
+		$client.socket.on("get_users_room_res", (data: any) => {
+			console.log("user_room", data);
+			let chatRoom = chat.my_rooms.get(data.room_name);
+			console.log("in room: ", data.room_name, "users: ", data.users);
+
+		});
+
+		$client.socket.on("new_message_room_res", (data: any) => {
+			chat.my_rooms.get(data.room_name).messages.push(new Message(data.room_name, data.username, data.content_message, data.date_message));
+			chat = chat;
+		});
 
 		$client.socket.emit("get_my_rooms");
 		$client.socket.emit("get_all_rooms");
@@ -214,6 +258,9 @@
 			$client.socket.off("unset_password_room");
 			$client.socket.off("new_room_res");
 			$client.socket.off("append_user_to_room_res");
+			$client.socket.off("get_message_room_res");
+			$client.socket.off("get_users_room_res");
+			$client.socket.off("new_message_room_res");
 		});
 	});
 </script>
@@ -252,7 +299,7 @@
 	</div>
 	<div class="vflex chatroom">
 		{#if (roomSelected.length)}
-		<ChatRoom bind:chatRoom={chat.my_rooms.get(roomSelected)} />
+		<ChatRoom bind:chatRoom={chat.my_rooms[roomSelected]} />
 		{:else}
 		<div class="flex no-select">
 			<h2>Please select a room</h2> 
