@@ -75,6 +75,7 @@
 			}
 		}	
 		.users {
+			position: relative;
 			width: 20%;
 			gap: 0.2em;
 			padding-top: 1.5em;
@@ -85,7 +86,8 @@
 				height: 100%;
 				overflow-y: overlay;
 				
-				.users {
+				.user {
+					
 					cursor: pointer;
 					width: 100%;
 					padding: .5em .5em;
@@ -93,7 +95,26 @@
 					border-radius: 0 0 .5em 0;
 
 					&:hover { background-color: transparentize(#fff, .7); }
+				
+					input {
+						position: absolute;
+						top: 0.8em;
+						right: 0;
+					}
 				}
+			}
+
+			button {
+				position: absolute;
+				right: .2em;
+				bottom: 0;
+				border-radius: .2em .2em 0 0;
+
+				img {
+					width: 30px;
+				}
+				&:hover { background-color: transparentize(#fff, .6); }
+
 			}
 		}
 	}
@@ -101,59 +122,36 @@
 </style>
 
 <script lang="ts">
-    import ChatRoomMessage from "$lib/chat/ChatRoomMessages.svelte";
-    import { ChattRoom } from "$lib/chatt/ChattRoom";
     import ChatRoomSettings from "$lib/chat/ChatRoomSettings.svelte";
     import Modal from "$lib/tools/Modal.svelte";
     import { client } from "$lib/stores/client";
-	import { onMount } from "svelte";
-    import { Message } from "$lib/chatt/Message";
     import { Chatt } from "$lib/chatt/Chatt";
+    import UserProfile from "$lib/users/UserProfile.svelte";
+    import ChatUserSettings from "$lib/chat/ChatUserSettings.svelte";
 
 	export let chat: Chatt;
 	export let roomName: string;
 
 	let chatRoomSettingsModal: any;
+	let chatUsersSettingsModal: any;
+	let userProfileModal: any;
+
+	let profileUser: any;
 
 	let newMessage: string = "";
 
-	// function banUser(username)
-	// {
-	// 	let date : any = prompt("Date: ")
-	// 	let res : Date;
-	// 	if (date)
-	// 	{
-	// 		res = new Date(date);
-	// 		console.log(res);
-	// 		if (isNaN(res.getTime()))
-	// 			alert("Bad date");
-	// 		else 
-	// 			$client.socket.emit("ban_user", { room_name : $chatRoom.actualRoomName, username_ban: username, ban_end: res});
-	// 	}
-	// }
-	// function setAdmin(username)
-	// {
-	// 	$client.socket.emit("set_admin", { room_name : $chatRoom.actualRoomName, username_new_admin: username});
-	// }
-	// function muteUser(username)
-	// {
-	// 	let date : any = prompt("Date: ")
-	// 	let res : Date;
-	// 	if (date)
-	// 	{
-	// 		res = new Date(date);
-	// 		console.log(res);
-	// 		if (isNaN(res.getTime()))
-	// 			alert("Bad date");
-	// 		else 
-	// 			$client.socket.emit("mute_user", { room_name : $chatRoom.actualRoomName, username_ban: username, mute_end: res});
-	// 	}
-	// }
-	// let files : any;
 </script>
 
 <Modal bind:this={chatRoomSettingsModal}>
 	<ChatRoomSettings itself={chatRoomSettingsModal} chatRoom={chat.my_rooms.get(roomName)}/>
+</Modal>
+
+<Modal bind:this={chatUsersSettingsModal}>
+	<ChatUserSettings itself={chatUsersSettingsModal} roomName={roomName} />
+</Modal>
+
+<Modal bind:this={userProfileModal}>
+	<UserProfile itself={userProfileModal} profileUser={profileUser}/> 
 </Modal>
 
 {#if chat}
@@ -168,9 +166,13 @@
 			{/if}
 		</div>
 		<div class="read">
-		<!-- {#each chatRoom.messages as message} -->
-			<!-- <ChatRoomMessages username={message.username} content_message={message.message} itself={ itself } axelUserProfileModal={axelUserProfileModal} is_admin={actualMessages.is_admin}/> -->
-		<!-- {/each} -->
+		{#each chat.my_rooms.get(roomName).messages as message}
+			<div class="message">
+				<p>{message.username}:</p>
+				<p>{message.message}</p>
+				<p>{message.date}</p>
+			</div>
+		{/each}
 		</div>
 		<div class="write">
 			<input class="text-input" placeholder="write your message here..." bind:value={newMessage}>
@@ -185,14 +187,18 @@
 	<div class="vflex users">
 		<div class="vflex list">
 			{#each chat.my_rooms.get(roomName).users as user}
-			<div class="users">
+			<div class="user" on:click={() => {
+				//TODO get profile User info
+			}}>
 				<p>{user.username}</p>
-				<!-- <input type="button" class="btn-room" value="mute" on:click={()=>muteUser(actual_user.username)}/>
-				<input type="button" class="btn-room" value="ban" on:click={()=>banUser(actual_user.username)}/>
-				<input type="button" class="btn-room" value="set Admin" on:click={()=>setAdmin(actual_user.username)}/> -->
 			</div>
 			{/each}
 		</div>
+		{#if chat.my_rooms.get(roomName).is_admin}
+		<button on:click={() => { chatUsersSettingsModal.open(); }}>
+			<img src="setting.png" alt="user-setting">
+		</button>
+		{/if}
 	</div>
 </div>
 {/if}
