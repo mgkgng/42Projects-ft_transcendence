@@ -1,55 +1,46 @@
 <style lang="scss">
-	.chatroom {
-		width: 77%;
+	.read {
+		overflow-y: scroll;
+		padding: 2em;
 
-		.read {
-			overflow-y: scroll;
-			padding: 2em;
+		width: 100%;
+		height: 70%;
 
-			width: 100%;
-			height: 70%;
-
-		}
-		.write {
-			position: relative;
-			width: 100%;
-			height: 30%;
+	}
+	.write {
+		position: relative;
+		width: 100%;
+		height: 30%;
 
 
-			input {
-				padding-left: 1.5em;
-				border-radius: .3em 0 .8em 0;
+		input {
+			padding-left: 1.5em;
+			border-radius: .3em 0 .8em 0;
 
-				width: 100%;
-				height: 100%;
-				background-color: transparentize(#fff, .8	);
-				border-top: $border;
-				border-left: $border;
-			}
-
-			button {
-				position: absolute;
-				right: 0;
-				bottom: 0;
-				width: 3em;
-				height: 2em;
-				cursor: pointer;
-				transition: .3s;
-				border-radius: .2em 0 .8em 0;
-
-				&:hover {
-					background-color: transparentize(#fff, .7);
-				}
-			}
-		}
-
-		.no-select {
 			width: 100%;
 			height: 100%;
-			justify-content: center;
-			align-items: center;
+			background-color: transparentize(#fff, .8	);
+			border-top: $border;
+			border-left: $border;
+		}
+
+		button {
+			position: absolute;
+			right: 0;
+			bottom: 0;
+			width: 3em;
+			height: 2em;
+			cursor: pointer;
+			transition: .3s;
+			border-radius: .2em 0 .8em 0;
+
+			&:hover {
+				background-color: transparentize(#fff, .7);
+			}
 		}
 	}
+
+	
 
 	.users {
 		width: 17%;

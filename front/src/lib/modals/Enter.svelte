@@ -30,7 +30,7 @@
 <script lang="ts">
 	export let itself: any;
 	export let enterGameModal: any;
-	export let chatRoomModal: any;
+	export let chatModal: any;
 	export let rankModal: any;
 	
 </script>
@@ -45,7 +45,7 @@
 		itself.close();
 	}}>Rank</button>
 	<button class="chat" on:click={()=>{
-		chatRoomModal.open();
+		chatModal.open();
 		itself.close();
 	}}>Chat</button>
 </div>

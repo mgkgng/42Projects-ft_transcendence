@@ -81,12 +81,12 @@
 
     import { client } from "$lib/stores/client";
 	import { onMount, beforeUpdate } from "svelte";
-    import { Chat } from "$lib/chatt/Chat";
+    import { Chatt } from "$lib/chatt/Chatt";
     import RoomPassword from "$lib/chat/RoomPassword.svelte";
     import Modal from "$lib/tools/Modal.svelte";
 	
 	export let itself: any; 
-	export let chat: Chat;
+	export let chat: Chatt;
 
 	let passwordModal: any;
 

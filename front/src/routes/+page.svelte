@@ -1,11 +1,12 @@
 <script lang="ts">
 	import '$lib/stores/client';
 	import '$lib/scss/app.scss';
-	import Title from "$lib/home/Title.svelte";
 	import { client } from "$lib/stores/client";
     import { onMount } from "svelte";
     import { browser } from "$app/environment";
+    import { loaded } from '$lib/stores/var';
     import Header from "$lib/header/Header.svelte";
+	import Title from "$lib/home/Title.svelte";
 	import Modal from '$lib/tools/Modal.svelte';
 	import Room from "$lib/game/Room.svelte";
 	import Message from '$lib/modals/Message.svelte';
@@ -13,9 +14,8 @@
     import CreateGame from "$lib/game/CreateGame.svelte";
     import EnterGame from "$lib/game/EnterGame.svelte";
     import JoinGame from "$lib/game/JoinGame.svelte";
-    import ChatRoom from '$lib/chat/ChatRoom.svelte';
-    import { loaded } from '$lib/stores/var';
     import Rank from '$lib/rank/Rank.svelte';
+    import Chat from '$lib/chat/Chat.svelte';
 
 	let roomModal: any;
 	let roomID: string = "";
@@ -27,7 +27,7 @@
 	let enterModal: any;
 	let enterGameModal: any;
 	let createGameModal: any;
-	let chatRoomModal: any;
+	let chatModal: any;
 	let rankModal: any;
 
 	onMount(() => {
@@ -80,8 +80,8 @@
 	});
 </script>
 
-<Modal bind:this={chatRoomModal} closeOnBgClick={false}>
-	<ChatRoom itself={chatRoomModal} />
+<Modal bind:this={chatModal} closeOnBgClick={false}>
+	<Chat itself={chatModal} />
 </Modal>
 
 <Modal bind:this={rankModal}>
@@ -89,7 +89,7 @@
 </Modal>
 
 <Modal bind:this={enterModal}>
-	<Enter itself={enterModal} enterGameModal={enterGameModal} rankModal={rankModal} chatRoomModal={chatRoomModal}/>
+	<Enter itself={enterModal} enterGameModal={enterGameModal} rankModal={rankModal} chatModal={chatModal}/>
 </Modal>
 
 <Modal bind:this={createGameModal}>

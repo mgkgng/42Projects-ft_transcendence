@@ -1,5 +1,5 @@
 import { browser } from "$app/environment";
-import { ChatRoom } from "$lib/chatt/ChatRoom";
+import { ChattRoom } from "$lib/chatt/ChattRoom";
 
 export class Chatt {
 	rooms: Map<string, boolean>;

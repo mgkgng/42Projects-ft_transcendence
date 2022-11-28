@@ -115,7 +115,18 @@
 				padding-top: 30%;
 			}
 		}
+		.chatroom {
+			width: 77%;
+
+			.no-select {
+				width: 100%;
+				height: 100%;
+				justify-content: center;
+				align-items: center;
+			}
+		}
 	}
+
 </style>
 
 <script lang="ts">
@@ -125,10 +136,11 @@
 	import { onMount, afterUpdate } from "svelte";
     import AddRoom from "$lib/chat/AddRoom.svelte";
     import { Chatt } from "$lib/chatt/Chatt";
-    import SearchRoom from "$lib/chat/SearchRoom.svelte";
 	import { ChattRoom } from "$lib/chatt/ChattRoom";
+    import SearchRoom from "$lib/chat/SearchRoom.svelte";
     import CloseButton from "$lib/items/CloseButton.svelte";
     import RoomPassword from "./RoomPassword.svelte";
+    import ChatRoom from "$lib/chat/ChatRoom.svelte";
 
 	export let itself: any; 
 
@@ -285,11 +297,11 @@
 	</div>
 	<div class="vflex chatroom">
 		{#if (roomSelected.length)}
-			
+		<ChatRoom chatRoom={chat.my_rooms.get(roomSelected)} />
 		{:else}
-			<div class="flex no-select">
-				<h2>Please select a room</h2> 
-			</div>
+		<div class="flex no-select">
+			<h2>Please select a room</h2> 
+		</div>
 		{/if}
 	</div>
 	<CloseButton window={itself}/>
