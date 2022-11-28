@@ -8,6 +8,9 @@
 			width: 80%;
 			height: 100%;
 			align-items: center;
+			border-right: $border;
+			border-radius: 0 0 .8em 0;
+			padding-left: .5em;
 			
 			.title {
 				position: relative;
@@ -51,7 +54,8 @@
 					width: 100%;
 					height: 100%;
 					background-color: transparentize(#fff, .8	);
-					border-top: $border;
+					border-top: $border-thin;
+					border-left: $border-thin;
 				}
 		
 				button {
@@ -73,13 +77,6 @@
 		.users {
 			width: 20%;
 			gap: 0;
-	
-			p {
-				padding: 1em;
-				text-align: center;
-				border-bottom: $border;
-				background-color: transparentize($submain-blue, .3);
-			}
 	
 			.list {
 				padding: .8em .5em;
@@ -224,7 +221,6 @@
 		</div>
 	</div>
 	<div class="vflex users">
-		<p>Online</p>
 		<div class="vflex list">
 			{#each chatRoom.users as user}
 			<div class="users">
