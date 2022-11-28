@@ -1,5 +1,5 @@
 import { Message } from "$lib/chatt/Message";
-import { UserRoom } from "$lib/chatt/UserRoom";
+import { ChatRoomUser } from "$lib/chatt/ChatRoomUser";
 
 export class ChattRoom {
 	room_name : string = "";
@@ -27,12 +27,6 @@ export class ChattRoom {
 function socket_event_update_front(client : any) {
 	client.socket.on("get_my_rooms", (data : any) => { //HAVE TO OPTIMIZE : NOT REALOAD ALL MESSAGE WHEN A ROOM IS ADDED OR DELETED
 		chatRoom.update((chatRoom: any) => {
-			chatRoom.rooms = [];
-			chatRoom.messages = new Map();
-			chatRoom.actualRoom = new ChatRoom("", false, false, false, false);
-			return(chatRoom);
-		});
-		chatRoom.update((chatRoom: any) => {
 			for (let rooms of data ){
 				chatRoom.rooms.push(rooms.room.name);
 				chatRoom.messages.set(rooms.room.name, new ChatRoom(rooms.room.name, rooms.room.is_password_protected, rooms.room.is_private, rooms.is_admin, rooms.is_owner))
@@ -57,9 +51,9 @@ function socket_event_update_front(client : any) {
 	client.socket.on("get_users_room", (data: any) =>
 	{
 		chatRoom.update((chatRoom: any) => {
-			let inter : Array<UserRoom> = new Array<UserRoom>;
+			let inter : Array<ChatRoomUser> = new Array<ChatRoomUser>;
 			for (let users of data.users)
-				inter.push(new UserRoom(users.id_user.username, users.is_admin, users.is_owner, users.is_login))
+				inter.push(new ChatRoomUser(users.id_user.username, users.is_admin, users.is_owner, users.is_login))
 			chatRoom.messages.get(data.room_name).usersRoom = inter;
 			return (chatRoom);
 		});

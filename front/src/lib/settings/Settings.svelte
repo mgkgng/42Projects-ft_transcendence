@@ -104,7 +104,7 @@
     import { client } from "$lib/stores/client";
     import Modal from "$lib/tools/Modal.svelte";
     import ChangeUsername from "$lib/settings/ChangeUsername.svelte";
-    import ConfirmLeave from "$lib/settings/ConfirmLeave.svelte";
+    import ConfirmLeave from "$lib/modals/ConfirmLeave.svelte";
 
 	//TODO limit the image size
 	

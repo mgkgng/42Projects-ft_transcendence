@@ -1,4 +1,4 @@
-export class UserRoom {
+export class ChatRoomUser {
 	is_admin : boolean = false;
 	is_owner: boolean = false;
 	is_login: boolean = false;

@@ -8,7 +8,7 @@
 			border-radius: 50%;
 			cursor: pointer;
 			color: #e6e6e6;
-			backdrop-filter: blur(6px);
+			backdrop-filter: (6px);
 			border: $border;
 			text-align: center;
 			font-size: 25px;

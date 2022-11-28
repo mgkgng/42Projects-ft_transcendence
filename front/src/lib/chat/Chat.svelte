@@ -115,15 +115,15 @@
 				padding-top: 30%;
 			}
 		}
-		.chatroom {
-			width: 77%;
+	}
+	.chatroom {
+		width: 77%;
 
-			.no-select {
-				width: 100%;
-				height: 100%;
-				justify-content: center;
-				align-items: center;
-			}
+		.no-select {
+			width: 100%;
+			height: 100%;
+			justify-content: center;
+			align-items: center;
 		}
 	}
 

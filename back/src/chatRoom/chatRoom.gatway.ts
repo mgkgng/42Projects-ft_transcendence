@@ -171,7 +171,7 @@ export class ChatRoomService {
 						inter.is_login = true; 
 					end.push(inter);
 				}
-				client.emit('get_users_room', {users: end, room_name: data.room_name});
+				client.emit('get_users_room_res', {users: end, room_name: data.room_name});
 			} catch (e) {
 				console.log("get_users Error: bad data", e);
 				client.emit("error_get_users_room", {error: "Error data"});
@@ -210,7 +210,7 @@ export class ChatRoomService {
 				.select(["messageChatRoomEntity.content_message", "messageChatRoomEntity.date_message", "user.username", "chatRoom.name"])
 				.where("chatRoom.id_g = :id", {id: id_room}).orderBy("messageChatRoomEntity.date_message", "ASC").getMany();
 				//console.log(res);
-				client.emit('get_message_room', {messages : res, room_name: data.room_name});
+				client.emit('get_message_room_res', {messages : res, room_name: data.room_name});
 			} catch (e) {
 				console.log("getMessage Error", e);
 				throw new WsException("No message in this room");
