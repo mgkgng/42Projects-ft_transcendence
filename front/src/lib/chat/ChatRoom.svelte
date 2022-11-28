@@ -73,25 +73,77 @@
 <script lang="ts">
     import ChatRoomMessage from "$lib/chat/ChatRoomMessages.svelte";
     import { ChattRoom } from "$lib/chatt/ChattRoom";
+    import ChatRoomSettings from "$lib/chat/ChatRoomSettings.svelte";
+    import Modal from "$lib/tools/Modal.svelte";
 
 	export let chatRoom: ChattRoom;
 
+	let chatRoomSettingsModal: any;
+
 	let newMessage: string = "";
+
+	// function sendMessage(){
+	// 	$client.socket.emit("new_message_room", {room_name: actualName, content_message: newMessage});
+	// }
+	// function set_private_room()
+	// {
+	// 	$client.socket.emit("set_room_private", {room_name: $chatRoom.actualRoomName});
+	// }
+	// function unset_private_room()
+	// {
+	// 	$client.socket.emit("unset_room_private", {room_name: $chatRoom.actualRoomName});
+	// }
+	// function set_password_room()
+	// {
+	// 	let password = prompt("Enter the new passwod's room: ");
+	// 	$client.socket.emit("set_password_room", {room_name: $chatRoom.actualRoomName, password: password});
+	// }
+	// function unset_password_room()
+	// {
+	// 	$client.socket.emit("unset_password_room", {room_name: actualName});
+	// }
+	// function banUser(username)
+	// {
+	// 	let date : any = prompt("Date: ")
+	// 	let res : Date;
+	// 	if (date)
+	// 	{
+	// 		res = new Date(date);
+	// 		console.log(res);
+	// 		if (isNaN(res.getTime()))
+	// 			alert("Bad date");
+	// 		else 
+	// 			$client.socket.emit("ban_user", { room_name : $chatRoom.actualRoomName, username_ban: username, ban_end: res});
+	// 	}
+	// }
+	// function setAdmin(username)
+	// {
+	// 	$client.socket.emit("set_admin", { room_name : $chatRoom.actualRoomName, username_new_admin: username});
+	// }
+	// function muteUser(username)
+	// {
+	// 	let date : any = prompt("Date: ")
+	// 	let res : Date;
+	// 	if (date)
+	// 	{
+	// 		res = new Date(date);
+	// 		console.log(res);
+	// 		if (isNaN(res.getTime()))
+	// 			alert("Bad date");
+	// 		else 
+	// 			$client.socket.emit("mute_user", { room_name : $chatRoom.actualRoomName, username_ban: username, mute_end: res});
+	// 	}
+	// }
+	// let files : any;
 </script>
+
+<Modal bind:this={chatRoomSettingsModal}>
+	<ChatRoomSettings itself={chatRoomSettingsModal} chatRoom={chatRoom}/>
+</Modal>
 
 <div class="read">
 	{#if chatRoom.is_owner}
-		<!-- {#if chat.my_rooms.get(roomSelected).is_owner.is_private}
-			<input class="button" value="Set private" on:click={unset_private_room}>
-		{:else}
-			<input class="button" value="Set private" on:click={set_private_room}>
-		{/if}
-		{#if chat.my_rooms.get(roomSelected).is_owner.is_password_protected}
-			<input class="button" value="delete password" on:click={unset_password_room}>
-			<input class="button" value="Change password" on:click={set_password_room}>
-		{:else}
-			<input class="button" value="add password" on:click={set_password_room}>
-		{/if} -->
+		<button>Settings</button>
 	{/if}
 	{#each chatRoom.messages as message}
 		<!-- <ChatRoomMessage username={message.username} content_message={message.message} itself={ itself } axelUserProfileModal={axelUserProfileModal} is_admin={actualMessages.is_admin}/> -->
