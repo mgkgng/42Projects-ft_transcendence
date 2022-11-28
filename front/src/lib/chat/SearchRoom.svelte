@@ -122,7 +122,8 @@
 		<input class="text-input" placeholder="Search Room Name ..." bind:value={research}>
 	</div>
 	<div class="vflex result">
-		{#each ([...chat.rooms.keys()].sort()) as room_name}
+		{#if !research.length}
+			{#each ([...chat.rooms.keys()].sort()) as room_name}
 			{#if (!chat.my_rooms.has(room_name))}
 				<div class="flex list">
 					<p>{room_name}</p>
@@ -135,6 +136,20 @@
 					}}>Join</button>
 				</div>
 			{/if}
-		{/each}
+			{/each}
+		{:else}
+			{#each searchResult as result}
+			<div class="flex list">
+				<p>{result}</p>
+				<button on:click={() => {
+					if (chat.rooms.get(result).is_password_protected) {
+						roomName = result;
+						passwordModal.open();
+					} else
+						$client.socket.emit("append_user_to_room", {room_name: result, room_password: ""});
+				}}>Join</button>
+			</div>
+			{/each}
+		{/if}
 	</div>
 </div>

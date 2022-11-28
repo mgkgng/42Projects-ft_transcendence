@@ -85,7 +85,8 @@
     import { ChattRoom } from "$lib/chatt/ChattRoom";
 	import Modal from "$lib/tools/Modal.svelte";
 	import ConfirmLeave from "$lib/modals/ConfirmLeave.svelte";
-
+    import { client } from "$lib/stores/client";
+	
 	export let itself: any;
 	export let chatRoom: ChattRoom;
 
@@ -126,23 +127,21 @@
 		<div class="empty"></div>
 		{/if}
 	</div>
-
-
-	<!-- {#if chatRoom.is_password_protected}
-	<input class="button" value="delete password" on:click={unset_password_room}>
-	<input class="button" value="Change password" on:click={set_password_room}>
-	{:else}
-	<input class="button" value="add password" on:click={set_password_room}>
-	{/if} -->
-
 	<div class="flex buttons">
 		<button on:click={() => {
 			if (!modified)
 				itself.close();
 			confirmLeaveModal.open();
-		}}>Cancel</button>
+		}}>Close</button>
 		<button class="{(modified) ? "" : "no-active"}" on:click={() => {
-
+			if (original[0] != isPrivate)
+				$client.socket.emit((isPrivate) ? "set_room_private" : "unset_room_private", { room_name: chatRoom.room_name });
+			if (original[1] != withPassword)
+				$client.socket.emit((withPassword) ? "set_password_room" : "unset_password_room",
+					(withPassword) ? { room_name: chatRoom.room_name, password: password } 
+						: { room_name: chatRoom.room_name });
+			else if (original[1] = true && password != "default-password")
+				$client.socket.emit("set_password_room", { room_name: chatRoom.room_name, password: password });
 		}}>Save</button>
 	</div>
 </div>

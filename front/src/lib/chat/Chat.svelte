@@ -169,8 +169,8 @@
 		});
 
 		$client.socket.on("set_room_visible", (data: any) => { client.socket.emit("get_my_rooms"); });
-		$client.socket.on("set_room_private", (data: any) => { chat.my_rooms.get(data.room_name).is_private = true; });
-		$client.socket.on("unset_room_private", (data: any) => { chat.my_rooms.get(data.room_name).is_private = false; });
+		$client.socket.on("set_room_private_res", (data: any) => { chat.my_rooms.get(data.room_name).is_private = true; });
+		$client.socket.on("unset_room_private_res", (data: any) => { chat.my_rooms.get(data.room_name).is_private = false; });
 		$client.socket.on("set_password_room", (data: any) => { chat.my_rooms.get(data.room_name).is_password_protected = true; });
 		$client.socket.on("unset_password_room", (data: any) => { chat.my_rooms.get(data.room_name).is_password_protected = false; });
 
@@ -252,7 +252,7 @@
 	</div>
 	<div class="vflex chatroom">
 		{#if (roomSelected.length)}
-		<ChatRoom chatRoom={chat.my_rooms.get(roomSelected)} />
+		<ChatRoom bind:chatRoom={chat.my_rooms.get(roomSelected)} />
 		{:else}
 		<div class="flex no-select">
 			<h2>Please select a room</h2> 

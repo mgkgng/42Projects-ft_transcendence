@@ -20,7 +20,6 @@
 			overflow-y: scroll;
 
 			.line {
-				border-radius: .3em;
 				padding: .5em 0;
 				width: 100%;
 				gap: 0;
@@ -33,9 +32,19 @@
 					transition: .2s;
 				}
 
-				&:nth-child(2) { background-color: $yellow; }
-				&:nth-child(3) { background-color: $grey; }
-				&:nth-child(4) { background-color: $red; }
+				h3 {
+					height: 100%;
+					border-radius: .3em;
+				}
+				&:nth-child(2) { h3 {
+					background-color: #cde309f4; }
+				}
+				&:nth-child(3) { h3 {
+					background-color: transparentize(#fff, .6); }
+				}
+				&:nth-child(4) { h3 {
+					background-color: #986911; }
+				}
 			}
 			.no-match {
 				width: 100%;
@@ -84,7 +93,7 @@
 
 <div class="vflex window rank">
 	<h1>Global Ranking</h1>
-	<h3>{(myPos != -1) ? "You are situated at #" + myPos + " !": "Try any game to find yourself in the rank!"}</h3>
+	<h3>{(myPos != -1) ? "You are situated at #" + (myPos + 1) + " !": "Try any game to find yourself in the rank!"}</h3>
 	<div class="vflex list">
 		<div class="flex line">
 			<p>Rank</p>
