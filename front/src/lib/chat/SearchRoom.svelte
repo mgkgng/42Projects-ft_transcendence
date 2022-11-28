@@ -55,7 +55,6 @@
 		}
 	}
 
-	
 	.back{
 		padding: 0em;
 		width: 50px;
@@ -98,13 +97,18 @@
 	$: $client.socket.emit("get_all_rooms_begin_by", { research: research });
 
 	onMount(() => {
-		console.log("ccc", [...chat.rooms.keys()].sort());
-		console.log("ttt", chat.my_rooms);
+		$client.socket.on("success_append_user_to_room", (data: any) => {
+			console.log("success", data);
+		})
+
 		$client.socket.on("get_all_rooms_begin_by_res", (data: any) => {
 			console.log("test", data);
 		});
 
-		return (() => { $client.socket.off("get_all_rooms_begin_by_res"); });
+		return (() => {
+			$client.socket.off("success_append_user_to_room");
+			$client.socket.off("get_all_rooms_begin_by_res");
+		});
 	});
 
 </script>
@@ -119,7 +123,7 @@
 	</div>
 	<div class="vflex result">
 		{#each ([...chat.rooms.keys()].sort()) as room_name}
-			{#if (!chat.my_rooms.includes(room_name))}
+			{#if (!chat.my_rooms.has(room_name))}
 				<div class="flex list">
 					<p>{room_name}</p>
 					<button on:click={() => {

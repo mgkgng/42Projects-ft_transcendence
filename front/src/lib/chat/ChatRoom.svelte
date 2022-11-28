@@ -107,7 +107,7 @@
     import Modal from "$lib/tools/Modal.svelte";
     import { client } from "$lib/stores/client";
 	import { onMount } from "svelte";
-
+    import { Message } from "$lib/chatt/Message";
 
 	export let chatRoom: ChattRoom;
 
@@ -167,12 +167,20 @@
 	// let files : any;
 
 	onMount(() => {
+		console.log("couocu");
 		$client.socket.on("get_message_room_res", (data: any) => {
-			console.log(data);
+			console.log("message_room", data);
+			chatRoom.messages = data.messages;
+			chatRoom = chatRoom;
+			console.log("check get_message", chatRoom);
 		});
 
 		$client.socket.on("get_users_room_res", (data: any) => {
-			console.log(data);
+			console.log("user_room", data);
+		});
+
+		$client.socket.on("new_message_room", (data: any) => {
+			chatRoom.messages.push(new Message(data.room_name, data.username, data.content_message, data.date_message));
 		})
 
 		$client.socket.emit("get_message_room", { room_name: chatRoom.room_name });
@@ -181,6 +189,7 @@
 		return (() => {
 			$client.socket.off("get_message_room_res");
 			$client.socket.off("get_users_room_res");
+			$client.socket.off("new_message_room");
 		});
 	});
 </script>
@@ -217,9 +226,9 @@
 	<div class="vflex users">
 		<p>Online</p>
 		<div class="vflex list">
-			{#each chatRoom.usersRoom as actual_user}
-			<div class="user">
-				<div>{actual_user.username}</div>
+			{#each chatRoom.users as user}
+			<div class="users">
+				<div>{user.username}</div>
 				<!-- <input type="button" class="btn-room" value="mute" on:click={()=>muteUser(actual_user.username)}/>
 				<input type="button" class="btn-room" value="ban" on:click={()=>banUser(actual_user.username)}/>
 				<input type="button" class="btn-room" value="set Admin" on:click={()=>setAdmin(actual_user.username)}/> -->

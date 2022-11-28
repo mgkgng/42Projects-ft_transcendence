@@ -185,12 +185,20 @@
 			chat = chat;
 		});
 
-		$client.socket.on("new_room_res", (data : any) => {
-			console.log("something received");
+		$client.socket.on("new_room_res", (data: any) => {
 			chat.rooms.set(data.room_name, new ChattRoom(data.room_name, data.is_password_protected, data.is_private, data.is_admin, true))
 			chat.my_rooms.push(data.room_name);
 			chat = chat;
 		});
+
+		$client.socket.on("append_user_to_room_res", (data: any) => {
+			console.log("res", data);
+			let roomInfo = chat.rooms.get(data.room_name);
+			chat.my_rooms.set(data.room_name, new ChattRoom(data.room_name, roomInfo.is_password_protected, false, false, false));
+			chat = chat;
+
+			console.log("appended result", chat);
+		})
 
 		$client.socket.emit("get_my_rooms");
 		$client.socket.emit("get_all_rooms");
@@ -205,6 +213,7 @@
 			$client.socket.off("set_password_room");
 			$client.socket.off("unset_password_room");
 			$client.socket.off("new_room_res");
+			$client.socket.off("append_user_to_room_res");
 		});
 	});
 </script>
@@ -214,7 +223,7 @@
 </Modal>
 
 <Modal bind:this={searchRoomModal}>
-	<SearchRoom itself={searchRoomModal} chat={chat}/>
+	<SearchRoom itself={searchRoomModal} bind:chat={chat}/>
 </Modal>
 
 <div class="flex window chat">

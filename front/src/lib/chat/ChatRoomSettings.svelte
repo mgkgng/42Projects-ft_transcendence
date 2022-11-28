@@ -69,6 +69,14 @@
 		<label for="public">Public</label>
 	</div>
 
+	<div class="flex password">
+		<input type="radio" id="with" bind:group={withPassword} name="withPassword" value={true}>
+		<label for="with">With Password</label>
+		<input type="radio" id="without" bind:group={withPassword} name="withPassword" value={false}>
+		<label for="without">Without Password</label>
+	</div>
+
+
 	<!-- {#if chatRoom.is_password_protected}
 	<input class="button" value="delete password" on:click={unset_password_room}>
 	<input class="button" value="Change password" on:click={set_password_room}>

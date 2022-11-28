@@ -9,7 +9,7 @@
 	import Title from "$lib/home/Title.svelte";
 	import Modal from '$lib/tools/Modal.svelte';
 	import Room from "$lib/game/Room.svelte";
-	import Message from '$lib/modals/Message.svelte';
+	import AlertMessage from '$lib/modals/AlertMessage.svelte';
 	import Enter from "$lib/modals/Enter.svelte";
     import CreateGame from "$lib/game/CreateGame.svelte";
     import EnterGame from "$lib/game/EnterGame.svelte";
@@ -105,7 +105,7 @@
 </Modal>
 
 <Modal bind:this={messageModal}>
-	<Message itself={messageModal} msg={modalMessage}/>
+	<AlertMessage itself={messageModal} msg={modalMessage}/>
 </Modal>
 
 <Modal bind:this={roomModal} closeOnBgClick={false}>
