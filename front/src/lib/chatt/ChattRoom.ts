@@ -1,4 +1,6 @@
 import { Message } from "$lib/chatt/Message";
+import { ChatRoomUser } from "$lib/chatt/ChatRoomUser";
+
 
 export class ChattRoom {
 	room_name : string = "";
@@ -7,7 +9,7 @@ export class ChattRoom {
 	is_admin : boolean = false;
 	is_owner : boolean = false;
 	messages : Array<Message>;
-	users : any[];
+	users : Array<ChatRoomUser>;
 	
 	constructor(room_name : string, is_password_protected : boolean, is_private : boolean, is_admin : boolean, is_owner : boolean)
 	{

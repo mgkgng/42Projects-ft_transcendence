@@ -143,6 +143,7 @@
     import ChatRoom from "$lib/chat/ChatRoom.svelte";
     import Room from "../game/Room.svelte";
     import { Message } from "../chatt/Message";
+    import { ChatRoomUser } from "../chatt/ChatRoomUser";
 
 	export let itself: any; 
 
@@ -223,20 +224,17 @@
 		});
 
 		$client.socket.on("get_message_room_res", (data: any) => {
-			console.log("message_room", data);
-
 			let chatRoom = chat.my_rooms.get(data.room_name);
-			console.log("in room: ", data.room_name, "messages: ", data.messages);
-			// chatRoom.messages = data.messages;
-			chatRoom = chatRoom;
-			// console.log("check get_message", chatRoom);
+			for (let message of data.messages)
+				chatRoom.messages.push(new Message(message.id_chat_room.name, message.id_user.username, message.content_message, message.data_message))
+			chat = chat;
 		});
 
 		$client.socket.on("get_users_room_res", (data: any) => {
-			console.log("user_room", data);
 			let chatRoom = chat.my_rooms.get(data.room_name);
-			console.log("in room: ", data.room_name, "users: ", data.users);
-
+			for (let user of data.users)
+				chatRoom.users.push(new ChatRoomUser(user.id_user.username, user.is_admin, user.is_owner, user.is_login));
+			chat = chat;
 		});
 
 		$client.socket.on("new_message_room_res", (data: any) => {
@@ -299,7 +297,7 @@
 	</div>
 	<div class="vflex chatroom">
 		{#if (roomSelected.length)}
-		<ChatRoom bind:chatRoom={chat.my_rooms[roomSelected]} />
+		<ChatRoom bind:chat={chat} roomName={roomSelected}/>
 		{:else}
 		<div class="flex no-select">
 			<h2>Please select a room</h2> 

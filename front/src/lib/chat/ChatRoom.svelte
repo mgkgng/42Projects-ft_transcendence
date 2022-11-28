@@ -76,20 +76,23 @@
 		}	
 		.users {
 			width: 20%;
-			gap: 0;
-	
+			gap: 0.2em;
+			padding-top: 1.5em;
+
 			.list {
-				padding: .8em .5em;
 				gap: 0;
-				.user {
-					padding-left: .5em;
-					height: 1.8em;
+				width: 90%;
+				height: 100%;
+				overflow-y: overlay;
+				
+				.users {
 					cursor: pointer;
+					width: 100%;
+					padding: .5em .5em;
 					transition: .1s;
-					border-radius: .2em 0 .5em .2em;
-					&:hover {
-						background-color: transparentize(#fff, .7);
-					}
+					border-radius: 0 0 .5em 0;
+
+					&:hover { background-color: transparentize(#fff, .7); }
 				}
 			}
 		}
@@ -105,8 +108,10 @@
     import { client } from "$lib/stores/client";
 	import { onMount } from "svelte";
     import { Message } from "$lib/chatt/Message";
+    import { Chatt } from "$lib/chatt/Chatt";
 
-	export let chatRoom: ChattRoom;
+	export let chat: Chatt;
+	export let roomName: string;
 
 	let chatRoomSettingsModal: any;
 
@@ -148,14 +153,15 @@
 </script>
 
 <Modal bind:this={chatRoomSettingsModal}>
-	<ChatRoomSettings itself={chatRoomSettingsModal} chatRoom={chatRoom}/>
+	<ChatRoomSettings itself={chatRoomSettingsModal} chatRoom={chat.my_rooms.get(roomName)}/>
 </Modal>
 
+{#if chat}
 <div class="flex room">
 	<div class="vflex chat">
 		<div class="title">
-			<h1>{chatRoom.room_name}</h1>
-			{#if chatRoom.is_owner}
+			<h1>{chat.my_rooms.get(roomName).room_name}</h1>
+			{#if chat.my_rooms.get(roomName).is_owner}
 			<button on:click={() => { chatRoomSettingsModal.open(); }}>
 				<img src="setting.png" alt="setting">
 			</button>
@@ -170,7 +176,7 @@
 			<input class="text-input" placeholder="write your message here..." bind:value={newMessage}>
 			<button on:click={() => {
 				$client.socket.emit("new_message_room", {
-					room_name: chatRoom.room_name,
+					room_name: chat.my_rooms.get(roomName).room_name,
 					content_message: newMessage
 				});
 			}}>Send</button>
@@ -178,9 +184,9 @@
 	</div>
 	<div class="vflex users">
 		<div class="vflex list">
-			{#each chatRoom.users as user}
+			{#each chat.my_rooms.get(roomName).users as user}
 			<div class="users">
-				<div>{user.username}</div>
+				<p>{user.username}</p>
 				<!-- <input type="button" class="btn-room" value="mute" on:click={()=>muteUser(actual_user.username)}/>
 				<input type="button" class="btn-room" value="ban" on:click={()=>banUser(actual_user.username)}/>
 				<input type="button" class="btn-room" value="set Admin" on:click={()=>setAdmin(actual_user.username)}/> -->
@@ -189,3 +195,4 @@
 		</div>
 	</div>
 </div>
+{/if}
