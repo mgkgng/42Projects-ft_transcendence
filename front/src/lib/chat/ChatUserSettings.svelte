@@ -1,7 +1,7 @@
 <style lang="scss">
 	.settings {
 		width: 480px;
-		height: 640px;
+		height: 320px;
 		padding: 1em;
 		align-items: center;
 		gap: 0;
@@ -11,7 +11,7 @@
 			input { display: none; }
 			input[id="mute"]:checked+label { background-color: $yellow; }
 			input[id="ban"]:checked+label { background-color: $red; }
-			input[id="admin"]:checked+label { background-color: $red; }
+			input[id="admin"]:checked+label { background-color: $submain-lowshadeblue; }
 
 			label {
 				display: inline-block;
@@ -29,17 +29,34 @@
 		.setting-body {
 			width: 100%;
 			height: 85%;
+			justify-content: center;
+			align-items: center;
 			
 			border: $border-thin;
 			border-radius: .3em;
+
+			p {
+				padding: 0 .8em; 
+				text-align: center;
+			}
+
+			select {
+				width: 12em;
+				background-color: transparentize(#fff, .7);
+			}
 		}
+
 		.buttons {
 			gap: .2em;
+			margin-top: .5em;
 			button {
 				width: 6em;
 				height: 3em;
 				border: $border-thin;
 				border-radius: .3em;
+				background-color: $main-bright;
+
+				&:first-child { background-color: $submain-lowshadeblue; }
 			}
 		}
 	}
@@ -57,8 +74,6 @@
 	let users: Array<string> = chat.my_rooms.get(roomName).users.filter((x:any) => !x.is_admin).map((x: any) => x.username);
 	let admins: Array<string> = chat.my_rooms.get(roomName).users.filter((x: any) => x.is_admin).map((x: any) => x.username);
 
-	$: console.log("yo", selected1);
-
 	const Setting = {
 		Mute: 0,
 		Ban: 1,
@@ -66,23 +81,20 @@
 	};
 
 	const explain: Array<string> = [
-		"",
-		"",
-		""
+		"If you mute an user, he/she will not be able to speak for a limited time.",
+		"If you ban an user, he/she will not be able to join the chat room for a limited time.",
+		"If you set an user admin, he/she will be able to mute / ban / set admin other users."
 	];
 
 	function reset(settingType: number) {
 		userSet = (settingType != Setting.Admin) ? users : users.filter((x) => { !admins.includes(x); });
-		userSelected = [];
-		selected1 = [];
-		selected2 = [];
+		selected = "";
 		date = tomorrow;
 	}
 
 	let userSet: Array<string> = [];
 	let userSelected: Array<string> = [];
-	let selected1: Array<string> = [];
-	let selected2: Array<string> = [];
+	let selected: string = ""
 
 	let settingType: number = Setting.Mute;
 
@@ -102,53 +114,34 @@
 		<input type="radio" id="admin" bind:group={settingType} name="settingType" value={2}>
 		<label for="admin">Set Admin</label>
 	</div>
-	<div class="setting-body">
+	<div class="vflex setting-body">
 		<p>{explain[settingType]}</p>
-		<p>Select Users:</p>
-		<div class="flex select">
-			<select multiple bind:value={selected1}>
+		<div class="flex">
+			<p>Select the User:</p>
+			<select bind:value={selected}>
 				{#each userSet as user}
 				<option value={user}>{user}</option>
 				{/each}
 			</select>
-			<div class="vflex buttons">
-				<button on:click={() => {
-					userSelected.concat(selected1);
-					userSet.filter(x => !selected1.includes(x));
-					userSelected = userSelected;
-					userSet = userSet;
-					selected1 = [];
-				}}>&gt;</button>
-				<button on:click={() => {
-					userSet.concat(selected2);
-					userSelected.filter(x => !selected2.includes(x));
-					userSelected = userSelected;
-					userSet = userSet;
-					selected2 = [];
-				}}>&lt;</button>
-			</div>
-			<select multiple bind:value={selected2}>
-				{#each userSelected as user}
-				<option value={user}>{user}</option>
-				{/each}
-			</select>
-
 		</div>
 		{#if settingType != Setting.Admin}
-		<input type="date" id="until" name="date" value={date} min={tomorrow} max="2042-4-2">
+		<div class="flex">
+			<p>Until:</p>
+			<input type="date" id="until" name="date" value={date} min={tomorrow} max="2042-4-2">
+		</div>
 		{/if}
 	</div>
 	<div class="flex buttons">
-		<button on:click={() => { itself.open(); }}>Cancel</button>
-		<button on:click={() => {
-			for (let user of userSelected) {
-				if (settingType == Setting.Mute)
-					$client.socket.emit("mute_user", { room_name : roomName, username_ban: user, mute_end: undefined});
-				else if (settingType == Setting.Ban)
-					$client.socket.emit("ban_user", { room_name : roomName, username_ban: user, ban_end: undefined});
-				else
-					$client.socket.emit("set_admin", { room_name : roomName, username_new_admin: user});
-			}
+		<button on:click={() => { itself.close(); }}>Cancel</button>
+		<button class="{(!selected.length) ? "no-active" : ""}" on:click={() => {
+			if (!selected.length)
+				return ;
+			if (settingType == Setting.Mute)
+				$client.socket.emit("mute_user", { room_name : roomName, username_ban: user, mute_end: undefined});
+			else if (settingType == Setting.Ban)
+				$client.socket.emit("ban_user", { room_name : roomName, username_ban: user, ban_end: undefined});
+			else
+				$client.socket.emit("set_admin", { room_name : roomName, username_new_admin: user});
 		}}>Confirm</button>
 	</div>
 </div>
