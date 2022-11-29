@@ -66,6 +66,10 @@
     import UserProfile from "$lib/users/UserProfile.svelte";
 
 	export let itself: any;
+
+	let userInfo: any;
+	user.subscribe((user: any) => { userInfo = user; });
+
 	
 	let userProfileModal: any;
 	let profileUser: any;
@@ -78,7 +82,7 @@
 
 		$client.socket.on("RankingRes", (data: any) => {
 			rankList = data;
-			myPos = data.map((x: any) => x.username).indexOf($user.username);
+			myPos = data.map((x: any) => x.username).indexOf(userInfo.username);
 		});
 
 		return (() => {

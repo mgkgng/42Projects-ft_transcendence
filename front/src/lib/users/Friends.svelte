@@ -151,6 +151,9 @@
 
 	export let itself: any;
 
+	let userInfo: any;
+	user.subscribe((user: any) => { userInfo = user; });
+
 	let friends: Array<any>
 	let searchUser: string = "";
 	let userSearchList: Array<any> = [];
@@ -162,7 +165,7 @@
 	$: { $client.socket.emit("getUserinDB", {username: searchUser}); }
 
 	onMount(() => {
-		$client.socket.emit("getFriendList", { username: $user.username });
+		$client.socket.emit("getFriendList", { username: userInfo.username });
 
 		$client.socket.on("error_getFriendList", (data: any) => {
 			console.log("Error!");
