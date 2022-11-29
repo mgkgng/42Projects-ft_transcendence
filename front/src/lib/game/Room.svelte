@@ -127,6 +127,9 @@
 	let player2: any;
 
 	let switched: boolean = false;
+
+	let userInfo: any;
+	user.subscribe((user: any) => { userInfo = user; });
 	
 	onMount(()=> {
 		if (!roomID.length)
@@ -143,12 +146,12 @@
 			player1 = data.player1;
 			player2 = data.player2;
 			initPos = (MapSize[gameInfo?.mapSize][0] - PaddleSize[gameInfo?.paddleSize]) / 2;
-			userType = (player1?.info.username_42 == $user.username) ? UserType.Player1 :
-				(player2?.info.username_42 == $user.username) ? UserType.Player2 :
+			userType = (player1?.info.username_42 == userInfo.username) ? UserType.Player1 :
+				(player2?.info.username_42 == userInfo.username) ? UserType.Player2 :
 				UserType.Watcher;
 
 			// By default, player1 is on the right side unless user is the player2
-			switched = ($user.username == player2?.info.username_42);
+			switched = (userInfo.username == player2?.info.username_42);
 		});
 
 		$client.socket.on("PlayerUpdate", (data: any) => {
@@ -261,7 +264,7 @@
 	<div class="button-container">
 		<!-- there should be a difference between host-guest mode and random matching mode -->
 		{#if !started && hostname.length}
-			{#if $user.username == hostname}
+			{#if userInfo.username == hostname}
 			<button class="start" on:click={()=>{
 				if (!ready) {
 					// TODO message appear

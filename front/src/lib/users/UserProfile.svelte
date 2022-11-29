@@ -99,9 +99,18 @@
     import { onMount } from "svelte";
     import { client } from "$lib/stores/client";
     import CloseButton from "$lib/items/CloseButton.svelte";
+    import WriteMessage from "$lib/users/WriteMessage.svelte";
+    import Modal from "../tools/Modal.svelte";
+
 
 	export let itself: any;
 	export let profileUser: any;
+
+	let userInfo: any;
+	user.subscribe((user: any) => { userInfo = user; });
+
+
+	let writeMessageModal: any;
 
 	let gameHistory: Array<any> = [];
 
@@ -121,9 +130,15 @@
 
 		return (() => {
 			$client.socket.off("resHistory");
-		})
+			$client.socket.off("error_askFriend");
+			$client.socket.off("success_askFriend");
+		});
 	});
 </script>
+
+<Modal bind:this={writeMessageModal}>
+	<WriteMessage itself={writeMessageModal} sendTo={[profileUser.username]}/>
+</Modal>
 
 <div class="vflex window profile">
 	<div class="flex info">
@@ -137,7 +152,7 @@
 			<p>Connected: {(profileUser.status == "online") ? "Online" : profileUser.last_connection.split('T'[0])}</p>
 		</div>
 	</div>
-	{#if profileUser.username != $user.username}
+	{#if profileUser.username_42 != userInfo.username_42}
 	<div class="flex tools">
 		<button on:click={() => {
 			console.log("testing");
@@ -146,7 +161,7 @@
 			});
 		}}>Add</button>
 		<button>Block</button>
-		<button>Message</button>
+		<button on:click={() => { writeMessageModal.open(); }}>Message</button>
 	</div>
 	{/if} 
 	<div class="history">

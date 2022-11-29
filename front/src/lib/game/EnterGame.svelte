@@ -8,7 +8,7 @@
 			border-radius: 50%;
 			cursor: pointer;
 			color: #e6e6e6;
-			backdrop-filter: blur(6px);
+			backdrop-filter: (6px);
 			border: $border;
 			text-align: center;
 			font-size: 25px;
@@ -36,7 +36,7 @@
 	import { onMount } from "svelte";
     import { user } from "$lib/stores/user";
     import Modal from "$lib/tools/Modal.svelte";
-	import Message from "$lib/modals/Message.svelte";
+	import AlertMessage from "$lib/modals/AlertMessage.svelte";
 
 	export let itself: any;
 	export let createGameModal: any;
@@ -63,7 +63,7 @@
 </script>
 
 <Modal bind:this={messageModal}>
-	<Message itself={messageModal} msg={modalMessage}/>
+	<AlertMessage itself={messageModal} msg={modalMessage}/>
 </Modal>
 
 <div class="flex buttons">

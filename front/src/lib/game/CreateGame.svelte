@@ -2,7 +2,7 @@
 	.container {
 		position: relative;
 		width: 520px;
-		height: 480px;
+		height: 520px;
 		font-size: 19px;
 
 		padding-left: 3em;
@@ -72,6 +72,10 @@
 			label {
 				padding: 0 1em; 
 			}
+
+			input[type="range"] {
+				width: 80%;
+			}
 		}
 	}
 
@@ -105,16 +109,15 @@
 	.submit {
 		position: absolute;
 		left: 35%;
-		bottom: .8em;
+		bottom: 1.2em;
 		padding: 1em;
 		border-radius: .5em;
 		border: $border;
-		background-color: $submain-blue;
 		color: #fff;
 		cursor: pointer;
-		transition: .2s;
+		transition: .3s;
 
-		&:hover { filter: brightness(80%); }
+		&:hover { background-color: $submain-blue; }
 	}
 </style>
 
@@ -160,8 +163,8 @@
 		<div class="option">
 			<p>Points</p>
 			<label>
-				<input type=number bind:value={maxPoint} min=3 max=20>
 				<input type=range bind:value={maxPoint} min=3 max=20>
+				<h4>{maxPoint}</h4>
 			</label>
 		</div>
 		<div class="option">
@@ -184,7 +187,6 @@
 				<label for="speed2">Normal</label>
 				<input type=radio id="speed3" bind:group={puckSpeed} name="puckSpeed" value={2}>
 				<label for="speed3">Fast</label>
-
 			</div>
 		</div>
 		<div class="option">
@@ -194,7 +196,6 @@
 				<label for="public">Public</label>
 				<input type=radio id="private" bind:group={isPrivate} name="isPrivate" value={true}> 
 				<label for="private">Private</label>
-
 			</div>
 		</div>
 	</div>

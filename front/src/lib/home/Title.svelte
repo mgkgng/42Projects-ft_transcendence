@@ -143,6 +143,7 @@
 	export let enterModal: any;
 	export let title: string;
 	export let roomID: string;
+	export let main: boolean;
 
 	let circlesAround: Array<Circle> = [];
 	let circleRadius = 250;
@@ -216,7 +217,7 @@
 	<div class="circle-around" style="--dist: {circleRadius + 85}px; --size: {circleInfo.size}px; --duration: {circleInfo.duration}s; --angle: {circleInfo.angle}deg; --angle2: {circleInfo.angle + 360}deg"></div>
 	{/each}
 
-	{#if userState !== undefined}
+	{#if main && userState !== undefined}
 	<div class="click-bg"></div>
 		{#if !$login}
 		<button on:click={() => {

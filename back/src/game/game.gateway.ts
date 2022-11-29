@@ -30,7 +30,6 @@ import { UserEntity } from "src/entity/User.entity";
 	  origin: '*',
 	},
 })
-//export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	clients: Map<string, Client>;
 	rooms: Map<string, Room>;
@@ -55,17 +54,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		
 		// Get the user information from db and pass it to the user
 		let userInfo = this.getUserInfo(client);
-		const user_db = await this.dataSource.getRepository(UserEntity).createQueryBuilder("user").
-		where("user.username = :username", {username: userInfo.username_42}).getOne();
-		client.emit("GetConnectionInfo", {
-			user: {		
-				username: user_db.username,
-				displayname: user_db.displayname,
-				img_url: user_db.img_url,
-				campus_name: user_db.campus_name,
-				campus_country: user_db.campus_country
-			}
-		});
 
 		// Check the user and if the user is already connected
 		if (!this.clients.has(userInfo.username_42)) {	
@@ -438,10 +426,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	getUserInfo(request: any) {
 		const user: any = (this.jwtService.decode(request.handshake.headers.authorization.split(' ')[1]));	
 		return user;
-	}
-
-	getUsername(request: any) {
-
 	}
 
 	async getPlayerInfo(player: any) {

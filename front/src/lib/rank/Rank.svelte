@@ -20,7 +20,6 @@
 			overflow-y: scroll;
 
 			.line {
-				border-radius: .3em;
 				padding: .5em 0;
 				width: 100%;
 				gap: 0;
@@ -33,9 +32,26 @@
 					transition: .2s;
 				}
 
-				&:nth-child(2) { background-color: $yellow; }
-				&:nth-child(3) { background-color: $grey; }
-				&:nth-child(4) { background-color: $red; }
+				h3 {
+					height: 100%;
+					border-radius: .3em;
+				}
+				&:nth-child(2) { h3 {
+					background-color: #cde309f4; }
+				}
+				&:nth-child(3) { h3 {
+					background-color: transparentize(#fff, .6); }
+				}
+				&:nth-child(4) { h3 {
+					background-color: #986911; }
+				}
+			}
+			.no-match {
+				width: 100%;
+				height: 50%;
+				align-items: center;
+				justify-content: center;
+				font-size: 25px;
 			}
 		}
 	}
@@ -46,14 +62,18 @@
     import { client } from "$lib/stores/client";
     import { user } from "$lib/stores/user";
     import CloseButton from "$lib/items/CloseButton.svelte";
-    import Modal from "../tools/Modal.svelte";
-    import UserProfile from "../profile/UserProfile.svelte";
-
+    import Modal from "$lib/tools/Modal.svelte";
+    import UserProfile from "$lib/users/UserProfile.svelte";
 
 	export let itself: any;
+
+	let userInfo: any;
+	user.subscribe((user: any) => { userInfo = user; });
+
 	
 	let userProfileModal: any;
 	let profileUser: any;
+	let myPos: number = -1;
 
 	let rankList: Array<any> = [];
 
@@ -61,8 +81,8 @@
 		$client.socket.emit("RankingReq");
 
 		$client.socket.on("RankingRes", (data: any) => {
-			console.log("rankList", data);
 			rankList = data;
+			myPos = data.map((x: any) => x.username).indexOf(userInfo.username);
 		});
 
 		return (() => {
@@ -77,7 +97,7 @@
 
 <div class="vflex window rank">
 	<h1>Global Ranking</h1>
-	<h3>You are situated at</h3>
+	<h3>{(myPos != -1) ? "You are situated at #" + (myPos + 1) + " !": "Try any game to find yourself in the rank!"}</h3>
 	<div class="vflex list">
 		<div class="flex line">
 			<p>Rank</p>
@@ -102,7 +122,9 @@
 			</div>
 			{/each}
 		{:else}
-		<div>No match has been made!</div>
+		<div class="flex no-match">
+			<p>No match has been made</p>
+		</div>
 		{/if}
 	</div>
 	<CloseButton window={itself} />

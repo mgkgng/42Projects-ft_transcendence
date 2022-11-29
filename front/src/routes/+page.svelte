@@ -1,21 +1,22 @@
 <script lang="ts">
 	import '$lib/stores/client';
 	import '$lib/scss/app.scss';
-	import Title from "$lib/home/Title.svelte";
 	import { client } from "$lib/stores/client";
     import { onMount } from "svelte";
     import { browser } from "$app/environment";
+    import { loaded } from '$lib/stores/var';
     import Header from "$lib/header/Header.svelte";
+	import Title from "$lib/home/Title.svelte";
 	import Modal from '$lib/tools/Modal.svelte';
 	import Room from "$lib/game/Room.svelte";
-	import Message from '$lib/modals/Message.svelte';
+	import AlertMessage from '$lib/modals/AlertMessage.svelte';
 	import Enter from "$lib/modals/Enter.svelte";
     import CreateGame from "$lib/game/CreateGame.svelte";
     import EnterGame from "$lib/game/EnterGame.svelte";
     import JoinGame from "$lib/game/JoinGame.svelte";
-    import ChatRoom from '$lib/chat/ChatRoom.svelte';
-    import { loaded } from '../lib/stores/var';
     import Rank from '$lib/rank/Rank.svelte';
+    import Chat from '$lib/chat/Chat.svelte';
+    import { user } from '$lib/stores/user';
 
 	let roomModal: any;
 	let roomID: string = "";
@@ -27,7 +28,7 @@
 	let enterModal: any;
 	let enterGameModal: any;
 	let createGameModal: any;
-	let chatRoomModal: any;
+	let chatModal: any;
 	let rankModal: any;
 
 	onMount(() => {
@@ -52,10 +53,6 @@
 			roomModal.open();
 		});
 
-		$client.socket.on("askFriendNotification", (data: any) => {
-			console.log("Notif", data);
-		});
-
 		$client.socket.on("JoinQueueError", (data: any) => {
 			modalMessage = data;
 			messageModal.open();
@@ -74,15 +71,18 @@
 		});
 
 		return (() => {
-			$client.socket.off("CreateRoomRes", "JoinRoomRes", "JoinQueueError",
-				"askFriendNotification", "MatchFound", "CreateRoomError",
-				"RoomCheckError");
+			$client.socket.off("CreateRoomRes");
+			$client.socket.off("JoinRoomRes");
+			$client.socket.off("JoinQueueError");
+			$client.socket.off("MatchFound");
+			$client.socket.off("CreateRoomError"); 
+			$client.socket.off("RoomCheckError");
 		});
 	});
 </script>
 
-<Modal bind:this={chatRoomModal}>
-	<ChatRoom itself={chatRoomModal} />
+<Modal bind:this={chatModal} closeOnBgClick={false}>
+	<Chat itself={chatModal} />
 </Modal>
 
 <Modal bind:this={rankModal}>
@@ -90,7 +90,7 @@
 </Modal>
 
 <Modal bind:this={enterModal}>
-	<Enter itself={enterModal} enterGameModal={enterGameModal} rankModal={rankModal} chatRoomModal={chatRoomModal}/>
+	<Enter itself={enterModal} enterGameModal={enterGameModal} rankModal={rankModal} chatModal={chatModal}/>
 </Modal>
 
 <Modal bind:this={createGameModal}>
@@ -106,7 +106,7 @@
 </Modal>
 
 <Modal bind:this={messageModal}>
-	<Message itself={messageModal} msg={modalMessage}/>
+	<AlertMessage itself={messageModal} msg={modalMessage}/>
 </Modal>
 
 <Modal bind:this={roomModal} closeOnBgClick={false}>
@@ -115,5 +115,5 @@
 
 {#if $loaded}
 <Header />
-<Title title={"TRANSCENDENCE"} enterModal={enterModal} roomModal={roomModal} bind:roomID={roomID}/>
+<Title title={"TRANSCENDENCE"} enterModal={enterModal} roomModal={roomModal} bind:roomID={roomID} main={true}/>
 {/if}

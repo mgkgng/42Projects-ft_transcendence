@@ -147,9 +147,12 @@
     import { onMount } from "svelte";
     import { user } from "$lib/stores/user";
     import Modal from "$lib/tools/Modal.svelte";
-    import UserProfile from "$lib/profile/UserProfile.svelte";
+    import UserProfile from "$lib/users/UserProfile.svelte";
 
 	export let itself: any;
+
+	let userInfo: any;
+	user.subscribe((user: any) => { userInfo = user; });
 
 	let friends: Array<any>
 	let searchUser: string = "";
@@ -162,7 +165,7 @@
 	$: { $client.socket.emit("getUserinDB", {username: searchUser}); }
 
 	onMount(() => {
-		$client.socket.emit("getFriendList", { username: $user.username });
+		$client.socket.emit("getFriendList", { username: userInfo.username });
 
 		$client.socket.on("error_getFriendList", (data: any) => {
 			console.log("Error!");

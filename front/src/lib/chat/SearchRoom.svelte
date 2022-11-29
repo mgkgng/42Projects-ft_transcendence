@@ -55,7 +55,6 @@
 		}
 	}
 
-	
 	.back{
 		padding: 0em;
 		width: 50px;
@@ -80,57 +79,77 @@
 <script lang="ts">
 
     import { client } from "$lib/stores/client";
-    import { chatRoom } from "$lib/stores/chatRoom";
 	import { onMount, beforeUpdate } from "svelte";
+    import { Chatt } from "$lib/chatt/Chatt";
+    import RoomPassword from "$lib/chat/RoomPassword.svelte";
+    import Modal from "$lib/tools/Modal.svelte";
 	
 	export let itself: any; 
+	export let chat: Chatt;
 
-	let rooms : string[];
-	let all_rooms : Map<string, boolean> = new Map();
-	chatRoom.subscribe(chat => { rooms = chat.rooms;});
-	chatRoom.subscribe(chat => { all_rooms= chat.all_rooms;});
+	let passwordModal: any;
 
 	let research : string = "";
+	let searchResult: Array<string> = [];
+
+	let roomName: string = "";
+
+	$: $client.socket.emit("get_all_rooms_begin_by", { research: research });
+
 	onMount(() => {
-		$client.socket.emit("get_all_rooms_begin_by", {research: research});
+		$client.socket.on("success_append_user_to_room", (data: any) => {
+			console.log("success", data);
+		})
+
+		$client.socket.on("get_all_rooms_begin_by_res", (data: any) => {
+			console.log("test", data);
+		});
 
 		return (() => {
-			$client.socket.off("get_all_rooms_begin_by");
-			// $client
-		})
+			$client.socket.off("success_append_user_to_room");
+			$client.socket.off("get_all_rooms_begin_by_res");
+		});
 	});
 
-	function addToTheRoom(room : any)
-	{
-		let user_password : string = "";
-		if (all_rooms.get(room) == true && user_password == "")
-		{
-			user_password = prompt("Please enter the password", "");
-		}
-		$client.socket.emit("append_user_to_room", {room_name: room, room_password: user_password});				
-	}
-	
-	function researchRooms()
-	{
-		// console.log("changed")
-		$client.socket.emit("get_all_rooms_begin_by", {research: research});
-
-	}
 </script>
+
+<Modal bind:this={passwordModal}>
+	<RoomPassword itself={passwordModal} roomName={roomName}/>
+</Modal>
 
 <div class="vflex window rooms">
 	<div class="flex research">
 		<input class="text-input" placeholder="Search Room Name ..." bind:value={research}>
-		<button on:click={researchRooms}>Search</button>
 	</div>
 	<div class="vflex result">
-		{#each ([...all_rooms.keys()].sort()) as room_name}
-			{#if (!rooms.includes(room_name))}
+		{#if !research.length}
+			{#each ([...chat.rooms.keys()].sort()) as room_name}
+			{#if (!chat.my_rooms.has(room_name))}
 				<div class="flex list">
 					<p>{room_name}</p>
-					<button on:click={() => addToTheRoom(room_name)}>Join</button>
+					<button on:click={() => {
+						if (chat.rooms.get(room_name).is_password_protected) {
+							roomName = room_name;
+							passwordModal.open();
+						} else
+							$client.socket.emit("append_user_to_room", {room_name: room_name, room_password: ""});
+					}}>Join</button>
 				</div>
 			{/if}
-		{/each}
+			{/each}
+		{:else}
+			{#each searchResult as result}
+			<div class="flex list">
+				<p>{result}</p>
+				<button on:click={() => {
+					if (chat.rooms.get(result).is_password_protected) {
+						roomName = result;
+						passwordModal.open();
+					} else
+						$client.socket.emit("append_user_to_room", {room_name: result, room_password: ""});
+				}}>Join</button>
+			</div>
+			{/each}
+		{/if}
 	</div>
 </div>

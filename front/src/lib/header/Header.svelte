@@ -46,6 +46,13 @@
 			border-radius: .4em;
 		}
 
+		p {
+			position: absolute;		
+			color: #fff;
+			width: 10em;
+			right: 2em;
+		}
+
 		@keyframes grow {
 			0% {
 				transform: scaleY(0);
@@ -59,7 +66,7 @@
 		.menu {
 			// display: none;
 			position: absolute;
-			top: 85px;
+			top: 115px;
 			right: 0;
 			border: 2px solid #fff;
 			border-radius: .3em;
@@ -104,21 +111,48 @@
 </style>
 
 <script lang="ts">
-    import UserProfile from "$lib/profile/UserProfile.svelte";
+    import UserProfile from "$lib/users/UserProfile.svelte";
     import { user } from "$lib/stores/user";
     import { login } from "$lib/stores/var";
     import Modal from "$lib/tools/Modal.svelte";
-	import Friends from "$lib/modals/Friends.svelte"
+	import Friends from "$lib/users/Friends.svelte"
     import Settings from "$lib/settings/Settings.svelte";
+	import { onMount } from "svelte";
+    import { client } from "$lib/stores/client";
+
 
 	let userProfileModal: any;
 	let friendsModal: any;
 	let settingsModal: any;
 
+	let userInfo: any;
+
+	let notifMsg: any;
+	let notifFriend: any;
+
+	user.subscribe((user: any) => { userInfo = user; });
+
+	onMount(() => {
+		if (!$client.socket)
+			return ;
+
+		$client.socket.on("newDirectMessage", (data: any) => {
+			console.log("message arrived", data); 
+		});
+
+		$client.socket.on("askFriendNotification", (data: any) => {
+			console.log("Notif", data);
+		});
+
+		return(() => {
+			$client.socket.off("newDirectMessage");
+			$client.socket.off("askFriendNotification");
+		});
+	});
 </script>
 
 <Modal bind:this={userProfileModal} >
-	<UserProfile itself={userProfileModal} profileUser={$user} />
+	<UserProfile itself={userProfileModal} profileUser={userInfo} />
 </Modal>
 <Modal bind:this={friendsModal}>
 	<Friends itself={friendsModal} />
@@ -129,12 +163,13 @@
 
 <header>
 	<div class="profile">
-		{#if !$user}
+		{#if !userInfo}
 		<div class="who">?</div>
 		{:else}
 		<div class="summary">
-			<img src={(!$user.img) ? $user.img_url : $user.img} alt="profile" />
+			<img src={(!userInfo.img) ? userInfo.img_url : userInfo.img} alt="profile" />
 		</div>
+		<p>Hello {userInfo.username}!</p>
 		<div class="menu">
 			<button on:click={() => { userProfileModal.open(); }}>Profile</button>
 			<button on:click={() => { friendsModal.open(); }}>Friends</button>

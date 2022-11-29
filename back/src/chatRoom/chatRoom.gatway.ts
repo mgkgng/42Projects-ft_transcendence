@@ -49,13 +49,11 @@ export class ChatRoomService {
 	@SubscribeMessage('new_room')
 	async creat_room(@MessageBody() data: any, @Request() req, @ConnectedSocket() client : Socket)
 	{
-		//console.log("new room");
+		console.log("new room", data);
 		const id_user = await this.mainServer.getIdUser(req);
-		const is_password_protected : boolean = data.is_password_protected;	
 		// const password : string = is_password_protected ? 
 		// await bcrypt.hash(data.room_password, 10) 
 		//   	: "";
-		const password = "non"
 		const name : string = data.room_name;
 		const date_creation : Date = new Date();
 		const  querry = this.dataSource.createQueryRunner(); 
@@ -63,8 +61,8 @@ export class ChatRoomService {
 			const new_chat_room = new ChatRoomEntity();
 			new_chat_room.name = name;
 			new_chat_room.date_creation = date_creation;
-			new_chat_room.is_password_protected = is_password_protected;
-			new_chat_room.password = password;
+			new_chat_room.is_password_protected = data.is_password_protected;
+			new_chat_room.password = data.password;
 			new_chat_room.is_private = data.is_private;
 			const res_chat_room : any = await this.dataSource.getRepository(ChatRoomEntity).save(new_chat_room);
 			const new_user_chat_room = new UserChatRoomEntity();
@@ -77,7 +75,7 @@ export class ChatRoomService {
 			const res_user_chat_room = await this.dataSource.getRepository(UserChatRoomEntity).save(new_user_chat_room);
 			client.join(name);
 			console.log("Create room finish");
-			client.emit("new_room", {	room_name: name, is_password_protected: is_password_protected, is_admin: true, is_private: data.is_private	});
+			client.emit("new_room_res", { room_name: name, is_password_protected: data.is_password_protected, is_admin: true, is_private: data.is_private });
 		} catch (e) {
 			console.log("Create room error");
 			client.emit("error_new_room", {error: "Room already exist"});
@@ -90,6 +88,7 @@ export class ChatRoomService {
 	@SubscribeMessage('append_user_to_room')
 	async append_user_to_room(@MessageBody() data: any, @ConnectedSocket() client: Socket, @Request() req)
 	{
+		console.log("test", data);
 		try{
 			const user : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
 			const client_username_42 = user.username_42;
@@ -100,11 +99,12 @@ export class ChatRoomService {
 			where("room.id_g = :id ", {id: id_room}).getOne();
 
 			// const is_good_password = await bcrypt.compare(data.room_password, room.password);
-			const is_good_password = "bcrypt crash chaque fois";
+			const is_good_password = (data.room_password == room.password);
 
 			const is_already_in = await this.dataSource.getRepository(UserChatRoomEntity).createQueryBuilder("userRoom").
 			where("userRoom.room = :id and userRoom.id_user = :id_u", {id: id_room, id_u : id_user}).getOne();
 
+			console.log("Check, check", is_good_password, room.password);
 			if (room.is_password_protected && (!is_good_password )) //Test password
 				if (!(is_already_in && is_already_in.is_owner)) //Test if user is admin
 					client.emit("error_append_user_to_room", {error: "Bad password"});
@@ -122,12 +122,15 @@ export class ChatRoomService {
 				client.emit("set_room_visible", {room_name: room.name});
 				return;
 			}
+			console.log("check check");
 			const res_user_chat_room = await this.dataSource.createQueryBuilder().insert().into(UserChatRoomEntity).values
 			([ 
 				{id_user: id_user, room: id_room, is_admin: false, is_banned: false, is_muted: false}
 			]).execute(); //Add user to the room
+			console.log("user added");
 			client.emit("set_room_visible", {room_name: room.name});
-			client.emit("append_user_to_room", {room_name: room.name, is_admin: false, username: user.username});
+			client.emit("success_append_user_to_room", {room_name: room.name});
+			client.emit("append_user_to_room_res", {room_name: room.name, is_admin: false, username: user.username});
 		}
 		catch(e){
 			console.log("getMessage Error: bad data");
@@ -171,7 +174,7 @@ export class ChatRoomService {
 						inter.is_login = true; 
 					end.push(inter);
 				}
-				client.emit('get_users_room', {users: end, room_name: data.room_name});
+				client.emit('get_users_room_res', {users: end, room_name: data.room_name});
 			} catch (e) {
 				console.log("get_users Error: bad data", e);
 				client.emit("error_get_users_room", {error: "Error data"});
@@ -210,12 +213,12 @@ export class ChatRoomService {
 				.select(["messageChatRoomEntity.content_message", "messageChatRoomEntity.date_message", "user.username", "chatRoom.name"])
 				.where("chatRoom.id_g = :id", {id: id_room}).orderBy("messageChatRoomEntity.date_message", "ASC").getMany();
 				//console.log(res);
-				client.emit('get_message_room', {messages : res, room_name: data.room_name});
+				client.emit('get_message_room_res', {messages : res, room_name: data.room_name});
 			} catch (e) {
 				console.log("getMessage Error", e);
 				throw new WsException("No message in this room");
 			}
-		}catch(e){
+		} catch(e){
 			console.log("getMessage Error: bad data");
 			throw new WsException("Bad data");
 		}
@@ -227,7 +230,7 @@ export class ChatRoomService {
 	{
 		try{
 			const id_user = await this.mainServer.getIdUser(req);
-			const id_room = await this.mainServer.getIdRoom(data);
+			const id_room = await this.mainServer.getIdRoom(data.room_name);
 			try{
 				const res_is_in_room = await this.dataSource.getRepository(UserChatRoomEntity).createQueryBuilder("userChat")
 				.where("userChat.id_user = :u", {u : id_user})
@@ -294,7 +297,7 @@ export class ChatRoomService {
 			newMessage.date_message = date_creation;
 			const res_insert_message = await this.dataSource.getRepository(MessageChatRoomEntity).save(newMessage);
 			//await querry.commitTransaction();
-			this.server.to(data.room_name).emit('new_message_room', {room_name : data.room_name, content_message: data.content_message, username: client_username, date_message: date_creation});
+			this.server.to(data.room_name).emit('new_message_room_res', {room_name : data.room_name, content_message: data.content_message, username: client_username, date_message: date_creation});
 		} catch (e) {
 			//await querry.rollbackTransaction();
 			console.log("Can't create message");
@@ -309,7 +312,7 @@ export class ChatRoomService {
 	async getMyRoom(@MessageBody() data, @ConnectedSocket() client: Socket)
 	{
 		const res : any = await this.mainServer.getNamesRoomsForUser(client);
-		client.emit("get_my_rooms", res);
+		client.emit("get_my_rooms_res", res);
 	}
 	//OK
 	//Get all rooms in the databases
@@ -317,19 +320,18 @@ export class ChatRoomService {
 	@SubscribeMessage('get_all_rooms')
 	async getAllRooms(@MessageBody() data, @ConnectedSocket() client: Socket)
 	{
-		const res = await this.dataSource.getRepository(MessageChatRoomEntity)
-		.createQueryBuilder("messages")
-		.innerJoin("messages.id_chat", "room")
-		.groupBy("room.id_g")
-		.where("room.is_private = :p", {p: false})
-		.select(["Sum(1) as nb_users", "room.name", "room.is_password_protected"]).getMany();
+		// const res = await this.dataSource.getRepository(MessageChatRoomEntity)
+		// .createQueryBuilder("messages")
+		// .innerJoin("messages.id_chat_room", "room")
+		// .groupBy("room.id_g")
+		// .where("room.is_private = :p", {p: false})
+		// .select(["Sum(1) as nb_users", "room.name", "room.is_password_protected"]).getMany();
 
-		// const res = await this.dataSource.getRepository(ChatRoomEntity)
-		// .createQueryBuilder("chatRoom")
-		// .where("chatRoom.is_private = :p", {p: false})
-		// .select(["chatRoom.name", "chatRoom.is_password_protected"]).getMany();
-		console.log("get_all_rooms: ", res)
-		client.emit("get_all_rooms", res);
+		const res = await this.dataSource.getRepository(ChatRoomEntity)
+		.createQueryBuilder("chatRoom")
+		.where("chatRoom.is_private = :p", {p: false})
+		.select(["chatRoom.name", "chatRoom.is_password_protected"]).getMany();
+		client.emit("get_all_rooms_res", res);
 	}
 	//OK
 	//Get all rooms in the databases
@@ -337,7 +339,6 @@ export class ChatRoomService {
 	@SubscribeMessage('get_all_rooms_begin_by')
 	async getAllRoomsBeginBy(@MessageBody() data, @ConnectedSocket() client: Socket)
 	{
-
 		// const res = await this.dataSource.getRepository(MessageChatRoomEntity)
 		// .createQueryBuilder("messages")
 		// .innerJoin("messages.id_chat_room", "room")
@@ -351,8 +352,7 @@ export class ChatRoomService {
 		.where("substr(chatRoom.name, 1, :l) = :s", {l: data.research.length, s: data.research})
 		.andWhere("chatRoom.is_private = :p", {p: false})
 		.getMany();
-		console.log(res);
-		client.emit("get_all_rooms", res);
+		client.emit("get_all_rooms_begin_by_res", res);
 	}
 	//Ban a user if current socket user is Admin on the room 
 	//{room_name:string, username_ban: string, ban_end: Date}
@@ -446,12 +446,13 @@ export class ChatRoomService {
 	//{room_name:string}
 	@SubscribeMessage("set_room_not_visible")
 	async setRoomNotVisible(@MessageBody() data, @ConnectedSocket() client: Socket, @Request() req) {
+		console.log(data);
 		const user = await this.mainServer.getIdUser(req);
 		const room : any = await this.dataSource.getRepository(ChatRoomEntity).find({where: {name: data.room_name}});
 		const res = await this.dataSource.createQueryBuilder().update(UserChatRoomEntity)
 				.where("id_user = :u AND room = :r", {u: user, r: room[0].id_g})
 				.set({is_visible: false}).execute();
-		client.emit("set_room_not_visible", {});
+		client.emit("set_room_not_visible_res", data.room_name);
 	}
 	//Put a room in state "visible" for a user
 	//{room_name:string}
@@ -556,10 +557,10 @@ export class ChatRoomService {
 			const id_user = await this.mainServer.getIdUser(req);
 			const res = await this.dataSource.getRepository(UserEntity).createQueryBuilder("user")
 						.where("id_g = :id", {id : id_user})
-						.select(["user.email", "user.username", "user.img", "user.img_url", "user.displayname", "user.campus_name", "user.campus_country", "user.is_2fa", "user.otpauthUrl_2fa", "user.created_at", "user.last_connection" ]).getOne();
+						.select(["user.email", "user.username", "user.username_42", "user.img", "user.img_url", "user.displayname", "user.campus_name", "user.campus_country", "user.is_2fa", "user.otpauthUrl_2fa", "user.created_at", "user.last_connection" ]).getOne();
         	const url = await toDataURL(res.otpauthUrl_2fa);
 			res.otpauthUrl_2fa = url;
-			client.emit("get_user_info", res);
+			client.emit("get_user_info_res", res);
 		}catch(e)
 		{
 			client.emit("error_get_user_info", "User not found");
@@ -617,7 +618,7 @@ export class ChatRoomService {
 				const res = await this.dataSource.createQueryBuilder().update(UserEntity)
 				.where("id_g = :u", {u: id_user})
 				.set({username: data.new_username}).execute();
-				client.emit("change_username", {new_username: data.new_username});
+				client.emit("change_username_res", {new_username: data.new_username});
 				console.log("Username changed ", client.id);
 				return;
 			}
@@ -634,7 +635,7 @@ export class ChatRoomService {
 			const res_update = await this.dataSource.createQueryBuilder().update(UserEntity)
 			.where("id_g = :u", {u: id_user})
 			.set({is_2fa: true}).execute();
-			client.emit("active_double_auth", {});
+			client.emit("active_double_auth_res", {});
 		}catch(e){
 			client.emit("error_active_double_auth", {});
 		}
@@ -647,7 +648,7 @@ export class ChatRoomService {
 			const res_update = await this.dataSource.createQueryBuilder().update(UserEntity)
 			.where("id_g = :u", {u: id_user})
 			.set({is_2fa: false}).execute();
-			client.emit("disable_double_auth", {});
+			client.emit("disable_double_auth_res", {});
 		}catch(e){
 			client.emit("error_disable_double_auth", {});
 		}
