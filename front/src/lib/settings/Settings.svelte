@@ -227,7 +227,6 @@
 				$client.socket.emit("change_username", { new_username: username });
 			if (original[2] != doubleAuth)
 				$client.socket.emit((doubleAuth) ? "active_double_auth" : "disable_double_auth")
-			$client.socket.emit("get_user_info");	
 		}}>Save Changes</button>
 	</div>
 </div>
