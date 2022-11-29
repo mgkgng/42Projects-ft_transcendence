@@ -557,7 +557,7 @@ export class ChatRoomService {
 			const id_user = await this.mainServer.getIdUser(req);
 			const res = await this.dataSource.getRepository(UserEntity).createQueryBuilder("user")
 						.where("id_g = :id", {id : id_user})
-						.select(["user.email", "user.username", "user.img", "user.img_url", "user.displayname", "user.campus_name", "user.campus_country", "user.is_2fa", "user.otpauthUrl_2fa", "user.created_at", "user.last_connection" ]).getOne();
+						.select(["user.email", "user.username", "user.username_42", "user.img", "user.img_url", "user.displayname", "user.campus_name", "user.campus_country", "user.is_2fa", "user.otpauthUrl_2fa", "user.created_at", "user.last_connection" ]).getOne();
         	const url = await toDataURL(res.otpauthUrl_2fa);
 			res.otpauthUrl_2fa = url;
 			client.emit("get_user_info_res", res);
@@ -618,7 +618,7 @@ export class ChatRoomService {
 				const res = await this.dataSource.createQueryBuilder().update(UserEntity)
 				.where("id_g = :u", {u: id_user})
 				.set({username: data.new_username}).execute();
-				client.emit("change_username", {new_username: data.new_username});
+				client.emit("change_username_res", {new_username: data.new_username});
 				console.log("Username changed ", client.id);
 				return;
 			}
@@ -635,7 +635,7 @@ export class ChatRoomService {
 			const res_update = await this.dataSource.createQueryBuilder().update(UserEntity)
 			.where("id_g = :u", {u: id_user})
 			.set({is_2fa: true}).execute();
-			client.emit("active_double_auth", {});
+			client.emit("active_double_auth_res", {});
 		}catch(e){
 			client.emit("error_active_double_auth", {});
 		}
@@ -648,7 +648,7 @@ export class ChatRoomService {
 			const res_update = await this.dataSource.createQueryBuilder().update(UserEntity)
 			.where("id_g = :u", {u: id_user})
 			.set({is_2fa: false}).execute();
-			client.emit("disable_double_auth", {});
+			client.emit("disable_double_auth_res", {});
 		}catch(e){
 			client.emit("error_disable_double_auth", {});
 		}
