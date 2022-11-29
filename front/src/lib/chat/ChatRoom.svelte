@@ -147,7 +147,7 @@
 </Modal>
 
 <Modal bind:this={chatUsersSettingsModal}>
-	<ChatUserSettings itself={chatUsersSettingsModal} roomName={roomName} />
+	<ChatUserSettings itself={chatUsersSettingsModal} roomName={roomName} bind:chat={chat}/>
 </Modal>
 
 <Modal bind:this={userProfileModal}>
@@ -195,7 +195,9 @@
 			{/each}
 		</div>
 		{#if chat.my_rooms.get(roomName).is_admin}
-		<button on:click={() => { chatUsersSettingsModal.open(); }}>
+		<button on:click={() => {
+			chatUsersSettingsModal.open();
+		}}>
 			<img src="setting.png" alt="user-setting">
 		</button>
 		{/if}

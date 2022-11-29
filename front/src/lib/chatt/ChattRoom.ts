@@ -11,8 +11,7 @@ export class ChattRoom {
 	messages : Array<Message>;
 	users : Array<ChatRoomUser>;
 	
-	constructor(room_name : string, is_password_protected : boolean, is_private : boolean, is_admin : boolean, is_owner : boolean)
-	{
+	constructor(room_name : string, is_password_protected : boolean, is_private : boolean, is_admin : boolean, is_owner : boolean) {
 		this.room_name = room_name;
 		this.is_password_protected = is_password_protected;
 		this.is_private = is_private;
