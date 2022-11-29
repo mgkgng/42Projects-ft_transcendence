@@ -560,7 +560,7 @@ export class ChatRoomService {
 						.select(["user.email", "user.username", "user.img", "user.img_url", "user.displayname", "user.campus_name", "user.campus_country", "user.is_2fa", "user.otpauthUrl_2fa", "user.created_at", "user.last_connection" ]).getOne();
         	const url = await toDataURL(res.otpauthUrl_2fa);
 			res.otpauthUrl_2fa = url;
-			client.emit("get_user_info", res);
+			client.emit("get_user_info_res", res);
 		}catch(e)
 		{
 			client.emit("error_get_user_info", "User not found");

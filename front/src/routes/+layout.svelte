@@ -100,10 +100,9 @@
 				await connectWithUrlCode(url);
 
 			if ($client.socket) {
-				$client.socket.on("get_user_info", (data: any) => {
+				$client.socket.on("get_user_info_res", (data: any) => {
 					user.set(data);
 					login.set(true);
-					// $chatRoom.LoadMessages($client);
 				});
 				$client.socket.emit("get_user_info", {});
 			}

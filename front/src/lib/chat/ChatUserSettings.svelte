@@ -15,7 +15,6 @@
 </script>
 
 <div class="window settings">
-
 	<!-- <button on:click={() => {
 		//TODO "for a limited time"
 		$client.socket.emit("mute_user", { room_name : roomName, username_ban: user.username, mute_end: undefined});

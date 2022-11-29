@@ -16,6 +16,7 @@
     import JoinGame from "$lib/game/JoinGame.svelte";
     import Rank from '$lib/rank/Rank.svelte';
     import Chat from '$lib/chat/Chat.svelte';
+    import { user } from '$lib/stores/user';
 
 	let roomModal: any;
 	let roomID: string = "";
@@ -69,13 +70,37 @@
 			roomModal.open();
 		});
 
+		$client.socket.on("change_username_res", (data: any) => {
+			user.update((value: any) => {
+				value.username = data.new_username;
+				return (value);
+			}); 
+		});
+
+		$client.socket.on("active_double_auth_res", () => {
+			user.update((value: any) => {
+				value.is_2fa = true;
+				return (value);
+			});
+		});
+
+		$client.socket.on("disable_double_auth_res", () => {
+			user.update((value: any) => {
+				value.is_2fa = false;
+				return (value);
+			});
+		});
+
 		return (() => {
-			$client.socket.off("CreateRoomRes"), 
-			$client.socket.off("JoinRoomRes"), 
-			$client.socket.off("JoinQueueError"),
-			$client.socket.off("MatchFound"), 
-			$client.socket.off("CreateRoomError"), 
+			$client.socket.off("CreateRoomRes");
+			$client.socket.off("JoinRoomRes");
+			$client.socket.off("JoinQueueError");
+			$client.socket.off("MatchFound");
+			$client.socket.off("CreateRoomError"); 
 			$client.socket.off("RoomCheckError");
+			$client.socket.off("change_username_res");
+			$client.socket.off("active_double_auth_res");
+			$client.socket.off("disable_double_auth_res");
 		});
 	});
 </script>

@@ -125,15 +125,12 @@
 	let fileInput: any;
 
 	const onFileSelected = (e: any) => {
-		console.log("data", e);
 		let file = e.target.files[0];
 		let reader = new FileReader();
 			reader.readAsDataURL(file);
 			reader.onload = e => {
 				image = e.target?.result
 			};
-		console.log("coucou", file, reader);
-		// image = file;
 	}
 
 	const uploadImage = async () => {
@@ -153,53 +150,6 @@
 		let result = await response.json();
 		console.log("uploadImage",result);
 	}
-
-	// chatRoom.subscribe(value => {	username = value.username_search;	});
-	// client.subscribe(value => {	local_username = value.username; });
-
-	// function changeUsername()
-	// {
-	// 	new_username = prompt("Enter new username");
-	// 	$client.socket.emit("change_username", { new_username: new_username });
-	// }
-	// function active2FA()
-	// {
-	// 	$client.socket.emit("active_double_auth");
-	// }
-	// function disable2FA()
-	// {
-	// 	$client.socket.emit("disable_double_auth");
-	// }
-	onMount(() => {
-
-					// $client.socket.on("change_username", (data) => {
-			// confirmed = true;
-			// 	chatRoom.update((value) => {
-			// 		value.username_search = data.new_username;
-			// 		return value;
-			// 	}); 
-			// });
-
-
-		// 	$client.socket.on("active_double_auth", (data) => {
-		// 		user_info.is_2fa = true; 
-		// 	});
-		// 	$client.socket.on("disable_double_auth", (data) => {
-		// 		user_info.is_2fa = false; 
-		// 	});
-		// console.log("username ", $chatRoom.username_search, $client.user_info.username);
-		// if ($chatRoom.username_search == $client.user_info.username)
-		// {
-		// 	user_info = $client.user_info;
-		// 	client.subscribe(value => {	user_info = value.user_info;	});
-		// }
-		// else
-		// 	$client.socket.emit("get_other_user_info", { username_search: $chatRoom.username_search } );
-
-		return (() => {
-			$client.removeListeners("get_user_info");
-		})
-	});
 </script>
 
 <Modal bind:this={changeUsernameModal} closeOnBgClick={false}>
@@ -238,9 +188,13 @@
 			confirmLeaveModal.open();
 		}}>Close</button>
 		<button class="{(modified) ? "" : "no-active"}" on:click={() => {
-			// uploadImage();
-			// if (modified)
-			// 	$client.socket.emit("get_user_info");
+			if (original[0] != image)
+				uploadImage();
+			if (original[1] != username)
+				$client.socket.emit("change_username", { new_username: username });
+			if (original[2] != doubleAuth)
+				$client.socket.emit((doubleAuth) ? "active_double_auth" : "disable_double_auth")
+			client.emit("get_user_info");	
 		}}>Save Changes</button>
 	</div>
 </div>
