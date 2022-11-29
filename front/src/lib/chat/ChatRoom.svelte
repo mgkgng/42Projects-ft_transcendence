@@ -41,6 +41,11 @@
 		
 				width: 100%;
 				height: 80%;
+
+				.message {
+					display: grid;
+					grid-template-columns: 20% 70%;
+				}
 			}
 			.write {
 				position: relative;
@@ -132,6 +137,8 @@
 	export let chat: Chatt;
 	export let roomName: string;
 
+	console.log(chat);
+
 	let chatRoomSettingsModal: any;
 	let chatUsersSettingsModal: any;
 	let userProfileModal: any;
@@ -169,8 +176,8 @@
 		{#each chat.my_rooms.get(roomName).messages as message}
 			<div class="message">
 				<p>{message.username}:</p>
-				<p>{message.message}</p>
-				<p>{message.date}</p>
+				<div>{message.message}</div>
+				<div>{message.date}</div>
 			</div>
 		{/each}
 		</div>
