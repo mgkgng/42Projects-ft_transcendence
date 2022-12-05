@@ -119,16 +119,15 @@
     import Settings from "$lib/settings/Settings.svelte";
 	import { onMount } from "svelte";
     import { client } from "$lib/stores/client";
+    import PrivateMessages from "$lib/users/PrivateMessages.svelte";
 
 
 	let userProfileModal: any;
 	let friendsModal: any;
 	let settingsModal: any;
+	let privateMessagesModal: any;
 
 	let userInfo: any;
-
-	let notifMsg: any;
-	let notifFriend: any;
 
 	user.subscribe((user: any) => { userInfo = user; });
 
@@ -160,6 +159,9 @@
 <Modal bind:this={settingsModal} closeOnBgClick={false}>
 	<Settings itself={settingsModal} />
 </Modal>
+<Modal bind:this={privateMessagesModal}>
+	<PrivateMessages itself={privateMessagesModal} />
+</Modal>
 
 <header>
 	<div class="profile">
@@ -174,6 +176,7 @@
 			<button on:click={() => { userProfileModal.open(); }}>Profile</button>
 			<button on:click={() => { friendsModal.open(); }}>Friends</button>
 			<button on:click={() => { settingsModal.open(); }}>Settings</button>
+			<button on:click={() => { privateMessagesModal.open(); }}>Messages</button>
 			<button on:click={() => {
 				localStorage.removeItem("transcendence-jwt");
 				login.set(false);
