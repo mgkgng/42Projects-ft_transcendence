@@ -76,14 +76,16 @@ export class MainServerGateway {
 		else
 		{
 			const promiseParsedList = users.map( async (user) => {
-				let isUserAskedByConnectedUser = (await this.friendSystemService.getAskList(user.username)).find((ask) => ask.username === data.username);
-				let isUserFriendWithConnectedUser = (await this.friendSystemService.getFriendList(user.username)).find((friend) => friend.username === data.username);
+				let isUserFriendWithConnectedUser = await this.friendSystemService.isFriendWithByUsernameGetEnt(this.mainServerService.getUserConnectedBySocketId(client.id).username, user.username);
+				let isUserAskedByConnectedUser = await (await this.friendSystemService.getAskList(user.username)).find((ask) => ask.username === this.mainServerService.getUserConnectedBySocketId(client.id).username);
+				console.log(isUserAskedByConnectedUser);
 				return {username: user.username, displayname: user.displayname, img_url: user.img_url,
 					campus_name: user.campus_name, campus_country: user.campus_country,
 					last_connection: user.last_connection, created_at: user.created_at,
 					status: this.mainServerService.getUserStatus(user.username),
 					is_friend: isUserFriendWithConnectedUser ? true : false,
-					is_asked: isUserAskedByConnectedUser ? true : false}});
+					is_asked: isUserAskedByConnectedUser ? true : false
+				}});
 			const parsedList = await Promise.all(promiseParsedList);
 			const index = parsedList.indexOf(this.mainServerService.getUserConnectedBySocketId(client.id).username);
 			if (index > -1) {
