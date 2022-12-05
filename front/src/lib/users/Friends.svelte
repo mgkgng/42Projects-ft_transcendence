@@ -172,7 +172,7 @@
 		});
 
 		$client.socket.on("success_getFriendList", (data: any) => {
-			console.log(data);
+			console.log("hello?", data);
 		});
 
 		$client.socket.on("success_getUserinDB", (data: any) => {
@@ -192,7 +192,7 @@
 </script>
 
 <Modal bind:this={userProfileModal}>
-	<UserProfile profileUser={profileUser}/>
+	<UserProfile itself={userProfileModal} profileUser={profileUser}/>
 </Modal>
 
 <div class="vflex window friends">

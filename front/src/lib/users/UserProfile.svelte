@@ -102,13 +102,13 @@
     import WriteMessage from "$lib/users/WriteMessage.svelte";
     import Modal from "../tools/Modal.svelte";
 
-
 	export let itself: any;
 	export let profileUser: any;
 
+	console.log(profileUser);
+
 	let userInfo: any;
 	user.subscribe((user: any) => { userInfo = user; });
-
 
 	let writeMessageModal: any;
 
@@ -154,12 +154,20 @@
 	</div>
 	{#if profileUser.username_42 != userInfo.username_42}
 	<div class="flex tools">
+		{#if !profileUser.is_friend && !profileUser.is_asked}
 		<button on:click={() => {
 			console.log("testing");
 			$client.socket.emit("askFriend", {
 				username: profileUser.username
 			});
 		}}>Add</button>
+		{:else if !profileUser.is_friend && profileUser.is_asked}
+		<button on:click={() => {
+			$client.socket.emit("unaskFriend", {
+				username: profileUser.username
+			});
+		}}>Cancel</button>
+		{/if}	
 		<button>Block</button>
 		<button on:click={() => { writeMessageModal.open(); }}>Message</button>
 	</div>

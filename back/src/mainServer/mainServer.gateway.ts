@@ -91,6 +91,7 @@ export class MainServerGateway {
 			if (index > -1) {
 				parsedList.splice(index, 1);
 			}
+			console.log(parsedList);
 			this.server.to(client.id).emit('success_getUserinDB', {users: parsedList});
 			return;
 		}
