@@ -17,15 +17,13 @@ export class friendSystemService {
     ) {}
 
     // Do a request on this route to ask if 2 user are friend
-    async isFriendWithByUsername(first_username : string, second_username : string)
+    async isFriendWithByUsernameGetEnt(first_username : string, second_username : string)
     {
-        const qb = this.userFriendRepository.createQueryBuilder('u');
+		const qb = this.userFriendRepository.createQueryBuilder('u');
         return await qb
         .leftJoinAndSelect("u.id_first_user", "friendrequester")
         .leftJoinAndSelect("u.id_second_user", "friendrequested")
-        .where(`friendrequester.username = :first_username AND friendrequested.username = :second_username`, {first_username : first_username, second_username: second_username})
-        .orWhere(`friendrequester.username = :second_username AND friendrequested.username = :first_username`, {first_username : first_username, second_username: second_username})
-        .andWhere(`u.is_user_friend = true`)
+        .where(`friendrequester.username = :first_username AND friendrequested.username = :second_username OR friendrequester.username = :second_username AND friendrequested.username = :first_username AND u.is_user_friend = true`, {first_username: first_username, second_username: second_username})
         .getOne();
     }
 
@@ -120,10 +118,10 @@ export class friendSystemService {
     async removeFriend(first_username : string, second_username : string)
     {
         const qb = this.userFriendRepository.createQueryBuilder('u');
-        let isFriendEntity = await this.isFriendWithByUsername(first_username, second_username);
+        let isFriendEntity = await this.isFriendWithByUsernameGetEnt(first_username, second_username);
         if (isFriendEntity == null)
             return null;
-        return await qb.delete().where(`id_g = ${isFriendEntity.id_g}`).execute();
+		return await this.userFriendRepository.remove(isFriendEntity);
     }
 
     // If first_username have asked second_username as friend
