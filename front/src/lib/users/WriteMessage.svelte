@@ -106,6 +106,15 @@
 	onMount(() => {
 		$client.socket.on("success_getUserinDB", (data: any) => {
 			userSearchList = data.users.filter((user: any) => !sendTo.includes(user.username)); });
+	
+		$client.socket.on("success_sendDirectMessage", (data: any) => {
+			itself.close();
+		});
+
+		return (() => {
+			$client.socket.off("success_getUserinDB");
+			$client.socket.off("success_sendDirectMessage");
+		});
 	});
 </script>
 

@@ -38,6 +38,7 @@ export class ChatDirectMessageGateway {
 
 	@SubscribeMessage('sendDirectMessage')
 	async sendMessage(@MessageBody() data: any, @ConnectedSocket() client: any) {
+		console.log("test", data);
 		const user = await this.userRepository.findOne({
 			where: {username: data.username},
 			relations: ['relation_userBlocked']
