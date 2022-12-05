@@ -75,7 +75,7 @@ export class MainServerGateway {
 		}
 		else
 		{
-			const parsedList = users.map( async (user) => {
+			const promiseParsedList = users.map( async (user) => {
 				let isUserAskedByConnectedUser = (await this.friendSystemService.getAskList(user.username)).find((ask) => ask.username === data.username);
 				let isUserFriendWithConnectedUser = (await this.friendSystemService.getFriendList(user.username)).find((friend) => friend.username === data.username);
 				return {username: user.username, displayname: user.displayname, img_url: user.img_url,
@@ -84,6 +84,7 @@ export class MainServerGateway {
 					status: this.mainServerService.getUserStatus(user.username),
 					is_friend: isUserFriendWithConnectedUser ? true : false,
 					is_asked: isUserAskedByConnectedUser ? true : false}});
+			const parsedList = await Promise.all(promiseParsedList);
 			const index = parsedList.indexOf(this.mainServerService.getUserConnectedBySocketId(client.id).username);
 			if (index > -1) {
 				parsedList.splice(index, 1);
