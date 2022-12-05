@@ -18,7 +18,6 @@
 				width: 100%;
 				height: 4em;
 				border-bottom: $border-thin;
-				border-radius: .3em;
 				align-items: center;
 				transition: .2s;
 
@@ -58,13 +57,23 @@
 
 			font-size: 24px;
 		}
+
+		.add {
+			position: absolute;
+			right: 0;
+			bottom: 0;
+		}
 	}
 </style>
 
 <script lang="ts">
     import CloseButton from "$lib/items/CloseButton.svelte";
+    import WriteMessage from "$lib/users/WriteMessage.svelte";
+	import Modal from "$lib/tools/Modal.svelte";
 
 	export let itself: any;
+
+	let writeMessageModal: any;
 
 	let users: Array<any> = [{
 		username: "min-kang",
@@ -77,6 +86,10 @@
 	let selected: string = "";
 </script>
 
+<Modal bind:this={writeMessageModal}>
+	<WriteMessage itself={writeMessageModal} sendTo={[]}/>
+</Modal>
+
 <div class="flex window messages">
 	{#if users.length}
 		<div class="from">
@@ -86,6 +99,7 @@
 				<p>{user.username}</p>
 			</div>
 			{/each}
+			<button class="add" on:click={() => { writeMessageModal.open(); }}>+</button>
 		</div>
 		{#if selected.length}
 		<div class="chat">
@@ -99,6 +113,7 @@
 		<div class="flex no-users">
 			<p>You don't have any message yet.</p>
 		</div>
+		<button class="add" on:click={() => { writeMessageModal.open(); }}>+</button>
 	{/if}
 	<CloseButton window={itself} />
 </div>
