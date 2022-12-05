@@ -51,7 +51,11 @@ export class friendSystemGateway {
 			this.server.to(client.id).emit('error_getFriendList', {error: "No friends found"});
 			return;
 		}
-		this.server.to(client.id).emit('success_getFriendList', {friends: friends});
+		let parsedList = [];
+		parsedList = friends.map((friend) => {
+			return {username: friend.username, username_42: friend.username_42, displayname: friend.displayname, campus_name: friend.campus_name, campus_country: friend.campus_country, img_url: friend.img_url, created_at: friend.created_at, last_connection: friend.last_connection, status: this.mainServerService.getUserConnectedByUsername(friend.username) ? true : false};
+		});
+		this.server.to(client.id).emit('success_getFriendList', {friends: parsedList});
 		return;
 	}
 
