@@ -5,6 +5,7 @@
 		padding: 0;
 
 		.from {
+			position: relative;
 			width: 30%;
 			height: 100%;
 			border-right: $border;
@@ -60,8 +61,13 @@
 
 		.add {
 			position: absolute;
+			border-radius: .2rem;
 			right: 0;
 			bottom: 0;
+			font-size: 56px;
+			&:hover {
+				background-color: transparentize(#fff, .6);
+			}
 		}
 	}
 </style>
