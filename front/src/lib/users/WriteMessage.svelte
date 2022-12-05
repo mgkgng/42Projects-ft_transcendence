@@ -11,6 +11,7 @@
 			position: relative;
 
 			.bar {
+				width: 85%;
 				height: 2em;
 				background-color: transparentize(#fff, .8);
 				padding: .5em;
@@ -35,13 +36,16 @@
 
 				}
 			}
+			p {
+				height: 2.5em;
+				padding: .8em 1em;
+			}
 		}
 		.send-to {
 			width: 100%;
 			border-radius: .3em;
 
 			.dist {
-
 				.to {
 					align-items: center;
 					gap: .5em;
@@ -65,8 +69,14 @@
 			}
 			button {
 				position: absolute;
-				right: 0;
-				bottom: 0;
+				padding: .5em .5em;
+				right: .2em;
+				bottom: .2em;
+				border-radius: .3em;
+
+				&:hover {
+					background-color: transparentize(#fff, .6);
+				}
 			}
 		}
 	}
@@ -75,12 +85,15 @@
 <script lang="ts">
     import { client } from "$lib/stores/client";
     import { onMount } from "svelte";
+    import Modal from "$lib/tools/Modal.svelte";
+	import AlertMessage from "$lib/modals/AlertMessage.svelte"
 
 	export let itself: any;
 	export let sendTo: Array<string>;
 
 	let message: string = "";
 	let errorMessage: string = "";
+	let alertMessageModal: any;
 
 	let searchUser: string = "";
 	let userSearchList: Array<any> = [];
@@ -96,15 +109,26 @@
 	});
 </script>
 
+<Modal bind:this={alertMessageModal}>
+	<AlertMessage itself={alertMessageModal} msg={errorMessage} />
+</Modal>
+
 <div class="vflex window write">
 	<div class="search">
+		<input class="bar" type="text" placeholder="Search for users" bind:value={searchUser}>
 		{#if searchUser.length}
 			<div class="result">
 				{#if userSearchList.length}
 				{#each userSearchList as user}
 				<div class="user" on:click={() => {
-					sendTo.push(user.username);
-					sendTo = sendTo;
+					if (sendTo.length < 5) {
+						sendTo.push(user.username);
+						sendTo = sendTo;
+					} else {
+						errorMessage = "You can write to maximum five people.";
+						alertMessageModal.open();
+					}
+					searchUser = "";
 				}}>
 					{user.username}
 				</div>
@@ -115,7 +139,6 @@
 			</div>
 			{/if}
 	</div>
-	<input class="bar" type="text" placeholder="Search for users" bind:value={searchUser}>
 	<div class="vflex send-to">
 		<div class="flex dist">
 			{#each sendTo as user}
@@ -133,10 +156,12 @@
 		<input type="text" placeholder="Write your message here..." bind:value={message}>
 		<button on:click={() => {
 			if (!sendTo.length) {
-				errorMessage = "Please put anybody to whom you want to send a message."
+				errorMessage = "Please put at least one destination."
+				alertMessageModal.open();
 				return ;
 			} else if (!message.length) {
 				errorMessage = "You cannot send an empty message!";
+				alertMessageModal.open();
 				return ;
 			}
 			for (let dest of sendTo)

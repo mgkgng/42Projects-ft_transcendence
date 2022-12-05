@@ -13,12 +13,12 @@
 
 		button {
 			width: 5em;
-			height: 3em;
-			transition: .3s;
+			height: 5em;
+			transition: .4s;
 			border: $border;
 			border-radius: .3em;
 			cursor: pointer;
-			&:hover { background-color: $main-dark; }
+			&:hover { background-color: $red; }
 		}
 	}
 </style>
