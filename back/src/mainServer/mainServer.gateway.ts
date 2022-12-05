@@ -16,6 +16,7 @@ import { Socket } from 'socket.io';
 import { Like } from 'typeorm';
 import { MainServerService } from "src/mainServer/mainServer.service";
 import { Inject } from '@nestjs/common';
+import { friendSystemService } from 'src/friendSystem/friendSystem.service';
 
 @WebSocketGateway({
 	cors: {
@@ -31,6 +32,8 @@ export class MainServerGateway {
 		private userRepository : Repository<UserEntity>,
 		@Inject(MainServerService)
 		private mainServerService : MainServerService,
+		@Inject(friendSystemService)
+		private friendSystemService : friendSystemService
 	){
 	}
 	@WebSocketServer() server;
@@ -72,11 +75,15 @@ export class MainServerGateway {
 		}
 		else
 		{
-			const parsedList = users.map((user) => {
+			const parsedList = users.map( async (user) => {
+				let isUserAskedByConnectedUser = (await this.friendSystemService.getAskList(user.username)).find((ask) => ask.username === data.username);
+				let isUserFriendWithConnectedUser = (await this.friendSystemService.getFriendList(user.username)).find((friend) => friend.username === data.username);
 				return {username: user.username, displayname: user.displayname, img_url: user.img_url,
 					campus_name: user.campus_name, campus_country: user.campus_country,
 					last_connection: user.last_connection, created_at: user.created_at,
-					status: this.mainServerService.getUserStatus(user.username)}});
+					status: this.mainServerService.getUserStatus(user.username),
+					is_friend: isUserFriendWithConnectedUser ? true : false,
+					is_asked: isUserAskedByConnectedUser ? true : false}});
 			const index = parsedList.indexOf(this.mainServerService.getUserConnectedBySocketId(client.id).username);
 			if (index > -1) {
 				parsedList.splice(index, 1);

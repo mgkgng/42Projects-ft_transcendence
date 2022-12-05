@@ -10,12 +10,14 @@ import { UserBlockEntity } from 'src/entity/UserBlock.entity';
 import { JwtService } from '@nestjs/jwt';
 import { Repository } from 'typeorm';
 import { MainServerService } from "src/mainServer/mainServer.service";
+import { friendSystemService } from 'src/friendSystem/friendSystem.service';
+import { UserFriendEntity } from 'src/entity/UserFriend.entity';
 
 
 @Module({
-	imports :	[TypeOrmModule.forFeature([UserEntity, UserChatRoomEntity, ChatRoomEntity, GameEntity, MessageChatRoomEntity, UserBlockEntity]),
+	imports :	[TypeOrmModule.forFeature([UserEntity, UserChatRoomEntity, ChatRoomEntity, GameEntity, MessageChatRoomEntity, UserBlockEntity, UserFriendEntity]),
 	],				
-    providers: [MainServerService, JwtService, MainServerGateway],
+    providers: [MainServerService, JwtService, MainServerGateway, friendSystemService],
 	exports : [MainServerService]
 })
 export class MainServerModule {}
