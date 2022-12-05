@@ -159,7 +159,7 @@ export class friendSystemController {
     @Get("isfriendwith?")
     async isFriendWithByUsername(@Query() query : {first_username : string, second_username : string})
     {
-        return this.friendSystemService.isFriendWithByUsername(query.first_username, query.second_username);
+        return this.friendSystemService.isFriendWithByUsernameGetEnt(query.first_username, query.second_username);
     }
 
     @Get("getFriendList?")
