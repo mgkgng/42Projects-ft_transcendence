@@ -146,8 +146,8 @@
 	let settingsModal: any;
 	let privateMessagesModal: any;
 
-	let newMessage: bool;
-	let newFriendRequest: bool;
+	let newMessage: bool = false;
+	let newFriendRequest: bool = false;
 
 	let userInfo: any;
 
@@ -167,7 +167,7 @@
 
 		$client.socket.on("getDirectMessage", (data: any) => {
 			console.log("allo?", data);
-			newFriend = true;
+			newMessage = true;
 			console.log("testing", data);
 		});
 
@@ -206,11 +206,19 @@
 		<p>Hello {userInfo.username}!</p>
 		<div class="menu">
 			<button on:click={() => { userProfileModal.open(); }}>Profile</button>
-			<button on:click={() => { friendsModal.open(); }}>Friends
+			<button on:click={() => {
+				friendsModal.open();
+				if (newFriendRequest)
+					newFriendRequest = false;	
+			}}>Friends
 				{#if newFriendRequest}<div class="notif"></div>{/if}
 			</button>
 			<button on:click={() => { settingsModal.open(); }}>Settings</button>
-			<button on:click={() => { privateMessagesModal.open(); }}>Messages
+			<button on:click={() => {
+				privateMessagesModal.open();
+				if (newMessage)
+					newMessage = false;
+			}}>Messages
 				{#if newMessage}<div class="notif"></div>{/if}
 			</button>
 			<button on:click={() => {
