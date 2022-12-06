@@ -70,10 +70,6 @@
 			roomModal.open();
 		});
 
-		$client.socket.on("getDirectMessage", (data: any) => {
-			console.log("testing", data);
-		});
-
 		return (() => {
 			$client.socket.off("CreateRoomRes");
 			$client.socket.off("JoinRoomRes");
@@ -81,7 +77,6 @@
 			$client.socket.off("MatchFound");
 			$client.socket.off("CreateRoomError"); 
 			$client.socket.off("RoomCheckError");
-			$client.socket.off("getDirectMessage");
 		});
 	});
 </script>

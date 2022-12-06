@@ -10,40 +10,44 @@
 		flex-direction: row;
 	}
 
-	.who {
-		position: absolute;
-		top: 0;
-		right: 0;
-		width: 65px;
-		height: 65px;
-		border: $border;
-		border-radius: .3em;
-		font-size: 48px;
-		font-family: 'fake-receipt';
-		color: #fff;
-		padding-left: .3em;
-		padding-top: .05em;
-		background-color: transparentize(#fff, .9);
-	}
-
+	
 	.profile {
 		position: absolute;
 		top: 0;
 		right: 0;
 		float: right;
-
+		
 		// width: 50px;
 		width: 75px;
 		height: 80%;
 		border-radius: 5em;
-
+		
 		cursor: pointer;
+		
+		.who {
+			position: absolute;
+			top: 0;
+			right: 0;
+			width: 65px;
+			height: 65px;
+			border: $border;
+			border-radius: .3em;
+			font-size: 48px;
+			font-family: 'fake-receipt';
+			color: #fff;
+			padding-left: .3em;
+			padding-top: .05em;
+			background-color: transparentize(#fff, .9);
+		}
 
-		img {
-			width: 75px;
-			height: 75px;
-			object-fit: cover;
-			border-radius: .4em;
+		.summary {
+			position: relative;
+			img {
+				width: 75px;
+				height: 75px;
+				object-fit: cover;
+				border-radius: .4em;
+			}
 		}
 
 		p {
@@ -88,6 +92,7 @@
 			}
 	
 			button {
+				position: relative;
 				width: 100%;
 				padding: 1em 1.2em;
 				cursor: pointer;
@@ -106,6 +111,20 @@
 		&:focus-within .menu {
 			display: block;
 			animation: grow .2s ease-in-out;
+		}
+
+		.notif {
+			position: absolute;
+			top: .5em;
+			right: 0;
+			width: 15px;
+			height: 15px;
+			border-radius: 50%;
+			border: 2px solid $red-dark;
+			background-color: $red;
+		}
+		.img {
+			top: 0;
 		}
 	}
 </style>
@@ -127,6 +146,9 @@
 	let settingsModal: any;
 	let privateMessagesModal: any;
 
+	let newMessage: bool;
+	let newFriendRequest: bool;
+
 	let userInfo: any;
 
 	user.subscribe((user: any) => { userInfo = user; });
@@ -143,9 +165,16 @@
 			console.log("Notif", data);
 		});
 
+		$client.socket.on("getDirectMessage", (data: any) => {
+			console.log("allo?", data);
+			newFriend = true;
+			console.log("testing", data);
+		});
+
 		return(() => {
 			$client.socket.off("newDirectMessage");
 			$client.socket.off("askFriendNotification");
+			$client.socket.off("getDirectMessage");
 		});
 	});
 </script>
@@ -170,13 +199,20 @@
 		{:else}
 		<div class="summary">
 			<img src={(!userInfo.img) ? userInfo.img_url : userInfo.img} alt="profile" />
+			{#if newMessage || newFriendRequest}
+			<div class="notif img"></div>
+			{/if}
 		</div>
 		<p>Hello {userInfo.username}!</p>
 		<div class="menu">
 			<button on:click={() => { userProfileModal.open(); }}>Profile</button>
-			<button on:click={() => { friendsModal.open(); }}>Friends</button>
+			<button on:click={() => { friendsModal.open(); }}>Friends
+				{#if newFriendRequest}<div class="notif"></div>{/if}
+			</button>
 			<button on:click={() => { settingsModal.open(); }}>Settings</button>
-			<button on:click={() => { privateMessagesModal.open(); }}>Messages</button>
+			<button on:click={() => { privateMessagesModal.open(); }}>Messages
+				{#if newMessage}<div class="notif"></div>{/if}
+			</button>
 			<button on:click={() => {
 				localStorage.removeItem("transcendence-jwt");
 				login.set(false);
