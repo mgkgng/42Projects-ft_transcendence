@@ -115,6 +115,35 @@ export class friendSystemGateway {
 		}
 	}
 
+	@SubscribeMessage('unAskFriend')
+	async unAskFriend(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
+		const user = await this.userRepository.findOne({where: {username: this.mainServerService.getUserConnectedBySocketId(client.id).username}});
+		const friend = await this.userRepository.findOne({where: {username: data.username}});
+		if (!user || !friend)
+		{
+			this.server.to(client.id).emit('error_unAskFriend', {error: "User not found"});
+			return;
+		}
+		const userAskerList = await this.friendSystemService.getAskListWhereUserIsAsker(user.username);
+		const userFriendList = await this.friendSystemService.getFriendList(user.username);
+		if (userFriendList.find((user) => user.username == friend.username))
+		{
+			this.server.to(client.id).emit('error_unAskFriend', {error: "User already friend"});
+			return;
+		}
+		else if (!userAskerList || !userAskerList.find((user) => user.username == friend.username))
+		{
+			this.server.to(client.id).emit('error_unAskFriend', {error: "User not asked as friend or refused"});
+			return;
+		}
+		else
+		{
+			await this.friendSystemService.unAskFriend(user.username, friend.username);
+			this.server.to(client.id).emit('success_unAskFriend', {friend: friend.username});
+			return;
+		}
+	}
+
 	@SubscribeMessage('acceptFriend')
 	async acceptFriend(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
 		const user = await this.userRepository.findOne({where: {username: this.mainServerService.getUserConnectedBySocketId(client.id).username}});

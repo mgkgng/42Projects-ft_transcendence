@@ -41,12 +41,12 @@ export class friendSystemService {
         let i : number = 0;
         let parsedList : UserEntity[] = [];
         unparsedQuery.forEach(element => {
-            if (element.id_first_user.username == username)
+            if (element.id_first_user.username == username && element.is_user_friend == true)
             {
                 let newUserEntStatus = {...element.id_second_user, status: this.mainServerService.getUserStatus(element.id_second_user.username)};
                 parsedList.push(newUserEntStatus);
             }
-            if (element.id_second_user.username == username)
+            if (element.id_second_user.username == username && element.is_user_friend == true)
             {
                 let newUserEntStatus = {...element.id_first_user, status: this.mainServerService.getUserStatus(element.id_first_user.username)};
                 parsedList.push(newUserEntStatus);
@@ -124,6 +124,29 @@ export class friendSystemService {
 		return await this.userFriendRepository.remove(isFriendEntity);
     }
 
+	// Get a list of all the person username have asked to be friend
+	// and where the person have not refused the request
+	// and where the person have not accepted the request
+	async getAskListWhereUserIsAsker(username : string)
+	{
+		const qb = this.userFriendRepository.createQueryBuilder('u');
+		let isRequesterEntityList = await qb
+		.leftJoinAndSelect("u.id_first_user", "friendrequester")
+		.leftJoinAndSelect("u.id_second_user", "friendrequested")
+		.where(`friendrequester.username = :username`, {username: username})
+		// .andWhere(`u.is_user_friend = false AND u.is_user_refused = false`)
+		.getMany();
+
+		if (isRequesterEntityList.length == 0) // need to changed to empty array
+			return null;
+		let parsedList : UserEntity[] = [];
+		isRequesterEntityList.forEach(element => {
+			let newUserEntStatus = {...element.id_second_user, status: this.mainServerService.getUserStatus(element.id_second_user.username)};
+			parsedList.push(newUserEntStatus);
+		});
+		return parsedList;
+	}
+
     // If first_username have asked second_username as friend
     // and this function is called by first_username then it unfriend
     // them.
@@ -137,7 +160,9 @@ export class friendSystemService {
         .getOne();
         if (isRequestedEntity == null)
             return ;
-        return await this.removeFriend(first_username, second_username);
+		const ret = await this.userFriendRepository.remove(isRequestedEntity);
+		console.log("ret: ", ret);
+        return ret;
     }
 
 	// Function to refuse a friend request if the user is the one who have been asked
