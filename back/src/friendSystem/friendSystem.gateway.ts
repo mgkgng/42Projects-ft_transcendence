@@ -37,8 +37,6 @@ export class friendSystemGateway {
 
 	@SubscribeMessage('getFriendList')
 	async getFriendList(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
-		if (!data.username)
-			return;
 		const user = await this.userRepository.findOne({where: {username: this.mainServerService.getUserConnectedBySocketId(client.id).username}});
 		if (!user)
 		{
