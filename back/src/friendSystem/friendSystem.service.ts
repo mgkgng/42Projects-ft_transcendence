@@ -23,7 +23,7 @@ export class friendSystemService {
         return await qb
         .leftJoinAndSelect("u.id_first_user", "friendrequester")
         .leftJoinAndSelect("u.id_second_user", "friendrequested")
-        .where(`friendrequester.username = :first_username AND friendrequested.username = :second_username OR friendrequester.username = :second_username AND friendrequested.username = :first_username AND u.is_user_friend = true`, {first_username: first_username, second_username: second_username})
+        .where(`((friendrequester.username = :first_username AND friendrequested.username = :second_username) OR (friendrequester.username = :second_username AND friendrequested.username = :first_username)) AND u.is_user_friend = true`, {first_username: first_username, second_username: second_username})
         .getOne();
     }
 
@@ -31,12 +31,13 @@ export class friendSystemService {
     async getFriendList(username : string )
     {
         const qb = this.userFriendRepository.createQueryBuilder('u');
-        let unparsedQuery = await qb
-        .leftJoinAndSelect("u.id_first_user", "friendrequester")
-        .leftJoinAndSelect("u.id_second_user", "friendrequested")
-        .where(`friendrequester.username = :username OR friendrequested.username = :username`, {username: username})
-        .andWhere(`u.is_user_friend = true`)
-        .getMany();
+		// Make a query to get all the friend of a user
+		let unparsedQuery = await qb
+		.leftJoinAndSelect("u.id_first_user", "friendrequester")
+		.leftJoinAndSelect("u.id_second_user", "friendrequested")
+		.where(`(friendrequester.username = :username OR friendrequested.username = :username)`, {username: username})
+		.andWhere(`u.is_user_friend = true`)
+		.getMany();
 
         let i : number = 0;
         let parsedList : UserEntity[] = [];
@@ -62,7 +63,7 @@ export class friendSystemService {
         let unparsedQuery = await qb
         .leftJoinAndSelect("u.id_first_user", "friendrequester")
         .leftJoinAndSelect("u.id_second_user", "friendrequested")
-        .where(`friendrequester.username = :username OR friendrequested.username = :username`, {username: username})
+        .where(`(friendrequester.username = :username OR friendrequested.username = :username)`, {username: username})
         .andWhere(`u.is_user_friend = false AND u.is_user_refused = false`)
         .getMany();
 
@@ -172,7 +173,7 @@ export class friendSystemService {
 		let isRequestedEntity = await qb
 		.leftJoinAndSelect("u.id_first_user", "friendrequester")
 		.leftJoinAndSelect("u.id_second_user", "friendrequested")
-		.where("friendrequester.username = :first_username AND friendrequested.username = :second_username", {first_username: first_username, second_username: second_username})
+		.where("(friendrequester.username = :first_username AND friendrequested.username = :second_username)", {first_username: first_username, second_username: second_username})
 		.andWhere("u.is_user_friend = false AND u.is_user_refused = false")
 		.getOne();
 		if (isRequestedEntity == null)
