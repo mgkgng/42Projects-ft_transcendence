@@ -110,22 +110,34 @@
 					}
 				}
 				.tools {
+					padding: 0;
 					position: absolute;
 					right: 2em;
 					width: 7em;
+					height: 100%;
 					float: right;
 					justify-content: flex-end;
-					gap: 2em;
+					gap: 0;
+					align-items: center;
 
-					padding: 1em;
 					border-radius: 3em .2em .2em .2em;
-					cursor: pointer;
 
 					img { height: 1.2em; }
 
 					&:hover {
 						background-color: transparentize($submain-lowshadeblue, .3);
 						filter: saturate(50%);
+					}
+
+					button {
+						width: 2.5em;
+						height: 2.5em;
+						border-radius: 50%;
+						transition: .3s;
+						
+						&:hover {
+							background-color: transparentize(#fff, .8	);
+						}
 					}
 				}
 			}
@@ -164,8 +176,12 @@
     import { user } from "$lib/stores/user";
     import Modal from "$lib/tools/Modal.svelte";
     import UserProfile from "$lib/users/UserProfile.svelte";
+	import WriteMessage from "$lib/users/WriteMessage.svelte";
 
 	export let itself: any;
+
+	let writeMessageModal: any;
+	let destMsg: Array<string> = [];
 
 	let userInfo: any;
 	user.subscribe((user: any) => { userInfo = user; });
@@ -205,6 +221,18 @@
 			console.log(friendRequests);
 		});
 
+		$client.socket.on("success_removeFriend", (data: any) => {
+			friends = friends.filter((friend: any) => { return friend.username != friend.username; });
+		});
+
+		$client.socket.on("success_acceptFriend", (data: any) => {
+			friendRequests = friendRequests.filter((request: any) => { return request.username != data.username; });
+		});
+
+		$client.socket.on("success_refuseFriend", (data: any) => {
+			friendRequests = friendRequests.filter((request: any) => { return request.username != data.username; });
+		});
+
 		$client.socket.emit("getFriendList", { username: userInfo.username });
 		$client.socket.emit("getAskList");
 
@@ -215,12 +243,19 @@
 			$client.socket.off("success_getFriendList");
 			$client.socket.off("error_getUserinDB");
 			$client.socket.off("resUserProfile");
+			$client.socket.off("success_removeFriend");
+			$client.socket.off("success_acceptFriend");
+			$client.socket.off("success_refuseFriend");
 		});
 	});
 </script>
 
 <Modal bind:this={userProfileModal}>
 	<UserProfile itself={userProfileModal} profileUser={profileUser}/>
+</Modal>
+
+<Modal bind:this={writeMessageModal}>
+	<WriteMessage itself={writeMessageModal} sendTo={destMsg}/>
 </Modal>
 
 <div class="vflex window friends">
@@ -250,7 +285,7 @@
 	</div>
 	{#if friendRequests.length}
 	<div class="vflex requests">
-		{#each friendRequests as request, i}
+		{#each friendRequests as request}
 		<div class="flex line">
 			<img src={(request.img) ? request.img : request.img_url} alt="user" />
 			<div class="user" on:click={() => {
@@ -259,12 +294,9 @@
 			<div class="flex buttons">
 				<button on:click={() => {
 					$client.socket.emit("acceptFriend", { username: request.username });
-					friends.push(request);
-					friendRequests = friendRequests.splice(i, 1);
 				}}>Accept</button>
 				<button on:click={() => {
 					$client.socket.emit("refuseFriend", { username: request.username });
-					friendRequests = friendRequests.splice(i, 1);
 				}}>Refuse</button>
 			</div>
 		</div> 
@@ -277,8 +309,14 @@
 		<div class="flex line">
 			<div class="friend">{friend.username}</div>
 			<div class="flex tools">
-				<button><img src="/icon-mail.png" alt="mail"></button>
-				<button>-</button>
+				<button on:click={() => {
+					destMsg = [friend.username];
+					writeMessageModal.open();
+				}}><img src="/icon-mail.png" alt="mail"></button>
+				<button on:click={() => {
+					//TODO confirmMessage
+					$client.socket.emit("removeFriend", { username: friend.username });
+				}}>-</button>
 			</div>
 		</div>
 		{/each}
