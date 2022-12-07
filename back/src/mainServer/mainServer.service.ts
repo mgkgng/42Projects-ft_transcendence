@@ -45,7 +45,7 @@ export class MainServerService {
 		getUserConnectedByUsername(username : string) : any {
 			for (let i = 0; i < global.userConnectedList.length; i++) {
 				if (global.userConnectedList[i].username == username)
-					return global.userConnectedList[i];
+					return global.userConnectedList[i].socket;
 			}
 			return null;
 		}

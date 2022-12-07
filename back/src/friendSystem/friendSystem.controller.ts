@@ -168,6 +168,12 @@ export class friendSystemController {
         return this.friendSystemService.getFriendList(query.username);
     }
 
+	@Get("getAskList?")
+    async getAskList(@Query() query : {username : string })
+    {
+        return this.friendSystemService.getAskList(query.username);
+    }
+
     @Get("askfriend?")
     async askFriend(@Query() query : {first_username : string, second_username : string})
     {
@@ -183,7 +189,6 @@ export class friendSystemController {
     @Get('unfriend?')
     async unfriend(@Query() query : {first_username : string, second_username : string})
     {
-        console.log("unfriend", query);
         return this.friendSystemService.removeFriend(query.first_username, query.second_username);
     }
 
