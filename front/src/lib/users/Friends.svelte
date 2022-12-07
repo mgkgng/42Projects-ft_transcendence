@@ -131,6 +131,22 @@
 			}
 		}
 
+		.requests {
+			.line {
+				align-items: center;
+
+				img {
+					width: 45px;
+					height: 45px;
+					border-radius: 50%;
+					object-fit: cover;
+				}
+				.buttons {
+					
+				}
+			}
+		}
+
 		.no-friend {
 			padding-left: 3em;
 			padding-bottom: 3em;
@@ -154,25 +170,25 @@
 	let userInfo: any;
 	user.subscribe((user: any) => { userInfo = user; });
 
-	let friends: Array<any>
+	let friends: Array<any> = [];
 	let searchUser: string = "";
 	let userSearchList: Array<any> = [];
 	let userProfileModal: any;
 	let profileUser: any;
+	
+	let friendRequests: Array<any> = [];
 
 	$: searchUser = "";
 	$: searchUser = searchUser.toLowerCase();
 	$: { $client.socket.emit("getUserinDB", {username: searchUser}); }
 
 	onMount(() => {
-		$client.socket.emit("getFriendList", { username: userInfo.username });
-
 		$client.socket.on("error_getFriendList", (data: any) => {
 			console.log("Error!");
 		});
 
 		$client.socket.on("success_getFriendList", (data: any) => {
-			console.log("hello?", data);
+			friends = data.friends;
 		});
 
 		$client.socket.on("success_getUserinDB", (data: any) => {
@@ -184,9 +200,21 @@
 			// userProfileModal.open();
 		});
 
+		$client.socket.on("success_getAskList", (data: any) => {
+			friendRequests = data.friends;
+			console.log(friendRequests);
+		});
+
+		$client.socket.emit("getFriendList", { username: userInfo.username });
+		$client.socket.emit("getAskList");
+
+
 		return (() => {
-			$client.removeListeners("error_getFriendList", "success_getFriendList", "success_getUserinDB",
-				"error_getUserinDB", "resUserProfile");
+			$client.socket.off("error_getFriendList");
+			$client.socket.off("success_getUserinDB");
+			$client.socket.off("success_getFriendList");
+			$client.socket.off("error_getUserinDB");
+			$client.socket.off("resUserProfile");
 		});
 	});
 </script>
@@ -206,6 +234,8 @@
 				<div class="flex line" on:click={() => {
 					profileUser = user;
 					userProfileModal.open();
+					searchUser = "";
+					userSearchList = [];
 				}}>
 					<img src="{user.img_url}" alt="user">
 					<div class="user">{user.username}</div>
@@ -218,7 +248,29 @@
 			</div>
 			{/if}
 	</div>
+	{#if friendRequests.length}
+	<div class="vflex requests">
+		{#each friendRequests as request, i}
+		<div class="flex line">
+			<img src={(request.img) ? request.img : request.img_url} alt="user" />
+			<div class="user" on:click={() => {
 
+			}}>{request.username}</div>
+			<div class="flex buttons">
+				<button on:click={() => {
+					$client.socket.emit("acceptFriend", { username: request.username });
+					friends.push(request);
+					friendRequests = friendRequests.splice(i, 1);
+				}}>Accept</button>
+				<button on:click={() => {
+					$client.socket.emit("refuseFriend", { username: request.username });
+					friendRequests = friendRequests.splice(i, 1);
+				}}>Refuse</button>
+			</div>
+		</div> 
+		{/each}
+	</div>
+	{/if}
 	{#if friends}
 	<div class="vflex friends-list">
 		{#each friends as friend}
