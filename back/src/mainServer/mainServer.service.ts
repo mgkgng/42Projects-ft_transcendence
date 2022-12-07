@@ -28,7 +28,19 @@ export class MainServerService {
 			}
 			return null;
 		}
-	
+
+		// Take a string socketId as param and return the list of socket connected to this username linked
+		// to the socketId
+		getUserConnectedListBySocketId(socketId: string) : any {
+			let list = [];
+			let username = this.getUserConnectedBySocketId(socketId).username;
+			for (let i = 0; i < global.userConnectedList.length; i++) {
+				if (global.userConnectedList[i].username == username)
+					list.push(global.userConnectedList[i].socket);
+			}
+			return list;
+		}
+
 		// Function that will return the userConnectList entry by username if found
 		getUserConnectedByUsername(username : string) : any {
 			for (let i = 0; i < global.userConnectedList.length; i++) {
