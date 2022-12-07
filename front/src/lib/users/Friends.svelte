@@ -144,9 +144,24 @@
 		}
 
 		.requests {
+			width: 100%;
+			gap: .2em;
+
+			justify-content: space-between;
+			
 			.line {
 				align-items: center;
 
+				.user {
+					transition: .2s;
+					padding: .1em .3em;
+					border-radius: .2em;
+					cursor: pointer;
+
+					&:hover {
+						background-color: transparentize(#fff, .6);
+					}
+				}
 				img {
 					width: 45px;
 					height: 45px;
@@ -154,7 +169,19 @@
 					object-fit: cover;
 				}
 				.buttons {
-					
+					gap: .2em;
+
+					button {
+						background-color: $red;
+						border-radius: .2em;
+						width: 4em;
+						height: 2em;
+						transition: .2s;
+						&:first-child { background-color: $green; }
+						&:hover {
+							transform: scale(1.05);
+						}
+					}
 				}
 			}
 		}
@@ -204,6 +231,7 @@
 		});
 
 		$client.socket.on("success_getFriendList", (data: any) => {
+			console.log("ss", data);
 			friends = data.friends;
 		});
 
@@ -303,7 +331,7 @@
 		{/each}
 	</div>
 	{/if}
-	{#if friends}
+	{#if friends.length}
 	<div class="vflex friends-list">
 		{#each friends as friend}
 		<div class="flex line">
