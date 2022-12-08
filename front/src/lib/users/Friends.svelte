@@ -144,22 +144,34 @@
 		}
 
 		.requests {
-			width: 100%;
+			width: 90%;
+			max-height: 35%;
+			overflow-y: overlay;
 			gap: .2em;
+			border: $border;
+			border-radius: .2em;
 
 			justify-content: space-between;
 			
 			.line {
+				padding: .5em .5em;
 				align-items: center;
+				display: grid;
+				grid-template-columns: 12% 40% 35%;
 
 				.user {
 					transition: .2s;
 					padding: .1em .3em;
 					border-radius: .2em;
+					font-size: 15px;
 					cursor: pointer;
 
-					&:hover {
-						background-color: transparentize(#fff, .6);
+					p {
+						border-radius: .3em;
+						padding: 0 .1em;
+						&:hover {
+							background-color: transparentize(#fff, .6);
+						}
 					}
 				}
 				img {
@@ -170,6 +182,7 @@
 				}
 				.buttons {
 					gap: .2em;
+					font-size: 13px;
 
 					button {
 						background-color: $red;
@@ -213,14 +226,13 @@
 	let userInfo: any;
 	user.subscribe((user: any) => { userInfo = user; });
 
-	let friends: Array<any> = [];
+	let friends: Map<string, any> = new Map<string, any>();
+	let friendRequests: Map<string, any> = new Map<string, any>();
 	let searchUser: string = "";
 	let userSearchList: Array<any> = [];
 	let userProfileModal: any;
 	let profileUser: any;
 	
-	let friendRequests: Array<any> = [];
-
 	$: searchUser = "";
 	$: searchUser = searchUser.toLowerCase();
 	$: { $client.socket.emit("getUserinDB", {username: searchUser}); }
@@ -231,8 +243,9 @@
 		});
 
 		$client.socket.on("success_getFriendList", (data: any) => {
-			console.log("ss", data);
-			friends = data.friends;
+			for (let friend of data.friends)
+				friends.set(friend.username, friend);
+			friends = friends;
 		});
 
 		$client.socket.on("success_getUserinDB", (data: any) => {
@@ -244,26 +257,37 @@
 			// userProfileModal.open();
 		});
 
+		// TODO websocket to receive request while client is on the modal
+		// $client.socket.on("askFriendNotification", (data: any) => {
+		// 	// TODO turn off the notif <- notif should be a writable
+		// 	newFriendRequest = true;
+		// });
+
 		$client.socket.on("success_getAskList", (data: any) => {
-			friendRequests = data.friends;
-			console.log(friendRequests);
+			for (let request of data.friends)
+				friendRequests.set(request.username, request);
+			friendRequests = friendRequests;
 		});
 
 		$client.socket.on("success_removeFriend", (data: any) => {
-			friends = friends.filter((friend: any) => { return friend.username != friend.username; });
+			friends.delete(data.friend);
+			friends = friends;
 		});
 
 		$client.socket.on("success_acceptFriend", (data: any) => {
-			friendRequests = friendRequests.filter((request: any) => { return request.username != data.username; });
+			friends.set(data.friend, friendRequests.get(data.friend));
+			friendRequests.delete(data.friend);
+			friends = friends;
+			friendRequests = friendRequests;
 		});
 
 		$client.socket.on("success_refuseFriend", (data: any) => {
-			friendRequests = friendRequests.filter((request: any) => { return request.username != data.username; });
+			friendRequests.delete(data.friend);
+			friendRequests = friendRequests;
 		});
 
 		$client.socket.emit("getFriendList", { username: userInfo.username });
 		$client.socket.emit("getAskList");
-
 
 		return (() => {
 			$client.socket.off("error_getFriendList");
@@ -274,6 +298,7 @@
 			$client.socket.off("success_removeFriend");
 			$client.socket.off("success_acceptFriend");
 			$client.socket.off("success_refuseFriend");
+			$client.socket.off("success_getAskList");
 		});
 	});
 </script>
@@ -311,14 +336,16 @@
 			</div>
 			{/if}
 	</div>
-	{#if friendRequests.length}
+	{#if friendRequests.size}
 	<div class="vflex requests">
-		{#each friendRequests as request}
+		{#each [...friendRequests.values()] as request}
 		<div class="flex line">
 			<img src={(request.img) ? request.img : request.img_url} alt="user" />
 			<div class="user" on:click={() => {
 
-			}}>{request.username}</div>
+			}}>
+			<p>{request.username}</p>
+			</div>
 			<div class="flex buttons">
 				<button on:click={() => {
 					$client.socket.emit("acceptFriend", { username: request.username });
@@ -331,9 +358,9 @@
 		{/each}
 	</div>
 	{/if}
-	{#if friends.length}
+	{#if friends.size}
 	<div class="vflex friends-list">
-		{#each friends as friend}
+		{#each [...friends.values()] as friend}
 		<div class="flex line">
 			<div class="friend">{friend.username}</div>
 			<div class="flex tools">

@@ -210,13 +210,10 @@
 	{#each blues as blue}
 	<div class="blue-circle-around" style="--dist: {circleRadius + 85}px; --size: {blue.size}px; --duration: {blue.duration}s; --angle: {blue.angle}deg; --angle2: {blue.angle + 360}deg"></div>
 	{/each}
-
 	<MainCircle circleRadius={circleRadius}/>
-
 	{#each circlesAround as circleInfo}
 	<div class="circle-around" style="--dist: {circleRadius + 85}px; --size: {circleInfo.size}px; --duration: {circleInfo.duration}s; --angle: {circleInfo.angle}deg; --angle2: {circleInfo.angle + 360}deg"></div>
 	{/each}
-
 	{#if main && userState !== undefined}
 	<div class="click-bg"></div>
 		{#if !$login}

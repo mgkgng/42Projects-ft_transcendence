@@ -47,13 +47,13 @@
 				headers: {
 					'Content-Type': 'application/json'
 				},
-				body:JSON.stringify({username: "oui", password: url.get('code')}),
+				body: JSON.stringify({username: "oui", password: url.get('code')}),
 			});
 			let tok = await res.json();
 			while (tok.get_code != null)
 			{
 				let ufa_code : any = prompt("Your code is : ");
-				const res_ufa : any = await fetch("http://localhost:3000/auth42",{
+				const res_ufa : any = await fetch("http://localhost:3000/",{
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json'
@@ -67,8 +67,10 @@
 					Authorization: "Bearer " + tok.access_token,
 				}
 			});
-			localStorage.setItem('transcendence-jwt', tok.access_token);
-			login.set(true);
+			if (tok.access_token) {
+				localStorage.setItem('transcendence-jwt', tok.access_token);
+				login.set(true);
+			}
 			goto('/');
 		} catch(e){
 			console.log("NOT CONNECTED");
