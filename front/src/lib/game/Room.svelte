@@ -274,34 +274,9 @@
 	<ConfirmMsg msg={"Are you sure you want to quit?"} toQuit={itself} roomID={roomID} itself={quitConfirmMsgModal}/>
 </Modal>
 
-<!-- <svelte:window
-	on:keypress={(event) => {
-		console.log("there");
-		if (userType == UserType.Watcher || !['KeyA', 'KeyD'].includes(event.code))
-			return ;
-		if (moving) //* TODO should make movement more fluent
-			return ;
-		moving = true;
-		console.log("here");
-		$client.socket.emit("PaddleMoveKey", {
-			room: roomID,
-			left: ((userType == UserType.Player1 && !switched) && event.code == 'KeyD'
-				|| userType == UserType.Player2 && event.code == 'KeyA')
-		});
-	}}
-
-	on:keyup={(event)=>{
-		if (userType == UserType.Watcher || !['KeyA', 'KeyD'].includes(event.code))
-			return ;
-		
-		//* TODO some precision to make
-		$client.socket.emit("PaddleStopKey", roomID);
-
-		moving = false;
-	}}
-
+<svelte:window
 	on:mousemove={(e) => {
-		console.log(e.movementY);
+		// console.log(e.movementY);
 		if (e.movementY)
 			$client.socket.emit("PaddleMouse", e.movementY);
 	}}
