@@ -41,15 +41,6 @@
 		}
 	}
 	
-	.pong-game {
-		position: relative;
-
-		padding: 0;
-		border-radius: .5em;
-
-		background-color: #212121;
-	}
-
 	.loading-box {
 		height: 100%;
 		display: flex;
@@ -96,6 +87,7 @@
     import ConfirmMsg from '$lib/modals/ConfirmMsg.svelte';
     import { user } from '$lib/stores/user';
     import Player from '$lib/game/Player.svelte';
+	import Game from '$lib/game/Game.svelte';
 	//TODO room title front
 	//TODO room watch number front-back
 
@@ -238,24 +230,7 @@
 			<Player player={(!switched) ? player2 : player1} left={true} hostname={hostname} ready={ready}/>	
 			<h1>{(!switched && player2) ? player2.score : (!switched && !player2) ? "0" : player1?.score}</h1>
 		</div>
-		<div class="pong-game" style="min-width: {MapSize[gameInfo.mapSize][1]}px; min-height: {MapSize[gameInfo.mapSize][0]}px;">
-			<Paddle pos={(!switched) ? player2?.pos : player1?.pos} paddleWidth={PaddleSize[gameInfo.paddleSize]}
-				mapSize={MapSize[gameInfo.mapSize]}
-				switched={switched}
-				playerType={(!switched) ? 2 : 1}
-				user={(!switched) ? player2 : player1}
-				initPos={initPos}/>
-			{#if puck}
-			<PPuck pos={[(!switched) ? MapSize[gameInfo.mapSize][0] - puck.pos[0] : puck.pos[0],
-				(!switched) ? MapSize[gameInfo.mapSize][1] - puck.pos[1] : puck.pos[1]]} />
-			{/if}
-			<Paddle pos={(!switched) ? player1?.pos : player2?.pos} paddleWidth={PaddleSize[gameInfo.paddleSize]}
-				mapSize={MapSize[gameInfo.mapSize]}
-				switched={switched}
-				playerType={(!switched) ? 1 : 2}
-				user={(!switched) ? player1 : player2}
-				initPos={initPos}/>;
-		</div>
+		<Game bind:player1={player1} bind:player2={player2} bind:gameInfo={gameInfo} bind:switched={switched} bind:initPos={initPos}/>
 		<div class="vflex side right">
 			<Player player={(!switched) ? player1 : player2} left={false} hostname={hostname} ready={ready}/>
 			<h1>{(!switched) ? player1?.score : (player2) ? player2.score : "0"}</h1>
@@ -300,33 +275,8 @@
 </Modal>
 
 <svelte:window
-	on:keypress={(event) => {
-		console.log("there");
-		if (userType == UserType.Watcher || !['KeyA', 'KeyD'].includes(event.code))
-			return ;
-		if (moving) //* TODO should make movement more fluent
-			return ;
-		moving = true;
-		console.log("here");
-		$client.socket.emit("PaddleMoveKey", {
-			room: roomID,
-			left: ((userType == UserType.Player1 && !switched) && event.code == 'KeyD'
-				|| userType == UserType.Player2 && event.code == 'KeyA')
-		});
-	}}
-
-	on:keyup={(event)=>{
-		if (userType == UserType.Watcher || !['KeyA', 'KeyD'].includes(event.code))
-			return ;
-		
-		//* TODO some precision to make
-		$client.socket.emit("PaddleStopKey", roomID);
-
-		moving = false;
-	}}
-
 	on:mousemove={(e) => {
-		console.log(e.movementY);
+		// console.log(e.movementY);
 		if (e.movementY)
 			$client.socket.emit("PaddleMouse", e.movementY);
 	}}
