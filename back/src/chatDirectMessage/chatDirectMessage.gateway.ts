@@ -38,7 +38,6 @@ export class ChatDirectMessageGateway {
 
 	@SubscribeMessage('sendDirectMessage')
 	async sendMessage(@MessageBody() data: any, @ConnectedSocket() client: any) {
-		console.log("test", data);
 		const user = await this.userRepository.findOne({
 			where: {username: data.username},
 			relations: ['relation_userBlocked']
@@ -54,11 +53,40 @@ export class ChatDirectMessageGateway {
 		}
 		const userConnected = this.mainServerService.getUserConnectedByUsername(data.username);
 		if (userConnected && user.relation_userBlocked.includes(client.username) == false)
-			userConnected.socket.emit('getDirectMessage', {sender: userSender.username, message: data.message});
+		{
+			let emitList = this.mainServerService.getUserConnectedListBySocketId(client.id);
+			emitList.forEach(element => {
+				this.server.to(element.id).emit('getDirectMessage', {sender: userSender.username, message: data.message});
+			});
+		}
 		let ret = await this.chatDirectMessageService.handleSendDirectMessage(this.mainServerService.getUserConnectedBySocketId(client.id).username, data.username, data.message);
 		if (ret)
 			this.server.to(client.id).emit('success_sendDirectMessage', {message: data.message});
 		else
 			this.server.to(client.id).emit('error_sendDirectMessage', {error: 'An error occured'});
+	}
+
+	// Get all the chatDirectMessage between 2 users
+	@SubscribeMessage('getDirectMessage')
+	async getDirectMessage(@MessageBody() data: any, @ConnectedSocket() client: any) {
+		const user = await this.userRepository.findOne({
+			where: {username: data.username},
+			relations: ['relation_userBlocked']
+		});
+		const userSender = await this.userRepository.findOne({
+			where:
+			{username: this.mainServerService.getUserConnectedBySocketId(client.id).username},
+			relations: ['relation_userBlocked']
+		});
+		if (!user || !userSender)
+		{
+			this.server.to(client.id).emit('error_getDirectMessage', {error: 'User not found'});
+			return;
+		}
+		let ret = await this.chatDirectMessageService.handleGetDirectMessageHistory(this.mainServerService.getUserConnectedBySocketId(client.id).username, data.username);
+		if (ret)
+			this.server.to(client.id).emit('success_getDirectMessage', {messageHistory: ret});
+		else
+			this.server.to(client.id).emit('error_getDirectMessage', {error: 'An error occured'});
 	}
 }
