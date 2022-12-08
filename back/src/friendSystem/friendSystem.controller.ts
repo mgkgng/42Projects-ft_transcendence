@@ -192,6 +192,12 @@ export class friendSystemController {
         return this.friendSystemService.removeFriend(query.first_username, query.second_username);
     }
 
+	@Get('getAskListWhereUserIsAsked?')
+	async getAskListWhereUserIsAsked(@Query() query : {username : string})
+	{
+		return this.friendSystemService.getAskListWhereUserIsAsked(query.username);
+	}
+
     @Get('changeStatus?')
     async changeStatus(@Query() query : {username : string, status : string})
     {

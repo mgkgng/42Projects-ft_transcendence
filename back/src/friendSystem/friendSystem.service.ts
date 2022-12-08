@@ -126,8 +126,6 @@ export class friendSystemService {
     }
 
 	// Get a list of all the person username have asked to be friend
-	// and where the person have not refused the request
-	// and where the person have not accepted the request
 	async getAskListWhereUserIsAsker(username : string)
 	{
 		const qb = this.userFriendRepository.createQueryBuilder('u');
@@ -143,6 +141,29 @@ export class friendSystemService {
 		let parsedList : UserEntity[] = [];
 		isRequesterEntityList.forEach(element => {
 			let newUserEntStatus = {...element.id_second_user, status: this.mainServerService.getUserStatus(element.id_second_user.username)};
+			parsedList.push(newUserEntStatus);
+		});
+		return parsedList;
+	}
+
+	// Get a list of all the person username have been asked to be friend
+	// and where the person have not refused the request
+	// and where the person have not accepted the request
+	async getAskListWhereUserIsAsked(username : string)
+	{
+		const qb = this.userFriendRepository.createQueryBuilder('u');
+		let isRequestedEntityList = await qb
+		.leftJoinAndSelect("u.id_first_user", "friendrequester")
+		.leftJoinAndSelect("u.id_second_user", "friendrequested")
+		.where(`(friendrequested.username = :username)`, {username: username})
+		.andWhere(`u.is_user_friend = false AND u.is_user_refused = false`)
+		.getMany();
+
+		if (isRequestedEntityList.length == 0)
+			return null;
+		let parsedList : UserEntity[] = [];
+		isRequestedEntityList.forEach(element => {
+			let newUserEntStatus = {...element.id_first_user, status: this.mainServerService.getUserStatus(element.id_first_user.username)};
 			parsedList.push(newUserEntStatus);
 		});
 		return parsedList;
