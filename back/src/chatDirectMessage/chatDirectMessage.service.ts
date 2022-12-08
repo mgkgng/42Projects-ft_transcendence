@@ -31,14 +31,28 @@ export class ChatDirectMessageService {
         return this.chatDirectMessageRepository.save([newDirectMessage]);
     }
 
-    async handleGetDirectMessageHistory(username_sender_arg: string, username_receiver_arg: string)
-    {
-        const qb = this.chatDirectMessageRepository.createQueryBuilder('u');
-        const qbu = this.userRepository.createQueryBuilder('u');
+	async handleGetDirectMessageHistory(username_sender_arg: string, username_receiver_arg: string)
+	{
+		const qbu = this.userRepository.createQueryBuilder('u');
+		const entSender = await qbu.select().where(`u.username = :username_sender`, {username_sender: username_sender_arg}).getOneOrFail();
+		const entReceiver = await qbu.select().where(`u.username = :username_receiver`, {username_receiver: username_receiver_arg}).getOneOrFail();
 
-        return await this.chatDirectMessageRepository.find({relations: ['message_sender', 'message_recipient'], where: [
-            {message_sender: await qbu.select().where(`u.username = :username_sender`, {username_sender: username_sender_arg}).getOneOrFail(), message_recipient: await qbu.select().where(`u.username = :username_receiver`, {username_receiver: username_receiver_arg}).getOneOrFail()},
-            {message_sender: await qbu.select().where(`u.username = :username_receiver`, {username_receiver: username_receiver_arg}).getOneOrFail(), message_recipient: await qbu.select().where(`u.username = :username_sender`, {username_sender: username_sender_arg}).getOneOrFail()}
-        ], order: {date: "ASC"}});
-    }
+		const messages = await this.chatDirectMessageRepository.createQueryBuilder('message')
+		.innerJoinAndSelect('message.message_sender', 'sender')
+		.innerJoinAndSelect('message.message_recipient', 'recipient')
+		.where('message.message_sender = :sender', { sender: entSender.id_g })
+		.andWhere('message.message_recipient = :recipient', { recipient: entReceiver.id_g })
+		.orWhere('message.message_sender = :recipient', { recipient: entReceiver.id_g })
+		.andWhere('message.message_recipient = :sender', { sender: entSender.id_g })
+		.orderBy('message.date', 'ASC')
+		.getMany();
+
+		return messages.map((message) => ({
+			id: message.id_g,
+			sender: message.message_sender.username,
+			recipient: message.message_recipient.username,
+			message: message.string,
+			date: message.date
+		}))
+	}
 }
