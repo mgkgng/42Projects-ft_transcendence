@@ -44,6 +44,6 @@
 
 <div class="paddle {(playerType == 1) ? "user" : ""} {(!user) ? "absent" : ""}"
 	style="left: {((playerType === 1 && switched) || (playerType === 2 && !switched)) ? PongConfig.DeadZoneHeight : mapSize[1] - PongConfig.DeadZoneHeight - PongConfig.PaddleHeight}px;
-		top: {(!switched) ? pos : mapSize[0] - pos - paddleWidth}px;
+		top: {(!switched) ? pos : mapSize[0] - pos}px;
 		height: {paddleWidth}px">
 </div>

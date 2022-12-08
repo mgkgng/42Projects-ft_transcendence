@@ -185,6 +185,26 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		player.control[0] = intervalID;
 	}
 
+	@SubscribeMessage("PaddleMoveMouse")
+	paddleMoveMouse(@MessageBody() data: any, @Request() req) {
+		// Check if the request came from a proper player
+		console.log("hello?", data);
+
+		let target = this.getClient(req);
+		let room = this.getRoom(data.roomID);
+		if (!room || !room.players.has(target.username))
+			return ;
+
+		// Get the player
+		let player = room.players.get(target.username);
+
+		player.paddle.pos = data.pos;
+		room.broadcast("PaddleUpdate", {
+			type: player.index,
+			pos: data.pos
+		});
+	}
+
 	@SubscribeMessage("PaddleStopKey")
 	paddleStopKey(@MessageBody() data: any, @Request() req) {
 		// TODO is there any more efficient way to handle this?

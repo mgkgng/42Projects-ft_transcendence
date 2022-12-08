@@ -230,7 +230,8 @@
 			<Player player={(!switched) ? player2 : player1} left={true} hostname={hostname} ready={ready}/>	
 			<h1>{(!switched && player2) ? player2.score : (!switched && !player2) ? "0" : player1?.score}</h1>
 		</div>
-		<Game bind:player1={player1} bind:player2={player2} bind:gameInfo={gameInfo} bind:switched={switched} bind:initPos={initPos}/>
+		<Game bind:player1={player1} bind:player2={player2} bind:gameInfo={gameInfo} bind:switched={switched} bind:initPos={initPos}
+			userType={userType} roomID={roomID}/>
 		<div class="vflex side right">
 			<Player player={(!switched) ? player1 : player2} left={false} hostname={hostname} ready={ready}/>
 			<h1>{(!switched) ? player1?.score : (player2) ? player2.score : "0"}</h1>
@@ -273,11 +274,3 @@
 <Modal bind:this={quitConfirmMsgModal} closeOnBgClick={false}>
 	<ConfirmMsg msg={"Are you sure you want to quit?"} toQuit={itself} roomID={roomID} itself={quitConfirmMsgModal}/>
 </Modal>
-
-<svelte:window
-	on:mousemove={(e) => {
-		// console.log(e.movementY);
-		if (e.movementY)
-			$client.socket.emit("PaddleMouse", e.movementY);
-	}}
-/>

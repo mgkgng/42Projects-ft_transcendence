@@ -14,20 +14,35 @@
 	import Paddle from '$lib/game/Paddle.svelte';
     import PPuck from '$lib/game/PPuck.svelte';
 	import { UserType, MapSize, PaddleSize } from '$lib/stores/var';
+    import { client } from '../stores/client';
 
 	export let player1: any;
 	export let player2: any;
 	export let gameInfo: any;
 	export let switched: boolean;
 	export let initPos: number;
+	export let roomID: string;
+	export let userType: number;
 
 	export let puck: any;
 
-	let game: HTMLElement;
+	let game: any;
+	let gameSize: any;
 
+	let prevY: number = initPos;
+
+
+	onMount(() => {
+		game = document.getElementById("game");
+		gameSize = game?.getBoundingClientRect();
+
+		console.log(game);
+		console.log(gameSize);
+
+	});
 </script>
 
-<div class="pong-game" style="min-width: {MapSize[gameInfo.mapSize][1]}px; min-height: {MapSize[gameInfo.mapSize][0]}px;">
+<div id="game" class="pong-game" style="min-width: {MapSize[gameInfo.mapSize][1]}px; min-height: {MapSize[gameInfo.mapSize][0]}px;">
 	<Paddle pos={(!switched) ? player2?.pos : player1?.pos} paddleWidth={PaddleSize[gameInfo.paddleSize]}
 		mapSize={MapSize[gameInfo.mapSize]}
 		switched={switched}
@@ -48,7 +63,22 @@
 
 <svelte:window
 	on:mousemove={(event)=>{
-		console.log(event.clientX, event.clientY);
-		console.log(game.getBoundingClientRect());
+		let pos = Math.floor(event.clientY - gameSize.y) - PaddleSize[gameInfo.paddleSize] / 2;
+		console.log(pos);
+		if (pos < 0)
+			pos = 0;
+		if (pos > gameSize.height - PaddleSize[gameInfo.paddleSize])
+			pos = gameSize.height - PaddleSize[gameInfo.paddleSize];
+
+		if (pos == prevY)
+			return ;
+		prevY = pos;
+
+		console.log("yo");
+
+		$client.socket.emit("PaddleMoveMouse", {
+			roomID: roomID,
+			pos: (!switched) ? pos : gameSize.height - pos
+		});
 	}}
 />
