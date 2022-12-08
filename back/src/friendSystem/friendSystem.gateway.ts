@@ -77,14 +77,17 @@ export class friendSystemGateway {
 		}
 		// return the list of user who ask to be friend with the user
 		const friends = await this.friendSystemService.getAskListWhereUserIsAsked(user.username);
+		if (!friends)
+		{
+			this.server.to(client.id).emit('success_getAskList', {friends: []});
+			return ;	
+			// A mon avis, if friends == null, ce serait parce que la liste est vide. mais ça reste néanmoins une réussite?
+			// this.server.to(client.id).emit('error_getAskList', {error: "No asker found"});
+			// return;
+		}
 		const parsedList = friends.map((friend) => {
 			return {username: friend.username, username_42: friend.username_42, displayname: friend.displayname, campus_name: friend.campus_name, campus_country: friend.campus_country, img_url: friend.img_url, created_at: friend.created_at, last_connection: friend.last_connection, status: this.mainServerService.getUserConnectedByUsername(friend.username) ? true : false};
 		});
-		if (!friends)
-		{
-			this.server.to(client.id).emit('error_getAskList', {error: "No asker found"});
-			return;
-		}
 		this.server.to(client.id).emit('success_getAskList', {friends: parsedList});
 		return;
 	}

@@ -4,13 +4,38 @@
 		height: 480px;
 		padding-bottom: .2em;
 		padding-right: .5em;
-		justify-content: space-between;
 		gap: .2em;
 
 		h2 {
 			padding-bottom: .2em;
 			width: 85%;
 			border-bottom: $border-thin;
+		}
+		.update {
+			position: absolute;
+			padding: .2em;
+			right: 3.3em;
+			top: 2.2em;
+			border-radius: 50%;
+			img {
+				width: 32px;
+			}
+			&:hover {
+				background-color: transparentize(#fff, .6);
+				transform: scale(1.05);
+			}
+			&:active{
+				transform: scale(1);
+			}
+		}
+
+		.not-loaded {
+			position: absolute;
+			top: 50%;
+			left: 40%;
+			.loading {
+				position: relative;
+			}
 		}
 		.search {
 			position: absolute;
@@ -223,16 +248,19 @@
 	let writeMessageModal: any;
 	let destMsg: Array<string> = [];
 
+	let loadedRequests: boolean = false;
+	let loadedFriends: boolean = false;
+
 	let userInfo: any;
 	user.subscribe((user: any) => { userInfo = user; });
 
-	let friends: Map<string, any> = new Map<string, any>();
-	let friendRequests: Map<string, any> = new Map<string, any>();
+	let friends: Map<string, any>;
+	let friendRequests: Map<string, any>;
 	let searchUser: string = "";
 	let userSearchList: Array<any> = [];
 	let userProfileModal: any;
 	let profileUser: any;
-	
+
 	$: searchUser = "";
 	$: searchUser = searchUser.toLowerCase();
 	$: { $client.socket.emit("getUserinDB", {username: searchUser}); }
@@ -243,9 +271,12 @@
 		});
 
 		$client.socket.on("success_getFriendList", (data: any) => {
+			loadedFriends = false;
+			friends = new Map<string, any>();
 			for (let friend of data.friends)
 				friends.set(friend.username, friend);
 			friends = friends;
+			loadedFriends = true;
 		});
 
 		$client.socket.on("success_getUserinDB", (data: any) => {
@@ -264,9 +295,14 @@
 		// });
 
 		$client.socket.on("success_getAskList", (data: any) => {
+			loadedRequests = false;
+			friendRequests = new Map<string, any>();
 			for (let request of data.friends)
 				friendRequests.set(request.username, request);
 			friendRequests = friendRequests;
+			setTimeout(() => {
+				loadedRequests = true;
+			}, 200);
 		});
 
 		$client.socket.on("success_removeFriend", (data: any) => {
@@ -284,6 +320,10 @@
 		$client.socket.on("success_refuseFriend", (data: any) => {
 			friendRequests.delete(data.friend);
 			friendRequests = friendRequests;
+		});
+
+		$client.socket.on("error_getAskList", (data: any) => {
+			console.log("error: ", data);
 		});
 
 		$client.socket.emit("getFriendList", { username: userInfo.username });
@@ -313,6 +353,12 @@
 
 <div class="vflex window friends">
 	<h2>Friends</h2>
+	<button class="update" on:click={() => {
+		$client.socket.emit("getFriendList", { username: userInfo.username });
+		$client.socket.emit("getAskList");
+	}}>
+		<img src="update.png" alt="update">
+	</button>
 	<div class="flex search-bar">
 		<input class="bar" type="text" placeholder="Search for users" bind:value={searchUser}>
 			{#if searchUser.length}
@@ -336,50 +382,58 @@
 			</div>
 			{/if}
 	</div>
-	{#if friendRequests.size}
-	<div class="vflex requests">
-		{#each [...friendRequests.values()] as request}
-		<div class="flex line">
-			<img src={(request.img) ? request.img : request.img_url} alt="user" />
-			<div class="user" on:click={() => {
-
-			}}>
-			<p>{request.username}</p>
-			</div>
-			<div class="flex buttons">
-				<button on:click={() => {
-					$client.socket.emit("acceptFriend", { username: request.username });
-				}}>Accept</button>
-				<button on:click={() => {
-					$client.socket.emit("refuseFriend", { username: request.username });
-				}}>Refuse</button>
-			</div>
-		</div> 
-		{/each}
-	</div>
-	{/if}
-	{#if friends.size}
-	<div class="vflex friends-list">
-		{#each [...friends.values()] as friend}
-		<div class="flex line">
-			<div class="friend">{friend.username}</div>
-			<div class="flex tools">
-				<button on:click={() => {
-					destMsg = [friend.username];
-					writeMessageModal.open();
-				}}><img src="/icon-mail.png" alt="mail"></button>
-				<button on:click={() => {
-					//TODO confirmMessage
-					$client.socket.emit("removeFriend", { username: friend.username });
-				}}>-</button>
-			</div>
-		</div>
-		{/each}
+	{#if !loadedFriends || !loadedRequests}
+	<div class="vflex not-loaded">
+		<div class="loading"></div>
+		<p>Loading...</p>
 	</div>
 	{:else}
-	<div class="no-friend">
-		<p>You have no friends yet</p>
-	</div>
+		{#if friendRequests && friendRequests.size}
+		<div class="vflex requests">
+			{#each [...friendRequests.values()] as request}
+			<div class="flex line">
+				<img src={(request.img) ? request.img : request.img_url} alt="user" />
+				<div class="user" on:click={() => {
+					$client.socket.emit("getFriendList", { username: userInfo.username });
+					$client.socket.emit("getAskList");
+				}}>
+				<p>{request.username}</p>
+				</div>
+				<div class="flex buttons">
+					<button on:click={() => {
+						$client.socket.emit("acceptFriend", { username: request.username });
+					}}>Accept</button>
+					<button on:click={() => {
+						$client.socket.emit("refuseFriend", { username: request.username });
+					}}>Refuse</button>
+				</div>
+			</div> 
+			{/each}
+		</div>
+		{/if}
+		{#if friends && friends.size}
+		<div class="vflex friends-list">
+			{#each [...friends.values()] as friend}
+			<div class="flex line">
+				<div class="friend">{friend.username}</div>
+				<div class="flex tools">
+					<button on:click={() => {
+						destMsg = [friend.username];
+						writeMessageModal.open();
+					}}><img src="/icon-mail.png" alt="mail"></button>
+					<button on:click={() => {
+						//TODO confirmMessage
+						$client.socket.emit("removeFriend", { username: friend.username });
+					}}>-</button>
+				</div>
+			</div>
+			{/each}
+		</div>
+		{:else}
+		<div class="no-friend">
+			<p>You have no friends yet</p>
+		</div>
+		{/if}
 	{/if}
 	<CloseButton window={itself} />
 </div>
