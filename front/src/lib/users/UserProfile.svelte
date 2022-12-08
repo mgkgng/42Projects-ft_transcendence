@@ -121,7 +121,13 @@
 			console.log("error", data)
 		});
 		$client.socket.on("success_askFriend", (data: any) => {
-			console.log("success", data);
+			profileUser.is_asked = true;
+			profileUser = profileUser;
+		});
+
+		$client.socket.on("success_unAskFriend", (data: any) => {
+			profileUser.is_asked = false;
+			profileUser = profileUser;
 		});
 
 		$client.socket.on("resHistory", (data: any) => {
@@ -132,6 +138,7 @@
 			$client.socket.off("resHistory");
 			$client.socket.off("error_askFriend");
 			$client.socket.off("success_askFriend");
+			$client.socket.off("success_unAskFriend");
 		});
 	});
 </script>
@@ -156,16 +163,11 @@
 	<div class="flex tools">
 		{#if !profileUser.is_friend && !profileUser.is_asked}
 		<button on:click={() => {
-			console.log("testing");
-			$client.socket.emit("askFriend", {
-				username: profileUser.username
-			});
+			$client.socket.emit("askFriend", { username: profileUser.username });
 		}}>Add</button>
 		{:else if !profileUser.is_friend && profileUser.is_asked}
 		<button on:click={() => {
-			$client.socket.emit("unaskFriend", {
-				username: profileUser.username
-			});
+			$client.socket.emit("unAskFriend", { username: profileUser.username });
 		}}>Cancel</button>
 		{/if}	
 		<button>Block</button>

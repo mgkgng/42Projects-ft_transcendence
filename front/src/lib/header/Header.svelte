@@ -162,7 +162,7 @@
 		});
 
 		$client.socket.on("askFriendNotification", (data: any) => {
-			console.log("Notif", data);
+			newFriendRequest = true;
 		});
 
 		$client.socket.on("getDirectMessage", (data: any) => {

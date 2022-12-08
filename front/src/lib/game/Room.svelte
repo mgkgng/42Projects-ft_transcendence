@@ -299,4 +299,10 @@
 
 		moving = false;
 	}}
-/> -->
+
+	on:mousemove={(e) => {
+		console.log(e.movementY);
+		if (e.movementY)
+			$client.socket.emit("PaddleMouse", e.movementY);
+	}}
+/>

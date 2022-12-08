@@ -162,7 +162,6 @@ export class friendSystemService {
         if (isRequestedEntity == null)
             return ;
 		const ret = await this.userFriendRepository.remove(isRequestedEntity);
-		console.log("ret: ", ret);
         return ret;
     }
 
