@@ -70,7 +70,7 @@ export class MainServerService {
 	async getIdRoom (@MessageBody() name) //GET THE UNIQ ID OF A ROOM FIND WITH THE ROOM'S NAME 
 	{
 		const id_user : any = await this.dataSource.getRepository(ChatRoomEntity)
-		.createQueryBuilder().where("ChatRoomEntity.name = :u", { u: name.room_name}).getOneOrFail();
+		.createQueryBuilder().where("ChatRoomEntity.id_public_room = :u", { u: name.id_public_room}).getOneOrFail();
 		return (id_user.id_g);
 	}
 
@@ -80,9 +80,9 @@ export class MainServerService {
 		const names_rooms : any = await this.dataSource.getRepository(UserChatRoomEntity)
 		.createQueryBuilder("userRooms").innerJoinAndSelect("userRooms.room", "chatRoom")
 		.where("userRooms.id_user = :u", { u: id_user })
-		.andWhere("userRooms.is_visible = TRUE")
+		.andWhere("userRooms.is_visible = :p", { p: true })
 		.andWhere("(userRooms.ban_end < :d OR userRooms.ban_end is null)", { d: new Date() })
-		.select(["userRooms.id", "chatRoom.name", "userRooms.is_admin", "userRooms.is_owner", "chatRoom.is_password_protected", "chatRoom.is_private"]).getMany();
+		.select(["userRooms.id", "chatRoom.id_public_room" , "chatRoom.name", "userRooms.is_admin", "userRooms.is_owner", "chatRoom.is_password_protected", "chatRoom.is_private"]).getMany();
 		return (names_rooms);
 	}
 
