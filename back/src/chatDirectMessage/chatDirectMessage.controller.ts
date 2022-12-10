@@ -40,4 +40,10 @@ export class ChatDirectMessageController {
 
         return await this.chatDirectMessageRepository.find({relations: ['message_sender', 'message_recipient']})
     }
+
+    @Get('getMessageUserList?')
+    async handleGetMessageUserList(@Query() query: {username: string})
+    {
+        return this.chatDirectMessageService.handleGetMessageUserList(query.username);
+    }
 }

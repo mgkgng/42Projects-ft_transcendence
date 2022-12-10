@@ -55,4 +55,92 @@ export class ChatDirectMessageService {
 			date: message.date
 		}))
 	}
+
+	// Take string : username as parameter and return a list of the 
+	// user that u have message with in descending order of the last message send or received
+	async handleGetMessageUserList(username: string) {
+		const user = await this.userRepository.createQueryBuilder('u')
+			.where('u.username = :username', { username })
+			.getOne();
+
+		if (!user) {
+			return [];
+		}
+
+		const directMessages = await this.chatDirectMessageRepository.createQueryBuilder('dm')
+			.innerJoinAndSelect('dm.message_sender', 'message_sender')
+			.innerJoinAndSelect('dm.message_recipient', 'message_recipient')
+			.where('message_sender.username = :username OR message_recipient.username = :username', { username })
+			.getMany();
+
+		if (!directMessages || directMessages.length === 0) {
+			return [];
+		}
+
+		const uniqueUsers = new Set<UserEntity>();
+		directMessages
+			.filter(dm => dm.message_sender.username !== username || dm.message_recipient.username !== username)
+			.forEach(dm => {
+				const sender = dm.message_sender.username;
+				const recipient = dm.message_recipient.username;
+				if (sender !== username) {
+					uniqueUsers.add({ ...dm.message_sender });
+				}
+				if (recipient !== username) {
+					uniqueUsers.add(dm.message_recipient);
+				}
+			});
+
+		const messageDateMap = new Map<string, Date>();
+		directMessages
+			.filter(dm => dm.message_sender.username !== username || dm.message_recipient.username !== username)
+			.forEach(dm => {
+				const sender = dm.message_sender.username;
+				const recipient = dm.message_recipient.username;
+				if (sender !== username) {
+					if (messageDateMap.has(sender)) {
+						if (messageDateMap.get(sender) < dm.date) {
+							messageDateMap.set(sender, dm.date);
+						}
+					} else {
+						messageDateMap.set(sender, dm.date);
+					}
+				}
+				if (recipient !== username) {
+					if (messageDateMap.has(recipient)) {
+						if (messageDateMap.get(recipient) < dm.date) {
+							messageDateMap.set(recipient, dm.date);
+						}
+					} else {
+						messageDateMap.set(recipient, dm.date);
+					}
+				}
+			});
+
+		return Array.from(uniqueUsers)
+			.map(user => ({
+				username: user.username,
+				display_name: user.displayname,
+				campus_name: user.campus_name,
+				campus_country: user.campus_country,
+				img_url: user.img_url,
+				last_connection: user.last_connection,
+				created_at: user.created_at,
+				status: this.mainServerService.getUserStatus(user.username),
+				messageDate: directMessages.find(dm => dm.message_sender.username === user.username || dm.message_recipient.username === user.username).date
+			}))
+			.reduce((acc, user) => {
+				if (acc.find(u => u.username === user.username)) {
+					const existingUser = acc.find(u => u.username === user.username);
+					if (messageDateMap.get(existingUser.username) < messageDateMap.get(user.username)) {
+						acc = acc.filter(u => u.username !== user.username);
+						acc.push(user);
+					}
+				} else {
+					acc.push(user);
+				}
+				return acc;
+			}, [])
+			.sort((user1, user2) => messageDateMap.get(user2.username).getTime() - messageDateMap.get(user1.username).getTime());
+	}
 }

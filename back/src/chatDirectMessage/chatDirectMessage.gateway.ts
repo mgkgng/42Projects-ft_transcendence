@@ -89,4 +89,13 @@ export class ChatDirectMessageGateway {
 		else
 			this.server.to(client.id).emit('error_getDirectMessage', {error: 'An error occured'});
 	}
+
+	@SubscribeMessage('getMessageUserList')
+	async getMessageUserList(@MessageBody() data: any, @ConnectedSocket() client: any) {
+		let ret = await this.chatDirectMessageService.handleGetMessageUserList(this.mainServerService.getUserConnectedBySocketId(client.id).username);
+		if (ret)
+			this.server.to(client.id).emit('success_getMessageUserList', {messageUserList: ret});
+		else
+			this.server.to(client.id).emit('error_getMessageUserList', {error: 'An error occured'});
+	}
 }
