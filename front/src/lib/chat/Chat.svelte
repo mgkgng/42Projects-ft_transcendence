@@ -213,8 +213,9 @@
 		});
 
 		$client.socket.on("new_room_res", (data: any) => {
-			chat.rooms.set(data.room_name, new ChattRoom(data.room_name, data.is_password_protected, data.is_private, data.is_admin, true))
-			chat.my_rooms.push(data.room_name);
+			console.log("bonjour?", data);
+			chat.rooms.set(data.room_name, data.is_password_protected);
+			chat.my_rooms.set(data.room_name, new ChattRoom(data.room_name, data.is_password_protected, data.is_private, data.is_admin, true));
 			chat = chat;
 		});
 

@@ -62,7 +62,7 @@ export class ChatRoomService {
 			new_chat_room.name = name;
 			new_chat_room.date_creation = date_creation;
 			new_chat_room.is_password_protected = data.is_password_protected;
-			new_chat_room.password = data.password;
+			new_chat_room.password = data.room_password;
 			new_chat_room.is_private = data.is_private;
 			const res_chat_room : any = await this.dataSource.getRepository(ChatRoomEntity).save(new_chat_room);
 			const new_user_chat_room = new UserChatRoomEntity();
