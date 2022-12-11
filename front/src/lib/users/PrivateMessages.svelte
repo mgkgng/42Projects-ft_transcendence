@@ -37,8 +37,33 @@
 		}
 
 		.chat {
-			width: 70%;
+			width: 65%;
 			height: 100%;
+			gap: 0;
+			.read {
+				height: 70%;
+				
+				.line {
+					width: 100%;
+					position: relative;
+					.content {
+						width: max-content;
+						max-width: 20em;
+						padding: .3em .5em;
+						background-color: rgb(75, 75, 75);
+						border-radius: .4em;
+					}
+					.me {
+						// float: right;
+						position: absolute;
+						right: 0;
+						background-color: blue;
+					}
+					.date {
+						font-size: 12px;
+					}
+				}
+			}
 		}
 
 		.no-selected {
@@ -77,35 +102,34 @@
     import WriteMessage from "$lib/users/WriteMessage.svelte";
 	import Modal from "$lib/tools/Modal.svelte";
 	import { onMount } from "svelte";
-    import { client } from "../stores/client";
+    import { client } from "$lib/stores/client";
+    import { user } from "$lib/stores/user";
 
 	export let itself: any;
 
 	let writeMessageModal: any;
+	let exchanges: Map<string, any> = new Map<string, any>();
 	let allMessages: Map<string, any> = new Map<string, any>();
 
-	let users: Array<any> = [{
-		username: "min-kang",
-		img: "pingu/pingu-angry.jpeg",
-	}, {
-		username: "hmm",
-		img: "pingu/pingu-coucou.jpeg"
-	}];
-
 	let selected: string = "";
+
+	let userInfo: any;
+	user.subscribe((user: any) => { userInfo = user; });
 
 	onMount(() => {
 		$client.socket.on("success_getMessageUserList", (data: any) => {
 			console.log("list", data);
 			for (let user of data.messageUserList) {
+				exchanges.set(user.username, user);
+				exchanges = exchanges;
 				$client.socket.emit("getDirectMessage", { username: user.username});
 			}
 		});
 		
 		$client.socket.on("success_getDirectMessage", (data: any) => {
-			// let with = (data.messageHistory[0].recipient == usernamesomething) ? data.messageHistory[0].sender : data.messageHistory[0].recipient
-			// allMessages.set(user.username, undefined);
-
+			let from = (data.messageHistory[0].recipient == userInfo.username) ? data.messageHistory[0].sender : data.messageHistory[0].recipient
+			allMessages.set(from, data.messageHistory);
+			allMessages = allMessages;
 		});
 
 		$client.socket.emit("getMessageUserList");
@@ -122,18 +146,31 @@
 </Modal>
 
 <div class="flex window messages">
-	{#if users.length}
+	{#if exchanges.size}
 		<div class="from">
-			{#each users as user}
+			{#each [...exchanges.values()] as user}
 			<div class="flex line" on:click={() => { selected = user.username; }}>
-				<img src="{user.img}" alt="from">
+				<img src="{(user.img) ? user.img : user.img_url}" alt="from">
 				<p>{user.username}</p>
 			</div>
 			{/each}
 			<button class="add" on:click={() => { writeMessageModal.open(); }}>+</button>
 		</div>
 		{#if selected.length}
-		<div class="chat">
+		<div class="vflex chat">
+			<div class="vflex read">
+				{#each allMessages.get(selected) as message}
+				<div class="line">
+					<p class="content {(userInfo.username == message.sender) ? "me" : ""}">
+						{message.message}
+					</p>
+					<div class="date">{message.date.split("T")[1].split(".")[0]}</div>
+				</div>
+				{/each}
+			</div>
+			<div class="write">
+
+			</div>
 		</div>
 		{:else}
 		<div class="flex no-selected">

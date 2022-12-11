@@ -166,9 +166,7 @@
 		});
 
 		$client.socket.on("getDirectMessage", (data: any) => {
-			console.log("allo?", data);
 			newMessage = true;
-			console.log("testing", data);
 		});
 
 		return(() => {
