@@ -76,10 +76,13 @@
     import CloseButton from "$lib/items/CloseButton.svelte";
     import WriteMessage from "$lib/users/WriteMessage.svelte";
 	import Modal from "$lib/tools/Modal.svelte";
+	import { onMount } from "svelte";
+    import { client } from "../stores/client";
 
 	export let itself: any;
 
 	let writeMessageModal: any;
+	let allMessages: Map<string, any> = new Map<string, any>();
 
 	let users: Array<any> = [{
 		username: "min-kang",
@@ -90,6 +93,28 @@
 	}];
 
 	let selected: string = "";
+
+	onMount(() => {
+		$client.socket.on("success_getMessageUserList", (data: any) => {
+			console.log("list", data);
+			for (let user of data.messageUserList) {
+				$client.socket.emit("getDirectMessage", { username: user.username});
+			}
+		});
+		
+		$client.socket.on("success_getDirectMessage", (data: any) => {
+			// let with = (data.messageHistory[0].recipient == usernamesomething) ? data.messageHistory[0].sender : data.messageHistory[0].recipient
+			// allMessages.set(user.username, undefined);
+
+		});
+
+		$client.socket.emit("getMessageUserList");
+
+		return (() => {
+			$client.socket.off("success_getMessageUserList");
+			$client.socket.off("success_getDirectMessage");
+		});
+	});
 </script>
 
 <Modal bind:this={writeMessageModal}>

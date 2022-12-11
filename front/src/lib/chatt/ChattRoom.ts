@@ -3,6 +3,7 @@ import { ChatRoomUser } from "$lib/chatt/ChatRoomUser";
 
 
 export class ChattRoom {
+	roomID: string = "";
 	room_name : string = "";
 	is_password_protected : boolean = false;
 	is_private : boolean = false;
@@ -11,7 +12,8 @@ export class ChattRoom {
 	messages : Array<Message>;
 	users : Array<ChatRoomUser>;
 	
-	constructor(room_name : string, is_password_protected : boolean, is_private : boolean, is_admin : boolean, is_owner : boolean) {
+	constructor(roomID: string, room_name : string, is_password_protected : boolean, is_private : boolean, is_admin : boolean, is_owner : boolean) {
+		this.roomID = roomID;
 		this.room_name = room_name;
 		this.is_password_protected = is_password_protected;
 		this.is_private = is_private;

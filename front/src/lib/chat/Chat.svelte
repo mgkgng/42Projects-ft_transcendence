@@ -133,7 +133,7 @@
 	// export let userInfo;
 	import Modal from "$lib/tools/Modal.svelte";
     import { client } from "$lib/stores/client";
-	import { onMount, afterUpdate } from "svelte";
+	import { onMount } from "svelte";
     import AddRoom from "$lib/chat/AddRoom.svelte";
     import { Chatt } from "$lib/chatt/Chatt";
 	import { ChattRoom } from "$lib/chatt/ChattRoom";
@@ -175,37 +175,39 @@
 
 		$client.socket.on("set_room_private_res", (data: any) => {
 			console.log("check private");
-			chat.my_rooms.get(data.room_name).is_private = true;
+			chat.my_rooms.get(data.id_public_room).is_private = true;
 			chat = chat
 		});
 
 		$client.socket.on("unset_room_private_res", (data: any) => {
 			console.log("check public");
-			chat.my_rooms.get(data.room_name).is_private = false;
+			chat.my_rooms.get(data.id_public_room).is_private = false;
 			chat = chat;
 		});
 
 		$client.socket.on("set_password_room", (data: any) => {
 			console.log("check with");
-			chat.my_rooms.get(data.room_name).is_password_protected = true;
+			chat.my_rooms.get(data.id_public_room).is_password_protected = true;
 			chat = chat;
 		});
 
 		$client.socket.on("unset_password_room", (data: any) => {
 			console.log("check without");
-			chat.my_rooms.get(data.room_name).is_password_protected = false;
+			chat.my_rooms.get(data.id_public_room).is_password_protected = false;
 			chat = chat;
 		});
 
 		$client.socket.on("get_all_rooms_res", (data : any) => {
+			console.log(data);
 			for (let room of data)
-				chat.rooms.set(room.name, room.is_password_protected);
+				chat.rooms.set(room.id_public_room, room.is_password_protected);
 			chat = chat;
 		});
 
 		$client.socket.on("get_my_rooms_res", (data: any) => {
+			console.log(data);
 			for (let x of data) {
-				chat.my_rooms.set(x.room.name, new ChattRoom(x.room.name, x.room.is_password_protected, x.room.is_private, x.is_admin, x.is_owner));
+				chat.my_rooms.set(x.room.name, new ChattRoom(x.room.id_public_room, x.room.name, x.room.is_password_protected, x.room.is_private, x.is_admin, x.is_owner));
 				$client.socket.emit("get_message_room", { room_name: x.room.name });
 				$client.socket.emit("get_users_room", {room_name: x.room.name })
 			}
@@ -213,36 +215,36 @@
 		});
 
 		$client.socket.on("new_room_res", (data: any) => {
-			chat.rooms.set(data.room_name, data.is_password_protected);
-			chat.my_rooms.set(data.room_name, new ChattRoom(data.room_name, data.is_password_protected, data.is_private, data.is_admin, true));
+			chat.rooms.set(data.id_public_room, data.is_password_protected);
+			chat.my_rooms.set(data.id_public_room, new ChattRoom(data.id_public_room, data.room_name, data.is_password_protected, data.is_private, data.is_admin, true));
 			chat = chat;
 		});
 
 		$client.socket.on("append_user_to_room_res", (data: any) => {
 			console.log("res", data);
-			let roomInfo = chat.rooms.get(data.room_name);
-			chat.my_rooms.set(data.room_name, new ChattRoom(data.room_name, roomInfo.is_password_protected, false, false, false));
+			let roomInfo = chat.rooms.get(data.id_public_room);
+			chat.my_rooms.set(data.id_public_room, new ChattRoom(data.id_public_room, data.room_name, roomInfo.is_password_protected, false, false, false));
 			chat = chat;
 
 			console.log("appended result", chat);
 		});
 
 		$client.socket.on("get_message_room_res", (data: any) => {
-			let chatRoom = chat.my_rooms.get(data.room_name);
+			let chatRoom = chat.my_rooms.get(data.id_public_room);
 			for (let message of data.messages)
 				chatRoom.messages.push(new Message(message.id_chat_room.name, message.id_user.username, message.content_message, message.data_message))
 			chat = chat;
 		});
 
 		$client.socket.on("get_users_room_res", (data: any) => {
-			let chatRoom = chat.my_rooms.get(data.room_name);
+			let chatRoom = chat.my_rooms.get(data.id_public_room);
 			for (let user of data.users)
 				chatRoom.users.push(new ChatRoomUser(user.id_user.username, user.is_admin, user.is_owner, user.is_login));
 			chat = chat;
 		});
 
 		$client.socket.on("new_message_room_res", (data: any) => {
-			chat.my_rooms.get(data.room_name).messages.push(new Message(data.room_name, data.username, data.content_message, data.date_message));
+			chat.my_rooms.get(data.id_public_room).messages.push(new Message(data.room_name, data.username, data.content_message, data.date_message));
 			chat = chat;
 		});
 

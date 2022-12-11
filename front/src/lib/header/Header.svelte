@@ -203,7 +203,7 @@
 			<div class="notif img"></div>
 			{/if}
 		</div>
-		<p>Hello {userInfo.username}!</p>
+		<!-- <p>Hello {userInfo.username}!</p> -->
 		<div class="menu">
 			<button on:click={() => { userProfileModal.open(); }}>Profile</button>
 			<button on:click={() => {
