@@ -7,15 +7,17 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { GameEntity } from 'src/entity/Game.entity';
 import { MainServerModule } from 'src/mainServer/mainServer.module';
 import { UserModule } from 'src/user/user.module';
+import { friendSystemService } from 'src/friendSystem/friendSystem.service';
+import { UserEntity } from 'src/entity/User.entity';
 //import { JwtAuthGuard } from 'src/auth/auth.adaptater';
 //import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   controllers: [GameController],
-  providers: [GameGateway, JwtService, ],//{
+  providers: [GameGateway, JwtService, friendSystemService],//{
 			//provide: APP_GUARD,
 			//useClass: JwtAuthGuard,
 		//  }],
-	imports :	[TypeOrmModule.forFeature([GameEntity]), MainServerModule, UserModule]
+	imports :	[TypeOrmModule.forFeature([GameEntity, UserEntity]), MainServerModule, UserModule]
 })
 export class GameModule {}

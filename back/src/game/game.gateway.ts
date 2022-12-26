@@ -16,11 +16,14 @@ import { UserBlockEntity } from "src/entity/UserBlock.entity";
 import { MainServerService } from "src/mainServer/mainServer.service";
 import { JwtService } from '@nestjs/jwt';
 import { GameEntity } from "src/entity/Game.entity";
+import { Inject } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository, DataSource } from "typeorm";
 import { UserService } from "src/user/user.service";
 import { ErrorMessage, getRandomInt, MapSize, PaddleSize, RoomUpdate, UserState } from "./game.utils";
 import { UserEntity } from "src/entity/User.entity";
+import { friendSystemService } from "src/friendSystem/friendSystem.service";
+
 //TODO Too many connections for a client
 //TODO if the client websocket contains request, handshake..
 //TODO put username_42 inside of client and replace everything with it
@@ -37,6 +40,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	constructor(private mainServerService : MainServerService, private jwtService: JwtService, 
 				@InjectRepository(GameEntity) private gameRep: Repository<GameEntity>,
+				@InjectRepository(UserEntity) private userRep : Repository<UserEntity>,
+				@Inject(friendSystemService) private friendSystemService : friendSystemService,
 				private dataSource : DataSource,
 				private userService : UserService,
 				private jwtServer: JwtService
@@ -431,6 +436,71 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	// 		console.log("Data error ", client.id);
 	// 	}
 	// }
+
+
+
+	/** From here, it is about friend system and the notification */
+	@SubscribeMessage('askFriend')
+	async askFriend(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
+		const user = await this.userRep.findOne({where: {username: this.mainServerService.getUserConnectedBySocketId(client.id).username}});
+		const friend = await this.userRep.findOne({where: {username: data.username}});
+
+		if (!user || !friend)
+		{
+			this.server.to(client.id).emit('error_askFriend', {error: "User not found"});
+			return;
+		}
+		const userAskList = await this.friendSystemService.getAskList(user.username);
+		const userFriendList = await this.friendSystemService.getFriendList(user.username);
+		if (userAskList.find((user) => user.username == friend.username) || userFriendList.find((user) => user.username == friend.username))
+		{
+			this.server.to(client.id).emit('error_askFriend', {error: "User already asked as friend"});
+			return;
+		}
+		else
+		{
+			const userFriend = await this.friendSystemService.askFriend(user.username, friend.username);
+			const friendSocketId = this.mainServerService.getUserConnectedByUsername(friend.username);
+			if (friendSocketId)
+			{
+				let emitList = this.mainServerService.getUserConnectedListBySocketId(friendSocketId.id);
+				emitList.forEach((user) => {
+					this.server.to(user.id).emit('askFriendNotification', {friend: userFriend});
+				})
+			}
+			this.server.to(client.id).emit('success_askFriend', {friend: friend.username});
+			return;
+		}
+	}
+
+	@SubscribeMessage('unAskFriend')
+	async unAskFriend(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
+		const user = await this.userRep.findOne({where: {username: this.mainServerService.getUserConnectedBySocketId(client.id).username}});
+		const friend = await this.userRep.findOne({where: {username: data.username}});
+		if (!user || !friend)
+		{
+			this.server.to(client.id).emit('error_unAskFriend', {error: "User not found"});
+			return;
+		}
+		const userAskerList = await this.friendSystemService.getAskListWhereUserIsAsker(user.username);
+		const userFriendList = await this.friendSystemService.getFriendList(user.username);
+		if (userFriendList.find((user) => user.username == friend.username))
+		{
+			this.server.to(client.id).emit('error_unAskFriend', {error: "User already friend"});
+			return;
+		}
+		else if (!userAskerList || !userAskerList.find((user) => user.username == friend.username))
+		{
+			this.server.to(client.id).emit('error_unAskFriend', {error: "User not asked as friend or refused"});
+			return;
+		}
+		else
+		{
+			await this.friendSystemService.unAskFriend(user.username, friend.username);
+			this.server.to(client.id).emit('success_unAskFriend', {friend: friend.username});
+			return;
+		}
+	}
 
 	getRoom(id: string) { return (this.rooms.get(id)); }
 
