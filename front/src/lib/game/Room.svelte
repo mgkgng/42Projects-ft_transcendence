@@ -217,7 +217,6 @@
 			$client.removeListeners("RoomInfo", "PlayerUpdate", "PaddleUpdate",
 				"LoadBall", "PongStart", "PuckHit", "ScoreUpdate",
 				"ReadyUpdate", "GameFinished", "GameStartFail", "GameStart", "RoomFound");
-			$client.socket.emit("CheckOnGoing");
 		});
 	});
 
@@ -228,13 +227,13 @@
 	<div class="flex pong" style="width: {MapSize[gameInfo.mapSize][1] + 200}px; height: {MapSize[gameInfo.mapSize][0]}px;">
 		<div class="vflex side">
 			<Player player={(!switched) ? player2 : player1} left={true} hostname={hostname} ready={ready}/>	
-			<h1>{(!switched && player2) ? player2.score : (!switched && !player2) ? "0" : player1?.score}</h1>
+			<h1>{(!switched && player2) ? player2.score : ((!switched && !player2) || (switched && !player1)) ? "0" : player1?.score}</h1>
 		</div>
 		<Game bind:player1={player1} bind:player2={player2} bind:gameInfo={gameInfo} bind:switched={switched} bind:initPos={initPos}
 			userType={userType} roomID={roomID} puck={puck} />
 		<div class="vflex side right">
 			<Player player={(!switched) ? player1 : player2} left={false} hostname={hostname} ready={ready}/>
-			<h1>{(!switched) ? player1?.score : (player2) ? player2.score : "0"}</h1>
+			<h1>{(!switched && player1) ? player1?.score : (player2) ? player2.score : "0"}</h1>
 		</div>
 	</div>
 	<div class="button-container">

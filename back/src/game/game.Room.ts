@@ -119,8 +119,8 @@ export class Room {
 			this.destroyRoom();
 			return ;
 		} else if (this.hostname.length && client.username == this.hostname) { // If the user who just quitted was a host, change the host and make room available again
-
-			this.hostname = this.players.values()[0].username;
+			console.log(this.players);
+			this.hostname = this.players.get(this.players.keys().next().value).username;
 			this.isAvailable = true;
 		}
 		// Player index update
