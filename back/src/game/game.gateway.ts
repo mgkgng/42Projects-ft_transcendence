@@ -23,6 +23,7 @@ import { UserService } from "src/user/user.service";
 import { ErrorMessage, getRandomInt, MapSize, PaddleSize, RoomUpdate, UserState } from "./game.utils";
 import { UserEntity } from "src/entity/User.entity";
 import { friendSystemService } from "src/friendSystem/friendSystem.service";
+import { UserFriendEntity } from "src/entity/UserFriend.entity";
 
 //TODO Too many connections for a client
 //TODO if the client websocket contains request, handshake..
@@ -41,7 +42,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	constructor(private mainServerService : MainServerService, private jwtService: JwtService, 
 				@InjectRepository(GameEntity) private gameRep: Repository<GameEntity>,
 				@InjectRepository(UserEntity) private userRep : Repository<UserEntity>,
-				@Inject(friendSystemService) private friendSystemService : friendSystemService,
+				@InjectRepository(UserFriendEntity) private userFriendRepository : Repository<UserFriendEntity>,
+				@Inject(friendSystemService) private friendSystemService : friendSystemService,		
 				private dataSource : DataSource,
 				private userService : UserService,
 				private jwtServer: JwtService
@@ -437,67 +439,84 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	// 	}
 	// }
 
+	/** From here, it is about friend system, direct messages and the notification */
+
+	@SubscribeMessage('reqFriendAndMessage')
+	sendFriendAndMessage(@ConnectedSocket() client: Socket, @Request() req) {
+		let target = this.getClient(req);
+		let allMessages = [];
+		let allRequest = [];
+
+		//TODO message
+		client.emit("updateFriendAndMessage", {
+			messages: allMessages,
+			requests: Array.from(target.newRequests.keys())
+		})
+	}
+
+	@SubscribeMessage('requestsChecked')
+	requestChecked(@Request() req) {
+		let target = this.getClient(req);
+		target.newRequests.clear();
+	}
 
 
-	/** From here, it is about friend system and the notification */
-	@SubscribeMessage('askFriend')
+	@SubscribeMessage('askFriendG')
 	async askFriend(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
 		const user = await this.userRep.findOne({where: {username: this.mainServerService.getUserConnectedBySocketId(client.id).username}});
 		const friend = await this.userRep.findOne({where: {username: data.username}});
 
-		if (!user || !friend)
-		{
-			this.server.to(client.id).emit('error_askFriend', {error: "User not found"});
+		if (!user || !friend) {
+			this.server.to(client.id).emit('error_askFriendG', {error: "User not found"});
 			return;
 		}
+
 		const userAskList = await this.friendSystemService.getAskList(user.username);
 		const userFriendList = await this.friendSystemService.getFriendList(user.username);
 		if (userAskList.find((user) => user.username == friend.username) || userFriendList.find((user) => user.username == friend.username))
 		{
-			this.server.to(client.id).emit('error_askFriend', {error: "User already asked as friend"});
+			this.server.to(client.id).emit('error_askFriendG', {error: "User already asked as friend"});
 			return;
 		}
 		else
 		{
 			const userFriend = await this.friendSystemService.askFriend(user.username, friend.username);
-			const friendSocketId = this.mainServerService.getUserConnectedByUsername(friend.username);
-			if (friendSocketId)
-			{
-				let emitList = this.mainServerService.getUserConnectedListBySocketId(friendSocketId.id);
-				emitList.forEach((user) => {
-					this.server.to(user.id).emit('askFriendNotification', {friend: userFriend});
-				})
-			}
-			this.server.to(client.id).emit('success_askFriend', {friend: friend.username});
+			let target = this.clients.get(friend.username_42);
+			target.updateRequest(user.username_42, true);
+
+			this.server.to(client.id).emit('success_askFriendG', {friend: friend.username});
 			return;
 		}
 	}
 
-	@SubscribeMessage('unAskFriend')
+	@SubscribeMessage('unAskFriendG')
 	async unAskFriend(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
 		const user = await this.userRep.findOne({where: {username: this.mainServerService.getUserConnectedBySocketId(client.id).username}});
 		const friend = await this.userRep.findOne({where: {username: data.username}});
 		if (!user || !friend)
 		{
-			this.server.to(client.id).emit('error_unAskFriend', {error: "User not found"});
+			this.server.to(client.id).emit('error_unAskFriendG', {error: "User not found"});
 			return;
 		}
 		const userAskerList = await this.friendSystemService.getAskListWhereUserIsAsker(user.username);
 		const userFriendList = await this.friendSystemService.getFriendList(user.username);
 		if (userFriendList.find((user) => user.username == friend.username))
 		{
-			this.server.to(client.id).emit('error_unAskFriend', {error: "User already friend"});
+			this.server.to(client.id).emit('error_unAskFriendG', {error: "User already friend"});
 			return;
 		}
 		else if (!userAskerList || !userAskerList.find((user) => user.username == friend.username))
 		{
-			this.server.to(client.id).emit('error_unAskFriend', {error: "User not asked as friend or refused"});
+			this.server.to(client.id).emit('error_unAskFriendG', {error: "User not asked as friend or refused"});
 			return;
 		}
 		else
 		{
 			await this.friendSystemService.unAskFriend(user.username, friend.username);
-			this.server.to(client.id).emit('success_unAskFriend', {friend: friend.username});
+			let target = this.clients.get(friend.username_42);
+			target.updateRequest(user.username_42, false);
+
+			this.server.to(client.id).emit('success_unAskFriendG', {friend: friend.username});
 			return;
 		}
 	}

@@ -9,6 +9,7 @@ import { MainServerModule } from 'src/mainServer/mainServer.module';
 import { UserModule } from 'src/user/user.module';
 import { friendSystemService } from 'src/friendSystem/friendSystem.service';
 import { UserEntity } from 'src/entity/User.entity';
+import { UserFriendEntity } from 'src/entity/UserFriend.entity';
 //import { JwtAuthGuard } from 'src/auth/auth.adaptater';
 //import { APP_GUARD } from '@nestjs/core';
 
@@ -18,6 +19,6 @@ import { UserEntity } from 'src/entity/User.entity';
 			//provide: APP_GUARD,
 			//useClass: JwtAuthGuard,
 		//  }],
-	imports :	[TypeOrmModule.forFeature([GameEntity, UserEntity]), MainServerModule, UserModule]
+	imports :	[TypeOrmModule.forFeature([GameEntity, UserEntity, UserFriendEntity]), MainServerModule, UserModule]
 })
 export class GameModule {}

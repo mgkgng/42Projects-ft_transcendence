@@ -117,15 +117,15 @@
 	onMount(() => {
 		$client.socket.emit("getHistory", { username: profileUser.username });
 
-		$client.socket.on("error_askFriend", (data: any) => {
+		$client.socket.on("error_askFriendG", (data: any) => {
 			console.log("error", data)
 		});
-		$client.socket.on("success_askFriend", (data: any) => {
+		$client.socket.on("success_askFriendG", (data: any) => {
 			profileUser.is_asked = true;
 			profileUser = profileUser;
 		});
 
-		$client.socket.on("success_unAskFriend", (data: any) => {
+		$client.socket.on("success_unAskFriendG", (data: any) => {
 			profileUser.is_asked = false;
 			profileUser = profileUser;
 		});
@@ -136,9 +136,9 @@
 
 		return (() => {
 			$client.socket.off("resHistory");
-			$client.socket.off("error_askFriend");
-			$client.socket.off("success_askFriend");
-			$client.socket.off("success_unAskFriend");
+			$client.socket.off("error_askFriendG");
+			$client.socket.off("success_askFriendG");
+			$client.socket.off("success_unAskFriendG");
 		});
 	});
 </script>
@@ -163,11 +163,11 @@
 	<div class="flex tools">
 		{#if !profileUser.is_friend && !profileUser.is_asked}
 		<button on:click={() => {
-			$client.socket.emit("askFriend", { username: profileUser.username });
+			$client.socket.emit("askFriendG", { username: profileUser.username });
 		}}>Add</button>
 		{:else if !profileUser.is_friend && profileUser.is_asked}
 		<button on:click={() => {
-			$client.socket.emit("unAskFriend", { username: profileUser.username });
+			$client.socket.emit("unAskFriendG", { username: profileUser.username });
 		}}>Cancel</button>
 		{/if}	
 		<button>Block</button>

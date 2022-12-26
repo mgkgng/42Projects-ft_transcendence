@@ -8,6 +8,8 @@ export class Client {
 	sockets: Map<string, Socket>;
 	state: number;
 	room: string;
+	newMessages: Map<string, boolean>;
+	newRequests: Map<string, boolean>;
 
 	constructor(username: string, socket: Socket) {
 		this.id = socket.id;
@@ -15,6 +17,8 @@ export class Client {
 		this.sockets = new Map<string, Socket>();
 		this.sockets.set(socket.id, socket);
 		this.isAvailable();
+		this.newMessages = new Map<string, boolean>;
+		this.newRequests = new Map<string, boolean>;
 	}
 
 	isAvailable() {
@@ -30,6 +34,20 @@ export class Client {
 	isWatching(roomID: string) {
 		this.state = UserState.Watching;
 		this.room = roomID;
+	}
+
+	newMessageReceived() {
+
+	}
+
+	updateRequest(from: string, askFriend: boolean) {
+		if (askFriend) {
+			this.newRequests.set(from, true);
+			this.broadcast('askFriendGNotification', { friend: from });
+		} else {
+			this.newRequests.delete(from);
+			this.broadcast('unAskFriendGNotification', { friend: from });
+		}
 	}
 
 	broadcast(event: string, data: any) { GameGateway.broadcast(this.sockets.values(), event, data); }

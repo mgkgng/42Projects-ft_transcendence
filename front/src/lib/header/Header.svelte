@@ -147,7 +147,7 @@
 	let privateMessagesModal: any;
 
 	let newMessage: bool = false;
-	let newFriendRequest: bool = false;
+	let newFriendRequest: Map<string, boolean> = new Map<string, boolean>();
 
 	let userInfo: any;
 
@@ -157,21 +157,38 @@
 		if (!$client.socket)
 			return ;
 
+		$client.socket.on("updateFriendAndMessage", (data: any) => {
+			console.log("got update", data);
+
+			for (let req of data.requests)
+				newFriendRequest.set(req, true);
+			newFriendRequest = newFriendRequest;
+		});
+
 		$client.socket.on("newDirectMessage", (data: any) => {
 			console.log("message arrived", data); 
 		});
 
-		$client.socket.on("askFriendNotification", (data: any) => {
-			newFriendRequest = true;
+		$client.socket.on("askFriendGNotification", (data: any) => {
+			newFriendRequest.set(data.friend, true);
+			newFriendRequest = newFriendRequest;
+		});
+
+		$client.socket.on("unAskFriendGNotification", (data: any) => {
+			newFriendRequest.delete(data.friend);
+			newFriendRequest = newFriendRequest;
 		});
 
 		$client.socket.on("getDirectMessage", (data: any) => {
 			newMessage = true;
 		});
 
+		$client.socket.emit("reqFriendAndMessage");
+
 		return(() => {
+			$client.socket.off("updateFriendAndMessage");
 			$client.socket.off("newDirectMessage");
-			$client.socket.off("askFriendNotification");
+			$client.socket.off("askFriendGNotification");
 			$client.socket.off("getDirectMessage");
 		});
 	});
@@ -197,7 +214,7 @@
 		{:else}
 		<div class="summary">
 			<img src={(!userInfo.img) ? userInfo.img_url : userInfo.img} alt="profile" />
-			{#if newMessage || newFriendRequest}
+			{#if newMessage || newFriendRequest.size}
 			<div class="notif img"></div>
 			{/if}
 		</div>
@@ -206,10 +223,13 @@
 			<button on:click={() => { userProfileModal.open(); }}>Profile</button>
 			<button on:click={() => {
 				friendsModal.open();
-				if (newFriendRequest)
-					newFriendRequest = false;	
+				if (newFriendRequest.size) {
+					$client.socket.emit('requestsChecked');
+					newFriendRequest.clear();	
+					newFriendRequest = newFriendRequest;
+				}
 			}}>Friends
-				{#if newFriendRequest}<div class="notif"></div>{/if}
+				{#if newFriendRequest.size}<div class="notif"></div>{/if}
 			</button>
 			<button on:click={() => { settingsModal.open(); }}>Settings</button>
 			<button on:click={() => {
