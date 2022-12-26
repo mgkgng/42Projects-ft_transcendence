@@ -188,7 +188,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage("PaddleMoveMouse")
 	paddleMoveMouse(@MessageBody() data: any, @Request() req) {
 		// Check if the request came from a proper player
-		console.log("hello?", data);
+		// console.log("hello?", data);
 
 		let target = this.getClient(req);
 		let room = this.getRoom(data.roomID);

@@ -108,16 +108,16 @@ export class Room {
 			this.endGame(this.players.keys()[0]); //TODO check if it works well tomorrow
 			// TODO tomorrow player 
 			return ;
-		} else if (!this.players.size) { // If no more user left in the room, broadcast watchers and destroy the room
+		} 
+
+		// get rid of the user from the room
+		this.deleteClient(client);
+		if (!this.players.size) { // If no more user left in the room, broadcast watchers and destroy the room
 			this.broadcast("RoomAlert", ErrorMessage.RoomDestroyed);
 			this.destroyRoom();
 			return ;
-		}
+		} else if (this.hostname.length && client.username == this.hostname) { // If the user who just quitted was a host, change the host and make room available again
 
-		// get rid of the user from the room
-		this.deleteClient(client);	
-		// If the user who just quitted was a host, change the host and make room available again
-		if (this.hostname.length && client.username == this.hostname) {
 			this.hostname = this.players.values()[0].username;
 			this.isAvailable = true;
 		}

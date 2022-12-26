@@ -38,7 +38,6 @@
 
 		console.log(game);
 		console.log(gameSize);
-
 	});
 </script>
 
@@ -62,9 +61,8 @@
 </div>
 
 <svelte:window
-	on:mousemove={(event)=>{
+	on:mousemove={(event) => {
 		let pos = Math.floor(event.clientY - gameSize.y) - PaddleSize[gameInfo.paddleSize] / 2;
-		console.log(pos);
 		if (pos < 0)
 			pos = 0;
 		if (pos > gameSize.height - PaddleSize[gameInfo.paddleSize])
@@ -74,11 +72,9 @@
 			return ;
 		prevY = pos;
 
-		console.log("yo");
-
 		$client.socket.emit("PaddleMoveMouse", {
-			roomID: roomID,
-			pos: (!switched) ? pos : gameSize.height - pos
+			pos: (!switched) ? pos : gameSize.height - pos - PaddleSize[gameInfo.paddleSize],
+			roomID: roomID
 		});
 	}}
 />

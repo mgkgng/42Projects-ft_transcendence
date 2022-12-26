@@ -115,8 +115,8 @@
 	/* Room Info */
 	let gameInfo: any;
 	let hostname: string;
-	let player1: any;
-	let player2: any;
+	let player1: any = undefined;
+	let player2: any = undefined;
 
 	let switched: boolean = false;
 
@@ -216,7 +216,7 @@
 				clearInterval(puckMoving);
 			$client.removeListeners("RoomInfo", "PlayerUpdate", "PaddleUpdate",
 				"LoadBall", "PongStart", "PuckHit", "ScoreUpdate",
-				"ReadyUpdate", "GameFinished", "GameStartFail", "GameStart");
+				"ReadyUpdate", "GameFinished", "GameStartFail", "GameStart", "RoomFound");
 			$client.socket.emit("CheckOnGoing");
 		});
 	});
@@ -231,7 +231,7 @@
 			<h1>{(!switched && player2) ? player2.score : (!switched && !player2) ? "0" : player1?.score}</h1>
 		</div>
 		<Game bind:player1={player1} bind:player2={player2} bind:gameInfo={gameInfo} bind:switched={switched} bind:initPos={initPos}
-			userType={userType} roomID={roomID}/>
+			userType={userType} roomID={roomID} puck={puck} />
 		<div class="vflex side right">
 			<Player player={(!switched) ? player1 : player2} left={false} hostname={hostname} ready={ready}/>
 			<h1>{(!switched) ? player1?.score : (player2) ? player2.score : "0"}</h1>
