@@ -36,8 +36,9 @@ export class Client {
 		this.room = roomID;
 	}
 
-	newMessageReceived() {
-
+	newMessageReceived(from: string) {
+		this.newMessages.set(from, true);
+		this.broadcast('newMessageArrived', from);
 	}
 
 	updateRequest(from: string, askFriend: boolean) {

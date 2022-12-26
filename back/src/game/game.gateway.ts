@@ -24,6 +24,7 @@ import { ErrorMessage, getRandomInt, MapSize, PaddleSize, RoomUpdate, UserState 
 import { UserEntity } from "src/entity/User.entity";
 import { friendSystemService } from "src/friendSystem/friendSystem.service";
 import { UserFriendEntity } from "src/entity/UserFriend.entity";
+import { ChatDirectMessageService } from "src/chatDirectMessage/chatDirectMessage.service";
 
 //TODO Too many connections for a client
 //TODO if the client websocket contains request, handshake..
@@ -44,6 +45,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				@InjectRepository(UserEntity) private userRep : Repository<UserEntity>,
 				@InjectRepository(UserFriendEntity) private userFriendRepository : Repository<UserFriendEntity>,
 				@Inject(friendSystemService) private friendSystemService : friendSystemService,		
+				@Inject(ChatDirectMessageService) private chatDirectMessageService : ChatDirectMessageService,
 				private dataSource : DataSource,
 				private userService : UserService,
 				private jwtServer: JwtService
@@ -407,6 +409,30 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 	}
 
+	getRoom(id: string) { return (this.rooms.get(id)); }
+
+	getClient(request: any) {
+		const user: any = (this.jwtService.decode(request.handshake.headers.authorization.split(' ')[1]));
+		return this.clients.get(user.username_42);
+	}
+
+	getUserInfo(request: any) {
+		const user: any = (this.jwtService.decode(request.handshake.headers.authorization.split(' ')[1]));	
+		return user;
+	}
+
+	async getPlayerInfo(player: any) {
+		const userdata = await this.userService.findOne(player)
+		return ({
+			username: userdata.username,
+			username_42: userdata.username_42,
+			displayname: userdata.displayname,
+			img_url: userdata.img_url,
+			campus_name: userdata.campus_name,
+			campus_country: userdata.campus_country,
+		});
+	}
+
 	// @SubscribeMessage('CheckNewUsername')
 	// async checkNewUsername(@ConnectedSocket() client: Socket, @MessageBody() data, @Request() req)
 	// {
@@ -440,16 +466,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	// }
 
 	/** From here, it is about friend system, direct messages and the notification */
+	/* I need to do this here in order to finish the project as soon as possible */
 
 	@SubscribeMessage('reqFriendAndMessage')
 	sendFriendAndMessage(@ConnectedSocket() client: Socket, @Request() req) {
 		let target = this.getClient(req);
-		let allMessages = [];
-		let allRequest = [];
-
-		//TODO message
 		client.emit("updateFriendAndMessage", {
-			messages: allMessages,
+			messages: Array.from(target.newMessages.keys()),
 			requests: Array.from(target.newRequests.keys())
 		})
 	}
@@ -460,6 +483,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		target.newRequests.clear();
 	}
 
+	@SubscribeMessage('messagesChekced')
+	messagesChecked(@Request() req) {
+		let target = this.getClient(req);
+		target.newMessages.clear();
+	}
 
 	@SubscribeMessage('askFriendG')
 	async askFriend(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
@@ -521,27 +549,31 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 	}
 
-	getRoom(id: string) { return (this.rooms.get(id)); }
-
-	getClient(request: any) {
-		const user: any = (this.jwtService.decode(request.handshake.headers.authorization.split(' ')[1]));
-		return this.clients.get(user.username_42);
-	}
-
-	getUserInfo(request: any) {
-		const user: any = (this.jwtService.decode(request.handshake.headers.authorization.split(' ')[1]));	
-		return user;
-	}
-
-	async getPlayerInfo(player: any) {
-		const userdata = await this.userService.findOne(player)
-		return ({
-			username: userdata.username,
-			username_42: userdata.username_42,
-			displayname: userdata.displayname,
-			img_url: userdata.img_url,
-			campus_name: userdata.campus_name,
-			campus_country: userdata.campus_country,
+	@SubscribeMessage('sendDirectMessageG')
+	async sendMessage(@MessageBody() data: any, @ConnectedSocket() client: any) {
+		const user = await this.userRep.findOne({
+			where: {username: data.username},
+			relations: ['relation_userBlocked']
 		});
+		const userSender = await this.userRep.findOne({
+			where: {username: this.mainServerService.getUserConnectedBySocketId(client.id).username},
+			relations: ['relation_userBlocked']
+		});
+		if (!user || !userSender || userSender.relation_userBlocked.includes(data.username))
+		{
+			this.server.to(client.id).emit('error_sendDirectMessageG', {error: 'User not found or blocked'});
+			return;
+		}
+
+		if (!user.relation_userBlocked.includes(client.username)) {
+			let target = this.clients.get(data.username); //TODO should be able to get username_42 by username
+			target.newMessageReceived(userSender.username);
+		}
+
+		let ret = await this.chatDirectMessageService.handleSendDirectMessage(this.mainServerService.getUserConnectedBySocketId(client.id).username, data.username, data.message);
+		if (ret)
+			this.server.to(client.id).emit('success_sendDirectMessageG', {message: data.message});
+		else
+			this.server.to(client.id).emit('error_sendDirectMessageG', {error: 'An error occured'});
 	}
 }

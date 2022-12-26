@@ -146,7 +146,7 @@
 	let settingsModal: any;
 	let privateMessagesModal: any;
 
-	let newMessage: bool = false;
+	let newMessage: Map<string, boolean> = new Map<string, boolean>();
 	let newFriendRequest: Map<string, boolean> = new Map<string, boolean>();
 
 	let userInfo: any;
@@ -165,8 +165,10 @@
 			newFriendRequest = newFriendRequest;
 		});
 
-		$client.socket.on("newDirectMessage", (data: any) => {
+		$client.socket.on("newMessageArrived", (data: any) => {
 			console.log("message arrived", data); 
+			newMessage.set(data, true);
+			newMessage = newMessage;
 		});
 
 		$client.socket.on("askFriendGNotification", (data: any) => {
@@ -179,17 +181,12 @@
 			newFriendRequest = newFriendRequest;
 		});
 
-		$client.socket.on("getDirectMessage", (data: any) => {
-			newMessage = true;
-		});
-
 		$client.socket.emit("reqFriendAndMessage");
 
 		return(() => {
 			$client.socket.off("updateFriendAndMessage");
-			$client.socket.off("newDirectMessage");
+			$client.socket.off("newMessageArrived");
 			$client.socket.off("askFriendGNotification");
-			$client.socket.off("getDirectMessage");
 		});
 	});
 </script>
@@ -214,7 +211,7 @@
 		{:else}
 		<div class="summary">
 			<img src={(!userInfo.img) ? userInfo.img_url : userInfo.img} alt="profile" />
-			{#if newMessage || newFriendRequest.size}
+			{#if newMessage.size || newFriendRequest.size}
 			<div class="notif img"></div>
 			{/if}
 		</div>
@@ -234,10 +231,13 @@
 			<button on:click={() => { settingsModal.open(); }}>Settings</button>
 			<button on:click={() => {
 				privateMessagesModal.open();
-				if (newMessage)
-					newMessage = false;
+				if (newMessage.size) {
+					$client.socket.emit('messagesChecked');
+					newMessage.clear();	
+					newMessage = newMessage;
+				}
 			}}>Messages
-				{#if newMessage}<div class="notif"></div>{/if}
+				{#if newMessage.size}<div class="notif"></div>{/if}
 			</button>
 			<button on:click={() => {
 				localStorage.removeItem("transcendence-jwt");

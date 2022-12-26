@@ -12,13 +12,15 @@ import { UserEntity } from 'src/entity/User.entity';
 import { UserFriendEntity } from 'src/entity/UserFriend.entity';
 //import { JwtAuthGuard } from 'src/auth/auth.adaptater';
 //import { APP_GUARD } from '@nestjs/core';
+import { ChatDirectMessageService } from 'src/chatDirectMessage/chatDirectMessage.service';
+import { ChatDirectMessageEntity } from 'src/entity/ChatDirectMessage.entity';
 
 @Module({
   controllers: [GameController],
-  providers: [GameGateway, JwtService, friendSystemService],//{
+  providers: [GameGateway, JwtService, friendSystemService, ChatDirectMessageService],//{
 			//provide: APP_GUARD,
 			//useClass: JwtAuthGuard,
 		//  }],
-	imports :	[TypeOrmModule.forFeature([GameEntity, UserEntity, UserFriendEntity]), MainServerModule, UserModule]
+	imports :	[TypeOrmModule.forFeature([GameEntity, UserEntity, UserFriendEntity, ChatDirectMessageEntity]), MainServerModule, UserModule]
 })
 export class GameModule {}
