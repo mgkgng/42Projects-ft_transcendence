@@ -76,8 +76,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage("CheckOnGoing")
 	checkOnGoing(@ConnectedSocket() client: Socket, @Request() req) {
 		let target = this.getClient(req);
-		if (target.state == UserState.Playing)
-				client.emit("OnGoingRes", target.room);
+		client.emit("OnGoingRes", target.room);
 	}
 
 	@SubscribeMessage("JoinQueue")

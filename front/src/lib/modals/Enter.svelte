@@ -28,17 +28,23 @@
 </style>
 
 <script lang="ts">
+    import { client } from "$lib/stores/client";
+
 	export let itself: any;
 	export let enterGameModal: any;
 	export let chatModal: any;
 	export let rankModal: any;
+
+	let loading: boolean = false;
 	
 </script>
 
 <div class="flex buttons">
-	<button class="play" on:click={()=>{
-		enterGameModal.open();
-		itself.close();
+	<button class="play {(loading) ? "loading" : ""}" on:click={()=>{
+		if (loading)
+			return ;
+		$client.socket.emit("CheckOnGoing")
+		loading = true;
 	}}>Play</button>
 	<button class="rank" on:click={()=>{
 		rankModal.open();

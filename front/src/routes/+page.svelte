@@ -71,6 +71,17 @@
 			roomModal.open();
 		});
 
+		$client.socket.on("OnGoingRes", (data: any) => {
+			if (data === "") {
+				enterModal.close();
+				enterGameModal.open();
+			} else {
+				enterModal.close();
+				roomID = data;
+				roomModal.open();
+			}
+		});
+
 		return (() => {
 			$client.socket.off("CreateRoomRes");
 			$client.socket.off("JoinRoomRes");
