@@ -48,8 +48,9 @@
 		});
 
 		$client.socket.on("JoinRoomRes", (data: any) => {
-			roomID = data;
+			console.log(data);
 			joinGameModal.close();
+			roomID = data.roomID;
 			roomModal.open();
 		});
 
