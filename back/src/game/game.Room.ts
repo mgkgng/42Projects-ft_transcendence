@@ -22,6 +22,7 @@ export class Room {
 	isAvailable: boolean;
 	isReady: boolean;
 	isStarted: boolean;
+	isOver: boolean;
 
 	/* Game */
 	puck: Puck;
@@ -50,6 +51,7 @@ export class Room {
 		this.isReady = false;
 		this.isStarted = !(hostname.length > 0);
 		this.isPrivate = gameInfo.privateMode;
+		this.isOver = false;
 
 		/* Game */
 		this.puck = undefined;
@@ -156,6 +158,7 @@ export class Room {
 	startPong() { setTimeout(Room.startPong, 1000, this); }
 
 	endGame(winner: any) {
+		this.isOver = true;
 		this.broadcast("GameFinished", winner);
 		this.storeGame();
 

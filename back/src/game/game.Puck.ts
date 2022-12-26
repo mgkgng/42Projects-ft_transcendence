@@ -16,6 +16,8 @@ export class Puck {
 	} 
 
 	setCheckPuck(room: any) {
+		if (room.isOver)
+			return ;
 		let distToDeath = (this.vec[1] > 0)
 			? (this.mapSize[1] - PongConfig.DeadZoneHeight - PongConfig.PaddleHeight) - this.pos[1]
 			: this.pos[1] - PongConfig.DeadZoneHeight - PongConfig.PaddleHeight;
@@ -26,7 +28,7 @@ export class Puck {
 
 		setTimeout(() => {
 			let player = room.players.get(room.playerIndex[(this.vec[1] > 0) ? 1 : 0]);
-			if (!player)
+			if (!player || room.isOver)
 				return ;
 			let paddlePos = player.paddle.pos;
 			if (deathPointX > paddlePos && deathPointX < paddlePos + PaddleSize[room.gameInfo.paddleSize]) {
@@ -41,7 +43,7 @@ export class Puck {
 			} else {
 				// if not, update the score, if the score reached the max point, finish the match
 				let winner = (this.vec[1] > 0) ? room.players.get(room.playerIndex[0]) : room.players.get(room.playerIndex[1]);
-				if (!winner)
+				if (!winner || room.isOver)
 					return ;
 				room.broadcast("ScoreUpdate", winner?.info.username);
 				winner.score++;
