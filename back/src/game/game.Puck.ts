@@ -31,6 +31,7 @@ export class Puck {
 			if (!player || room.isOver)
 				return ;
 			let paddlePos = player.paddle.pos;
+			console.log(paddlePos, deathPointX);
 			if (deathPointX > paddlePos && deathPointX < paddlePos + PaddleSize[room.gameInfo.paddleSize]) {
 				// if paddle hits the puck
 				room.broadcast("PuckHit");

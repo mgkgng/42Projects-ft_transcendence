@@ -45,7 +45,7 @@
 			return ;
 		$client.socket.emit("CheckOnGoing")
 		loading = true;
-	}}>Play</button>
+	}}>{(!loading) ? "Play" : ""}</button>
 	<button class="rank" on:click={()=>{
 		rankModal.open();
 		itself.close();

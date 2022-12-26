@@ -187,7 +187,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage("PaddleMoveMouse")
 	paddleMoveMouse(@MessageBody() data: any, @Request() req) {
 		// Check if the request came from a proper player
-		// console.log("hello?", data);
 
 		let target = this.getClient(req);
 		let room = this.getRoom(data.roomID);
@@ -196,7 +195,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 		// Get the player
 		let player = room.players.get(target.username);
-
 		player.paddle.pos = data.pos;
 		room.broadcast("PaddleUpdate", {
 			type: player.index,
@@ -291,9 +289,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			target.isWatching(room.id);
 			room.addClient(target);
 		}
-
-		// tell either the player or the watcher that they can join the room
-		target.broadcast("JoinRoomRes", data.roomID);
 	}
 
 	@SubscribeMessage("ExitRoom")
@@ -313,6 +308,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage("isReady")
 	setReady(@MessageBody() data: any, @Request() req) {
+
+		console.log(data);
 		// Check if the client is a guest player in the room
 		let target = this.getClient(req);
 		let room = this.getRoom(data.roomID);

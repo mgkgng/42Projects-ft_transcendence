@@ -88,6 +88,7 @@
     import { user } from '$lib/stores/user';
     import Player from '$lib/game/Player.svelte';
 	import Game from '$lib/game/Game.svelte';
+	import AlertMessage from '$lib/modals/AlertMessage.svelte';
 	//TODO room title front
 	//TODO room watch number front-back
 
@@ -105,6 +106,8 @@
 	let puckMoving: any;
 	
 	let gameFinishedModal: any;
+	let alertMessageModal: any;
+	let alertMessage: string;
 
 	let ready: boolean = false;
 	let tryStart: boolean = false;
@@ -122,9 +125,11 @@
 
 	let userInfo: any;
 	user.subscribe((user: any) => { userInfo = user; });
+
+	$: console.log("this is the roomID", roomID);
 	
 	onMount(()=> {
-		if (!roomID.length)
+		if (!roomID)
 			return ;
 		
 		$client.socket.on("RoomFound", (data: any) => {
@@ -195,9 +200,7 @@
 		$client.socket.on("ReadyUpdate", (data: any) => { ready = data; });
 
 		$client.socket.on("GameFinished", (data: any) => {
-			console.log("???", data);
-			if (puckMoving)
-				clearInterval(puckMoving);
+			clearInterval(puckMoving);
 			puck = undefined;
 			winner = data;
 			gameFinishedModal.open();
@@ -214,9 +217,17 @@
 		return (() => {
 			if (puckMoving)
 				clearInterval(puckMoving);
-			$client.removeListeners("RoomInfo", "PlayerUpdate", "PaddleUpdate",
-				"LoadBall", "PongStart", "PuckHit", "ScoreUpdate",
-				"ReadyUpdate", "GameFinished", "GameStartFail", "GameStart", "RoomFound");
+			$client.socket.off("RoomFound");
+			$client.socket.off("PlayerUpdate");
+			$client.socket.off("PaddleUpdate");
+			$client.socket.off("LoadBall");
+			$client.socket.off("PongStart");
+			$client.socket.off("PuckHit");
+			$client.socket.off("ScoreUpdate");
+			$client.socket.off("ReadyUpdate");
+			$client.socket.off("GameFinished");
+			$client.socket.off("GameStartFail");
+			$client.socket.off("GameStart");
 		});
 	});
 
@@ -242,7 +253,8 @@
 			{#if userInfo.username == hostname}
 			<button class="start" on:click={()=>{
 				if (!ready) {
-					// TODO message appear
+					alertMessage = "The guest is not ready yet";
+					alertMessageModal.open();
 					return ;
 				}
 				tryStart = true;
@@ -272,4 +284,8 @@
 
 <Modal bind:this={quitConfirmMsgModal} closeOnBgClick={false}>
 	<ConfirmMsg msg={"Are you sure you want to quit?"} toQuit={itself} roomID={roomID} itself={quitConfirmMsgModal}/>
+</Modal>
+
+<Modal bind:this={alertMessageModal}>
+	<AlertMessage msg={alertMessage} itself={alertMessageModal} />
 </Modal>

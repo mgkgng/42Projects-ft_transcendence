@@ -35,9 +35,6 @@
 	onMount(() => {
 		game = document.getElementById("game");
 		gameSize = game?.getBoundingClientRect();
-
-		console.log(game);
-		console.log(gameSize);
 	});
 </script>
 
@@ -71,7 +68,6 @@
 		if (pos == prevY)
 			return ;
 		prevY = pos;
-
 		$client.socket.emit("PaddleMoveMouse", {
 			pos: (!switched) ? pos : gameSize.height - pos - PaddleSize[gameInfo.paddleSize],
 			roomID: roomID
