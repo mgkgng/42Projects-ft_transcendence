@@ -50,18 +50,18 @@
 				body: JSON.stringify({username: "oui", password: url.get('code')}),
 			});
 			let tok = await res.json();
-			while (tok.get_code != null)
-			{
-				let ufa_code : any = prompt("Your code is : ");
-				const res_ufa : any = await fetch("http://localhost:3000/",{
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json'
-					},
-					body:JSON.stringify({username: ufa_code, password: tok.tmp_jwt}),
-				});
-				tok = await res_ufa.json();
-			}
+			// while (tok.get_code != null)
+			// {
+			// 	let ufa_code : any = prompt("Your code is : ");
+			// 	const res_ufa : any = await fetch("http://localhost:3000/",{
+			// 		method: 'POST',
+			// 		headers: {
+			// 			'Content-Type': 'application/json'
+			// 		},
+			// 		body:JSON.stringify({username: ufa_code, password: tok.tmp_jwt}),
+			// 	});
+			// 	tok = await res_ufa.json();
+			// }
 			$client.socket = io("http://localhost:3001",{
 				extraHeaders: {
 					Authorization: "Bearer " + tok.access_token,

@@ -139,10 +139,8 @@
 		angle: number;
 	};
 
-	export let roomModal: any;
 	export let enterModal: any;
 	export let title: string;
-	export let roomID: string;
 	export let main: boolean;
 
 	let circlesAround: Array<Circle> = [];

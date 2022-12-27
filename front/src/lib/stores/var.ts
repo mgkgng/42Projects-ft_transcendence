@@ -17,7 +17,7 @@ export const MapSize = [
 	[400, 700]
 ]
 
-export const PuckSpeed = [3, 8, 13]
+export const PuckSpeed = [2, 4, 6]
 
 export const RoomUpdate = {
 	NewRoom: 0,

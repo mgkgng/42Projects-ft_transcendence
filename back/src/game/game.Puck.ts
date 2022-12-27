@@ -9,7 +9,7 @@ export class Puck {
 
 	constructor(mapSize : Array<number>, puckSpeed: number) { // temporary test
 		this.puckSpeed = puckSpeed;
-		this.vec = [(Math.floor(Math.random() * 3) + 1) * ((Math.floor(Math.random() * 2)) ? 2 : -2),
+		this.vec = [(Math.floor(Math.random() * 4) + 1) * ((Math.floor(Math.random() * 2)) ? 1 : -1),
 			puckSpeed * ((Math.floor(Math.random() * 2)) ? 1 : -1)];
 		this.mapSize = mapSize;
 		this.pos = [mapSize[0] / 2, mapSize[1] / 2];
@@ -18,9 +18,7 @@ export class Puck {
 	setCheckPuck(room: any) {
 		if (room.isOver)
 			return ;
-		let distToDeath = (this.vec[1] > 0)
-			? (this.mapSize[1] - PongConfig.DeadZoneHeight - PongConfig.PaddleHeight) - this.pos[1]
-			: this.pos[1] - PongConfig.DeadZoneHeight - PongConfig.PaddleHeight;
+		let distToDeath = (this.mapSize[1] / 2 - PongConfig.PaddleHeight - PongConfig.DeadZoneHeight) * 2;
 		let frameNb = Math.floor(Math.abs((distToDeath / this.vec[1])));
 
 		let timeOut = frameNb * PongConfig.FrameDuration;
