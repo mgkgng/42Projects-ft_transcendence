@@ -3,6 +3,7 @@
         width: 400px;
         height: 500px;
         padding: .2em;
+        gap: .2em;
 
         justify-content: center;
         align-items: center;
@@ -23,6 +24,8 @@
         .verify {
             width: 100%;
             gap: .2em;
+            margin-top: 1.5em;
+            margin-bottom: .2em;
             justify-content: center;
 
             input {
@@ -44,6 +47,9 @@
                 }
             }
         }
+        p {
+            color: $red;
+        }
     }
 </style>
 
@@ -51,14 +57,23 @@
     import { client } from "$lib/stores/client";
     import { onMount } from "svelte";
     
+    export let itself: any;
     export let qrCodeUrl : any;
 
     let verifKey: string = "";
     let verifLoading: boolean = false;
+    let msg = "";
 
     onMount(() => {
         $client.socket.on('verify2FAKeyRes', (data: any) => {
-
+            console.log(data);
+            verifLoading = false;
+            if (data.res === false) {
+                verifKey = "";
+                msg = "Wrong verification code";
+            } else {
+                itself.close();
+            }
         });
     });
 </script>
@@ -71,7 +86,9 @@
     <div class="flex verify">
         <input type="text-input" placeholder="Code for validation" bind:value={verifKey}>
         <button class="{verifLoading ? "loading" : ""}" on:click={() => {
+            verifLoading = true;
             $client.socket.emit('verify2FAKey', verifKey);
         }}>{(!verifLoading) ? "Verify" : ""}</button>
     </div>
+    <p>{msg}</p>
 </div>

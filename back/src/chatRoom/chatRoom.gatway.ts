@@ -10,6 +10,8 @@ import { MainServerService } from "src/mainServer/mainServer.service";
 import { UseGuards, Request, HttpException } from '@nestjs/common';
 import { AuthGuard } from "@nestjs/passport";
 import { toDataURL } from "qrcode";
+import { authenticator } from "otplib";
+
 // import * as bcrypt from 'bcrypt';
 
 @WebSocketGateway({
@@ -669,4 +671,23 @@ export class ChatRoomService {
 			client.emit("error_disable_double_auth", {});
 		}
 	}
+
+	@SubscribeMessage('verify2FAKey')
+	async verify2FAKey(@MessageBody() data: any, @ConnectedSocket() client: Socket, @Request() req) {
+	  try {
+		// Get the user's secret key from the database
+		const id_user = await this.mainServer.getIdUser(req);
+		const res = await this.dataSource.getRepository(UserEntity).createQueryBuilder("user")
+			.where("id_g = :id", {id : id_user})
+			.select(["user.secret_2fa"]).getOne();
+
+		const valid = authenticator.verify({ secret: res.secret_2fa, token: data });
+		client.emit('verify2FAKeyRes', { res: valid });
+
+	  } catch (e) {
+		client.emit('error_verify2FAKey', {});
+	  }
+	}
+	
+
 }

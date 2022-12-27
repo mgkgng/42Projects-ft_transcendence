@@ -200,7 +200,7 @@
 </Modal>
 
 <Modal bind:this={qrCodeModal} closeOnBgClick={false}>
-	<QRCodeModal qrCodeUrl={qrCodeUrl} />
+	<QRCodeModal itself={qrCodeModal} qrCodeUrl={qrCodeUrl} />
 </Modal>
 
 <div class="vflex window settings">
