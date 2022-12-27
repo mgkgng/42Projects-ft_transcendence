@@ -421,6 +421,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		return user;
 	}
 
+	async getUsername42ByUsername(username: string): Promise<string>  {
+		const user = await this.userRep.findOne({ where: { username } });
+		return user?.username_42;
+		
+	}
+
 	async getPlayerInfo(player: any) {
 		const userdata = await this.userService.findOne(player)
 		return ({
@@ -566,7 +572,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 
 		if (!user.relation_userBlocked.includes(client.username)) {
-			let target = this.clients.get(data.username); //TODO should be able to get username_42 by username
+			let username42 = await this.getUsername42ByUsername(data.username);
+			let target = this.clients.get(username42);
 			target.newMessageReceived(userSender.username);
 		}
 
