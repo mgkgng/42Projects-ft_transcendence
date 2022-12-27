@@ -79,7 +79,7 @@
 		});
 
 		return (() => {
-			$client.removeListeners("CheckNewUsernameRes");
+			$client.socket.off("CheckNewUsernameRes");
 		});
 	});
 </script>

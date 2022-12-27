@@ -105,6 +105,7 @@
     import Modal from "$lib/tools/Modal.svelte";
     import ChangeUsername from "$lib/settings/ChangeUsername.svelte";
     import ConfirmLeave from "$lib/modals/ConfirmLeave.svelte";
+	import QRCodeModal from "$lib/settings/QRCodeModal.svelte";
 
 	//TODO limit the image size
 	
@@ -120,6 +121,8 @@
 
 	let changeUsernameModal: any;
 	let confirmLeaveModal: any;
+	let qrCodeModal: any;
+	let qrCodeUrl: any;
 
 	/* Image */
 	let fileInput: any;
@@ -160,12 +163,15 @@
 			original[1] = data.new_username;
 		});
 
-		$client.socket.on("active_double_auth_res", () => {
-			user.update((u: any) => {
-				u.is_2fa = true;
-				return (u);
-			});
-			original[2] = true;
+		$client.socket.on("active_double_auth_res", (data: any) => {
+			console.log(data);
+			qrCodeUrl = data;
+			qrCodeModal.open();
+			// user.update((u: any) => {
+			// 	u.is_2fa = true;
+			// 	return (u);
+			// });
+			// original[2] = true;
 		});
 
 		$client.socket.on("disable_double_auth_res", () => {
@@ -191,6 +197,10 @@
 
 <Modal bind:this={confirmLeaveModal} closeOnBgClick={false}>
 	<ConfirmLeave itself={confirmLeaveModal} settingModal={itself} />
+</Modal>
+
+<Modal bind:this={qrCodeModal} closeOnBgClick={false}>
+	<QRCodeModal qrCodeUrl={qrCodeUrl} />
 </Modal>
 
 <div class="vflex window settings">
@@ -226,7 +236,7 @@
 			if (original[1] != username)
 				$client.socket.emit("change_username", { new_username: username });
 			if (original[2] != doubleAuth)
-				$client.socket.emit((doubleAuth) ? "active_double_auth" : "disable_double_auth")
+				$client.socket.emit((doubleAuth) ? "active_double_auth" : "disable_double_auth");
 		}}>Save Changes</button>
 	</div>
 </div>
