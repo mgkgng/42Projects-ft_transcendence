@@ -66,15 +66,19 @@
 
     onMount(() => {
         $client.socket.on('verify2FAKeyRes', (data: any) => {
-            console.log(data);
-            verifLoading = false;
             if (data.res === false) {
+                verifLoading = false;
                 verifKey = "";
                 msg = "Wrong verification code";
             } else {
+                $client.socket.emit("active_double_auth");
                 itself.close();
             }
         });
+
+        $client.socket.on("active_double_auth_res", () => {
+            itself.close();
+        })
     });
 </script>
 
@@ -86,6 +90,8 @@
     <div class="flex verify">
         <input type="text-input" placeholder="Code for validation" bind:value={verifKey}>
         <button class="{verifLoading ? "loading" : ""}" on:click={() => {
+            if (verifLoading)
+                return ;
             verifLoading = true;
             $client.socket.emit('verify2FAKey', verifKey);
         }}>{(!verifLoading) ? "Verify" : ""}</button>

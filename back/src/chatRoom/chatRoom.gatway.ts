@@ -640,6 +640,23 @@ export class ChatRoomService {
 			console.log("Data error ", client.id);
 		}
 	}
+
+	@SubscribeMessage('try_active_double_auth')
+	async tryActiveDoubleAuth(@MessageBody() data, @ConnectedSocket() client: Socket, @Request() req)
+	{
+		try {
+			const id_user = await this.mainServer.getIdUser(req);
+			const res = await this.dataSource.getRepository(UserEntity).createQueryBuilder("user")
+			.where("id_g = :id", {id : id_user})
+			.select(["user.otpauthUrl_2fa"]).getOne();
+
+			let url = await toDataURL(res.otpauthUrl_2fa);
+			client.emit("try_active_double_auth_res", url);
+		} catch(e) {
+			client.emit("try_error_active_double_auth", {});
+		}
+	}
+
 	@SubscribeMessage('active_double_auth')
 	async activeDoubleAuth(@MessageBody() data, @ConnectedSocket() client: Socket, @Request() req)
 	{
@@ -649,11 +666,7 @@ export class ChatRoomService {
 			.where("id_g = :u", {u: id_user})
 			.set({is_2fa: true}).execute();
 
-			const res = await this.dataSource.getRepository(UserEntity).createQueryBuilder("user")
-			.where("id_g = :id", {id : id_user})
-			.select(["user.otpauthUrl_2fa"]).getOne();
-			let url = await toDataURL(res.otpauthUrl_2fa);
-			client.emit("active_double_auth_res", url);
+			client.emit("active_double_auth_res");
 		}catch(e) {
 			client.emit("error_active_double_auth", {});
 		}

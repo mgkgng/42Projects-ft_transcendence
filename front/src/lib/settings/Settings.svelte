@@ -163,15 +163,18 @@
 			original[1] = data.new_username;
 		});
 
-		$client.socket.on("active_double_auth_res", (data: any) => {
+		$client.socket.on("try_active_double_auth_res", (data: any) => {
 			console.log(data);
 			qrCodeUrl = data;
 			qrCodeModal.open();
-			// user.update((u: any) => {
-			// 	u.is_2fa = true;
-			// 	return (u);
-			// });
-			// original[2] = true;
+		});
+
+		$client.socket.on("active_double_auth_res", (data: any) => {
+			user.update((u: any) => {
+				u.is_2fa = true;
+				return (u);
+			});
+			original[2] = true;
 		});
 
 		$client.socket.on("disable_double_auth_res", () => {
@@ -236,7 +239,7 @@
 			if (original[1] != username)
 				$client.socket.emit("change_username", { new_username: username });
 			if (original[2] != doubleAuth)
-				$client.socket.emit((doubleAuth) ? "active_double_auth" : "disable_double_auth");
+				$client.socket.emit((doubleAuth) ? "try_active_double_auth" : "disable_double_auth");
 		}}>Save Changes</button>
 	</div>
 </div>
