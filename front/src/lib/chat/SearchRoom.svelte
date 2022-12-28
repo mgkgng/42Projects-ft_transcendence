@@ -96,7 +96,7 @@
 	let allRooms: Array<any> = [];
 	let roomID: string = "";
 
-	let loading: boolean;
+	let loading: boolean = true;
 
 	$: {
 		if (researchTrigger != research) {
@@ -145,11 +145,11 @@
 			<div class="flex room">
 				<p>{room.name}</p>
 				<button on:click={() => {
-					if (chat.rooms.get(room.id_public_room).is_password_protected) {
+					if (room.is_password_protected) {
 						roomID = room.id_public_room;
 						passwordModal.open();
 					} else
-						$client.socket.emit("append_user_to_room", {roomID: room.id_public_room, room_password: ""}); // TODO
+						$client.socket.emit("append_user_to_room", {id_public_room: room.id_public_room, room_password: ""}); // TODO
 				}}>Join</button>
 			</div>
 		{/if}

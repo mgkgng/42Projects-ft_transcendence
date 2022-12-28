@@ -90,7 +90,6 @@ export class ChatRoomService {
 	@SubscribeMessage('append_user_to_room')
 	async append_user_to_room(@MessageBody() data: any, @ConnectedSocket() client: Socket, @Request() req)
 	{
-		console.log("test", data);
 		try{
 			const user : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
 			const client_username_42 = user.username_42;
@@ -106,7 +105,6 @@ export class ChatRoomService {
 			const is_already_in = await this.dataSource.getRepository(UserChatRoomEntity).createQueryBuilder("userRoom").
 			where("userRoom.room = :id and userRoom.id_user = :id_u", {id: id_room, id_u : id_user}).getOne();
 
-			console.log("Check, check", is_good_password, room.password);
 			if (room.is_password_protected && (!is_good_password )) //Test password
 				if (!(is_already_in && is_already_in.is_owner)) //Test if user is admin
 					client.emit("error_append_user_to_room", {error: "Bad password"});
@@ -124,12 +122,10 @@ export class ChatRoomService {
 				client.emit("set_room_visible", {id_public_room: room.id_public_room});
 				return;
 			}
-			console.log("check check");
 			const res_user_chat_room = await this.dataSource.createQueryBuilder().insert().into(UserChatRoomEntity).values
 			([ 
 				{id_user: id_user, room: id_room, is_admin: false, is_banned: false, is_muted: false}
 			]).execute(); //Add user to the room
-			console.log("user added");
 			client.emit("set_room_visible", {id_public_room: room.id_public_room});
 			client.emit("success_append_user_to_room", {id_public_room: room.id_public_room, room_name: room.name});
 			client.emit("append_user_to_room_res", {id_public_room: room.id_public_room, is_admin: false, username: user.username});

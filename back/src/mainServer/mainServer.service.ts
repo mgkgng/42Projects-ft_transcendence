@@ -70,7 +70,7 @@ export class MainServerService {
 	async getIdRoom (@MessageBody() name) //GET THE UNIQ ID OF A ROOM FIND WITH THE ROOM'S NAME 
 	{
 		const id_user : any = await this.dataSource.getRepository(ChatRoomEntity)
-		.createQueryBuilder().where("ChatRoomEntity.id_public_room = :u", { u: name.id_public_room}).getOneOrFail();
+		.createQueryBuilder().where("ChatRoomEntity.id_public_room = :u", { u: name.id_public_room }).getOneOrFail();
 		return (id_user.id_g);
 	}
 
