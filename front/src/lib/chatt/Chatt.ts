@@ -27,4 +27,24 @@ export class Chatt {
 		});
 		return(keys);
 	}
+
+	sortRoomsValues(values: any[]) {
+		values.sort((a: any, b: any) => {
+			if (!a.messages.length && b.messages.length)
+				return (-1);
+			else if (a.messages.length && !b.messages.length)
+				return (1);
+			else if (!a.messages.length && !b.messages.length)
+				return (0);
+
+			if (a.messages[a.messages.length - 1].date > b.messages[b.messages.length - 1].date)
+				return (-1);
+			else if (a.messages[a.messages.length - 1].date < b.messages[b.messages.length - 1].date)
+				return (1);
+
+			return (0);
+		});
+		return (values);
+	}
+	  
 }

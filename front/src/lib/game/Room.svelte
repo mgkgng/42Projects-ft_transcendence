@@ -233,7 +233,6 @@
 			$client.socket.off("GameStart");
 		});
 	});
-
 </script>
 
 {#if gameInfo}

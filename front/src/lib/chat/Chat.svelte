@@ -171,7 +171,7 @@
 			chat = chat;
 		});
 
-		$client.socket.on("set_room_visible", (data: any) => { client.socket.emit("get_my_rooms"); });
+		$client.socket.on("set_room_visible", (data: any) => { $client.socket.emit("get_my_rooms"); });
 
 		$client.socket.on("set_room_private_res", (data: any) => {
 			console.log("check private");
@@ -205,12 +205,12 @@
 		});
 
 		$client.socket.on("get_my_rooms_res", (data: any) => {
-			console.log(data);
 			for (let x of data) {
-				chat.my_rooms.set(x.room.name, new ChattRoom(x.room.id_public_room, x.room.name, x.room.is_password_protected, x.room.is_private, x.is_admin, x.is_owner));
+				chat.my_rooms.set(x.room.id_public_room, new ChattRoom(x.room.id_public_room, x.room.name, x.room.is_password_protected, x.room.is_private, x.is_admin, x.is_owner));
 				$client.socket.emit("get_message_room", { room_name: x.room.name });
 				$client.socket.emit("get_users_room", {room_name: x.room.name })
 			}
+			console.log("get_my_rooms_res", chat.my_rooms);
 			chat = chat;
 		});
 
@@ -286,11 +286,11 @@
 		<div class="vflex list">
 			<p>My Rooms</p>
 			{#if chat?.my_rooms.size}
-			{#each (chat.sortRoomsKeys([...chat.my_rooms.keys()])) as room}
+			{#each (chat.sortRoomsValues([...chat.my_rooms.values()])) as room}
 			<div class="flex line">
 				<div class="room {(room == roomSelected) ? "chosen" : ""}" on:click={() => {
-					roomSelected = room;
-				}}>{room}</div>
+					roomSelected = room.roomID;
+				}}>{room.room_name}</div>
 				<div class="button" on:click={() => {
 					$client.socket.emit("set_room_not_visible", { room_name: room });
 				}}><p>Quit</p></div>
@@ -303,7 +303,7 @@
 	</div>
 	<div class="vflex chatroom">
 		{#if (roomSelected.length)}
-		<ChatRoom bind:chat={chat} roomName={roomSelected}/>
+		<ChatRoom bind:chat={chat} roomID={roomSelected}/>
 		{:else}
 		<div class="flex no-select">
 			<h2>Please select a room</h2> 

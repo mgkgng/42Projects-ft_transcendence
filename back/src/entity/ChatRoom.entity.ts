@@ -7,7 +7,7 @@ export class ChatRoomEntity {
 	@PrimaryGeneratedColumn()
 	id_g: number;
 
-	@Column()
+	@Column({unique: true})
 	id_public_room : string;
 
 	@OneToMany(() => UserChatRoomEntity, (id: UserChatRoomEntity) => id.room)
@@ -16,7 +16,7 @@ export class ChatRoomEntity {
 	@OneToMany(() => MessageChatRoomEntity, (user: MessageChatRoomEntity) => user.id_chat_room)
 	relation_messageChatRoom: MessageChatRoomEntity[];
 
-	@Column({unique: true})
+	@Column({unique: false})
 	name: string;
 
 	@Column()

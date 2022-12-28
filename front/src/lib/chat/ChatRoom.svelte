@@ -20,6 +20,12 @@
 				border-top: 0;
 				border-radius: 0 0 .3em .3em;
 				padding: 0 1em;
+				gap: .2em;
+				align-items: center;
+
+				h1 { padding-bottom: .2em; }
+				h3 { filter: brightness(50%); }
+				
 				button {
 					width: 10%;
 					height: 100%;
@@ -135,7 +141,7 @@
     import ChatUserSettings from "$lib/chat/ChatUserSettings.svelte";
 
 	export let chat: Chatt;
-	export let roomName: string;
+	export let roomID: string;
 
 	console.log(chat);
 
@@ -150,11 +156,11 @@
 </script>
 
 <Modal bind:this={chatRoomSettingsModal}>
-	<ChatRoomSettings itself={chatRoomSettingsModal} chatRoom={chat.my_rooms.get(roomName)}/>
+	<ChatRoomSettings itself={chatRoomSettingsModal} chatRoom={chat.my_rooms.get(roomID)}/>
 </Modal>
 
 <Modal bind:this={chatUsersSettingsModal}>
-	<ChatUserSettings itself={chatUsersSettingsModal} roomName={roomName} bind:chat={chat}/>
+	<ChatUserSettings itself={chatUsersSettingsModal} roomID={roomID} bind:chat={chat}/>
 </Modal>
 
 <Modal bind:this={userProfileModal}>
@@ -164,16 +170,17 @@
 {#if chat}
 <div class="flex room">
 	<div class="vflex chat">
-		<div class="title">
-			<h1>{chat.my_rooms.get(roomName).room_name}</h1>
-			{#if chat.my_rooms.get(roomName).is_owner}
+		<div class="flex title">
+			<h1 class="name">{chat.my_rooms.get(roomID).room_name}</h1>
+			<h3 class="id">#{chat.my_rooms.get(roomID).roomID}</h3>
+			{#if chat.my_rooms.get(roomID).is_owner}
 			<button on:click={() => { chatRoomSettingsModal.open(); }}>
 				<img src="setting.png" alt="setting">
 			</button>
 			{/if}
 		</div>
 		<div class="read">
-		{#each chat.my_rooms.get(roomName).messages as message}
+		{#each chat.my_rooms.get(roomID).messages as message}
 			<div class="message">
 				<p>{message.username}:</p>
 				<div>{message.message}</div>
@@ -185,7 +192,7 @@
 			<input class="text-input" placeholder="write your message here..." bind:value={newMessage}>
 			<button on:click={() => {
 				$client.socket.emit("new_message_room", {
-					room_name: chat.my_rooms.get(roomName).room_name,
+					room_name: chat.my_rooms.get(roomID).room_name,
 					content_message: newMessage
 				});
 			}}>Send</button>
@@ -193,7 +200,7 @@
 	</div>
 	<div class="vflex users">
 		<div class="vflex list">
-			{#each chat.my_rooms.get(roomName).users as user}
+			{#each chat.my_rooms.get(roomID).users as user}
 			<div class="user" on:click={() => {
 				//TODO get profile User info
 			}}>
@@ -201,7 +208,7 @@
 			</div>
 			{/each}
 		</div>
-		{#if chat.my_rooms.get(roomName).is_admin}
+		{#if chat.my_rooms.get(roomID).is_admin}
 		<button on:click={() => {
 			chatUsersSettingsModal.open();
 		}}>

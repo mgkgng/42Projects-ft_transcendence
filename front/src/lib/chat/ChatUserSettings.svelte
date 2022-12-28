@@ -69,10 +69,10 @@
 
 	export let itself: any;
 	export let chat: Chatt;
-	export let roomName: string;
+	export let roomID: string;
 
-	let users: Array<string> = chat.my_rooms.get(roomName).users.filter((x:any) => !x.is_admin).map((x: any) => x.username);
-	let admins: Array<string> = chat.my_rooms.get(roomName).users.filter((x: any) => x.is_admin).map((x: any) => x.username);
+	let users: Array<string> = chat.my_rooms.get(roomID).users.filter((x:any) => !x.is_admin).map((x: any) => x.username);
+	let admins: Array<string> = chat.my_rooms.get(roomID).users.filter((x: any) => x.is_admin).map((x: any) => x.username);
 
 	const Setting = {
 		Mute: 0,
@@ -137,11 +137,11 @@
 			if (!selected.length)
 				return ;
 			if (settingType == Setting.Mute)
-				$client.socket.emit("mute_user", { room_name : roomName, username_ban: user, mute_end: undefined});
+				$client.socket.emit("mute_user", { room_name : roomID, username_ban: user, mute_end: undefined});
 			else if (settingType == Setting.Ban)
-				$client.socket.emit("ban_user", { room_name : roomName, username_ban: user, ban_end: undefined});
+				$client.socket.emit("ban_user", { room_name : roomID, username_ban: user, ban_end: undefined});
 			else
-				$client.socket.emit("set_admin", { room_name : roomName, username_new_admin: user});
+				$client.socket.emit("set_admin", { room_name : roomID, username_new_admin: user});
 		}}>Confirm</button>
 	</div>
 </div>
