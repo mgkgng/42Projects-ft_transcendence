@@ -6,7 +6,7 @@
 		.research {
 			justify-content: center;
 			align-items: center;
-			gap: .5em;
+			gap: .2em;
 
 			input {
 				border-radius: .2em;
@@ -17,7 +17,12 @@
 				padding-left: .4em;
 			}
 			button {
-				height: 1.2em;
+				background-color: $submain-lowshadeblue;
+				border-radius: .3em;
+				width: 4em;
+				height: 1.5em;
+
+				&.hover { filter: brightness(85%); }
 			}
 		}
 
@@ -91,20 +96,11 @@
 	let passwordModal: any;
 
 	let research: string = "";
-	let researchTrigger: string = research;
 
 	let allRooms: Array<any> = [];
 	let roomID: string = "";
 
 	let loading: boolean = true;
-
-	$: {
-		if (researchTrigger != research) {
-			$client.socket.emit("get_all_rooms_begin_by", { research: research });
-			loading = true;
-			researchTrigger = research;
-		}
-	}
 
 	onMount(() => {
 		$client.socket.on("success_append_user_to_room", (data: any) => {
@@ -137,6 +133,9 @@
 <div class="vflex window rooms">
 	<div class="flex research">
 		<input class="text-input" placeholder="Search Room Name ..." bind:value={research}>
+		<button on:click={() => {
+			$client.socket.emit("get_all_rooms_begin_by", { research: research });
+		}}>Search</button>
 	</div>
 	{#if !loading}
 	<div class="vflex result">

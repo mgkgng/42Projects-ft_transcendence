@@ -351,18 +351,35 @@ export class ChatRoomService {
 	async getAllRoomsBeginBy(@MessageBody() data, @ConnectedSocket() client: Socket, @Request() req)
 	{
 		const id_user = await this.mainServer.getIdUser(req);
-		const res = await this.dataSource.createQueryRunner().
-		query("SELECT sum(1) as \"nb_users\", min(chat_room_entity.name) as name, \
+
+		let res: any;
+		if (data.research[0] === '#') {
+			res = await this.dataSource.createQueryRunner().query(
+				"SELECT sum(1) as \"nb_users\", min(chat_room_entity.name) as name, \
 				min(chat_room_entity.id_public_room) as id_public_room, bool_or(chat_room_entity.is_password_protected) as is_password_protected \
 				FROM chat_room_entity left join user_chat_room_entity \
 				on chat_room_entity.id_g = user_chat_room_entity.\"roomIdG\" \
-				where chat_room_entity.is_private = FALSE  \
-				and substr(chat_room_entity.name, 1, $1) = $2 \
-				and chat_room_entity.id_g not in (select id from user_chat_room_entity where \"idUserIdG\" = $3 and user_chat_room_entity.is_visible = TRUE) \
-				group by chat_room_entity.id_g", [data.research.length, data.research, id_user]);
+				WHERE chat_room_entity.id_public_room = $1 \
+				and chat_room_entity.id_g not in (select id from user_chat_room_entity where \"idUserIdG\" = $2 and user_chat_room_entity.is_visible = TRUE) \
+				group by chat_room_entity.id_g",
+				[data.research.slice(1), id_user]
+			);
+		} else {
+			res = await this.dataSource.createQueryRunner().
+				query("SELECT sum(1) as \"nb_users\", min(chat_room_entity.name) as name, \
+					min(chat_room_entity.id_public_room) as id_public_room, bool_or(chat_room_entity.is_password_protected) as is_password_protected \
+					FROM chat_room_entity left join user_chat_room_entity \
+					on chat_room_entity.id_g = user_chat_room_entity.\"roomIdG\" \
+					where chat_room_entity.is_private = FALSE  \
+					and substr(chat_room_entity.name, 1, $1) = $2 \
+					and chat_room_entity.id_g not in (select id from user_chat_room_entity where \"idUserIdG\" = $3 and user_chat_room_entity.is_visible = TRUE) \
+					group by chat_room_entity.id_g", [data.research.length, data.research, id_user]);
+		}
 		console.log(res, data)
 		client.emit("get_all_rooms_begin_by_res", res);
 	}
+
+
 	//Ban a user if current socket user is Admin on the room 
 	//{id_public_room:string, username_ban: string, ban_end: Date}
 	@SubscribeMessage('ban_user')
