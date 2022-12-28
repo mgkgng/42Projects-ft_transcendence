@@ -27,7 +27,7 @@
 			overflow-y: scroll;
 			gap: .2em;
 
-			.list {
+			.room {
 				position: relative;
 				height: 3em;
 				border: $border-thin;
@@ -83,27 +83,44 @@
     import { Chatt } from "$lib/chatt/Chatt";
     import RoomPassword from "$lib/chat/RoomPassword.svelte";
     import Modal from "$lib/tools/Modal.svelte";
+    import CloseButton from "$lib/items/CloseButton.svelte";
 	
 	export let itself: any; 
 	export let chat: Chatt;
 
 	let passwordModal: any;
 
-	let research : string = "";
-	let searchResult: Array<string> = [];
+	let research: string = "";
+	let researchTrigger: string = research;
 
-	let roomName: string = "";
+	let allRooms: Array<any> = [];
+	let roomID: string = "";
 
-	$: $client.socket.emit("get_all_rooms_begin_by", { research: research });
+	let loading: boolean;
+
+	$: {
+		if (researchTrigger != research) {
+			$client.socket.emit("get_all_rooms_begin_by", { research: research });
+			loading = true;
+			researchTrigger = research;
+		}
+	}
 
 	onMount(() => {
 		$client.socket.on("success_append_user_to_room", (data: any) => {
 			console.log("success", data);
-		})
+		});
 
 		$client.socket.on("get_all_rooms_begin_by_res", (data: any) => {
 			console.log("test", data);
+			allRooms = data;
+			allRooms.sort((a: any, b: any) => {
+				return (b.nb_users - a.nb_users || a.name - b.name || a.id_public_room - b.id_public_room);
+			});
+			loading = false;
 		});
+
+		$client.socket.emit("get_all_rooms_begin_by", { research: "" });
 
 		return (() => {
 			$client.socket.off("success_append_user_to_room");
@@ -114,42 +131,32 @@
 </script>
 
 <Modal bind:this={passwordModal}>
-	<RoomPassword itself={passwordModal} roomName={roomName}/>
+	<RoomPassword itself={passwordModal} roomID={roomID}/>
 </Modal>
 
 <div class="vflex window rooms">
 	<div class="flex research">
 		<input class="text-input" placeholder="Search Room Name ..." bind:value={research}>
 	</div>
+	{#if !loading}
 	<div class="vflex result">
-		{#if !research.length}
-			{#each ([...chat.rooms.keys()].sort()) as room_name}
-			{#if (!chat.my_rooms.has(room_name))}
-				<div class="flex list">
-					<p>{room_name}</p>
-					<button on:click={() => {
-						if (chat.rooms.get(room_name).is_password_protected) {
-							roomName = room_name;
-							passwordModal.open();
-						} else
-							$client.socket.emit("append_user_to_room", {room_name: room_name, room_password: ""});
-					}}>Join</button>
-				</div>
-			{/if}
-			{/each}
-		{:else}
-			{#each searchResult as result}
-			<div class="flex list">
-				<p>{result}</p>
+		{#each allRooms as room}
+		{#if (!chat.my_rooms.has(room.id_public_room))}
+			<div class="flex room">
+				<p>{room.name}</p>
 				<button on:click={() => {
-					if (chat.rooms.get(result).is_password_protected) {
-						roomName = result;
+					if (chat.rooms.get(room.id_public_room).is_password_protected) {
+						roomID = room.id_public_room;
 						passwordModal.open();
 					} else
-						$client.socket.emit("append_user_to_room", {room_name: result, room_password: ""});
+						$client.socket.emit("append_user_to_room", {roomID: room.id_public_room, room_password: ""}); // TODO
 				}}>Join</button>
 			</div>
-			{/each}
 		{/if}
+		{/each}
 	</div>
+	{:else}
+	<div class="result loading">Loading...</div>
+	{/if}
+	<CloseButton window={itself}/>
 </div>

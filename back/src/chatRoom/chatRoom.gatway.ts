@@ -336,7 +336,7 @@ export class ChatRoomService {
 	{
 		const res = await this.dataSource.getRepository(MessageChatRoomEntity)
 		.createQueryBuilder("messages")
-		.innerJoin("messages.id_chat", "room")
+		.innerJoin("messages.id_chat_room", "room")
 		.groupBy("room.id_g")
 		.where("room.is_private = :p", {p: false})
 		.select(["Sum(1) as nb_users", "room.id_public_room", "room.is_password_protected"]).getMany();
