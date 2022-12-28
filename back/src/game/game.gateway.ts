@@ -139,7 +139,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	roomCheck(@ConnectedSocket() client: Socket, @MessageBody() data: any, @Request() req) {
 		// Check if the room exists and if room contains the user as client
 		let target = this.getClient(req);
-		let room = this.getRoom(data.room);
+		let room = this.getRoom(data);
 		if (!room) {
 			client.emit("RoomCheckError", ErrorMessage.RoomNotFound);
 			return ;

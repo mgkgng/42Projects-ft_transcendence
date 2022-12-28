@@ -15,9 +15,6 @@ export class Puck {
 		this.mapSize = mapSize;
 		this.pos = [mapSize[0] / 2, mapSize[1] / 2];
 		this.initialized = true;
-
-		console.log("puck speed: ", this.puckSpeed);
-		console.log("puck vector initalized:", this.vec);
 	}
 
 	setCheckPuck(room: any) {
@@ -29,8 +26,6 @@ export class Puck {
 			this.initialized = false;
 		}
 
-		console.log("vector update: ", this.vec);
-
 		let frameNb = distToDeath / Math.abs(this.vec[1]);
 		let timeOut = frameNb * PongConfig.FrameDuration;
 		let deathPointX = this.calculPosX(frameNb);
@@ -39,7 +34,6 @@ export class Puck {
 			let player = room.players.get(room.playerIndex[(this.vec[1] > 0) ? 1 : 0]);
 			if (!player || room.isOver)
 				return ;
-			console.log("player to check: ", player.username, player.paddle.pos);
 			let paddlePos = player.paddle.pos;
 			console.log(paddlePos, deathPointX);
 			if (deathPointX > paddlePos - PongConfig.PaddleBumper && deathPointX < paddlePos + PaddleSize[room.gameInfo.paddleSize] + PongConfig.PaddleBumper) {
@@ -79,14 +73,11 @@ export class Puck {
 			if (deathPointX < 0) {
 				deathPointX *= -1;
 				this.vec[0] *= -1;
-				console.log("left wall touched");
 			} else if (deathPointX > this.mapSize[0]) {
 				deathPointX = this.mapSize[0] - (deathPointX - this.mapSize[0]);
 				this.vec[0] *= -1;
-				console.log("rigt wall touched");
 			}
 		}
-		console.log("check deathpoint", deathPointX);
 		return (deathPointX);
 	}
 }

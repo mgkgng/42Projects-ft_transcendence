@@ -156,8 +156,11 @@
 			if (data.join) {
 				player2 = data.player;
 			} else {
-				if (started)
+				if (started) {
+					if (puckMoving)
+						clearInterval(puckMoving);
 					return ;
+				}
 				if (data.username == player1.info.username_42)
 					player1 = undefined;
 				else
@@ -212,10 +215,7 @@
 		$client.socket.on("GameStartFail", () => { tryStart = false; });
 		$client.socket.on("GameStart", () => { started = true });
 
-		$client.socket.emit("RoomCheck", {
-			client: $client.id,
-			room: roomID
-		});
+		$client.socket.emit("RoomCheck", roomID);
 
 		return (() => {
 			if (puckMoving)
