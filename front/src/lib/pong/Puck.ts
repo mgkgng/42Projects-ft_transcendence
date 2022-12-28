@@ -13,8 +13,13 @@ export class Puck {
 
 	move() {
 		// If the puck has hit the wall, change the direction on X vector
-		if (this.pos[0] < 0 || this.pos[0] > this.mapSize[0] - PongConfig.PuckSize) //puck size counted
+		if (this.pos[0] < 0) {
+			this.pos[0] *= -1;
 			this.vec[0] *= -1;
+		} else if (this.pos[0] > this.mapSize[0]) {
+			this.pos[0] = this.mapSize[0] - (this.pos[0] - this.mapSize[0]);
+			this.vec[0] *= -1;
+		}
 
 		// Move
 		this.pos[0] += this.vec[0];

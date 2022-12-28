@@ -183,7 +183,10 @@
 			}, 20);
 		});
 
-		$client.socket.on("PuckHit", (data: any) => { puck.vec[1] *= -1; });
+		$client.socket.on("PuckHit", (data: any) => {
+			puck.vec[1] += (puck.vec[1] > 0) ? 1 : -1;
+			puck.vec[1] *= -1;
+		});
 
 		$client.socket.on("ScoreUpdate", (data: any) => {
 			// Destroy puck

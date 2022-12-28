@@ -6,6 +6,7 @@ export class Puck {
 	pos: Array<number>;
 	vec: Array<number>;
 	mapSize: Array<number>;
+	initialized: boolean;
 
 	constructor(mapSize : Array<number>, puckSpeed: number) { // temporary test
 		this.puckSpeed = puckSpeed;
@@ -13,14 +14,24 @@ export class Puck {
 			puckSpeed * ((Math.floor(Math.random() * 2)) ? 1 : -1)];
 		this.mapSize = mapSize;
 		this.pos = [mapSize[0] / 2, mapSize[1] / 2];
-	} 
+		this.initialized = true;
+
+		console.log("puck speed: ", this.puckSpeed);
+		console.log("puck vector initalized:", this.vec);
+	}
 
 	setCheckPuck(room: any) {
 		if (room.isOver)
 			return ;
 		let distToDeath = (this.mapSize[1] / 2 - PongConfig.PaddleHeight - PongConfig.DeadZoneHeight) * 2;
-		let frameNb = Math.floor(Math.abs((distToDeath / this.vec[1])));
+		if (this.initialized) {
+			distToDeath /= 2;
+			this.initialized = false;
+		}
 
+		console.log("vector update: ", this.vec);
+
+		let frameNb = distToDeath / Math.abs(this.vec[1]);
 		let timeOut = frameNb * PongConfig.FrameDuration;
 		let deathPointX = this.calculPosX(frameNb);
 
@@ -28,14 +39,16 @@ export class Puck {
 			let player = room.players.get(room.playerIndex[(this.vec[1] > 0) ? 1 : 0]);
 			if (!player || room.isOver)
 				return ;
+			console.log("player to check: ", player.username, player.paddle.pos);
 			let paddlePos = player.paddle.pos;
 			console.log(paddlePos, deathPointX);
-			if (deathPointX > paddlePos && deathPointX < paddlePos + PaddleSize[room.gameInfo.paddleSize]) {
+			if (deathPointX > paddlePos - PongConfig.PaddleBumper && deathPointX < paddlePos + PaddleSize[room.gameInfo.paddleSize] + PongConfig.PaddleBumper) {
 				// if paddle hits the puck
 				room.broadcast("PuckHit");
 				this.pos[0] = deathPointX;
 				this.pos[1] = (this.vec[1] > 0) ? (this.mapSize[1] - PongConfig.DeadZoneHeight - PongConfig.PaddleHeight)
 					: PongConfig.DeadZoneHeight + PongConfig.PaddleHeight;
+				this.vec[1] += (this.vec[1] > 0) ? 1 : -1;
 				this.vec[1] *= -1;
 				this.setCheckPuck(room);
 				return ;
@@ -59,17 +72,21 @@ export class Puck {
 	}
 
 	calculPosX(frameNb: number) {
-		// TODO precision should be made, it should be because of the css stuff
 		let deathPointX = this.pos[0];
 
 		for (let i = 0; i < frameNb; i++) {
 			deathPointX += this.vec[0];
-			if (deathPointX < 0 || deathPointX > this.mapSize[0] - PongConfig.PuckSize) {
+			if (deathPointX < 0) {
+				deathPointX *= -1;
 				this.vec[0] *= -1;
-				deathPointX += this.vec[0];
+				console.log("left wall touched");
+			} else if (deathPointX > this.mapSize[0]) {
+				deathPointX = this.mapSize[0] - (deathPointX - this.mapSize[0]);
+				this.vec[0] *= -1;
+				console.log("rigt wall touched");
 			}
 		}
-		console.log("check deathpoint", this.mapSize[0] - deathPointX);
-		return (this.mapSize[0] - deathPointX);
+		console.log("check deathpoint", deathPointX);
+		return (deathPointX);
 	}
 }

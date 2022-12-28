@@ -46,7 +46,7 @@
 		user={(!switched) ? player2 : player1}
 		initPos={initPos}/>
 	{#if puck}
-	<PPuck pos={[(!switched) ? MapSize[gameInfo.mapSize][0] - puck.pos[0] : puck.pos[0],
+	<PPuck pos={[(!switched) ? puck.pos[0] : MapSize[gameInfo.mapSize][0] - puck.pos[0],
 		(!switched) ? MapSize[gameInfo.mapSize][1] - puck.pos[1] : puck.pos[1]]} />
 	{/if}
 	<Paddle pos={(!switched) ? player1?.pos : player2?.pos} paddleWidth={PaddleSize[gameInfo.paddleSize]}
