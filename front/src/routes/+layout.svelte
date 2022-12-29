@@ -76,7 +76,7 @@
 			console.log("NOT CONNECTED");
 			localStorage.removeItem('transcendence-jwt');
 		}
-	}
+	
 
 	onMount(async () => {
 		if (!browser || $client.socket)
@@ -113,7 +113,9 @@
 				loaded.set(true);
 			}, 1000);
 			
-			return (() => { $client.removeListeners("get_user_info"); });
+			return (() => { 
+				$client.socket.off("get_user_info_res"); 
+			});
 		}
 	});
 </script>
