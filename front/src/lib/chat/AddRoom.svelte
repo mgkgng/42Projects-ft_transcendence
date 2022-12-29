@@ -86,7 +86,7 @@
 
 	export let itself: any;
 
-	let newRoomName: string;
+	let newRoomTitle: string;
 	let newRoomPassword: string = "";
 	let withPassword: boolean = false;
 	let isPrivate: boolean = false;
@@ -101,7 +101,7 @@
 	</div>
 	<div class="flex input">
 		<div class="vflex info">
-			<input class="text-input" placeholder="Room Name" bind:value={newRoomName}>
+			<input class="text-input" placeholder="Room Name" bind:value={newRoomTitle}>
 			{#if (withPassword)}
 			<input class="text-input" placeholder="Password" bind:value={newRoomPassword}>
 			{:else}
@@ -111,7 +111,7 @@
 		<div class="vflex submit">
 			<button on:click={() => {
 				$client.socket.emit("new_room", {
-					room_name: newRoomName, 
+					room_name: newRoomTitle, 
 					is_password_protected: withPassword, 
 					room_password: newRoomPassword, 
 					is_private: isPrivate

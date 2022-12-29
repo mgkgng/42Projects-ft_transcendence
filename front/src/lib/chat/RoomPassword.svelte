@@ -9,7 +9,7 @@
     import { onMount } from "svelte";
 
 	export let itself: any;
-	export let roomName: string;
+	export let roomID: string;
 
 	let password: string = "";
 	let message: string = "";
@@ -35,7 +35,7 @@
 	<div class="buttons">
 		<button on:click={() => { itself.close(); }}>Cancel</button>
 		<button on:click={() => { $client.socket.emit("append_user_to_room", {
-			room_name: roomName,
+			id_public_room: roomID,
 			room_password: password
 		}); }}>Enter</button>
 	</div>

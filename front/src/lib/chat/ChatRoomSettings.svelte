@@ -135,13 +135,13 @@
 		}}>Close</button>
 		<button class="{(modified) ? "" : "no-active"}" on:click={() => {
 			if (original[0] != isPrivate)
-				$client.socket.emit((isPrivate) ? "set_room_private" : "unset_room_private", { room_name: chatRoom.room_name });
+				$client.socket.emit((isPrivate) ? "set_room_private" : "unset_room_private", { id_public_room: chatRoom.roomID });
 			if (original[1] != withPassword)
 				$client.socket.emit((withPassword) ? "set_password_room" : "unset_password_room",
-					(withPassword) ? { room_name: chatRoom.room_name, password: password } 
-						: { room_name: chatRoom.room_name });
+					(withPassword) ? { id_public_room: chatRoom.roomID, password: password } 
+						: { id_public_room: chatRoom.roomID });
 			else if (original[1] = true && password != "default-password")
-				$client.socket.emit("set_password_room", { room_name: chatRoom.room_name, password: password });
+				$client.socket.emit("set_password_room", { id_public_room: chatRoom.roomID, password: password });
 		}}>Save</button>
 	</div>
 </div>

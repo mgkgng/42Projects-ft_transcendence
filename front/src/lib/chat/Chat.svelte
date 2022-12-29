@@ -207,8 +207,8 @@
 		$client.socket.on("get_my_rooms_res", (data: any) => {
 			for (let x of data) {
 				chat.my_rooms.set(x.room.id_public_room, new ChattRoom(x.room.id_public_room, x.room.name, x.room.is_password_protected, x.room.is_private, x.is_admin, x.is_owner));
-				$client.socket.emit("get_message_room", { room_name: x.room.name });
-				$client.socket.emit("get_users_room", {room_name: x.room.name })
+				$client.socket.emit("get_message_room", { id_public_room: x.room.id_public_room });
+				$client.socket.emit("get_users_room", {id_public_room: x.room.id_public_room })
 			}
 			console.log("get_my_rooms_res", chat.my_rooms);
 			chat = chat;
@@ -232,7 +232,7 @@
 		$client.socket.on("get_message_room_res", (data: any) => {
 			let chatRoom = chat.my_rooms.get(data.id_public_room);
 			for (let message of data.messages)
-				chatRoom.messages.push(new Message(message.id_chat_room.name, message.id_user.username, message.content_message, message.data_message))
+				chatRoom.messages.push(new Message(message.id_chat_room.id_public_room, message.id_user.username, message.content_message, message.data_message))
 			chat = chat;
 		});
 
@@ -244,7 +244,7 @@
 		});
 
 		$client.socket.on("new_message_room_res", (data: any) => {
-			chat.my_rooms.get(data.id_public_room).messages.push(new Message(data.room_name, data.username, data.content_message, data.date_message));
+			chat.my_rooms.get(data.id_public_room).messages.push(new Message(data.id_public_room, data.username, data.content_message, data.date_message));
 			chat = chat;
 		});
 
@@ -290,9 +290,9 @@
 			<div class="flex line">
 				<div class="room {(room == roomSelected) ? "chosen" : ""}" on:click={() => {
 					roomSelected = room.roomID;
-				}}>{room.room_name}</div>
+				}}>{room.title}</div>
 				<div class="button" on:click={() => {
-					$client.socket.emit("set_room_not_visible", { room_name: room });
+					$client.socket.emit("set_room_not_visible", { id_public_room: room.roomID });
 				}}><p>Quit</p></div>
 			</div>
 			{/each}

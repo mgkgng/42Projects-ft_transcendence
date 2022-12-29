@@ -171,7 +171,7 @@
 <div class="flex room">
 	<div class="vflex chat">
 		<div class="flex title">
-			<h1 class="name">{chat.my_rooms.get(roomID).room_name}</h1>
+			<h1 class="name">{chat.my_rooms.get(roomID).title}</h1>
 			<h3 class="id">#{chat.my_rooms.get(roomID).roomID}</h3>
 			{#if chat.my_rooms.get(roomID).is_owner}
 			<button on:click={() => { chatRoomSettingsModal.open(); }}>
@@ -192,7 +192,7 @@
 			<input class="text-input" placeholder="write your message here..." bind:value={newMessage}>
 			<button on:click={() => {
 				$client.socket.emit("new_message_room", {
-					room_name: chat.my_rooms.get(roomID).room_name,
+					id_public_room: chat.my_rooms.get(roomID).roomID,
 					content_message: newMessage
 				});
 			}}>Send</button>
