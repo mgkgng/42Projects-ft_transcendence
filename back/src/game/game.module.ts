@@ -14,6 +14,7 @@ import { UserFriendEntity } from 'src/entity/UserFriend.entity';
 //import { APP_GUARD } from '@nestjs/core';
 import { ChatDirectMessageService } from 'src/chatDirectMessage/chatDirectMessage.service';
 import { ChatDirectMessageEntity } from 'src/entity/ChatDirectMessage.entity';
+import { UserBlockEntity } from 'src/entity/UserBlock.entity';
 
 @Module({
   controllers: [GameController],
@@ -21,6 +22,6 @@ import { ChatDirectMessageEntity } from 'src/entity/ChatDirectMessage.entity';
 			//provide: APP_GUARD,
 			//useClass: JwtAuthGuard,
 		//  }],
-	imports :	[TypeOrmModule.forFeature([GameEntity, UserEntity, UserFriendEntity, ChatDirectMessageEntity]), MainServerModule, UserModule]
+	imports :	[TypeOrmModule.forFeature([GameEntity, UserEntity, UserBlockEntity, UserFriendEntity, ChatDirectMessageEntity]), MainServerModule, UserModule]
 })
 export class GameModule {}

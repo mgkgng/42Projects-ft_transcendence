@@ -244,4 +244,34 @@ export class friendSystemGateway {
 			return;
 		}
 	}
+
+	@SubscribeMessage('unblockUser')
+	async unblockUser(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
+	  try {
+		const success = await this.friendSystemService.unblockUser(this.mainServerService.getUserConnectedBySocketId(client.id).username, data.username);
+		this.server.to(client.id).emit('success_unblockUser', {success: true});
+	  } catch (error) {
+		this.server.to(client.id).emit('error_unblockUser', {error: error.message});
+	  }
+	}
+
+	@SubscribeMessage('blockUser')
+	async blockUser(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
+	  try {
+		const success = await this.friendSystemService.blockUser(this.mainServerService.getUserConnectedBySocketId(client.id).username, data.username);
+		this.server.to(client.id).emit('success_blockUser', {success: true});
+	  } catch (error) {
+		this.server.to(client.id).emit('error_blockUser', {error: error.message});
+	  }
+	}
+
+	@SubscribeMessage('isUserBlocked')
+	async isUserBlocked(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
+	  try {
+		const success = await this.friendSystemService.isUserBlocked(this.mainServerService.getUserConnectedBySocketId(client.id).username, data.username);
+		this.server.to(client.id).emit('success_isUserBlocked', {success: true, isUserBlocked: success});
+	  } catch (error) {
+		this.server.to(client.id).emit('error_isUserBlocked', {error: error.message});
+	  }
+	}
 }
