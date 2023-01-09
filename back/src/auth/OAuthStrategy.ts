@@ -23,6 +23,8 @@ export class OAuthStrategy extends PassportStrategy(Strategy, "oauth") {
 
   async validate(@MessageBody() code_2fa: string, @MessageBody() code : string): Promise<any> {
 	let res : any;
+	console.log(code_2fa);
+	console.log(code);
 	if (code_2fa == "oui")
 	{
 		res = await this.authService.validateUser42(code);
@@ -32,9 +34,11 @@ export class OAuthStrategy extends PassportStrategy(Strategy, "oauth") {
 	}else
 	{
 		res = {data: (this.jwtServer.decode(code))};
+		//Just reform data
 		res.data.campus = [];
 		res.data.campus.push({name: res.data.campus_name, country: res.data.campus_country});
 		res.data.login = res.data.username_42;
+		res.data.image = {link: res.data.img_url};
 	}
 	if (res)
 	{
@@ -62,8 +66,8 @@ export class OAuthStrategy extends PassportStrategy(Strategy, "oauth") {
 			{
 				if (!this.authService.verify_tmp_jwt(code) || !authenticator.check(code_2fa, user_bd.secret_2fa))
 				{
-					console.log("2FA", code, code_2fa);
-					console.log(authenticator.check(code_2fa, user_bd.secret_2fa))
+					//console.log("2FA", code, code_2fa);
+					//console.log(authenticator.check(code_2fa, user_bd.secret_2fa))
 					return ({error: "2FA code is not valid", user: find});
 				}
 			}
