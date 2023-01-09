@@ -7,6 +7,7 @@ import { UserFriendEntity } from "src/entity/UserFriend.entity";
 import { Repository } from "typeorm";
 import { friendSystemService } from "./friendSystem.service";
 import { MainServerService } from "src/mainServer/mainServer.service";
+import { UserBlockEntity } from "src/entity/UserBlock.entity";
 
 
 @Controller()
@@ -14,6 +15,8 @@ export class friendSystemController {
     constructor(
         @InjectRepository(UserEntity)
         private userRepository : Repository<UserEntity>,
+		@InjectRepository(UserBlockEntity)
+		private userBlockRepository : Repository<UserBlockEntity>,
         @InjectRepository(UserFriendEntity)
         private userFriendRepository : Repository<UserFriendEntity>,
         @Inject(friendSystemService)
@@ -203,4 +206,10 @@ export class friendSystemController {
     {
         return this.friendSystemService.changeStatus(query.username, query.status);
     }
+
+	@Get('userBlockList?')
+	async userBlockList()
+	{
+		return await this.userBlockRepository.find({relations: ["id_user", "id_user_blocked"]});
+	}
 }
