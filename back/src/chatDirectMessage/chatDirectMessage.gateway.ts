@@ -6,6 +6,7 @@ import { ChatDirectMessageService } from "./chatDirectMessage.service";
 import { Repository } from "typeorm";
 import { UserEntity } from "src/entity/User.entity";
 import { WebSocketServer } from "@nestjs/websockets";
+import { friendSystemService } from "src/friendSystem/friendSystem.service";
 
 @WebSocketGateway({
 	cors: {
@@ -19,40 +20,33 @@ export class ChatDirectMessageGateway {
         @Inject(ChatDirectMessageService)
         private chatDirectMessageService : ChatDirectMessageService,
         @InjectRepository(UserEntity)
-        private userRepository : Repository<UserEntity>
+        private userRepository : Repository<UserEntity>,
+		@Inject(friendSystemService)
+		private friendSystemService : friendSystemService,
     ) {}
 
 	@WebSocketServer() server;
 
-    @SubscribeMessage('newDirectMessage')
-    async receiveMessage(@MessageBody() data: any, @ConnectedSocket() client: any) {
-        const user = await this.userRepository.findOne({where: {username: data.username}, relations: ['relation_userBlocked']});
-        const userSender = await this.userRepository.findOne({where: {username: this.mainServerService.getUserConnectedBySocketId(client.id).username}, relations: ['relation_userBlocked']});
-        if (!user || !userSender || userSender.relation_userBlocked.includes(data.username))
-            return;
-        const userConnected = this.mainServerService.getUserConnectedByUsername(data.username);
-        if (userConnected && user.relation_userBlocked.includes(client.username) == false)
-            userConnected.socket.emit('newDirectMessage', data.message);
-        let ret = await this.chatDirectMessageService.handleSendDirectMessage(this.mainServerService.getUserConnectedBySocketId(client.id).username, data.username, data.message);
-    }
-
 	@SubscribeMessage('sendDirectMessage')
 	async sendMessage(@MessageBody() data: any, @ConnectedSocket() client: any) {
 		const user = await this.userRepository.findOne({
-			where: {username: data.username},
-			relations: ['relation_userBlocked']
+			where: {username: data.username}
 		});
 		const userSender = await this.userRepository.findOne({
-			where: {username: this.mainServerService.getUserConnectedBySocketId(client.id).username},
-			relations: ['relation_userBlocked']
+			where: {username: this.mainServerService.getUserConnectedBySocketId(client.id).username}
 		});
-		if (!user || !userSender || userSender.relation_userBlocked.includes(data.username))
+		if (!user || !userSender)
 		{
-			this.server.to(client.id).emit('error_sendDirectMessage', {error: 'User not found or blocked'});
+			this.server.to(client.id).emit('error_sendDirectMessage', {error: 'User not found'});
+			return;
+		}
+		if (this.friendSystemService.isUserBlocked(userSender.username, user.username))
+		{
+			this.server.to(client.id).emit('error_sendDirectMessage', {error: 'User blocked'});
 			return;
 		}
 		const userConnected = this.mainServerService.getUserConnectedByUsername(data.username);
-		if (userConnected && user.relation_userBlocked.includes(client.username) == false)
+		if (userConnected && !(await this.friendSystemService.isUserBlocked(user.username, userSender.username)))
 		{
 			let emitList = this.mainServerService.getUserConnectedListBySocketId(client.id);
 			emitList.forEach(element => {
@@ -70,17 +64,20 @@ export class ChatDirectMessageGateway {
 	@SubscribeMessage('getDirectMessage')
 	async getDirectMessage(@MessageBody() data: any, @ConnectedSocket() client: any) {
 		const user = await this.userRepository.findOne({
-			where: {username: data.username},
-			relations: ['relation_userBlocked']
+			where: {username: data.username}
 		});
 		const userSender = await this.userRepository.findOne({
 			where:
-			{username: this.mainServerService.getUserConnectedBySocketId(client.id).username},
-			relations: ['relation_userBlocked']
+			{username: this.mainServerService.getUserConnectedBySocketId(client.id).username}
 		});
 		if (!user || !userSender)
 		{
 			this.server.to(client.id).emit('error_getDirectMessage', {error: 'User not found'});
+			return;
+		}
+		if (this.friendSystemService.isUserBlocked(userSender.username, user.username))
+		{
+			this.server.to(client.id).emit('error_getDirectMessage', {error: 'User blocked'});
 			return;
 		}
 		let ret = await this.chatDirectMessageService.handleGetDirectMessageHistory(this.mainServerService.getUserConnectedBySocketId(client.id).username, data.username);
