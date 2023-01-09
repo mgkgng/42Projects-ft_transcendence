@@ -6,9 +6,8 @@
 		justify-content: center;
 		align-items: center;
 
-		min-width: 950px;
+		width: 90vw;
 		padding: 2em 0;
-		//height: 750px;
 
 		border: solid 2px transparentize(#fff, 0.65);
 		background-color: transparentize(#313131, 0.15);
@@ -79,9 +78,7 @@
 	import { onMount } from 'svelte';
 	import { client } from "$lib/stores/client";
 	import { UserType, MapSize, PaddleSize } from '$lib/stores/var';
-	import Paddle from '$lib/game/Paddle.svelte';
 	import { Puck } from '$lib/pong/Puck';
-    import PPuck from '$lib/game/PPuck.svelte';
     import Modal from '$lib/tools/Modal.svelte';
     import GameOver from '$lib/game/GameOver.svelte';
     import ConfirmMsg from '$lib/modals/ConfirmMsg.svelte';
