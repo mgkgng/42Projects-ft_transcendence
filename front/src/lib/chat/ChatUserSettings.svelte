@@ -65,7 +65,7 @@
 <script lang="ts">
     import { client } from "$lib/stores/client";
     import { user } from "$lib/stores/user";
-    import { Chatt } from "$lib/chatt/Chatt";
+    import type { Chatt } from "$lib/chatt/Chatt";
 
 	export let itself: any;
 	export let chat: Chatt;

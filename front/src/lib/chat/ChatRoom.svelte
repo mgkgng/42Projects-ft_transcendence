@@ -136,7 +136,7 @@
     import ChatRoomSettings from "$lib/chat/ChatRoomSettings.svelte";
     import Modal from "$lib/tools/Modal.svelte";
     import { client } from "$lib/stores/client";
-    import { Chatt } from "$lib/chatt/Chatt";
+    import type { Chatt } from "$lib/chatt/Chatt";
     import UserProfile from "$lib/users/UserProfile.svelte";
     import ChatUserSettings from "$lib/chat/ChatUserSettings.svelte";
 
