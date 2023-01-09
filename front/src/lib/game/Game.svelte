@@ -26,9 +26,8 @@
 	export let userType: number;
 
 	export let puck: any;
-
-	let game: any;
-	let gameSize: any;
+	let game: any = document.getElementById("game");
+	let gameSize: any = game?.getBoundingClientRect();
 	let paddleWidth: number;
 	let initPos: number;
 	let prevY: number = 0;
@@ -47,7 +46,8 @@
 	}
 
 	function defineValues() {
-		initPos = (gameSize.width - paddleWidth) / 2;
+		paddleWidth = convertPixelWithHeight(PaddleSize[gameInfo.paddleSize]);
+		initPos = (gameSize?.width - paddleWidth) / 2;
 	}
 
 	window.addEventListener('resize', () => {
@@ -60,39 +60,46 @@
 		game = document.getElementById("game");
 		gameSize = game?.getBoundingClientRect();
 		defineValues();
-	});
+	})
 </script>
 
 <!-- <div id="game" class="pong-game" style="min-width: {MapSize[gameInfo.mapSize][1]}px; min-height: {MapSize[gameInfo.mapSize][0]}px;"> -->
 <div id="game" class="pong-game">
-	<Paddle pos={(!switched) ? player2?.pos : player1?.pos} paddleWidth={paddleWidth}
+	{#if gameSize}
+	<Paddle pos={(!switched) ? convertPixelWithHeight(player2?.pos) : convertPixelWithHeight(MapSize[gameInfo.mapSize][0] - player1?.pos - PaddleSize[gameInfo.paddleSize])} paddleWidth={paddleWidth}
 		mapSize={MapSize[gameInfo.mapSize]}
 		switched={switched}
 		playerType={(!switched) ? 2 : 1}
 		user={(!switched) ? player2 : player1}
-		initPos={initPos}/>
+		initPos={initPos}
+		gameSize={gameSize}
+		gameInfo={gameInfo}
+		/>
 	{#if puck}
-	<PPuck pos={[(!switched) ? puck.pos[0] : MapSize[gameInfo.mapSize][0] - puck.pos[0],
-		(!switched) ? MapSize[gameInfo.mapSize][1] - puck.pos[1] : puck.pos[1]]} />
+	<PPuck pos={[(!switched) ? convertPixelWithWidth(puck.pos[0]) : convertPixelWithHeight(MapSize[gameInfo.mapSize][0] - puck.pos[0]),
+		(!switched) ? convertPixelWithHeight(MapSize[gameInfo.mapSize][1] - puck.pos[1]) : convertPixelWithHeight(puck.pos[1])]} />
 	{/if}
-	<Paddle pos={(!switched) ? player1?.pos : player2?.pos} paddleWidth={paddleWidth}
+	<Paddle pos={(!switched) ? convertPixelWithHeight(player1?.pos) : convertPixelWithHeight(MapSize[gameInfo.mapSize][0] - player2?.pos - PaddleSize[gameInfo.paddleSize])} paddleWidth={paddleWidth}
 		mapSize={MapSize[gameInfo.mapSize]}
 		switched={switched}
 		playerType={(!switched) ? 1 : 2}
 		user={(!switched) ? player1 : player2}
-		initPos={initPos}/>;
+		initPos={initPos}
+		gameSize={gameSize}
+		gameInfo={gameInfo}
+		/>;
+	{/if}
 </div>
 
 <svelte:window
 	on:mousemove={(event) => {
-		let pos = Math.floor(event.clientY - gameSize.y) - PaddleSize[gameInfo.paddleSize] / 2;
+		let pos = Math.floor(event.clientY - gameSize.y) - paddleWidth / 2;
 		if (pos < 0)
 			pos = 0;
 		if (pos > gameSize.height - paddleWidth)
 			pos = gameSize.height - paddleWidth;
 		
-		let posConverted = convertFromPixelWithHeight((!switched) ? pos : gameSize.height - pos - paddleWidth);
-
+		let posConverted = Math.floor(convertFromPixelWithHeight((!switched) ? pos : gameSize.height - pos - paddleWidth));
 		if (posConverted == prevY)
 			return ;
 		prevY = posConverted;
