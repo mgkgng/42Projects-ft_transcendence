@@ -1,6 +1,8 @@
 <style lang="scss">
 	.pong-game {
 		position: relative;
+		height: 100%;
+		width: 100%;
 
 		padding: 0;
 		border-radius: .5em;
@@ -20,7 +22,6 @@
 	export let player2: any;
 	export let gameInfo: any;
 	export let switched: boolean;
-	export let initPos: number;
 	export let roomID: string;
 	export let userType: number;
 
@@ -28,18 +29,43 @@
 
 	let game: any;
 	let gameSize: any;
+	let paddleWidth: number;
+	let initPos: number;
+	let prevY: number = 0;
 
-	let prevY: number = initPos;
+	function convertPixelWithHeight(where: number) {
+		console.log(gameSize);
+		return ((gameSize.height * where) / MapSize[gameInfo.mapSize][1]);
+	}
 
+	function convertPixelWithWidth(where: number) {
+		return ((gameSize.width * where) / MapSize[gameInfo.mapSize][0]);
+	}
+
+	function convertFromPixelWithHeight(pixel: number) {
+		return ((pixel * MapSize[gameInfo.mapSize][1]) / gameSize.height);
+	}
+
+	function defineValues() {
+		initPos = (gameSize.width - paddleWidth) / 2;
+	}
+
+	window.addEventListener('resize', () => {
+		game = document.getElementById("game");
+		gameSize = game?.getBoundingClientRect();
+		defineValues();
+	});
 
 	onMount(() => {
 		game = document.getElementById("game");
 		gameSize = game?.getBoundingClientRect();
+		defineValues();
 	});
 </script>
 
-<div id="game" class="pong-game" style="min-width: {MapSize[gameInfo.mapSize][1]}px; min-height: {MapSize[gameInfo.mapSize][0]}px;">
-	<Paddle pos={(!switched) ? player2?.pos : player1?.pos} paddleWidth={PaddleSize[gameInfo.paddleSize]}
+<!-- <div id="game" class="pong-game" style="min-width: {MapSize[gameInfo.mapSize][1]}px; min-height: {MapSize[gameInfo.mapSize][0]}px;"> -->
+<div id="game" class="pong-game">
+	<Paddle pos={(!switched) ? player2?.pos : player1?.pos} paddleWidth={paddleWidth}
 		mapSize={MapSize[gameInfo.mapSize]}
 		switched={switched}
 		playerType={(!switched) ? 2 : 1}
@@ -49,7 +75,7 @@
 	<PPuck pos={[(!switched) ? puck.pos[0] : MapSize[gameInfo.mapSize][0] - puck.pos[0],
 		(!switched) ? MapSize[gameInfo.mapSize][1] - puck.pos[1] : puck.pos[1]]} />
 	{/if}
-	<Paddle pos={(!switched) ? player1?.pos : player2?.pos} paddleWidth={PaddleSize[gameInfo.paddleSize]}
+	<Paddle pos={(!switched) ? player1?.pos : player2?.pos} paddleWidth={paddleWidth}
 		mapSize={MapSize[gameInfo.mapSize]}
 		switched={switched}
 		playerType={(!switched) ? 1 : 2}
@@ -62,14 +88,16 @@
 		let pos = Math.floor(event.clientY - gameSize.y) - PaddleSize[gameInfo.paddleSize] / 2;
 		if (pos < 0)
 			pos = 0;
-		if (pos > gameSize.height - PaddleSize[gameInfo.paddleSize])
-			pos = gameSize.height - PaddleSize[gameInfo.paddleSize];
+		if (pos > gameSize.height - paddleWidth)
+			pos = gameSize.height - paddleWidth;
+		
+		let posConverted = convertFromPixelWithHeight((!switched) ? pos : gameSize.height - pos - paddleWidth);
 
-		if (pos == prevY)
+		if (posConverted == prevY)
 			return ;
-		prevY = pos;
+		prevY = posConverted;
 		$client.socket.emit("PaddleMoveMouse", {
-			pos: (!switched) ? pos : gameSize.height - pos - PaddleSize[gameInfo.paddleSize],
+			pos: posConverted,
 			roomID: roomID
 		});
 	}}
