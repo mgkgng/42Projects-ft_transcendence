@@ -42,7 +42,7 @@
 	if (!pos)
 		pos = initPos;
 
-	$: console.log(left);
+	$: console.log(pos);
 		
 </script>
 

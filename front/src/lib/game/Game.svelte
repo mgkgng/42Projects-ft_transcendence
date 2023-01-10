@@ -47,7 +47,7 @@
 
 	function defineValues() {
 		paddleWidth = convertPixelWithHeight(PaddleSize[gameInfo.paddleSize]);
-		initPos = (gameSize?.width - paddleWidth) / 2;
+		initPos = convertPixelWithHeight((MapSize[gameInfo?.mapSize][0] - PaddleSize[gameInfo?.paddleSize]) / 2);
 		posHorizontal = [convertPixelWithWidth(PongConfig.DeadZoneHeight), convertPixelWithWidth(MapSize[gameInfo.mapSize][1] - PongConfig.DeadZoneHeight - PongConfig.PaddleHeight)];
 	}
 
@@ -68,7 +68,7 @@
 
 <div id="game" class="pong-game">
 	{#if gameSize}
-	<Paddle pos={(!switched) ? convertPixelWithHeight(player2?.pos) : convertPixelWithHeight(MapSize[gameInfo.mapSize][0] - player1?.pos - paddleWidth)} paddleWidth={paddleWidth}
+	<Paddle pos={(!switched) ? convertPixelWithHeight(player2?.pos) : convertPixelWithHeight(MapSize[gameInfo.mapSize][0] - player1?.pos - PaddleSize[gameInfo.paddleSize])} paddleWidth={paddleWidth}
 		mapSize={MapSize[gameInfo.mapSize]}
 		switched={switched}
 		playerType={(!switched) ? 2 : 1}
@@ -82,7 +82,7 @@
 	<PPuck pos={[(!switched) ? convertPixelWithWidth(puck.pos[0]) : convertPixelWithHeight(MapSize[gameInfo.mapSize][0] - puck.pos[0]),
 		(!switched) ? convertPixelWithHeight(MapSize[gameInfo.mapSize][1] - puck.pos[1]) : convertPixelWithHeight(puck.pos[1])]} />
 	{/if}
-	<Paddle pos={(!switched) ? convertPixelWithHeight(player1?.pos) : convertPixelWithHeight(MapSize[gameInfo.mapSize][0] - player2?.pos - paddleWidth)} paddleWidth={paddleWidth}
+	<Paddle pos={(!switched) ? convertPixelWithHeight(player1?.pos) : convertPixelWithHeight(MapSize[gameInfo.mapSize][0] - player2?.pos - PaddleSize[gameInfo.paddleSize])} paddleWidth={paddleWidth}
 		mapSize={MapSize[gameInfo.mapSize]}
 		switched={switched}
 		playerType={(!switched) ? 1 : 2}
