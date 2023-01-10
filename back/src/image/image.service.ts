@@ -25,7 +25,7 @@ export class ImageService {
         const user = await this.userRepository.findOne({where:{username : username}});
         if (!user)
             return null;
-        if (user.img_url.includes("http://localhost:3000/image/"))
+        if (user.img_url.includes("/image/"))
         {
             const imageToDelete = await this.imageRepository.findOne({where:{img_url : user.img_url}});
             if (imageToDelete)

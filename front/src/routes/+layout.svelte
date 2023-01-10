@@ -47,7 +47,8 @@
 	async function connectWithUrlCode(url : any)
 	{
 		try{
-			const res : any = await fetch("http://localhost:3000/auth42",{
+			// debugger;
+			const res : any = await fetch(`http://${location.hostname}:3000/auth42`,{
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'
@@ -64,7 +65,7 @@
 				// while (tok.get_code != null)
 				// {
 				//  	let ufa_code : any = prompt("Your code is : ");
-				//  	const res_ufa : any = await fetch("http://localhost:3000/",{
+				//  	const res_ufa : any = await fetch("http://cb8e2569788b:3000/",{
 				//  		method: 'POST',
 				//  		headers: {
 				//  			'Content-Type': 'application/json'
@@ -73,7 +74,7 @@
 				//  	});
 				//  	tok = await res_ufa.json();
 				// }
-				$client.socket = io("http://localhost:3001",{
+				$client.socket = io(`http://${location.hostname}:3001`,{
 					extraHeaders: {
 						Authorization: "Bearer " + tok.access_token,
 					}
@@ -99,7 +100,7 @@
 			{
 				const tok = localStorage.getItem('transcendence-jwt');
 				{
-					$client.socket = await io("http://localhost:3001",{
+					$client.socket = await io(`http://${location.hostname}:3001`,{
 						extraHeaders: {
 							Authorization: "Bearer " + tok,
 						},

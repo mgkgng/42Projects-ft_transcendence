@@ -144,7 +144,7 @@
 		// Formdata with jwt token
 		let jwt = localStorage.getItem("transcendence-jwt");
 
-		let response = await fetch("http://localhost:3000/uploadimage", {
+		let response = await fetch(`http://${location.hostname}:3000/uploadimage`, {
 			method: "POST",
 			body: formData,
 			headers: new Headers({ "Authorization": `Bearer ${jwt}` })

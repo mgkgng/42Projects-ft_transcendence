@@ -1,0 +1,10 @@
+HOST_HOSTNAME=$(shell hostname)
+
+all: update-env up
+
+update-env:
+	@echo "Updating HOST_HOSTNAME in .env file..."
+	@sed -i -e 's/^HOST_HOSTNAME.*/HOST_HOSTNAME=$(HOST_HOSTNAME)/g' .env
+
+up:
+	docker compose up

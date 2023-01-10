@@ -18,7 +18,7 @@ class Client {
 	// 		const tok = localStorage.getItem('transcendence-jwt');
 	// 		try
 	// 		{
-	// 			this.socket = io("http://localhost:3001",{
+	// 			this.socket = io("http://cb8e2569788b:3001",{
 	// 				extraHeaders: {
 	// 					Authorization: "Bearer " + tok,
 	// 				}
@@ -32,7 +32,7 @@ class Client {
 	// 	if (url.has('code'))
 	// 	{
 	// 		try {
-	// 			const res : any = await fetch("http://localhost:3000/auth42",{
+	// 			const res : any = await fetch("http://cb8e2569788b:3000/auth42",{
 	// 				method: 'POST',
 	// 				headers: {
 	// 					'Content-Type': 'application/json'
@@ -40,7 +40,7 @@ class Client {
 	// 				body:JSON.stringify({username: "ll", password: url.get('code')}),
 	// 			});
 	// 			const tok = await res.json();
-	// 			this.socket = io("http://localhost:3001",{
+	// 			this.socket = io("http://cb8e2569788b:3001",{
 	// 				extraHeaders: {
 	// 					Authorization: "Bearer " + tok.access_token,
 	// 				}

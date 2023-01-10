@@ -44,7 +44,7 @@
 	async function try_code(ufa_code : String)
 	{
 		console.log(tok);
-		const res_ufa : any = await fetch("http://localhost:3000/auth42",{
+		const res_ufa : any = await fetch(`http://${location.hostname}:3000/auth42`,{
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
@@ -55,7 +55,7 @@
 		if (res_tok.get_code == null)
 		{
 			tok = res_tok;
-			$client.socket = io("http://localhost:3001",{
+			$client.socket = io(`http://${location.hostname}:3001`,{
 				extraHeaders: {
 				Authorization: "Bearer " + tok.access_token,
 				}

@@ -37,7 +37,7 @@ export class ImageController {
         if (file.mimetype == "image/jpeg" || file.mimetype == "image/png") {
             let imageEntity = new ImageEntity();
             imageEntity.img_uid = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-            imageEntity.img_url = "http://localhost:3000/image/" + imageEntity.img_uid;
+            imageEntity.img_url = "/image/" + imageEntity.img_uid;
             imageEntity.img_size = file.size;
             imageEntity.img_name = file.originalname;
             imageEntity.img_type = file.mimetype;
