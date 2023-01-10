@@ -15,7 +15,7 @@
 	import { onMount } from 'svelte';
 	import Paddle from '$lib/game/Paddle.svelte';
     import PPuck from '$lib/game/PPuck.svelte';
-	import { UserType, MapSize, PaddleSize } from '$lib/stores/var';
+	import { UserType, MapSize, PaddleSize, PongConfig } from '$lib/stores/var';
     import { client } from '../stores/client';
 
 	export let player1: any;
@@ -30,23 +30,25 @@
 	let gameSize: any = game?.getBoundingClientRect();
 	let paddleWidth: number;
 	let initPos: number;
+	let posHorizontal: Array<number>;
 	let prevY: number = 0;
 
 	function convertPixelWithHeight(where: number) {
-		return ((gameSize.height * where) / MapSize[gameInfo.mapSize][0]);
+		return (Math.floor((gameSize.height * where) / MapSize[gameInfo.mapSize][0]));
 	}
 
 	function convertPixelWithWidth(where: number) {
-		return ((gameSize.width * where) / MapSize[gameInfo.mapSize][1]);
+		return (Math.floor((gameSize.width * where) / MapSize[gameInfo.mapSize][1]));
 	}
 
 	function convertFromPixelWithHeight(pixel: number) {
-		return ((pixel * MapSize[gameInfo.mapSize][0]) / gameSize.height);
+		return (Math.floor((pixel * MapSize[gameInfo.mapSize][0]) / gameSize.height));
 	}
 
 	function defineValues() {
-		paddleWidth = Math.floor(convertPixelWithHeight(PaddleSize[gameInfo.paddleSize]));
+		paddleWidth = convertPixelWithHeight(PaddleSize[gameInfo.paddleSize]);
 		initPos = (gameSize?.width - paddleWidth) / 2;
+		posHorizontal = [convertPixelWithWidth(PongConfig.DeadZoneHeight), convertPixelWithWidth(MapSize[gameInfo.mapSize][1] - PongConfig.DeadZoneHeight - PongConfig.PaddleHeight)];
 	}
 
 	window.addEventListener('resize', () => {
@@ -64,13 +66,13 @@
 	})
 </script>
 
-<!-- <div id="game" class="pong-game" style="min-width: {MapSize[gameInfo.mapSize][1]}px; min-height: {MapSize[gameInfo.mapSize][0]}px;"> -->
 <div id="game" class="pong-game">
 	{#if gameSize}
 	<Paddle pos={(!switched) ? convertPixelWithHeight(player2?.pos) : convertPixelWithHeight(MapSize[gameInfo.mapSize][0] - player1?.pos - paddleWidth)} paddleWidth={paddleWidth}
 		mapSize={MapSize[gameInfo.mapSize]}
 		switched={switched}
 		playerType={(!switched) ? 2 : 1}
+		left={posHorizontal[0]}
 		user={(!switched) ? player2 : player1}
 		initPos={initPos}
 		gameSize={gameSize}
@@ -84,6 +86,7 @@
 		mapSize={MapSize[gameInfo.mapSize]}
 		switched={switched}
 		playerType={(!switched) ? 1 : 2}
+		left={posHorizontal[1]}
 		user={(!switched) ? player1 : player2}
 		initPos={initPos}
 		gameSize={gameSize}

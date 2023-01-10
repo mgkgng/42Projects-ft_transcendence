@@ -25,10 +25,6 @@
 </style>
 
 <script lang="ts">
-    import { PongConfig } from "$lib/stores/var";
-	import { UserType, MapSize, PaddleSize } from '$lib/stores/var';
-
-
 	export let user: any;
 	export let playerType: number;
 	export let switched: boolean;
@@ -37,6 +33,7 @@
 	export let paddleWidth : number;
 
 	export let pos : number;
+	export let left: number;
 	export let initPos: number;
 
 	export let gameSize: any;
@@ -45,21 +42,10 @@
 	if (!pos)
 		pos = initPos;
 
-	function convertPixelWithHeight(where: number) {
-		return ((gameSize.height * where) / MapSize[gameInfo.mapSize][0]);
-	}
-
-	function convertPixelWithWidth(where: number) {
-		console.log("trying", where);
-		return ((gameSize.width * where) / MapSize[gameInfo.mapSize][1]);
-	}
-
-	console.log(mapSize, gameSize);
+	$: console.log(left);
 		
 </script>
 
 <div class="paddle {(playerType == 1) ? "user" : ""} {(!user) ? "absent" : ""}"
-	style="left: {((playerType === 1 && switched) || (playerType === 2 && !switched)) ? convertPixelWithWidth(PongConfig.DeadZoneHeight) : convertPixelWithWidth(mapSize[1] - PongConfig.DeadZoneHeight - PongConfig.PaddleHeight)}px;
-		top: {pos}px;
-		height: {paddleWidth}px">
+	style="left: {left}px; top: {pos}px; height: {paddleWidth}px">
 </div>
