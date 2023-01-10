@@ -46,12 +46,15 @@
 		pos = initPos;
 
 	function convertPixelWithHeight(where: number) {
-		return ((gameSize.height * where) / MapSize[gameInfo.mapSize][1]);
+		return ((gameSize.height * where) / MapSize[gameInfo.mapSize][0]);
 	}
 
 	function convertPixelWithWidth(where: number) {
-		return ((gameSize.width * where) / MapSize[gameInfo.mapSize][0]);
+		console.log("trying", where);
+		return ((gameSize.width * where) / MapSize[gameInfo.mapSize][1]);
 	}
+
+	console.log(mapSize, gameSize);
 		
 </script>
 
