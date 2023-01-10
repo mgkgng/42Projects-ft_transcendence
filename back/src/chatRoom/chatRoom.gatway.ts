@@ -12,7 +12,7 @@ import { AuthGuard } from "@nestjs/passport";
 import { toDataURL } from "qrcode";
 import { authenticator } from "otplib";
 
-// import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcrypt';
 
 @WebSocketGateway({
 	cors: {
@@ -99,14 +99,14 @@ export class ChatRoomService {
 			const room = await this.dataSource.getRepository(ChatRoomEntity).createQueryBuilder("room").
 			where("room.id_g = :id ", {id: id_room}).getOne();
 
-			// const is_good_password = await bcrypt.compare(data.room_password, room.password);
-			const is_good_password = (data.room_password == room.password);
+			const is_good_password = await bcrypt.compare(data.room_password, room.password);
+			//const is_good_password = (data.room_password == room.password);
 
 			const is_already_in = await this.dataSource.getRepository(UserChatRoomEntity).createQueryBuilder("userRoom").
 			where("userRoom.room = :id and userRoom.id_user = :id_u", {id: id_room, id_u : id_user}).getOne();
 
 			if (room.is_password_protected && (!is_good_password )) //Test password
-				if (!(is_already_in && is_already_in.is_owner)) //Test if user is admin
+				//if (!(is_already_in && is_already_in.is_owner)) //Test if user is admin
 					client.emit("error_append_user_to_room", {error: "Bad password"});
 			if (is_already_in != undefined) //Client already in room => just make this room visible for him
 			{
@@ -120,6 +120,8 @@ export class ChatRoomService {
 				.set({is_visible: true}).execute(); //UPDATE is_visible
 				client.join(data.id_public_room); 		//JOIN ROOM (socket.io rooms)
 				client.emit("set_room_visible", {id_public_room: room.id_public_room});
+				client.emit("success_append_user_to_room", {id_public_room: room.id_public_room, room_name: room.name});
+				client.emit("append_user_to_room_res", {id_public_room: room.id_public_room, is_admin: false, username: user.username});
 				return;
 			}
 			const res_user_chat_room = await this.dataSource.createQueryBuilder().insert().into(UserChatRoomEntity).values
@@ -307,8 +309,8 @@ export class ChatRoomService {
 			newMessage.date_message = date_creation;
 			const res_insert_message = await this.dataSource.getRepository(MessageChatRoomEntity).save(newMessage);
 			//await querry.commitTransaction();
-			//this.server.to(data.id_public_room).emit('new_message_room', {id_public_room : data.id_public_room, content_message: data.content_message, username: client_username, date_message: date_creation});
-			this.server.to(data.id_public_room).emit('notification_new_message_room', {id_public_room : data.id_public_room, id_message: res_insert_message.id });
+			this.server.to(data.id_public_room).emit('new_message_room', {id_public_room : data.id_public_room, content_message: data.content_message, username: client_username, date_message: date_creation});
+			//this.server.to(data.id_public_room).emit('notification_new_message_room', {id_public_room : data.id_public_room, id_message: res_insert_message.id });
 		} catch (e) {
 			//await querry.rollbackTransaction();
 			client.emit("error_new_message_room", {error: "Can't create message"});
