@@ -169,9 +169,16 @@
 		$client.socket.on("set_room_not_visible_res", (data: any) => {
 			chat.my_rooms.delete(data);
 			chat = chat;
+			if (data == roomSelected)
+				roomSelected = "";
+			console.log("Get My rooms", data);
+			$client.socket.emit("get_my_rooms"); 
 		});
 
-		$client.socket.on("set_room_visible", (data: any) => { $client.socket.emit("get_my_rooms"); });
+		$client.socket.on("set_room_visible", (data: any) => { 
+			console.log("Get My rooms", data);
+			$client.socket.emit("get_my_rooms"); 
+		});
 
 		$client.socket.on("set_room_private_res", (data: any) => {
 			console.log("check private");
@@ -205,6 +212,7 @@
 		});
 
 		$client.socket.on("get_my_rooms_res", (data: any) => {
+			chat.my_rooms.clear();
 			for (let x of data) {
 				chat.my_rooms.set(x.room.id_public_room, new ChattRoom(x.room.id_public_room, x.room.name, x.room.is_password_protected, x.room.is_private, x.is_admin, x.is_owner));
 				$client.socket.emit("get_message_room", { id_public_room: x.room.id_public_room });
@@ -221,8 +229,9 @@
 		});
 
 		$client.socket.on("append_user_to_room_res", (data: any) => {
-			console.log("res", data);
+			console.log("append_user_to_room_res", data);
 			let roomInfo = chat.rooms.get(data.id_public_room);
+			chat.rooms.set(data.id_public_room, data.is_password_protected);
 			chat.my_rooms.set(data.id_public_room, new ChattRoom(data.id_public_room, data.room_name, roomInfo.is_password_protected, false, false, false));
 			chat = chat;
 
@@ -243,7 +252,7 @@
 			chat = chat;
 		});
 
-		$client.socket.on("new_message_room_res", (data: any) => {
+		$client.socket.on("new_message_room", (data: any) => {
 			chat.my_rooms.get(data.id_public_room).messages.push(new Message(data.id_public_room, data.username, data.content_message, data.date_message));
 			chat = chat;
 		});
