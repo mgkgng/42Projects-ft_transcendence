@@ -384,8 +384,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				min(user_entity.created_at) as created_at, min(user_entity.last_connection) as last_connection \
 				FROM ( \
 					SELECT \"player1IdG\" as id_player, (CASE WHEN player1_score > player2_score THEN 1 ELSE 0 END) as is_winner FROM game_entity as game1 \
-						UNION \
-					SELECT \"player2IdG\" as id_player, (CASE WHEN player2_score > player2_score THEN 1 ELSE 0 END) as is_winner FROM game_entity as game2) \
+						UNION ALL\
+					SELECT \"player2IdG\" as id_player, (CASE WHEN player2_score > player1_score THEN 1 ELSE 0 END) as is_winner FROM game_entity as game2) \
 					as games inner join user_entity on games.id_player = user_entity.id_g \
 				GROUP BY id_player \
 				ORDER BY nb_victory DESC, win_rate DESC; ", []);
