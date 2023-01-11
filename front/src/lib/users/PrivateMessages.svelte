@@ -2,6 +2,7 @@
 	.messages {
 		width: 720px;
 		height: 560px;
+		display: flex;
 		padding: 0;
 
 		.from {
@@ -37,11 +38,12 @@
 		}
 
 		.chat {
-			width: 65%;
+			width: 80%;
 			height: 100%;
 			gap: 0;
 			.read {
-				height: 70%;
+				height: 90%;
+				overflow-y: scroll;
 				
 				.line {
 					width: 100%;
@@ -64,6 +66,20 @@
 					}
 				}
 			}
+			.write{
+				width: 100%;
+				height: 10%;
+				padding:0;
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+			input[type="text"]{
+				width: 80%;
+			}
+			button{
+				width: 20%;
+			}
+		}
 		}
 
 		.no-selected {
@@ -130,6 +146,27 @@
 			let from = (data.messageHistory[0].recipient == userInfo.username) ? data.messageHistory[0].sender : data.messageHistory[0].recipient
 			allMessages.set(from, data.messageHistory);
 			allMessages = allMessages;
+			console.log("receivu" + from, allMessages);
+			scrollToBottom();
+		});
+
+		$client.socket.on("success_sendDirectMessageG", (data: any) => {
+			allMessages.set(userInfo.username, data.messageHistory);
+			// NEED TO DO THIS
+			scrollToBottom();
+		});
+
+		$client.socket.on("error_getDirectMessage", (data: any) => {
+			console.log("error", data);
+		});
+
+		$client.socket.on("newMessageArrived", async (senderUsername: string) => {
+			console.log("newMessageArrived", senderUsername);
+			if (selected == senderUsername) {
+				$client.socket.emit("getDirectMessage", { username: senderUsername});
+			}
+			// refresh the message list
+			$client.socket.emit("getMessageUserList");
 		});
 
 		$client.socket.emit("getMessageUserList");
@@ -139,6 +176,30 @@
 			$client.socket.off("success_getDirectMessage");
 		});
 	});
+
+	function getMessageAndChangeSelected(selected_username: string)
+	{
+		selected = selected_username;
+		$client.socket.emit("getDirectMessage", { username: selected});
+		console.log("heru" + selected)
+	}
+
+	let message = '';
+
+	function sendDirectMessageAndUpdate() {
+		$client.socket.emit('sendDirectMessageG', {username: selected, message: message});
+		$client.socket.emit("getDirectMessage", { username: selected});
+		message = '';
+	}
+
+	function scrollToBottom() {
+		let chatBox = document.querySelector('.read');
+		if (chatBox)
+		{
+			chatBox.scrollTop = chatBox.scrollHeight;
+		}
+		console.log("chatbox", chatBox);
+	}
 </script>
 
 <Modal bind:this={writeMessageModal}>
@@ -149,14 +210,14 @@
 	{#if exchanges.size}
 		<div class="from">
 			{#each [...exchanges.values()] as user}
-			<div class="flex line" on:click={() => { selected = user.username; }}>
+			<div class="flex line" on:click={() => {getMessageAndChangeSelected(user.username)}}>
 				<img src="{(user.img) ? user.img : user.img_url}" alt="from">
 				<p>{user.username}</p>
 			</div>
 			{/each}
-			<button class="add" on:click={() => { writeMessageModal.open(); }}>+</button>
+			<button class="add" on:click={() => {writeMessageModal.open(); }}>+</button>
 		</div>
-		{#if selected.length}
+		{#if allMessages.has(selected)}
 		<div class="vflex chat">
 			<div class="vflex read">
 				{#each allMessages.get(selected) as message}
@@ -169,8 +230,9 @@
 				{/each}
 			</div>
 			<div class="write">
-
-			</div>
+				<input type="text" bind:value={message} placeholder="Type your message here" class="messageInput" on:keydown={event => {if (event.key === 'Enter') sendDirectMessageAndUpdate()} } />
+				<button on:click={() => sendDirectMessageAndUpdate()} class="sendButton">Send</button>
+			</div>			
 		</div>
 		{:else}
 		<div class="flex no-selected">
