@@ -17,14 +17,17 @@
 	onMount(() => {
 		$client.socket.on("error_append_user_to_room", (data: any) => {
 			console.log(data);
+			message = "Bad password !";
 		});
 		$client.socket.on("success_append_user_to_room", () => {
+			console.log("Ok");
+			message = "Room added !";
 			itself.close();
 		});
 
 		return(() => {
-			$client.socket.off("success_append_user_to_room");
-			$client.socket.off("error_append_user_to_room");
+			//$client.socket.off("success_append_user_to_room");
+			//$client.socket.off("error_append_user_to_room");
 		});
 		
 	})
@@ -38,5 +41,6 @@
 			id_public_room: roomID,
 			room_password: password
 		}); }}>Enter</button>
-	</div>
+	</div><br/>
+	<p>{message}</p>
 </div>

@@ -105,6 +105,7 @@
 	onMount(() => {
 		$client.socket.on("success_append_user_to_room", (data: any) => {
 			console.log("success", data);
+			itself.close();
 		});
 
 		$client.socket.on("get_all_rooms_begin_by_res", (data: any) => {

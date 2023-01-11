@@ -38,40 +38,53 @@
     import { onMount } from "svelte";
 	import { browser } from "$app/environment";
     import { loaded, login } from "$lib/stores/var";
+	import Modal from '$lib/tools/Modal.svelte';
+    import VerifyCode from '$lib/home/VerifyCode.svelte';
+
+	let verifCodeModal : any;
+	let tok : any;
 
 	async function connectWithUrlCode(url : any)
 	{
 		try{
-			const res : any = await fetch("http://localhost:3000/auth42",{
+			// debugger;
+			const res : any = await fetch(`http://${location.hostname}:3000/auth42`,{
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'
 				},
 				body: JSON.stringify({username: "oui", password: url.get('code')}),
 			});
-			let tok = await res.json();
-			// while (tok.get_code != null)
-			// {
-			// 	let ufa_code : any = prompt("Your code is : ");
-			// 	const res_ufa : any = await fetch("http://localhost:3000/",{
-			// 		method: 'POST',
-			// 		headers: {
-			// 			'Content-Type': 'application/json'
-			// 		},
-			// 		body:JSON.stringify({username: ufa_code, password: tok.tmp_jwt}),
-			// 	});
-			// 	tok = await res_ufa.json();
-			// }
-			$client.socket = io("http://localhost:3001",{
-				extraHeaders: {
-					Authorization: "Bearer " + tok.access_token,
-				}
-			});
-			if (tok.access_token) {
-				localStorage.setItem('transcendence-jwt', tok.access_token);
-				login.set(true);
+			tok = await res.json();
+			if (tok.get_code != null)
+			{//lunch the modal qrcode
+				verifCodeModal.open();
 			}
-			goto('/');
+			else {
+				console.log("Oupsi");
+				// while (tok.get_code != null)
+				// {
+				//  	let ufa_code : any = prompt("Your code is : ");
+				//  	const res_ufa : any = await fetch("http://cb8e2569788b:3000/",{
+				//  		method: 'POST',
+				//  		headers: {
+				//  			'Content-Type': 'application/json'
+				//  		},
+				//  		body:JSON.stringify({username: ufa_code, password: tok.tmp_jwt}),
+				//  	});
+				//  	tok = await res_ufa.json();
+				// }
+				$client.socket = io(`http://${location.hostname}:3001`,{
+					extraHeaders: {
+						Authorization: "Bearer " + tok.access_token,
+					}
+				});
+				if (tok.access_token) {
+					localStorage.setItem('transcendence-jwt', tok.access_token);
+					login.set(true);
+				}
+				goto('/');
+			}
 		} catch(e){
 			console.log("NOT CONNECTED");
 			localStorage.removeItem('transcendence-jwt');
@@ -87,7 +100,7 @@
 			{
 				const tok = localStorage.getItem('transcendence-jwt');
 				{
-					$client.socket = await io("http://localhost:3001",{
+					$client.socket = await io(`http://${location.hostname}:3001`,{
 						extraHeaders: {
 							Authorization: "Bearer " + tok,
 						},
@@ -119,6 +132,10 @@
 		}
 	});
 </script>
+
+<Modal bind:this={verifCodeModal}>
+	<VerifyCode  tok={tok} itself={verifCodeModal} />
+</Modal>
 
 <main>
 	{#if $loaded}

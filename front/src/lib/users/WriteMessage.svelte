@@ -178,6 +178,7 @@
 					username: dest,
 					message: message
 				});
+				message = "";
 		}}>Send</button>
 	</div>
 </div>

@@ -116,6 +116,7 @@
 
 	onMount(() => {
 		$client.socket.emit("getHistory", { username: profileUser.username });
+		$client.socket.emit("isUserBlocked", { username: profileUser.username });
 
 		$client.socket.on("error_askFriendG", (data: any) => {
 			console.log("error", data)
@@ -130,6 +131,11 @@
 			profileUser = profileUser;
 		});
 
+		$client.socket.on("success_isUserBlocked", (data: any) => {
+			profileUser.is_blocked = data.isUserBlocked;
+			profileUser = profileUser;
+		});
+
 		$client.socket.on("resHistory", (data: any) => {
 			gameHistory = data;
 		});
@@ -139,8 +145,22 @@
 			$client.socket.off("error_askFriendG");
 			$client.socket.off("success_askFriendG");
 			$client.socket.off("success_unAskFriendG");
+			$client.socket.off("success_isUserBlocked");
+			$client.socket.off("success_unblockUser");
+			$client.socket.off("success_blockUser");
 		});
 	});
+
+	function toggleBlock() {
+		if (profileUser.is_blocked) {
+			$client.socket.emit("unblockUser", { username: profileUser.username });
+			profileUser.is_blocked = false;
+		} else {
+			$client.socket.emit("blockUser", { username: profileUser.username });
+			profileUser.is_blocked = true;
+		}
+		profileUser = profileUser;
+	}
 </script>
 
 <Modal bind:this={writeMessageModal}>
@@ -169,8 +189,12 @@
 		<button on:click={() => {
 			$client.socket.emit("unAskFriendG", { username: profileUser.username });
 		}}>Cancel</button>
-		{/if}	
-		<button>Block</button>
+		{/if}
+		{#if !profileUser.is_blocked}
+			<button on:click={toggleBlock}>Block</button>
+		{:else}
+			<button on:click={toggleBlock}>Unblock</button>
+		{/if}
 		<button on:click={() => { writeMessageModal.open(); }}>Message</button>
 	</div>
 	{/if} 

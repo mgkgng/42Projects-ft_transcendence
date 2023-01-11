@@ -4,17 +4,20 @@ import { UserEntity } from "src/entity/User.entity";
 import { UserFriendEntity } from "src/entity/UserFriend.entity";
 import { Repository } from "typeorm";
 import { MainServerService } from "src/mainServer/mainServer.service";
+import { UserBlockEntity } from "src/entity/UserBlock.entity";
 
 @Injectable()
 export class friendSystemService {
-    constructor(
-        @InjectRepository(UserEntity)
-        private userRepository : Repository<UserEntity>,
-        @InjectRepository(UserFriendEntity)
-        private userFriendRepository : Repository<UserFriendEntity>,
-        @Inject(MainServerService)
-        private mainServerService : MainServerService
-    ) {}
+	constructor(
+		@InjectRepository(UserEntity)
+		private userRepository: Repository<UserEntity>,
+		@InjectRepository(UserBlockEntity)
+		private userBlockRepository: Repository<UserBlockEntity>,
+		@InjectRepository(UserFriendEntity)
+		private userFriendRepository: Repository<UserFriendEntity>,
+		@Inject(MainServerService)
+		private mainServerService: MainServerService
+	  ) {}
 
     // Do a request on this route to ask if 2 user are friend
     async isFriendWithByUsernameGetEnt(first_username : string, second_username : string)
@@ -228,4 +231,101 @@ export class friendSystemService {
             }
         });
     }
+
+	async isUserBlocked(blockerUsername: string, blockedUsername: string): Promise<boolean> {
+		// Find the user who is doing the blocking
+		const blockerUser = await this.userRepository.findOne({
+		  where: { username: blockerUsername },
+		});
+		if (!blockerUser) {
+		  throw new Error(`User with username "${blockerUsername}" not found.`);
+		}
+	  
+		// Find the user who is being checked for being blocked
+		const blockedUser = await this.userRepository.findOne({
+		  where: { username: blockedUsername },
+		});
+		if (!blockedUser) {
+		  throw new Error(`User with username "${blockedUsername}" not found.`);
+		}
+	  
+		// Check if the blocked user is already blocked by the blocker
+		const qb = this.userBlockRepository.createQueryBuilder('u');
+		let existingBlock = await qb
+        .leftJoinAndSelect("u.id_user", "userblocker")
+        .leftJoinAndSelect("u.id_user_blocked", "userblocked")
+        .where("userblocker.username = :first_username AND userblocked.username = :second_username", {first_username: blockerUser.username, second_username: blockedUser.username})
+        .getOne();
+	
+		return !!existingBlock;
+	  }
+
+	async blockUser(blockerUsername: string, blockedUsername: string): Promise<void> {
+		// Find the user who is doing the blocking
+		const blockerUser = await this.userRepository.findOne({
+		  where: { username: blockerUsername },
+		});
+		if (!blockerUser) {
+		  throw new Error(`User with username "${blockerUsername}" not found.`);
+		}
+	
+		// Find the user who is being blocked
+		const blockedUser = await this.userRepository.findOne({
+		  where: { username: blockedUsername },
+		});
+		if (!blockedUser) {
+		  throw new Error(`User with username "${blockedUsername}" not found.`);
+		}
+	
+		// Check if the blocked user is already blocked by the blocker
+		const qb = this.userBlockRepository.createQueryBuilder('u');
+		let existingBlock = await qb
+        .leftJoinAndSelect("u.id_user", "userblocker")
+        .leftJoinAndSelect("u.id_user_blocked", "userblocked")
+        .where("userblocker.username = :first_username AND userblocked.username = :second_username", {first_username: blockerUser.username, second_username: blockedUser.username})
+        .getOne();
+		if (existingBlock) {
+		  throw new Error(`User "${blockedUsername}" is already blocked by "${blockerUsername}".`);
+		}
+	
+		// Create a new UserBlockEntity to represent the block
+		const userBlock = new UserBlockEntity();
+		userBlock.id_user = blockerUser;
+		userBlock.id_user_blocked = blockedUser;
+	
+		// Save the UserBlockEntity to the database
+		await this.userBlockRepository.save(userBlock);
+	  }
+
+	  async unblockUser(unblockerUsername: string, unblockedUsername: string): Promise<void> {
+		// Find the user who is doing the unblocking
+		const unblockerUser = await this.userRepository.findOne({
+		  where: { username: unblockerUsername },
+		});
+		if (!unblockerUser) {
+		  throw new Error(`User with username "${unblockerUsername}" not found.`);
+		}
+	  
+		// Find the user who is being unblocked
+		const unblockedUser = await this.userRepository.findOne({
+		  where: { username: unblockedUsername },
+		});
+		if (!unblockedUser) {
+		  throw new Error(`User with username "${unblockedUsername}" not found.`);
+		}
+	  
+		// Check if the unblocked user is actually blocked by the unblocker
+		const qb = this.userBlockRepository.createQueryBuilder('u');
+		let existingBlock = await qb
+        .leftJoinAndSelect("u.id_user", "userUnblocker")
+        .leftJoinAndSelect("u.id_user_blocked", "userUnblocked")
+        .where("userUnblocker.username = :first_username AND userUnblocked.username = :second_username", {first_username: unblockerUser.username, second_username: unblockedUser.username})
+        .getOne();
+		if (!existingBlock) {
+		  throw new Error(`User "${unblockedUsername}" is not blocked by "${unblockerUsername}".`);
+		}
+	  
+		// Delete the UserBlockEntity to unblock the user
+		await this.userBlockRepository.delete(existingBlock);
+	  }
 }

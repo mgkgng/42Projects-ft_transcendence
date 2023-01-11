@@ -202,7 +202,8 @@
 	<div class="click-bg"></div>
 		{#if !$login}
 		<button on:click={() => {
-			goto("https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-f5ff5811f4e28fa86f612098072826a0d1e9b5dd48ca96888a53143c89c113f0&redirect_uri=http%3A%2F%2Flocalhost%3A3002&response_type=code");
+			//goto(`https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-f5ff5811f4e28fa86f612098072826a0d1e9b5dd48ca96888a53143c89c113f0&redirect_uri=http%3A%2F%2F${location.hostname}%3A3002&response_type=code`);
+			goto(`https://api.intra.42.fr/oauth/authorize?client_id=7e2bea32b8d407dab9d25b1ab4ff8ec14118a99e50807a191bc47334ed598658&redirect_uri=http%3A%2F%2F${location.hostname}%3A3002&response_type=code`);
 		}}>Login</button>
 		{:else}
 		<button on:click={() => {
