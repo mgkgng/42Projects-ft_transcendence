@@ -104,12 +104,10 @@
 
 	onMount(() => {
 		$client.socket.on("success_append_user_to_room", (data: any) => {
-			console.log("success", data);
 			itself.close();
 		});
 
 		$client.socket.on("get_all_rooms_begin_by_res", (data: any) => {
-			console.log("test", data);
 			allRooms = data;
 			allRooms.sort((a: any, b: any) => {
 				return (b.nb_users - a.nb_users || a.name - b.name || a.id_public_room - b.id_public_room);
@@ -120,7 +118,7 @@
 		$client.socket.emit("get_all_rooms_begin_by", { research: "" });
 
 		return (() => {
-			$client.socket.off("success_append_user_to_room");
+			//$client.socket.off("success_append_user_to_room");
 			$client.socket.off("get_all_rooms_begin_by_res");
 		});
 	});

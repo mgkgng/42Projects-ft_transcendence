@@ -76,7 +76,6 @@
 	export let hostname: string;
 	export let ready: boolean;
 
-	console.log("check", player);
 	//TODO precision username_42 & username
 </script>
 
