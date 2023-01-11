@@ -29,6 +29,7 @@ export class ChatDirectMessageGateway {
 
 	@SubscribeMessage('sendDirectMessage')
 	async sendMessage(@MessageBody() data: any, @ConnectedSocket() client: any) {
+		console.log("sendMessage")
 		const user = await this.userRepository.findOne({
 			where: {username: data.username}
 		});
@@ -46,6 +47,7 @@ export class ChatDirectMessageGateway {
 			return;
 		}
 		const userConnected = this.mainServerService.getUserConnectedByUsername(data.username);
+		console.log("send message" + await this.friendSystemService.isUserBlocked(user.username, userSender.username))
 		if (userConnected && !(await this.friendSystemService.isUserBlocked(user.username, userSender.username)))
 		{
 			let emitList = this.mainServerService.getUserConnectedListBySocketId(client.id);

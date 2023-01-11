@@ -25,8 +25,6 @@
 </style>
 
 <script lang="ts">
-    import { PongConfig } from "$lib/stores/var";
-
 	export let user: any;
 	export let playerType: number;
 	export let switched: boolean;
@@ -35,15 +33,19 @@
 	export let paddleWidth : number;
 
 	export let pos : number;
+	export let left: number;
 	export let initPos: number;
+
+	export let gameSize: any;
+	export let gameInfo: any;
 
 	if (!pos)
 		pos = initPos;
+
+	$: console.log(pos);
 		
 </script>
 
 <div class="paddle {(playerType == 1) ? "user" : ""} {(!user) ? "absent" : ""}"
-	style="left: {((playerType === 1 && switched) || (playerType === 2 && !switched)) ? PongConfig.DeadZoneHeight : mapSize[1] - PongConfig.DeadZoneHeight - PongConfig.PaddleHeight}px;
-		top: {(!switched) ? pos : mapSize[0] - pos - paddleWidth}px;
-		height: {paddleWidth}px">
+	style="left: {left}px; top: {pos}px; height: {paddleWidth}px">
 </div>

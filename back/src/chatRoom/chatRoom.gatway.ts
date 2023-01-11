@@ -51,7 +51,7 @@ export class ChatRoomService {
 	@SubscribeMessage('new_room')
 	async creat_room(@MessageBody() data: any, @Request() req, @ConnectedSocket() client : Socket)
 	{
-		console.log("new room", data);
+		// console.log("new room", data);
 		const id_user = await this.mainServer.getIdUser(req);
 		const is_password_protected : boolean = data.is_password_protected;	
 		// const password : string = is_password_protected ? await bcrypt.hash(data.room_password, 10) : "";
@@ -76,10 +76,10 @@ export class ChatRoomService {
 			new_user_chat_room.is_muted = false;
 			const res_user_chat_room = await this.dataSource.getRepository(UserChatRoomEntity).save(new_user_chat_room);
 			client.join(new_chat_room.id_public_room);
-			console.log("Create room finish");
+			// console.log("Create room finish");
 			client.emit("new_room_res", {	id_public_room: new_chat_room.id_public_room, room_name: name, is_password_protected: is_password_protected, is_admin: true, is_private: data.is_private	});
 		} catch (e) {
-			console.log("Create room error");
+			// console.log("Create room error");
 			client.emit("error_new_room", {error: "Room already exist"});
 			throw new WsException("Room already exist");
 		}
@@ -133,7 +133,7 @@ export class ChatRoomService {
 			client.emit("append_user_to_room_res", {id_public_room: room.id_public_room, is_admin: false, username: user.username});
 		}
 		catch(e){
-			console.log("getMessage Error: bad data");
+			// console.log("getMessage Error: bad data");
 			throw new WsException("Bad data");
 		}
 	}
@@ -176,11 +176,11 @@ export class ChatRoomService {
 				}
 				client.emit('get_users_room_res', {users: end, id_public_room: data.id_public_room});
 			} catch (e) {
-				console.log("get_users Error: bad data", e);
+				// console.log("get_users Error: bad data", e);
 				client.emit("error_get_users_room", {error: "Error data"});
 			}
 		}catch(e){
-			console.log("get_users Error: bad data");
+			// console.log("get_users Error: bad data");
 			throw new WsException("Bad data");
 		}
 	}
@@ -214,11 +214,11 @@ export class ChatRoomService {
 				.where("chatRoom.id_g = :id", {id: id_room}).orderBy("messageChatRoomEntity.date_message", "ASC").getMany();
 				client.emit('get_message_room_res', {messages : res, id_public_room: data.id_public_room} )
 			} catch (e) {
-				console.log("getMessage Error", e);
+				// console.log("getMessage Error", e);
 				throw new WsException("No message in this room");
 			}
 		} catch(e){
-			console.log("getMessage Error: bad data");
+			// console.log("getMessage Error: bad data");
 			throw new WsException("Bad data");
 		}
 	}
@@ -251,11 +251,11 @@ export class ChatRoomService {
 				.getMany();
 				client.emit('get_message_room', res);
 			} catch (e) {
-				console.log("getMessage Error", e);
+				// console.log("getMessage Error", e);
 				throw new WsException("No message in this room");
 			}
 		}catch(e){
-			console.log("getMessage Error: bad data");
+			// console.log("getMessage Error: bad data");
 			throw new WsException("Bad data");
 		}
 	}
@@ -269,7 +269,7 @@ export class ChatRoomService {
 		.where("messageChatRoomEntity.id = :i", {i: data.id_message})
 		.select(["messageChatRoomEntity.content_message", "messageChatRoomEntity.date_message", "user.username", "chatRoom.id_public_room"])
 		.getOne();
-		console.log(res);
+		// console.log(res);
 		client.emit('get_message_by_id', {content_message: res.content_message, id_public_room: res.id_chat_room.id_public_room, username: res.id_user.username, date_message: res.date_message});
 	}
 
@@ -344,6 +344,7 @@ export class ChatRoomService {
 		// .createQueryBuilder("chatRoom")
 		// .where("chatRoom.is_private = :p", {p: false})
 		// .select(["chatroom.id_public_room", "chatRoom.is_password_protected"]).getMany();
+		// console.log("get_all_rooms: ", res)
 		client.emit("get_all_rooms_res", res);
 	}
 	//OK
@@ -377,7 +378,7 @@ export class ChatRoomService {
 					and chat_room_entity.id_g not in (select id from user_chat_room_entity where \"idUserIdG\" = $3 and user_chat_room_entity.is_visible = TRUE) \
 					group by chat_room_entity.id_g", [data.research.length, data.research, id_user]);
 		}
-		console.log(res, data)
+		// console.log(res, data)
 		client.emit("get_all_rooms_begin_by_res", res);
 	}
 
@@ -474,10 +475,10 @@ export class ChatRoomService {
 	//{id_public_roomng}
 	@SubscribeMessage("set_room_not_visible")
 	async setRoomNotVisible(@MessageBody() data, @ConnectedSocket() client: Socket, @Request() req) {
-		console.log("set_room_not_visible", data)
+		// console.log("set_room_not_visible", data)
 		const user = await this.mainServer.getIdUser(req);
 		const room : any = await this.mainServer.getIdRoom(data);
-		console.log("set_room_not_visible", data, user, room);
+		// console.log("set_room_not_visible", data, user, room);
 		const res = await this.dataSource.createQueryBuilder().update(UserChatRoomEntity)
 				.where("id_user = :u AND room = :r", {u: user, r: room})
 				.set({is_visible: false}).execute();
@@ -635,7 +636,7 @@ export class ChatRoomService {
 				.select(["user.username"])
 				.where("user.username = :u", {u: data.new_username}).getOneOrFail();
 				client.emit("error_change_username", "Username already taken");
-				console.log("Username already taken ", client.id);
+				// console.log("Username already taken ", client.id);
 				return;
 			}catch(e){
 				if (data.new_username.length == 0 || data.new_username.length > 20)
@@ -647,12 +648,12 @@ export class ChatRoomService {
 				.where("id_g = :u", {u: id_user})
 				.set({username: data.new_username}).execute();
 				client.emit("change_username_res", {new_username: data.new_username});
-				console.log("Username changed ", client.id);
+				// console.log("Username changed ", client.id);
 				return;
 			}
 		}catch(e){
 			client.emit("error_change_username", "Data error");
-			console.log("Data error ", client.id);
+			// console.log("Data error ", client.id);
 		}
 	}
 

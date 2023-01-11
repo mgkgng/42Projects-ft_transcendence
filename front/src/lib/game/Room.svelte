@@ -7,6 +7,7 @@
 		align-items: center;
 
 		width: 90vw;
+		height: 90vh;
 		padding: 2em 0;
 
 		border: solid 2px transparentize(#fff, 0.65);
@@ -20,6 +21,8 @@
 		position: relative;
 		padding: 0;
 		gap: .2em;
+		height: 100%;
+		width: 90%;
 
 		display: flex;
 		justify-content: center;
@@ -86,8 +89,6 @@
     import Player from '$lib/game/Player.svelte';
 	import Game from '$lib/game/Game.svelte';
 	import AlertMessage from '$lib/modals/AlertMessage.svelte';
-	//TODO room title front
-	//TODO room watch number front-back
 
 	export let roomID: string;
 	export let itself: any;	
@@ -99,7 +100,6 @@
 
 	let quitConfirmMsgModal: any;
 
-	let moving = false;
 	let puckMoving: any;
 	
 	let gameFinishedModal: any;
@@ -124,7 +124,7 @@
 	user.subscribe((user: any) => { userInfo = user; });
 
 	$: console.log("this is the roomID", roomID);
-	
+
 	onMount(()=> {
 		if (!roomID)
 			return ;
@@ -139,7 +139,6 @@
 				started = true;
 			player1 = data.player1;
 			player2 = data.player2;
-			initPos = (MapSize[gameInfo?.mapSize][0] - PaddleSize[gameInfo?.paddleSize]) / 2;
 			userType = (player1?.info.username_42 == userInfo.username) ? UserType.Player1 :
 				(player2?.info.username_42 == userInfo.username) ? UserType.Player2 :
 				UserType.Watcher;
@@ -167,6 +166,7 @@
 		});
 		
 		$client.socket.on("PaddleUpdate", (data: any) => {
+			console.log(data);
 			if (data.type == 0)
 				player1.pos = data.pos;
 			else
@@ -234,13 +234,14 @@
 
 {#if gameInfo}
 <div class="container">
-	<div class="flex pong" style="width: {MapSize[gameInfo.mapSize][1] + 200}px; height: {MapSize[gameInfo.mapSize][0]}px;">
+	<!-- <div class="flex pong" style="width: {MapSize[gameInfo.mapSize][1] + 200}px; height: {MapSize[gameInfo.mapSize][0]}px;"> -->
+	<div class="flex pong">
 		<div class="vflex side">
 			<Player player={(!switched) ? player2 : player1} left={true} hostname={hostname} ready={ready}/>	
 			<h1>{(!switched && player2) ? player2.score : ((!switched && !player2) || (switched && !player1)) ? "0" : player1?.score}</h1>
 		</div>
-		<Game bind:player1={player1} bind:player2={player2} bind:gameInfo={gameInfo} bind:switched={switched} bind:initPos={initPos}
-			userType={userType} roomID={roomID} puck={puck} />
+		<Game bind:player1={player1} bind:player2={player2} bind:gameInfo={gameInfo} bind:switched={switched}
+			userType={userType} roomID={roomID} puck={puck}/>
 		<div class="vflex side right">
 			<Player player={(!switched) ? player1 : player2} left={false} hostname={hostname} ready={ready}/>
 			<h1>{(!switched && player1) ? player1?.score : (player2) ? player2.score : "0"}</h1>
