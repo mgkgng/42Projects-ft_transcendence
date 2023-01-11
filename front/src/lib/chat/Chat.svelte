@@ -237,7 +237,7 @@
 		$client.socket.on("get_message_room_res", (data: any) => {
 			let chatRoom = chat.my_rooms.get(data.id_public_room);
 			for (let message of data.messages)
-				chatRoom.messages.push(new Message(message.id_chat_room.id_public_room, message.id_user.username, message.content_message, message.data_message))
+				chatRoom.messages.push(new Message(message.id_chat_room.id_public_room, message.id_user.username, message.content_message, message.date_message))
 			chat = chat;
 		});
 

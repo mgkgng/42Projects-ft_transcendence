@@ -139,6 +139,7 @@
     import type { Chatt } from "$lib/chatt/Chatt";
     import UserProfile from "$lib/users/UserProfile.svelte";
     import ChatUserSettings from "$lib/chat/ChatUserSettings.svelte";
+    import { onMount } from "svelte";
 
 	export let chat: Chatt;
 	export let roomID: string;
@@ -150,8 +151,14 @@
 
 	let profileUser: any;
 
-	let newMessage: string = "";
-
+	let newMessage: string = "";	
+	
+	onMount(() => {
+		$client.socket.on("success_getUserinDB", (data: any) => {
+			profileUser = data.users[0]; 
+			console.log("succes_getUserinDB: ", profileUser, data)
+		});
+	});
 </script>
 
 <Modal bind:this={chatRoomSettingsModal}>
@@ -181,9 +188,14 @@
 		<div class="read">
 		{#each chat.my_rooms.get(roomID).messages as message}
 			<div class="message">
-				<p>{message.username}:</p>
+				<p on:click={() => {
+				//TODO get profile User info
+				profileUser = {};
+				$client.socket.emit("getUserinDB", {username : message.username});
+				userProfileModal.open();
+			}}>{message.username}:</p>
 				<div>{message.message}</div>
-				<div>{message.date}</div>
+				<div>{message.date.split("T")[0]}</div>
 			</div>
 		{/each}
 		</div>
@@ -201,10 +213,8 @@
 	<div class="vflex users">
 		<div class="vflex list">
 			{#each chat.my_rooms.get(roomID).users as user}
-			<div class="user" on:click={() => {
-				//TODO get profile User info
-			}}>
-				<p>{user.username}</p>
+			<div class="user" >
+			<p>{user.username}</p>
 			</div>
 			{/each}
 		</div>
