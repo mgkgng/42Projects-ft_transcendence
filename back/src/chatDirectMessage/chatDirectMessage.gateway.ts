@@ -41,7 +41,7 @@ export class ChatDirectMessageGateway {
 			this.server.to(client.id).emit('error_sendDirectMessage', {error: 'User not found'});
 			return;
 		}
-		if (this.friendSystemService.isUserBlocked(userSender.username, user.username))
+		if (await this.friendSystemService.isUserBlocked(userSender.username, user.username))
 		{
 			this.server.to(client.id).emit('error_sendDirectMessage', {error: 'User blocked'});
 			return;
@@ -77,7 +77,7 @@ export class ChatDirectMessageGateway {
 			this.server.to(client.id).emit('error_getDirectMessage', {error: 'User not found'});
 			return;
 		}
-		if (this.friendSystemService.isUserBlocked(userSender.username, user.username))
+		if (await this.friendSystemService.isUserBlocked(userSender.username, user.username))
 		{
 			this.server.to(client.id).emit('error_getDirectMessage', {error: 'User blocked'});
 			return;
