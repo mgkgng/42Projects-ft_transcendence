@@ -390,6 +390,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				GROUP BY id_player \
 				ORDER BY nb_victory DESC, win_rate DESC; ", []);
 		client.emit("RankingRes", res);
+
 	}
 
 	@SubscribeMessage('CheckNewUsername')

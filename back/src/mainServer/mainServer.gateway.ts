@@ -78,7 +78,7 @@ export class MainServerGateway {
 			const promiseParsedList = users.map( async (user) => {
 				let isUserFriendWithConnectedUser = await this.friendSystemService.isFriendWithByUsernameGetEnt(this.mainServerService.getUserConnectedBySocketId(client.id).username, user.username);
 				let isUserAskedByConnectedUser = await (await this.friendSystemService.getAskList(user.username)).find((ask) => ask.username === this.mainServerService.getUserConnectedBySocketId(client.id).username);
-				return {username: user.username, displayname: user.displayname, img_url: user.img_url,
+				return {username: user.username, username_42: user.username_42, displayname: user.displayname, img_url: user.img_url,
 					campus_name: user.campus_name, campus_country: user.campus_country,
 					last_connection: user.last_connection, created_at: user.created_at,
 					status: this.mainServerService.getUserStatus(user.username),

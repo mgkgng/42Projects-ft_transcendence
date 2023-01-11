@@ -113,11 +113,22 @@
 	let writeMessageModal: any;
 
 	let gameHistory: Array<any> = [];
+	let update : boolean = false;
+	$: {
+		if (profileUser.username_42 != undefined && !update)
+		{
+			test();
+			update = true;
+		}
+	} 	
+
+	function test() {
+		console.log("test:", profileUser);
+		$client.socket.emit("getHistory", { username: profileUser.username_42 });
+		$client.socket.emit("isUserBlocked", { username: profileUser.username_42 });
+	}
 
 	onMount(() => {
-		$client.socket.emit("getHistory", { username: profileUser.username });
-		$client.socket.emit("isUserBlocked", { username: profileUser.username });
-
 		$client.socket.on("error_askFriendG", (data: any) => {
 			console.log("error", data)
 		});
@@ -167,7 +178,9 @@
 	<WriteMessage itself={writeMessageModal} sendTo={[profileUser.username]}/>
 </Modal>
 
+
 <div class="vflex window profile">
+{#if profileUser != null && profileUser.created_at != null}
 	<div class="flex info">
 		<div class="photo">
 			<img src={profileUser.img_url} alt="grosse-tete">
@@ -213,5 +226,6 @@
 		<p>No Game History Yet</p>
 		{/if}
 	</div>
+{/if}
 	<CloseButton window={itself}/>
 </div>
