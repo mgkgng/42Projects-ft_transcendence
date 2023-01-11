@@ -324,6 +324,7 @@ export class ChatRoomService {
 	async getMyRoom(@MessageBody() data, @ConnectedSocket() client: Socket)
 	{
 		const res : any = await this.mainServer.getNamesRoomsForUser(client);
+		//console.log("get_my_rooms", res);
 		client.emit("get_my_rooms_res", res);
 	}
 	//OK
@@ -481,7 +482,7 @@ export class ChatRoomService {
 		const res = await this.dataSource.createQueryBuilder().update(UserChatRoomEntity)
 				.where("id_user = :u AND room = :r", {u: user, r: room})
 				.set({is_visible: false}).execute();
-		client.emit("set_room_not_visible_res", data.room_name);
+		client.emit("set_room_not_visible_res", data.id_public_room);
 	}
 	//Put a room in state "visible" for a user
 	//{id_public_room:string}

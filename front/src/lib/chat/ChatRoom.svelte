@@ -143,7 +143,6 @@
 	export let chat: Chatt;
 	export let roomID: string;
 
-	console.log(chat);
 
 	let chatRoomSettingsModal: any;
 	let chatUsersSettingsModal: any;
@@ -195,6 +194,7 @@
 					id_public_room: chat.my_rooms.get(roomID).roomID,
 					content_message: newMessage
 				});
+				newMessage = "";
 			}}>Send</button>
 		</div>
 	</div>

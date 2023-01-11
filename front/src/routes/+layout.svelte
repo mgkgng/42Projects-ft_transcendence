@@ -47,7 +47,6 @@
 	async function connectWithUrlCode(url : any)
 	{
 		try{
-			// debugger;
 			const res : any = await fetch(`http://${location.hostname}:3000/auth42`,{
 				method: 'POST',
 				headers: {
