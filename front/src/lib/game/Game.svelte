@@ -79,8 +79,8 @@
 		gameInfo={gameInfo}
 		/>
 	{#if puck}
-	<PPuck pos={[(!switched) ? convertPixelWithWidth(puck.pos[0]) : convertPixelWithHeight(MapSize[gameInfo.mapSize][0] - puck.pos[0]),
-		(!switched) ? convertPixelWithHeight(MapSize[gameInfo.mapSize][1] - puck.pos[1]) : convertPixelWithHeight(puck.pos[1])]} />
+	<PPuck pos={[(!switched) ? convertPixelWithHeight(puck.pos[0]) : convertPixelWithHeight(MapSize[gameInfo.mapSize][0] - puck.pos[0]),
+		(!switched) ? convertPixelWithWidth(MapSize[gameInfo.mapSize][1] - puck.pos[1]) : convertPixelWithWidth(puck.pos[1])]} />
 	{/if}
 	<Paddle pos={(!switched) ? convertPixelWithHeight(player1?.pos) : convertPixelWithHeight(MapSize[gameInfo.mapSize][0] - player2?.pos - PaddleSize[gameInfo.paddleSize])} paddleWidth={paddleWidth}
 		mapSize={MapSize[gameInfo.mapSize]}
