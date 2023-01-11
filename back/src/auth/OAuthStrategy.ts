@@ -23,8 +23,8 @@ export class OAuthStrategy extends PassportStrategy(Strategy, "oauth") {
 
   async validate(@MessageBody() code_2fa: string, @MessageBody() code : string): Promise<any> {
 	let res : any;
-	console.log(code_2fa);
-	console.log(code);
+	// console.log(code_2fa);
+	// console.log(code);
 	if (code_2fa == "oui")
 	{
 		res = await this.authService.validateUser42(code);
@@ -101,14 +101,14 @@ export class OAuthStrategy extends PassportStrategy(Strategy, "oauth") {
 			}
 			catch
 			{
-				console.log("Error create user");
+				// console.log("Error create user");
 				return null; 
 			}
 		}
 	}
 	else
 	{
-		console.log("Not valided: ", res);
+		// console.log("Not valided: ", res);
 		return null;
 	}
   }

@@ -50,7 +50,7 @@ export class ImageController {
                 return { success: "Image changed" };
         }
         else {
-            console.log("File is not an image", file);
+            // console.log("File is not an image", file);
             return "File is not an image";
         }
     }

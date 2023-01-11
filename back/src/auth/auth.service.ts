@@ -81,7 +81,7 @@ export class AuthService {
 	}
 	async get_valid_username(username: string)
 	{
-		console.log("get_valid_username");
+		// console.log("get_valid_username");
 		let i : number = 0;
 		let user : UserEntity;
 		do {

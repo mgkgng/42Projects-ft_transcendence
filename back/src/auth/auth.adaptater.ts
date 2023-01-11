@@ -36,7 +36,7 @@ export class WsAdapter extends IoAdapter {
 	  verify(socket.handshake.headers.authorization.split(' ')[1] as string, process.env.SECRET, (err, decoded : any) => { 
 		if (err)
 		{
-			console.log("ERROR", err);
+			// console.log("ERROR", err);
 			socket.emit("errors", {message: "UnauthorizedJwt"});
 			return (null);
 		}

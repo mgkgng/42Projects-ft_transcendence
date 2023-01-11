@@ -44,7 +44,7 @@ export class UserService {
 			return (res);
 		} catch (e) {
 			await querry.rollbackTransaction();
-			console.log("Create User failed");
+			// console.log("Create User failed");
 			return (null);
 		}
 	}

@@ -106,7 +106,7 @@ export class Room {
 
 	playerExit(client: Client) {
 		if (this.isStarted) { // If the game has begun, end the game
-			console.log("test: ", this.players, this.players.keys());
+			// console.log("test: ", this.players, this.players.keys());
 			this.endGame(this.players.keys()[0]); //TODO check if it works well tomorrow
 			// TODO tomorrow player 
 			return ;
@@ -119,7 +119,7 @@ export class Room {
 			this.destroyRoom();
 			return ;
 		} else if (this.hostname.length && client.username == this.hostname) { // If the user who just quitted was a host, change the host and make room available again
-			console.log(this.players);
+			// console.log(this.players);
 			this.hostname = this.players.get(this.players.keys().next().value).username;
 			this.isAvailable = true;
 		}

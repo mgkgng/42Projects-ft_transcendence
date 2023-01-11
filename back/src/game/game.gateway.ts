@@ -44,6 +44,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				@InjectRepository(GameEntity) private gameRep: Repository<GameEntity>,
 				@InjectRepository(UserEntity) private userRep : Repository<UserEntity>,
 				@InjectRepository(UserFriendEntity) private userFriendRepository : Repository<UserFriendEntity>,
+				@InjectRepository(UserBlockEntity) private userBlockRepository : Repository<UserBlockEntity>,
+				@InjectRepository(UserEntity) private userRepository : Repository<UserEntity>,
 				@Inject(friendSystemService) private friendSystemService : friendSystemService,		
 				@Inject(ChatDirectMessageService) private chatDirectMessageService : ChatDirectMessageService,
 				private dataSource : DataSource,
@@ -59,7 +61,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	server: Server;
 
 	public async handleConnection(client: any, ...args: any[]) {
-		console.log("Connection socket:", client.id);
+		// console.log("Connection socket:", client.id);
 		
 		// Get the user information from db and pass it to the user
 		let userInfo = this.getUserInfo(client);
@@ -318,7 +320,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage("isReady")
 	setReady(@MessageBody() data: any, @Request() req) {
 
-		console.log(data);
+		// console.log(data);
 		// Check if the client is a guest player in the room
 		let target = this.getClient(req);
 		let room = this.getRoom(data.roomID);
@@ -557,26 +559,36 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage('sendDirectMessageG')
 	async sendMessage(@MessageBody() data: any, @ConnectedSocket() client: any) {
-		const user = await this.userRep.findOne({
-			where: {username: data.username},
-			relations: ['relation_userBlocked']
+		console.log("sendMessageG")
+		const user = await this.userRepository.findOne({
+			where: {username: data.username}
 		});
-		const userSender = await this.userRep.findOne({
-			where: {username: this.mainServerService.getUserConnectedBySocketId(client.id).username},
-			relations: ['relation_userBlocked']
+		const userSender = await this.userRepository.findOne({
+			where: {username: this.mainServerService.getUserConnectedBySocketId(client.id).username}
 		});
-		if (!user || !userSender || userSender.relation_userBlocked.includes(data.username))
+		if (!user || !userSender)
 		{
-			this.server.to(client.id).emit('error_sendDirectMessageG', {error: 'User not found or blocked'});
+			this.server.to(client.id).emit('error_sendDirectMessageG', {error: 'User not found'});
 			return;
 		}
-
-		if (!user.relation_userBlocked.includes(client.username)) {
+		if (await this.friendSystemService.isUserBlocked(userSender.username, user.username))
+		{
+			this.server.to(client.id).emit('error_sendDirectMessageG', {error: 'User blocked'});
+			return;
+		}
+		const userConnected = this.mainServerService.getUserConnectedByUsername(data.username);
+		if (!(await this.friendSystemService.isUserBlocked(user.username, userSender.username))) {
 			let username42 = await this.getUsername42ByUsername(data.username);
 			let target = this.clients.get(username42);
 			target.newMessageReceived(userSender.username);
 		}
-
+		if (userConnected && !(await this.friendSystemService.isUserBlocked(user.username, userSender.username)))
+		{
+			let emitList = this.mainServerService.getUserConnectedListBySocketId(client.id);
+			emitList.forEach(element => {
+				this.server.to(element.id).emit('getDirectMessage', {sender: userSender.username, message: data.message});
+			});
+		}
 		let ret = await this.chatDirectMessageService.handleSendDirectMessage(this.mainServerService.getUserConnectedBySocketId(client.id).username, data.username, data.message);
 		if (ret)
 			this.server.to(client.id).emit('success_sendDirectMessageG', {message: data.message});
