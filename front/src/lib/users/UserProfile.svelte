@@ -117,12 +117,12 @@
 	$: {
 		if (profileUser.username_42 != undefined && !update)
 		{
-			test();
+			lunch_update();
 			update = true;
 		}
 	} 	
 
-	function test() {
+	function lunch_update() {
 		console.log("test:", profileUser);
 		$client.socket.emit("getHistory", { username: profileUser.username_42 });
 		$client.socket.emit("isUserBlocked", { username: profileUser.username_42 });
@@ -150,7 +150,9 @@
 		$client.socket.on("resHistory", (data: any) => {
 			gameHistory = data;
 		});
-
+		$client.socket.on("error_resHistory", (data: any) => {
+			//Username not exist in db
+		});
 		return (() => {
 			$client.socket.off("resHistory");
 			$client.socket.off("error_askFriendG");
@@ -223,7 +225,7 @@
 		</div>
 		{/each}
 		{:else}
-		<p>No Game History Yet</p>
+			<p>No Game History Yet</p>
 		{/if}
 	</div>
 {/if}

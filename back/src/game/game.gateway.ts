@@ -364,13 +364,18 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage("getHistory")
 	async getHistGame(@MessageBody() data: any, @ConnectedSocket() client: Socket, @Request() req) {
-		let id_user = await this.mainServerService.getIdUser(req);
-		const res = await this.dataSource.getRepository(GameEntity).createQueryBuilder("game")
-		.innerJoin("game.player1", "user1")
-		.innerJoin("game.player2", "user2")
-		.where("game.player1.id_g = :u or game.player2.id_g = :u", {u: id_user})
-		.select(["game.player1_score", "game.player2_score", "user1.username", "user2.username", "game.date_game"]).getMany();
-		client.emit("resHistory", res);
+		try{
+			let id_user = await this.mainServerService.getIdUserByUsername(data.username_42);
+			//let id_user = await this.mainServerService.getIdUser(req);
+			const res = await this.dataSource.getRepository(GameEntity).createQueryBuilder("game")
+			.innerJoin("game.player1", "user1")
+			.innerJoin("game.player2", "user2")
+			.where("game.player1.id_g = :u or game.player2.id_g = :u", {u: id_user})
+			.select(["game.player1_score", "game.player2_score", "user1.username", "user2.username", "game.date_game"]).getMany();
+			client.emit("resHistory", res);
+		}catch (e){
+			client.emit("error_resHistory", {error : "Bad data"});
+		}
 	}
 
 	@SubscribeMessage("RankingReq")
