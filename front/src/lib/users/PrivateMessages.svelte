@@ -120,6 +120,7 @@
 	import { onMount } from "svelte";
     import { client } from "$lib/stores/client";
     import { user } from "$lib/stores/user";
+	import { afterUpdate } from 'svelte';
 
 	export let itself: any;
 
@@ -134,7 +135,6 @@
 
 	onMount(() => {
 		$client.socket.on("success_getMessageUserList", (data: any) => {
-			console.log("list", data);
 			for (let user of data.messageUserList) {
 				exchanges.set(user.username, user);
 				exchanges = exchanges;
@@ -146,14 +146,10 @@
 			let from = (data.messageHistory[0].recipient == userInfo.username) ? data.messageHistory[0].sender : data.messageHistory[0].recipient
 			allMessages.set(from, data.messageHistory);
 			allMessages = allMessages;
-			console.log("receivu" + from, allMessages);
-			scrollToBottom();
 		});
 
 		$client.socket.on("success_sendDirectMessageG", (data: any) => {
-			allMessages.set(userInfo.username, data.messageHistory);
-			// NEED TO DO THIS
-			scrollToBottom();
+			$client.socket.emit("getDirectMessage", { username: selected})
 		});
 
 		$client.socket.on("error_getDirectMessage", (data: any) => {
@@ -161,7 +157,6 @@
 		});
 
 		$client.socket.on("newMessageArrived", async (senderUsername: string) => {
-			console.log("newMessageArrived", senderUsername);
 			if (selected == senderUsername) {
 				$client.socket.emit("getDirectMessage", { username: senderUsername});
 			}
@@ -174,21 +169,25 @@
 		return (() => {
 			$client.socket.off("success_getMessageUserList");
 			$client.socket.off("success_getDirectMessage");
+			$client.socket.off("success_sendDirectMessageG");
 		});
 	});
+
+	afterUpdate(() => {
+		scrollToBottom();
+	});
+
 
 	function getMessageAndChangeSelected(selected_username: string)
 	{
 		selected = selected_username;
 		$client.socket.emit("getDirectMessage", { username: selected});
-		console.log("heru" + selected)
 	}
 
 	let message = '';
 
-	function sendDirectMessageAndUpdate() {
+	async function sendDirectMessageAndUpdate() {
 		$client.socket.emit('sendDirectMessageG', {username: selected, message: message});
-		$client.socket.emit("getDirectMessage", { username: selected});
 		message = '';
 	}
 
@@ -198,7 +197,6 @@
 		{
 			chatBox.scrollTop = chatBox.scrollHeight;
 		}
-		console.log("chatbox", chatBox);
 	}
 </script>
 
@@ -232,7 +230,7 @@
 			<div class="write">
 				<input type="text" bind:value={message} placeholder="Type your message here" class="messageInput" on:keydown={event => {if (event.key === 'Enter') sendDirectMessageAndUpdate()} } />
 				<button on:click={() => sendDirectMessageAndUpdate()} class="sendButton">Send</button>
-			</div>			
+			</div>
 		</div>
 		{:else}
 		<div class="flex no-selected">
