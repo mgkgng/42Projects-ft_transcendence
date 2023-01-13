@@ -166,6 +166,7 @@
 
 	onMount (() => {
 		/* Chat Updates*/
+
 		$client.socket.on("set_room_not_visible_res", (data: any) => {
 			chat.my_rooms.delete(data);
 			chat = chat;
@@ -203,26 +204,28 @@
 		});
 
 		$client.socket.on("get_all_rooms_res", (data : any) => {
-			console.log(data);
 			for (let room of data)
 				chat.rooms.set(room.id_public_room, room.is_password_protected);
 			chat = chat;
 		});
 
 		$client.socket.on("get_my_rooms_res", (data: any) => {
-			chat.my_rooms.clear();
+			//chat.my_rooms.clear();
 			for (let x of data) {
-				chat.my_rooms.set(x.room.id_public_room, new ChattRoom(x.room.id_public_room, x.room.name, x.room.is_password_protected, x.room.is_private, x.is_admin, x.is_owner));
-				$client.socket.emit("get_message_room", { id_public_room: x.room.id_public_room });
+				if (chat.my_rooms.get(x.id_public_room) == undefined) {
+					chat.my_rooms.set(x.room.id_public_room, new ChattRoom(x.room.id_public_room, x.room.name, x.room.is_password_protected, x.room.is_private, x.is_admin, x.is_owner));
+					$client.socket.emit("get_message_room", { id_public_room: x.room.id_public_room });
+				}
 				$client.socket.emit("get_users_room", {id_public_room: x.room.id_public_room })
 			}
 			chat = chat;
 		});
 
 		$client.socket.on("new_room_res", (data: any) => {
-			chat.rooms.set(data.id_public_room, data.is_password_protected);
-			chat.my_rooms.set(data.id_public_room, new ChattRoom(data.id_public_room, data.room_name, data.is_password_protected, data.is_private, data.is_admin, true));
-			chat = chat;
+			//chat.rooms.set(data.id_public_room, data.is_password_protected);
+			//chat.my_rooms.set(data.id_public_room, new ChattRoom(data.id_public_room, data.room_name, data.is_password_protected, data.is_private, data.is_admin, true));
+			//chat = chat;
+			$client.socket.emit("get_my_rooms");
 		});
 
 		$client.socket.on("append_user_to_room_res", (data: any) => {
@@ -231,10 +234,11 @@
 			//chat.rooms.set(data.id_public_room, data.is_password_protected);
 			//chat.my_rooms.set(data.id_public_room, new ChattRoom(data.id_public_room, data.room_name, roomInfo.is_password_protected, false, false, false));
 			//chat = chat;
-			$client.socket.emit("get_my_rooms"); 
+			$client.socket.emit("get_users_room", { id_public_room: data.id_public_room}); 
 		});
 
 		$client.socket.on("get_message_room_res", (data: any) => {
+			console.log("Get Messages:", data)
 			let chatRoom = chat.my_rooms.get(data.id_public_room);
 			for (let message of data.messages)
 				chatRoom.messages.push(new Message(message.id_chat_room.id_public_room, message.id_user.username, message.content_message, message.date_message))
@@ -242,9 +246,13 @@
 		});
 
 		$client.socket.on("get_users_room_res", (data: any) => {
+			console.log("Get User:", data)
 			let chatRoom = chat.my_rooms.get(data.id_public_room);
+			chatRoom.users = [];
 			for (let user of data.users)
+			{
 				chatRoom.users.push(new ChatRoomUser(user.id_user.username, user.is_admin, user.is_owner, user.is_login));
+			}
 			chat = chat;
 		});
 
@@ -258,18 +266,18 @@
 
 		return(() => {
 			//$client.socket.off("get_my_rooms_res");
-			$client.socket.off("get_all_rooms_res");
-			$client.socket.off("set_room_not_visible_res");
-			$client.socket.off("set_room_visible");
-			$client.socket.off("set_room_private");
-			$client.socket.off("unset_room_private");
-			$client.socket.off("set_password_room");
-			$client.socket.off("unset_password_room");
-			$client.socket.off("new_room_res");
-			$client.socket.off("append_user_to_room_res");
-			$client.socket.off("get_message_room_res");
-			$client.socket.off("get_users_room_res");
-			$client.socket.off("new_message_room_res");
+			// $client.socket.off("get_all_rooms_res");
+			// $client.socket.off("set_room_not_visible_res");
+			// $client.socket.off("set_room_visible");
+			// $client.socket.off("set_room_private");
+			// $client.socket.off("unset_room_private");
+			// $client.socket.off("set_password_room");
+			// $client.socket.off("unset_password_room");
+			// $client.socket.off("new_room_res");
+			// $client.socket.off("append_user_to_room_res");
+			// $client.socket.off("get_message_room_res");
+			// $client.socket.off("get_users_room_res");
+			// $client.socket.off("new_message_room_res");
 		});
 	});
 </script>

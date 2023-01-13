@@ -92,13 +92,14 @@ export class ChatRoomService {
 	{
 		try{
 			const user : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
-			const client_username_42 = user.username_42;
+			const client_username_42 = data.username;
 			const id_user : any = await this.mainServer.getIdUserByUsername(client_username_42);
 			const id_room = await this.mainServer.getIdRoom(data);
-
+			if (data.room_password == undefined)
+				data.room_password = "";
 			const room = await this.dataSource.getRepository(ChatRoomEntity).createQueryBuilder("room").
 			where("room.id_g = :id ", {id: id_room}).getOne();
-
+			
 			const is_good_password = await bcrypt.compare(data.room_password, room.password);
 			//const is_good_password = (data.room_password == room.password);
 
@@ -133,7 +134,7 @@ export class ChatRoomService {
 			client.emit("append_user_to_room_res", {id_public_room: room.id_public_room, is_admin: false, username: user.username});
 		}
 		catch(e){
-			// console.log("getMessage Error: bad data");
+			console.log("Append message Error: bad data", e);
 			throw new WsException("Bad data");
 		}
 	}
@@ -164,7 +165,7 @@ export class ChatRoomService {
 				.innerJoin("userChatRoomEntity.room", "chatRoom")
 				.innerJoin("userChatRoomEntity.id_user", "user")
 				.select(["user.username", "userChatRoomEntity.is_admin","userChatRoomEntity.is_owner"])
-				.where("chatRoom.id_g = :id", {id: id_room}).getMany();
+				.where("chatRoom.id_g = :id and userChatRoomEntity.is_banned = FALSE", {id: id_room}).getMany();
 				let end : any = [];
 				for (let user of res)
 				{
@@ -199,11 +200,13 @@ export class ChatRoomService {
 				.andWhere("userChat.room = :r", {r: id_room}).getMany();
 				if (!res_is_in_room.length)
 				{
+					console.log("Not in room Error");
 					client.emit("error_get_message_room", {error: "You are not in this room"});
 					throw new WsException("Not in the room");
 				}
 				if (res_is_in_room[0].is_banned && res_is_in_room[0].ban_end > new Date())
 				{
+					console.log("Banned Error");
 					client.emit("error_get_message_room", {error: "You are banned"});
 					throw new WsException("Your are ban");
 				}
@@ -213,12 +216,13 @@ export class ChatRoomService {
 				.select(["messageChatRoomEntity.content_message", "messageChatRoomEntity.date_message", "user.username", "chatRoom.id_public_room"])
 				.where("chatRoom.id_g = :id", {id: id_room}).orderBy("messageChatRoomEntity.date_message", "ASC").getMany();
 				client.emit('get_message_room_res', {messages : res, id_public_room: data.id_public_room} )
+				return;
 			} catch (e) {
-				// console.log("getMessage Error", e);
+				console.log("getMessage Error", e);
 				throw new WsException("No message in this room");
 			}
 		} catch(e){
-			// console.log("getMessage Error: bad data");
+			console.log("getMessage Error: bad data");
 			throw new WsException("Bad data");
 		}
 	}
@@ -375,7 +379,7 @@ export class ChatRoomService {
 					on chat_room_entity.id_g = user_chat_room_entity.\"roomIdG\" \
 					where chat_room_entity.is_private = FALSE  \
 					and substr(chat_room_entity.name, 1, $1) = $2 \
-					and chat_room_entity.id_g not in (select id from user_chat_room_entity where \"idUserIdG\" = $3 and user_chat_room_entity.is_visible = TRUE) \
+					and chat_room_entity.id_g not in (select \"roomIdG\" as id_g from user_chat_room_entity where \"idUserIdG\" = $3 and user_chat_room_entity.is_visible = TRUE) \
 					group by chat_room_entity.id_g", [data.research.length, data.research, id_user]);
 		}
 		// console.log(res, data)
@@ -635,7 +639,6 @@ export class ChatRoomService {
 				.select(["user.username"])
 				.where("user.username = :u", {u: data.new_username}).getOneOrFail();
 				client.emit("error_change_username", "Username already taken");
-				// console.log("Username already taken ", client.id);
 				return;
 			}catch(e){
 				if (data.new_username.length == 0 || data.new_username.length > 20)
@@ -647,12 +650,10 @@ export class ChatRoomService {
 				.where("id_g = :u", {u: id_user})
 				.set({username: data.new_username}).execute();
 				client.emit("change_username_res", {new_username: data.new_username});
-				// console.log("Username changed ", client.id);
 				return;
 			}
 		}catch(e){
 			client.emit("error_change_username", "Data error");
-			// console.log("Data error ", client.id);
 		}
 	}
 
