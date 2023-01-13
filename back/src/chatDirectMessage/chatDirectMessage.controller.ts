@@ -27,11 +27,11 @@ export class ChatDirectMessageController {
     }
 
     //Get message history between 2 users
-    @Get('/getDirectMessageHistory?')
-    async handleGetDirectMessageHistory(@Query() query: {username_sender: string, username_receiver: string})
-    {
-        return this.chatDirectMessageService.handleGetDirectMessageHistory(query.username_sender, query.username_receiver);
-    }
+    // @Get('/getDirectMessageHistory?')
+    // async handleGetDirectMessageHistory(@Query() query: {username_sender: string, username_receiver: string, date: Date, offset: number})
+    // {
+    //     return this.chatDirectMessageService.handleGetDirectMessageHistory(query.username_sender, query.username_receiver, query.date, query.offset);
+    // }
 
     @Get('/debugMessage')
     async handleGetHistory()

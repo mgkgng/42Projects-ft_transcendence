@@ -66,11 +66,13 @@ export class ChatDirectMessageGateway {
 	@SubscribeMessage('getDirectMessage')
 	async getDirectMessage(@MessageBody() data: any, @ConnectedSocket() client: any) {
 		const user = await this.userRepository.findOne({
-			where: {username: data.username}
+			where: {username: data.username},
+			select: ["username"]
 		});
+
 		const userSender = await this.userRepository.findOne({
-			where:
-			{username: this.mainServerService.getUserConnectedBySocketId(client.id).username}
+			where: {username: this.mainServerService.getUserConnectedBySocketId(client.id).username},
+			select: ["username"]
 		});
 		if (!user || !userSender)
 		{
@@ -82,11 +84,14 @@ export class ChatDirectMessageGateway {
 			this.server.to(client.id).emit('error_getDirectMessage', {error: 'User blocked'});
 			return;
 		}
-		let ret = await this.chatDirectMessageService.handleGetDirectMessageHistory(this.mainServerService.getUserConnectedBySocketId(client.id).username, data.username);
-		if (ret)
-			this.server.to(client.id).emit('success_getDirectMessage', {messageHistory: ret});
-		else
-			this.server.to(client.id).emit('error_getDirectMessage', {error: 'An error occured'});
+
+		const messages = await this.chatDirectMessageService.handleGetDirectMessageHistory(userSender.username, user.username, data.limit, data.offset);
+		// const messages = await this.chatDirectMessageService.handleGetDirectMessageHistory(userSender.username, user.username);
+		if (messages) {
+			this.server.to(client.id).emit('success_getDirectMessage', { messageHistory: messages });
+		} else {
+			this.server.to(client.id).emit('error_getDirectMessage', { error: 'An error occured' });
+		}
 	}
 
 	@SubscribeMessage('getMessageUserList')

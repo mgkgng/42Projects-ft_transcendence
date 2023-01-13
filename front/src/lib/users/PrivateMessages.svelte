@@ -138,18 +138,23 @@
 			for (let user of data.messageUserList) {
 				exchanges.set(user.username, user);
 				exchanges = exchanges;
-				$client.socket.emit("getDirectMessage", { username: user.username});
 			}
 		});
 		
 		$client.socket.on("success_getDirectMessage", (data: any) => {
 			let from = (data.messageHistory[0].recipient == userInfo.username) ? data.messageHistory[0].sender : data.messageHistory[0].recipient
-			allMessages.set(from, data.messageHistory);
+			// if allMessage from user is not defined, create it otherwise append the message received
+			if (!allMessages.has(from)) {
+				allMessages.set(from, data.messageHistory);
+			} else {
+				allMessages.set(from, allMessages.get(from).concat(data.messageHistory));
+			}
 			allMessages = allMessages;
 		});
 
 		$client.socket.on("success_sendDirectMessageG", (data: any) => {
-			$client.socket.emit("getDirectMessage", { username: selected})
+			console.log("success_sendDirectMessageG", data);
+			$client.socket.emit("getDirectMessage", { username: user.username, limit: 1, offset: allMessages.get(selected).length});
 		});
 
 		$client.socket.on("error_getDirectMessage", (data: any) => {
@@ -158,7 +163,7 @@
 
 		$client.socket.on("newMessageArrived", async (senderUsername: string) => {
 			if (selected == senderUsername) {
-				$client.socket.emit("getDirectMessage", { username: senderUsername});
+				$client.socket.emit("getDirectMessage", { username: user.username, limit: 9999, offset: 0});
 			}
 			// refresh the message list
 			$client.socket.emit("getMessageUserList");
@@ -181,7 +186,7 @@
 	function getMessageAndChangeSelected(selected_username: string)
 	{
 		selected = selected_username;
-		$client.socket.emit("getDirectMessage", { username: selected});
+		$client.socket.emit("getDirectMessage", { username: selected, limit: 9999, offset: 0});
 	}
 
 	let message = '';
@@ -229,7 +234,7 @@
 			</div>
 			<div class="write">
 				<input type="text" bind:value={message} placeholder="Type your message here" class="messageInput" on:keydown={event => {if (event.key === 'Enter') sendDirectMessageAndUpdate()} } />
-				<button on:click={() => sendDirectMessageAndUpdate()} class="sendButton">Send</button>
+				<button on:click={sendDirectMessageAndUpdate} class="sendButton">Send</button>
 			</div>
 		</div>
 		{:else}
