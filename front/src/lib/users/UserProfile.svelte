@@ -101,6 +101,7 @@
     import CloseButton from "$lib/items/CloseButton.svelte";
     import WriteMessage from "$lib/users/WriteMessage.svelte";
     import Modal from "../tools/Modal.svelte";
+	import {format_date} from "$lib/stores/lib.ts"
 
 	export let itself: any;
 	export let profileUser: any;
@@ -190,8 +191,8 @@
 		<div class="vflex data">
 			<p class="username">{profileUser.displayname} a.k.a. {profileUser.username}</p>
 			<p class="campus">Campus: {profileUser.campus_name}, {profileUser.campus_country}</p>
-			<p>Joined: {profileUser.created_at.split('T')[0]}</p>
-			<p>Connected: {(profileUser.status == "online") ? "Online" : profileUser.last_connection.split('T'[0])}</p>
+			<p>Joined: {format_date(profileUser.created_at)}</p>
+			<p>Connected: {(profileUser.status == "online") ? "Online" : format_date(profileUser.last_connection)}</p>
 		</div>
 	</div>
 	{#if profileUser.username_42 != userInfo.username_42}

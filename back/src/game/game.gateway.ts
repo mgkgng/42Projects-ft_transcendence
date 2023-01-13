@@ -365,7 +365,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage("getHistory")
 	async getHistGame(@MessageBody() data: any, @ConnectedSocket() client: Socket, @Request() req) {
 		try{
-			let id_user = await this.mainServerService.getIdUserByUsername(data.username_42);
+			let id_user = await this.mainServerService.getIdUserByUsername(data.username);
 			//let id_user = await this.mainServerService.getIdUser(req);
 			const res = await this.dataSource.getRepository(GameEntity).createQueryBuilder("game")
 			.innerJoin("game.player1", "user1")

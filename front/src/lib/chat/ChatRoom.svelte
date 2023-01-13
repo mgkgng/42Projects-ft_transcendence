@@ -5,7 +5,7 @@
 		gap: 0;
 
 		.chat {
-			width: 80%;
+			width: 100%;
 			height: 100%;
 			align-items: center;
 			border-right: $border;
@@ -42,15 +42,28 @@
 				}
 			}
 			.read {
-				overflow-y: overlay;
-				padding: 2em;
-		
-				width: 100%;
-				height: 80%;
-
-				.message {
-					display: grid;
-					grid-template-columns: 20% 70%;
+				height: 90%;
+				overflow-y: scroll;
+				
+				.line {
+					width: 100%;
+					position: relative;
+					.content {
+						width: max-content;
+						max-width: 20em;
+						padding: .3em .5em;
+						background-color: rgb(75, 75, 75);
+						border-radius: .4em;
+					}
+					.me {
+						// float: right;
+						position: absolute;
+						right: 0;
+						background-color: blue;
+					}
+					.date {
+						font-size: 12px;
+					}
 				}
 			}
 			.write {
@@ -140,6 +153,8 @@
     import UserProfile from "$lib/users/UserProfile.svelte";
     import ChatUserSettings from "$lib/chat/ChatUserSettings.svelte";
     import { onMount } from "svelte";
+	import {format_date_hours} from "$lib/stores/lib.ts"
+    import { user } from "../stores/user";
 
 	export let chat: Chatt;
 	export let roomID: string;
@@ -185,9 +200,10 @@
 			</button>
 			{/if}
 		</div>
-		<div class="read">
+		<div class="vflex read">
 		{#each chat.my_rooms.get(roomID).messages as message}
-			<div class="message">
+			<div class="line">
+			<div class="vflex content {(user.user_info== message.username) ? "me" : ""}">
 				<p on:click={() => {
 				//TODO get profile User info
 				profileUser = {};
@@ -195,7 +211,8 @@
 				userProfileModal.open();
 			}}>{message.username}:</p>
 				<div>{message.message}</div>
-				<div>{message.date.split("T")[0]}</div>
+				<div>{format_date_hours(message.date)}</div>
+			</div>
 			</div>
 		{/each}
 		</div>
