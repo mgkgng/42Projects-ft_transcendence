@@ -190,13 +190,13 @@
 			chat = chat;
 		});
 
-		$client.socket.on("set_password_room", (data: any) => {
+		$client.socket.on("set_password_room_res", (data: any) => {
 			console.log("check with");
 			chat.my_rooms.get(data.id_public_room).is_password_protected = true;
 			chat = chat;
 		});
 
-		$client.socket.on("unset_password_room", (data: any) => {
+		$client.socket.on("unset_password_room_res", (data: any) => {
 			console.log("check without");
 			chat.my_rooms.get(data.id_public_room).is_password_protected = false;
 			chat = chat;

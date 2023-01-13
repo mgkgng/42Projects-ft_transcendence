@@ -5,7 +5,7 @@
 		gap: 0;
 
 		.chat {
-			width: 100%;
+			width: 80%;
 			height: 100%;
 			align-items: center;
 			border-right: $border;
@@ -209,7 +209,7 @@
 				profileUser = {};
 				$client.socket.emit("getUserinDB", {username : message.username});
 				userProfileModal.open();
-			}}>{message.username}:</p>
+			}}><u>{message.username}:</u></p>
 				<div>{message.message}</div>
 				<div>{format_date_hours(message.date)}</div>
 			</div>
@@ -231,7 +231,12 @@
 		<div class="vflex list">
 			{#each chat.my_rooms.get(roomID).users as user}
 			<div class="user" >
-			<p>{user.username}</p>
+			<p on:click={() => {
+				//TODO get profile User info
+				profileUser = {};
+				$client.socket.emit("getUserinDB", {username : user.username});
+				userProfileModal.open();
+			}}>{user.username}</p>
 			</div>
 			{/each}
 		</div>

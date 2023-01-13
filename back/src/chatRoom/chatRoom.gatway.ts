@@ -426,7 +426,6 @@ export class ChatRoomService {
 			const user : any = await this.dataSource.getRepository(UserEntity).find({where: {username_42: jwt.username_42}});
 			const user_ban : any = await this.dataSource.getRepository(UserEntity).find({where: {username: data.username_ban}});
 			const room : any = await this.dataSource.getRepository(ChatRoomEntity).find({where: {id_public_room: data.id_public_room}});
-
 			const is_admin = await this.dataSource.getRepository(UserChatRoomEntity).createQueryBuilder("userRoom")
 			.where("userRoom.id_user = :u AND userRoom.room = :r", {u: user[0].id_g, r: room[0].id_g})
 			.select("userRoom.is_admin").getMany();
@@ -495,7 +494,7 @@ export class ChatRoomService {
 				.where("id_user = :u AND room = :r", {u: user[0].id_g, r: room[0].id_g})
 				.set({is_visible: true}).execute();
 		client.join(data.id_public_room);
-		client.emit("set_room_visible", {});
+		client.emit("set_room_visible_res", {});
 	}
 	//Put a room private
 	//{id_public_room:string}
@@ -508,13 +507,13 @@ export class ChatRoomService {
 				.select(["u.is_owner"]).getOne();
 		if (is_owner.is_owner == false)
 		{
-			client.emit("error_set_room_private", {error: "You are not owner of the room."});
+			client.emit("error_set_room_private_res", {error: "You are not owner of the room."});
 			return ;
 		}
 		const res = await this.dataSource.createQueryBuilder().update(ChatRoomEntity)
 				.where("id_g = :r", {r: room})
 				.set({is_private: true}).execute();
-		client.emit("set_room_private", {id_public_room : data.id_public_room});
+		client.emit("set_room_private_res", {id_public_room : data.id_public_room});
 	}
 	//Put a room private
 	//{id_public_room:string}
@@ -528,13 +527,13 @@ export class ChatRoomService {
 				.select(["u.is_owner"]).getOne();
 		if (is_owner.is_owner == false)
 		{
-			client.emit("error_set_room_private", {error: "You are not owner of the room."});
+			client.emit("error_set_room_private_res", {error: "You are not owner of the room."});
 			return ;
 		}
 		const res = await this.dataSource.createQueryBuilder().update(ChatRoomEntity)
 				.where("id_g = :r", {r: room})
 				.set({is_private: false}).execute();
-		client.emit("unset_room_private", {id_public_room : data.id_public_room});
+		client.emit("unset_room_private_res", {id_public_room : data.id_public_room});
 	}
 	//{id_public_room:string, password:string}
 	@SubscribeMessage("set_password_room")
@@ -546,14 +545,14 @@ export class ChatRoomService {
 				.select(["u.is_owner"]).getOne();
 		if (is_owner.is_owner == false)
 		{
-			client.emit("error_unset_password_room", {error: "You are not owner of the room."});
+			client.emit("error_set_password_room", {error: "You are not owner of the room."});
 			return ;
 		}
 		// const password = await bcrypt.hash(data.password, 10);
 		const res = await this.dataSource.createQueryBuilder().update(ChatRoomEntity)
 				.where("id_g = :r", {r: room})
 				.set({password: data.password, is_password_protected: true}).execute();
-		client.emit("set_password_room", {id_public_room : data.id_public_room});
+		client.emit("set_password_room_res", {id_public_room : data.id_public_room});
 	}
 	//Unset password room
 	//{id_public_room:string}
@@ -567,14 +566,14 @@ export class ChatRoomService {
 				.select(["u.is_owner"]).getOne();
 		if (is_owner.is_owner == false)
 		{
-			client.emit("error_unset_password_room", {error: "You are not owner of the room."});
+			client.emit("error_unset_password_room_res", {error: "You are not owner of the room."});
 			return ;
 		}
 
 		const res = await this.dataSource.createQueryBuilder().update(ChatRoomEntity)
 				.where("id_g = :r", {r: room})
 				.set({is_password_protected: false}).execute();
-		client.emit("unset_password_room", {id_public_room : data.id_public_room});
+		client.emit("unset_password_room_res", {id_public_room : data.id_public_room});
 	}
 	//OK
 	//{}

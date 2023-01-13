@@ -134,7 +134,7 @@
 			confirmLeaveModal.open();
 		}}>Close</button>
 		<button class="{(modified) ? "" : "no-active"}" on:click={() => {
-			if (original[0] != isPrivate)
+			//if (original[0] != isPrivate)
 				$client.socket.emit((isPrivate) ? "set_room_private" : "unset_room_private", { id_public_room: chatRoom.roomID });
 			if (original[1] != withPassword)
 				$client.socket.emit((withPassword) ? "set_password_room" : "unset_password_room",
@@ -142,6 +142,7 @@
 						: { id_public_room: chatRoom.roomID });
 			else if (original[1] = true && password != "default-password")
 				$client.socket.emit("set_password_room", { id_public_room: chatRoom.roomID, password: password });
+			modified = false;
 		}}>Save</button>
 	</div>
 </div>

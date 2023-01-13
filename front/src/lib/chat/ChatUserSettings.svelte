@@ -137,11 +137,11 @@
 			if (!selected.length)
 				return ;
 			if (settingType == Setting.Mute)
-				$client.socket.emit("mute_user", { id_public_room : roomID, username_ban: user, mute_end: undefined});
+				$client.socket.emit("mute_user", { id_public_room : roomID, username_ban: selected, mute_end: undefined});
 			else if (settingType == Setting.Ban)
-				$client.socket.emit("ban_user", { id_public_room : roomID, username_ban: user, ban_end: undefined});
+				$client.socket.emit("ban_user", { id_public_room : roomID, username_ban: selected, ban_end: undefined});
 			else
-				$client.socket.emit("set_admin", { id_public_room : roomID, username_new_admin: user});
+				$client.socket.emit("set_admin", { id_public_room : roomID, username_new_admin: selected});
 		}}>Confirm</button>
 	</div>
 </div>
