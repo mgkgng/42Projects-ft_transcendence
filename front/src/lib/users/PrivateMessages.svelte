@@ -117,6 +117,7 @@
     import CloseButton from "$lib/items/CloseButton.svelte";
     import WriteMessage from "$lib/users/WriteMessage.svelte";
 	import Modal from "$lib/tools/Modal.svelte";
+	import { format_date_hours } from "$lib/stores/lib";
 	import { onMount } from "svelte";
     import { client } from "$lib/stores/client";
     import { user } from "$lib/stores/user";
@@ -228,7 +229,7 @@
 					<p class="content {(userInfo.username == message.sender) ? "me" : ""}">
 						{message.message}
 					</p>
-					<div class="date">{message.date.split("T")[1].split(".")[0]}</div>
+					<div class="date">{format_date_hours(message.date)}</div>
 				</div>
 				{/each}
 			</div>

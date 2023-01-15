@@ -87,6 +87,21 @@ export class ChatRoomService {
 	//OK
 	//Add user to a room 
 	//{id_public_room: string, username: string, room_password? : string}
+	//<---------------------------------------------------------------------->
+	//<            -														 >
+	//<           / \														 >
+    //<          /   \														 >	
+	//<         |     |													     >
+	//<          \   /													     >
+	//<           \ /-------------------------------------------|-------|    >
+	//<            -											|		|    >
+	//<           / \-------------------------------------------|-------|    >
+    //<          /   \						 		     					 >
+	//<         |     |										     			 >
+	//<          \   /														 >
+	//<           \ /										     			 >	
+	//<            -											 			 >
+	//<---------------------------------------------------------------------->
 	@SubscribeMessage('append_user_to_room')
 	async append_user_to_room(@MessageBody() data: any, @ConnectedSocket() client: Socket, @Request() req)
 	{
@@ -132,7 +147,6 @@ export class ChatRoomService {
 				console.log("Append user to room finish1");
 				return;
 			}
-
 			const res_user_chat_room = await this.dataSource.createQueryBuilder().insert().into(UserChatRoomEntity).values
 			([ 
 				{id_user: id_user, room: id_room, is_admin: false, is_banned: false, is_muted: false}
@@ -338,7 +352,6 @@ export class ChatRoomService {
 	async getMyRoom(@MessageBody() data, @ConnectedSocket() client: Socket)
 	{
 		const res : any = await this.mainServer.getNamesRoomsForUser(client);
-		console.log("get_my_rooms", res);
 		client.emit("get_my_rooms_res", res);
 	}
 	//OK

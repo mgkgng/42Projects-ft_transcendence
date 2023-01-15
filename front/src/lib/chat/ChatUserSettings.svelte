@@ -42,6 +42,7 @@
 
 			select {
 				width: 12em;
+				color: #000;
 				background-color: transparentize(#fff, .7);
 			}
 		}
@@ -87,7 +88,8 @@
 	];
 
 	function reset(settingType: number) {
-		userSet = (settingType != Setting.Admin) ? users : users.filter((x) => { !admins.includes(x); });
+		//userSet = (settingType != Setting.Admin) ? users : users.filter((x) => { !admins.includes(x); });
+		userSet = users;
 		selected = "";
 		date = tomorrow;
 	}
@@ -142,6 +144,7 @@
 				$client.socket.emit("ban_user", { id_public_room : roomID, username_ban: selected, ban_end: undefined});
 			else
 				$client.socket.emit("set_admin", { id_public_room : roomID, username_new_admin: selected});
+			selected = "";
 		}}>Confirm</button>
 	</div>
 </div>

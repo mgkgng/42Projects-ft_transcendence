@@ -5,8 +5,10 @@
 		gap: 0;
 
 		.chat {
-			width: 100%;
+			width: 80%;
 			height: 100%;
+			gap: 0;
+			
 			align-items: center;
 			border-right: $border;
 			border-radius: 0 0 .8em 0;
@@ -45,27 +47,23 @@
 				height: 90%;
 				width: 100%;
 				overflow-y: scroll;
-				display: grid;	
-				grid-column: 1fr 1fr;
-				grid-template-columns: 1fr; /* définit la largeur de chaque colonne à 1fr */
-				grid-auto-rows: minmax(50px, auto);
 				.line {
-					padding: 1em 1em 1em 1em ;
-					margin: 1em 1em 1em 1em;
+					width: 100%;
 					position: relative;
-					grid-column: 1;
-					min-height: 10%;
 					.content {
-						width: max-content;
-						max-width: 20em;
+						word-wrap: break-word;
+						max-width: 50%;
 						padding: .3em .5em;
 						background-color: rgb(75, 75, 75);
 						border-radius: .4em;
+
+						.username{
+							cursor: pointer;
+							text-decoration: underline;
+						}
 					}
 					.me {
-						// float: right;
-						position: absolute;
-						right: 0;
+						float: right;
 						background-color: blue;
 						grid-column: 2;
 					}
@@ -85,6 +83,7 @@
 		
 					width: 100%;
 					height: 100%;
+					word-wrap: break-word;
 					background-color: transparentize(#fff, .8	);
 					border-top: $border-thin;
 					border-left: $border-thin;
@@ -142,19 +141,19 @@
 				right: .2em;
 				bottom: 0;
 				border-radius: .2em .2em 0 0;
-
 				img {
 					width: 30px;
 				}
 				&:hover { background-color: transparentize(#fff, .6); }
-
+			}
+			.buttons-setting{
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				.btn-gauche { grid-column-start: 1; grid-row: 1; width: 30px; left: 20px; bottom: 3px;}
+				.btn-droite { grid-column-start: 2; grid-row: 1; }
 			}
 		}
-		.buttons{
-			grid-column: 1fr 1fr;
-			.btn-gauche { grid-column: 1;}
-			.btn-droite { grid-column: 2;}
-		}
+		
 	}
 
 </style>
@@ -168,6 +167,7 @@
     import ChatUserSettings from "$lib/chat/ChatUserSettings.svelte";
     import ChatAddUsers from "$lib/chat/ChatAddUsers.svelte";
     import { onMount } from "svelte";
+	import { afterUpdate } from 'svelte';
 	import {format_date_hours} from "$lib/stores/lib.ts"
     import { user} from "../stores/user.ts";
 
@@ -193,6 +193,16 @@
 			profileUser = data.users[0]; 
 			console.log("succes_getUserinDB: ", profileUser, data)
 		});
+	});
+	function scrollToBottom() {
+		let chatBox = document.querySelector('.read');
+		if (chatBox)
+		{
+			chatBox.scrollTop = chatBox.scrollHeight;
+		}
+	}
+	afterUpdate(() => {
+		scrollToBottom();
 	});
 </script>
 
@@ -233,7 +243,7 @@
 					profileUser = {};
 					$client.socket.emit("getUserinDB", {username : message.username});
 					userProfileModal.open();
-				}}><u>{message.username}:</u></p>
+				}}><u class="username">{message.username}:</u></p>
 					<div>{message.message}</div>
 					<div>{format_date_hours(message.date)}</div>
 				</div>
@@ -263,16 +273,16 @@
 			</div>
 			{/each}
 		</div>
-		<div class="buttons">
+		<div class="buttons-setting">
 			{#if chat.my_rooms.get(roomID).is_admin}
-			<button class="btn-gauche" on:click={() => {
+			<button class="btn-droite" on:click={() => {
 				chatUsersSettingsModal.open();
 			}}>
 				<img src="setting.png" alt="user-setting">
 			</button><br/>
 			{/if}
 			{#if chat.my_rooms.get(roomID).is_admin && chat.my_rooms.get(roomID).is_private}
-			<br/><button class="btn-gauche" on:click={() => {
+			<button class="btn-gauche" on:click={() => {
 				chatAddUsers.open();
 			}}>
 				<img src="logo-test/add.svg" alt="add-user">

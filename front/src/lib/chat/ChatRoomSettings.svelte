@@ -98,21 +98,22 @@
 
 	let isPrivate: boolean = chatRoom.is_private;
 	let withPassword: boolean = chatRoom.is_password_protected;
-	let password: string = (withPassword) ? "default-password" : "";
+	let password: string = (withPassword) ? "" : "";
 
 	let original = [isPrivate, withPassword, password];
 	let new_config= [isPrivate, withPassword, password];
 	let modified: boolean = false;
 	//$: modified = !original.every((v, i) => { return v === Array(chatRoom.isPrivate, chatRoom.withPassword, chatRoom.password)[i]});
 	function is_modified(isPrivate, withPassword, password, chatRoom) {
+		let res = false;
 		if ((new_config[0] != chatRoom.is_private || new_config[1] != chatRoom.is_password_protected) || 
 			(isPrivate != chatRoom.is_private || withPassword != chatRoom.is_password_protected))
-			return true;
+			res = true;
 		else
-		{
 			original = new_config;
-			return false;
-		}
+		if (!res && new_config[1] && password != "")
+			res = true;
+		return (res);
 	}
 	$: modified = is_modified(isPrivate, withPassword, password, chatRoom);
 
@@ -160,6 +161,7 @@
 				else if (original[1] == true && password != "default-password")
 					$client.socket.emit("set_password_room", { id_public_room: chatRoom.roomID, password: password });
 				new_config = [isPrivate, withPassword, password];
+				password = "";
 			}}>Save</button>
 		{:else}
 			<button class="no-active">Save</button>
