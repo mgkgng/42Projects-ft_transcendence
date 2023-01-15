@@ -201,6 +201,14 @@
 			chatBox.scrollTop = chatBox.scrollHeight;
 		}
 	}
+	function sendMessageAndUpdate()
+	{
+		$client.socket.emit("new_message_room", {
+			id_public_room: chat.my_rooms.get(roomID).roomID,
+			content_message: newMessage
+		});
+		newMessage = "";
+	}
 	afterUpdate(() => {
 		scrollToBottom();
 	});
@@ -251,14 +259,8 @@
 		{/each}
 		</div>
 		<div class="write">
-			<input class="text-input" placeholder="write your message here..." bind:value={newMessage}>
-			<button on:click={() => {
-				$client.socket.emit("new_message_room", {
-					id_public_room: chat.my_rooms.get(roomID).roomID,
-					content_message: newMessage
-				});
-				newMessage = "";
-			}}>Send</button>
+			<input class="text-input" placeholder="write your message here..." bind:value={newMessage} on:keydown={event => {if (event.key === 'Enter') sendMessageAndUpdate()}} >
+			<button on:click={() => {sendMessageAndUpdate()}}>Send</button>
 		</div>
 	</div>
 	<div class="vflex users">

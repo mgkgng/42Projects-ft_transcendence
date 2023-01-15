@@ -18,10 +18,10 @@
 		$client.socket.on("error_append_user_to_room", (data: any) => {
 			message = "Bad password !";
 		});
-		$client.socket.on("success_append_user_to_room", (data : any) => {
-			message = "Room added !";
-			itself.close();
-		});
+		// $client.socket.on("success_append_user_to_room", (data : any) => {
+		// 	message = "Room added !";
+		// 	itself.close();
+		// });
 
 		return(() => {
 			//$client.socket.off("success_append_user_to_room");
@@ -37,7 +37,7 @@
 		<button on:click={() => { itself.close(); }}>Cancel</button>
 		<button on:click={() => { $client.socket.emit("append_user_to_room", {
 			id_public_room: roomID,
-			username : client.username,
+			username : $client.username,
 			room_password: password
 		}); }}>Enter</button>
 	</div><br/>

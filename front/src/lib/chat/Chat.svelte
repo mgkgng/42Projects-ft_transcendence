@@ -178,8 +178,10 @@
 			$client.socket.emit("get_my_rooms");
 		});
 		 $client.socket.on("success_append_user_to_room", (data : any) => {
-		 	console.log("Add to room", data);
-		 	$client.socket.emit("get_my_rooms");
+			if (data.username == $client.username)
+		 		$client.socket.emit("get_my_rooms", {data : "some_data"});
+			else
+				$client.socket.emit("get_users_room", {id_public_room: data.id_public_room});
 		 });
 		$client.socket.on("set_room_private_res", (data: any) => {
 			console.log("check private");
@@ -222,7 +224,6 @@
 			}
 			chat = chat;
 		});
-
 		$client.socket.on("new_room_res", (data: any) => {
 			//chat.rooms.set(data.id_public_room, data.is_password_protected);
 			//chat.my_rooms.set(data.id_public_room, new ChattRoom(data.id_public_room, data.room_name, data.is_password_protected, data.is_private, data.is_admin, true));

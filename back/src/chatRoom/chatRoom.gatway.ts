@@ -107,7 +107,9 @@ export class ChatRoomService {
 	{
 		try{
 			const user : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
-			const client_username_42 = data.username;
+			let client_username_42 = data.username;
+			if (client_username_42 == undefined)
+				client_username_42 = user.username;
 			const id_user : any = await this.mainServer.getIdUserByUsername(client_username_42);
 			const id_room = await this.mainServer.getIdRoom(data);
 			if (data.room_password == undefined)
@@ -115,7 +117,9 @@ export class ChatRoomService {
 			const room = await this.dataSource.getRepository(ChatRoomEntity).createQueryBuilder("room").
 			where("room.id_g = :id ", {id: id_room}).getOne();
 			
-			const is_good_password = await bcrypt.compare(data.room_password, room.password);
+			let is_good_password = false;
+			if (room.is_password_protected)
+				is_good_password = await bcrypt.compare(data.room_password, room.password);
 			//const is_good_password = (data.room_password == room.password);
 
 			const is_already_in = await this.dataSource.getRepository(UserChatRoomEntity).createQueryBuilder("userRoom").
@@ -136,14 +140,13 @@ export class ChatRoomService {
 					client.emit("error_append_user_to_room", {error : "You are ban of this room"});
 					return ;
 				}
-				console.log("1");
 				const res = await this.dataSource.createQueryBuilder().update(UserChatRoomEntity)
 				.where("id_user = :u AND room = :r", {u: id_user, r: id_room})
 				.set({is_visible: true}).execute(); //UPDATE is_visible
-				console.log("2");
+				client.leave(data.id_public_room); 		//JOIN ROOM (socket.io rooms)
 				client.join(data.id_public_room); 		//JOIN ROOM (socket.io rooms)
-				client.emit("success_append_user_to_room", {id_public_room: room.id_public_room, room_name: room.name});
-				client.emit("append_user_to_room_res", {id_public_room: room.id_public_room, is_admin: false, username: user.username});
+				this.server.to(data.id_public_room).emit("success_append_user_to_room", {id_public_room: room.id_public_room, room_name: room.name, username: client_username_42});
+				//this.server.to(data.id_public_room).emit("append_user_to_room_res", {id_public_room: room.id_public_room, is_admin: false, username: user.username});
 				console.log("Append user to room finish1");
 				return;
 			}
@@ -152,13 +155,13 @@ export class ChatRoomService {
 				{id_user: id_user, room: id_room, is_admin: false, is_banned: false, is_muted: false}
 			]).execute(); //Add user to the room
 			client.join(data.id_public_room); 		//JOIN ROOM (socket.io rooms)
-			client.emit("success_append_user_to_room", {id_public_room: room.id_public_room, room_name: room.name});
-			client.emit("append_user_to_room_res", {id_public_room: room.id_public_room, is_admin: false, username: user.username});
+			this.server.to(data.id_public_room).emit("success_append_user_to_room", {id_public_room: room.id_public_room, room_name: room.name, username: client_username_42});
+			//this.server.to(data.id_public_room).emit("append_user_to_room_res", {id_public_room: room.id_public_room, is_admin: false, username: user.username});
 			console.log("Append user to room finish");
 			return;
 		}
 		catch(e){
-			console.log("Append message Error: bad data", e);
+			console.log("Append message Error: bad data");
 			throw new WsException("Bad data");
 		}
 	}
@@ -354,6 +357,7 @@ export class ChatRoomService {
 		const res : any = await this.mainServer.getNamesRoomsForUser(client);
 		client.emit("get_my_rooms_res", res);
 	}
+
 	//OK
 	//Get all rooms in the databases
 	//{}
@@ -467,6 +471,7 @@ export class ChatRoomService {
 				.set({is_muted: true, mute_end: mute_end})
 				.where("id_user = :u AND room = :r", {u: user_ban[0].id_g, r: room[0].id_g})
 				.execute();
+				client.leave(data.id_public_room);
 				this.server.to(data.id_public_room).emit("mute_user", data);
 			}
 	}
