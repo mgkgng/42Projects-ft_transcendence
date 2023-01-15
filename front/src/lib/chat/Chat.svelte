@@ -172,13 +172,15 @@
 			chat = chat;
 			if (data == roomSelected)
 				roomSelected = "";
-			$client.socket.emit("get_my_rooms"); 
+			$client.socket.emit("get_my_rooms");
 		});
-
 		$client.socket.on("set_room_visible", (data: any) => { 
-			$client.socket.emit("get_my_rooms"); 
+			$client.socket.emit("get_my_rooms");
 		});
-
+		 $client.socket.on("success_append_user_to_room", (data : any) => {
+		 	console.log("Add to room", data);
+		 	$client.socket.emit("get_my_rooms");
+		 });
 		$client.socket.on("set_room_private_res", (data: any) => {
 			console.log("check private");
 			chat.my_rooms.get(data.id_public_room).is_private = true;
@@ -210,7 +212,7 @@
 		});
 
 		$client.socket.on("get_my_rooms_res", (data: any) => {
-			//chat.my_rooms.clear();
+			console.log("get_my_rooms_res", data);
 			for (let x of data) {
 				if (chat.my_rooms.get(x.id_public_room) == undefined) {
 					chat.my_rooms.set(x.room.id_public_room, new ChattRoom(x.room.id_public_room, x.room.name, x.room.is_password_protected, x.room.is_private, x.is_admin, x.is_owner));
@@ -228,17 +230,17 @@
 			$client.socket.emit("get_my_rooms");
 		});
 
-		$client.socket.on("append_user_to_room_res", (data: any) => {
-			console.log("append_user_to_room_res", data);
+		//$client.socket.on("append_user_to_room_res", (data: any) => {
+		//	console.log("append_user_to_room_res", data);
 			//let roomInfo = chat.rooms.get(data.id_public_room);
 			//chat.rooms.set(data.id_public_room, data.is_password_protected);
 			//chat.my_rooms.set(data.id_public_room, new ChattRoom(data.id_public_room, data.room_name, roomInfo.is_password_protected, false, false, false));
 			//chat = chat;
-			$client.socket.emit("get_users_room", { id_public_room: data.id_public_room}); 
-		});
+		//	$client.socket.emit("get_my_rooms");
+		//});
 
 		$client.socket.on("get_message_room_res", (data: any) => {
-			console.log("Get Messages:", data)
+			console.log("Get Messages:", data);
 			let chatRoom = chat.my_rooms.get(data.id_public_room);
 			for (let message of data.messages)
 				chatRoom.messages.push(new Message(message.id_chat_room.id_public_room, message.id_user.username, message.content_message, message.date_message))
@@ -246,7 +248,7 @@
 		});
 
 		$client.socket.on("get_users_room_res", (data: any) => {
-			console.log("Get User:", data)
+			console.log("Get User:", data);
 			let chatRoom = chat.my_rooms.get(data.id_public_room);
 			chatRoom.users = [];
 			for (let user of data.users)
@@ -316,7 +318,7 @@
 	</div>
 	<div class="vflex chatroom">
 		{#if (roomSelected.length)}
-		<ChatRoom bind:chat={chat} roomID={roomSelected}/>
+		<ChatRoom chat={chat} roomID={roomSelected}/>
 		{:else}
 		<div class="flex no-select">
 			<h2>Please select a room</h2> 

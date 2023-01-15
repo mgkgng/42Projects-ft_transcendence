@@ -83,13 +83,17 @@
 
 <script lang="ts">
     import { ChattRoom } from "$lib/chatt/ChattRoom";
+    import { Chatt } from "$lib/chatt/Chatt";
 	import Modal from "$lib/tools/Modal.svelte";
 	import ConfirmLeave from "$lib/modals/ConfirmLeave.svelte";
     import { client } from "$lib/stores/client";
 	
 	export let itself: any;
-	export let chatRoom: ChattRoom;
+	export let chat: Chatt;
+	export let roomId : any;
 
+	let chatRoom : ChattRoom = chat.my_rooms.get(roomId);
+	$: chatRoom = chat.my_rooms.get(roomId);
 	let confirmLeaveModal: any;
 
 	let isPrivate: boolean = chatRoom.is_private;
@@ -97,8 +101,20 @@
 	let password: string = (withPassword) ? "default-password" : "";
 
 	let original = [isPrivate, withPassword, password];
+	let new_config= [isPrivate, withPassword, password];
 	let modified: boolean = false;
-	$: modified = !original.every((v, i) => { return v === Array(isPrivate, withPassword, password)[i]});
+	//$: modified = !original.every((v, i) => { return v === Array(chatRoom.isPrivate, chatRoom.withPassword, chatRoom.password)[i]});
+	function is_modified(isPrivate, withPassword, password, chatRoom) {
+		if ((new_config[0] != chatRoom.is_private || new_config[1] != chatRoom.is_password_protected) || 
+			(isPrivate != chatRoom.is_private || withPassword != chatRoom.is_password_protected))
+			return true;
+		else
+		{
+			original = new_config;
+			return false;
+		}
+	}
+	$: modified = is_modified(isPrivate, withPassword, password, chatRoom);
 
 </script>
 
@@ -133,16 +149,20 @@
 				itself.close();
 			confirmLeaveModal.open();
 		}}>Close</button>
-		<button class="{(modified) ? "" : "no-active"}" on:click={() => {
-			//if (original[0] != isPrivate)
-				$client.socket.emit((isPrivate) ? "set_room_private" : "unset_room_private", { id_public_room: chatRoom.roomID });
-			if (original[1] != withPassword)
-				$client.socket.emit((withPassword) ? "set_password_room" : "unset_password_room",
-					(withPassword) ? { id_public_room: chatRoom.roomID, password: password } 
-						: { id_public_room: chatRoom.roomID });
-			else if (original[1] = true && password != "default-password")
-				$client.socket.emit("set_password_room", { id_public_room: chatRoom.roomID, password: password });
-			modified = false;
-		}}>Save</button>
+		{#if (modified)}
+			<button class="{(modified) ? "" : "no-active"}" on:click={() => {
+				if (original[0] != isPrivate)
+					$client.socket.emit((isPrivate) ? "set_room_private" : "unset_room_private", { id_public_room: chatRoom.roomID });
+				if (original[1] != withPassword)
+					$client.socket.emit((withPassword) ? "set_password_room" : "unset_password_room",
+						(withPassword) ? { id_public_room: chatRoom.roomID, password: password } 
+							: { id_public_room: chatRoom.roomID });
+				else if (original[1] == true && password != "default-password")
+					$client.socket.emit("set_password_room", { id_public_room: chatRoom.roomID, password: password });
+				new_config = [isPrivate, withPassword, password];
+			}}>Save</button>
+		{:else}
+			<button class="no-active">Save</button>
+		{/if}
 	</div>
 </div>

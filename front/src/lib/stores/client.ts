@@ -4,10 +4,11 @@ import io from "socket.io-client";
 class Client {
 	socket: any;
 	user_info : any;
-
+	username : string;
 	constructor() {
 		this.socket = undefined;
 		this.user_info = undefined;
+		this.username = "";
 	}
 
 	// async send42Tok(url: any)

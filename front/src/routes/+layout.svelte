@@ -115,6 +115,7 @@
 
 			if ($client.socket) {
 				$client.socket.on("get_user_info_res", (data: any) => {
+					client.username = data.username;
 					user.set(data);
 					login.set(true);
 				});

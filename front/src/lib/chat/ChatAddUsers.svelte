@@ -268,10 +268,7 @@
 			friends = friends;
 			loadedFriends = true;
 		});
-		$client.socket.on("success_append_user_to_room", (data : any) => {
-			console.log("Add to room");
-			$client.socket.on("get_my_rooms");
-		});
+
 		$client.socket.emit("getFriendList");
 	});
 

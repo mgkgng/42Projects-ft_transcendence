@@ -197,7 +197,7 @@
 </script>
 
 <Modal bind:this={chatRoomSettingsModal}>
-	<ChatRoomSettings itself={chatRoomSettingsModal} chatRoom={chat.my_rooms.get(roomID)}/>
+	<ChatRoomSettings itself={chatRoomSettingsModal} bind:chat={chat} bind:roomId={roomID}/>
 </Modal>
 
 <Modal bind:this={chatAddUsers}>
@@ -205,7 +205,7 @@
 </Modal>
 
 <Modal bind:this={chatUsersSettingsModal}>
-	<ChatUserSettings itself={chatUsersSettingsModal} roomID={roomID} bind:chat={chat}/>
+	<ChatUserSettings itself={chatUsersSettingsModal} roomID={roomID} chat={chat}/>
 </Modal>
 
 <Modal bind:this={userProfileModal}>

@@ -54,7 +54,7 @@ export class ChatRoomService {
 		// console.log("new room", data);
 		const id_user = await this.mainServer.getIdUser(req);
 		const is_password_protected : boolean = data.is_password_protected;	
-		// const password : string = is_password_protected ? await bcrypt.hash(data.room_password, 10) : "";
+		const password : string = is_password_protected ? await bcrypt.hash(data.room_password, 10) : "";
 		const name : string = data.room_name;
 		const date_creation : Date = new Date();
 		const  querry = this.dataSource.createQueryRunner(); 
@@ -64,7 +64,7 @@ export class ChatRoomService {
 			new_chat_room.name = name;
 			new_chat_room.date_creation = date_creation;
 			new_chat_room.is_password_protected = data.is_password_protected;
-			new_chat_room.password = data.room_password;
+			new_chat_room.password = password;
 			new_chat_room.is_private = data.is_private;
 			const res_chat_room : any = await this.dataSource.getRepository(ChatRoomEntity).save(new_chat_room);
 			const new_user_chat_room = new UserChatRoomEntity();
@@ -107,31 +107,41 @@ export class ChatRoomService {
 			where("userRoom.room = :id and userRoom.id_user = :id_u", {id: id_room, id_u : id_user}).getOne();
 
 			if (room.is_password_protected && (!is_good_password )) //Test password
+			{
 				//if (!(is_already_in && is_already_in.is_owner)) //Test if user is admin
+					console.log("Error");
 					client.emit("error_append_user_to_room", {error: "Bad password"});
+					return;
+			}
 			if (is_already_in != undefined) //Client already in room => just make this room visible for him
 			{
 				if (is_already_in.is_banned && is_already_in.ban_end > new Date())
 				{
+					console.log("Error");
 					client.emit("error_append_user_to_room", {error : "You are ban of this room"});
 					return ;
 				}
+				console.log("1");
 				const res = await this.dataSource.createQueryBuilder().update(UserChatRoomEntity)
 				.where("id_user = :u AND room = :r", {u: id_user, r: id_room})
 				.set({is_visible: true}).execute(); //UPDATE is_visible
+				console.log("2");
 				client.join(data.id_public_room); 		//JOIN ROOM (socket.io rooms)
-				client.emit("set_room_visible", {id_public_room: room.id_public_room});
 				client.emit("success_append_user_to_room", {id_public_room: room.id_public_room, room_name: room.name});
 				client.emit("append_user_to_room_res", {id_public_room: room.id_public_room, is_admin: false, username: user.username});
+				console.log("Append user to room finish1");
 				return;
 			}
+
 			const res_user_chat_room = await this.dataSource.createQueryBuilder().insert().into(UserChatRoomEntity).values
 			([ 
 				{id_user: id_user, room: id_room, is_admin: false, is_banned: false, is_muted: false}
 			]).execute(); //Add user to the room
-			client.emit("set_room_visible", {id_public_room: room.id_public_room});
+			client.join(data.id_public_room); 		//JOIN ROOM (socket.io rooms)
 			client.emit("success_append_user_to_room", {id_public_room: room.id_public_room, room_name: room.name});
 			client.emit("append_user_to_room_res", {id_public_room: room.id_public_room, is_admin: false, username: user.username});
+			console.log("Append user to room finish");
+			return;
 		}
 		catch(e){
 			console.log("Append message Error: bad data", e);
@@ -328,7 +338,7 @@ export class ChatRoomService {
 	async getMyRoom(@MessageBody() data, @ConnectedSocket() client: Socket)
 	{
 		const res : any = await this.mainServer.getNamesRoomsForUser(client);
-		//console.log("get_my_rooms", res);
+		console.log("get_my_rooms", res);
 		client.emit("get_my_rooms_res", res);
 	}
 	//OK
@@ -552,7 +562,7 @@ export class ChatRoomService {
 			client.emit("error_set_password_room", {error: "You are not owner of the room."});
 			return ;
 		}
-		// const password = await bcrypt.hash(data.password, 10);
+		const password = await bcrypt.hash(data.password, 10);
 		const res = await this.dataSource.createQueryBuilder().update(ChatRoomEntity)
 				.where("id_g = :r", {r: room})
 				.set({password: data.password, is_password_protected: true}).execute();
