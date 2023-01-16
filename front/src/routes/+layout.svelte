@@ -82,6 +82,7 @@
 					localStorage.setItem('transcendence-jwt', tok.access_token);
 					login.set(true);
 				}
+				$client.socket.emit("get_user_info", {});
 				goto('/');
 			}
 		} catch(e){
@@ -122,7 +123,6 @@
 				});
 				$client.socket.emit("get_user_info", {});
 			}
-
 			setTimeout(() => {
 				loaded.set(true);
 			}, 1000);

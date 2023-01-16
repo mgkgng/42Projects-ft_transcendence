@@ -38,7 +38,7 @@ export class ChatRoomService {
 			{
 				const name : string = n.room.id_public_room;
 				// console.log("Join => ", n.room.id_public_roomublic_roomublic_roomublic_roomublic_roomublic_room);
-				client.join(n.room.id_public_room);
+				await client.join(n.room.id_public_room);
 			}
 		} catch (e) { console.log("error"); return (e); }
 		return ("connect");
@@ -75,7 +75,7 @@ export class ChatRoomService {
 			new_user_chat_room.is_banned = false;
 			new_user_chat_room.is_muted = false;
 			const res_user_chat_room = await this.dataSource.getRepository(UserChatRoomEntity).save(new_user_chat_room);
-			client.join(new_chat_room.id_public_room);
+			await client.join(new_chat_room.id_public_room);
 			// console.log("Create room finish");
 			client.emit("new_room_res", {	id_public_room: new_chat_room.id_public_room, room_name: name, is_password_protected: is_password_protected, is_admin: true, is_private: data.is_private	});
 		} catch (e) {
@@ -143,8 +143,8 @@ export class ChatRoomService {
 				const res = await this.dataSource.createQueryBuilder().update(UserChatRoomEntity)
 				.where("id_user = :u AND room = :r", {u: id_user, r: id_room})
 				.set({is_visible: true}).execute(); //UPDATE is_visible
-				client.leave(data.id_public_room); 		//JOIN ROOM (socket.io rooms)
-				client.join(data.id_public_room); 		//JOIN ROOM (socket.io rooms)
+				await client.leave(data.id_public_room); 		//JOIN ROOM (socket.io rooms)
+				await client.join(data.id_public_room); 		//JOIN ROOM (socket.io rooms)
 				this.server.to(data.id_public_room).emit("success_append_user_to_room", {id_public_room: room.id_public_room, room_name: room.name, username: client_username_42});
 				//this.server.to(data.id_public_room).emit("append_user_to_room_res", {id_public_room: room.id_public_room, is_admin: false, username: user.username});
 				console.log("Append user to room finish1");
@@ -154,7 +154,7 @@ export class ChatRoomService {
 			([ 
 				{id_user: id_user, room: id_room, is_admin: false, is_banned: false, is_muted: false}
 			]).execute(); //Add user to the room
-			client.join(data.id_public_room); 		//JOIN ROOM (socket.io rooms)
+			await client.join(data.id_public_room); 		//JOIN ROOM (socket.io rooms)
 			this.server.to(data.id_public_room).emit("success_append_user_to_room", {id_public_room: room.id_public_room, room_name: room.name, username: client_username_42});
 			//this.server.to(data.id_public_room).emit("append_user_to_room_res", {id_public_room: room.id_public_room, is_admin: false, username: user.username});
 			console.log("Append user to room finish");
@@ -471,7 +471,7 @@ export class ChatRoomService {
 				.set({is_muted: true, mute_end: mute_end})
 				.where("id_user = :u AND room = :r", {u: user_ban[0].id_g, r: room[0].id_g})
 				.execute();
-				client.leave(data.id_public_room);
+				await client.leave(data.id_public_room);
 				this.server.to(data.id_public_room).emit("mute_user", data);
 			}
 	}
@@ -525,7 +525,7 @@ export class ChatRoomService {
 		const res = await this.dataSource.createQueryBuilder().update(UserChatRoomEntity)
 				.where("id_user = :u AND room = :r", {u: user[0].id_g, r: room[0].id_g})
 				.set({is_visible: true}).execute();
-		client.join(data.id_public_room);
+		await client.join(data.id_public_room);
 		client.emit("set_room_visible_res", {});
 	}
 	//Put a room private
