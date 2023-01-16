@@ -28,7 +28,7 @@ export class ChatDirectMessageService {
         newDirectMessage.message_recipient = await qbu.select().where(`u.username = :username_receiver`, {username_receiver: username_receiver_arg}).getOneOrFail();
         newDirectMessage.string = message.toString();
         newDirectMessage.date = new Date();
-        return this.chatDirectMessageRepository.save([newDirectMessage]);
+        return this.chatDirectMessageRepository.save(newDirectMessage);
     }
 
 	// async handleGetDirectMessageHistory(username_sender_arg: string, username_receiver_arg: string)

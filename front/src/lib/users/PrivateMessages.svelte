@@ -43,23 +43,27 @@
 			gap: 0;
 			.read {
 				height: 90%;
+				width: 100%;
 				overflow-y: scroll;
-				
 				.line {
 					width: 100%;
 					position: relative;
 					.content {
-						width: max-content;
-						max-width: 20em;
+						word-wrap: break-word;
+						max-width: 50%;
 						padding: .3em .5em;
 						background-color: rgb(75, 75, 75);
 						border-radius: .4em;
+
+						.username{
+							cursor: pointer;
+							text-decoration: underline;
+						}
 					}
 					.me {
-						// float: right;
-						position: absolute;
-						right: 0;
+						float: right;
 						background-color: blue;
+						grid-column: 2;
 					}
 					.date {
 						font-size: 12px;
@@ -143,28 +147,66 @@
 		});
 		
 		$client.socket.on("success_getDirectMessage", (data: any) => {
+			console.log("success_getDirectMessage", data);
 			let from = (data.messageHistory[0].recipient == userInfo.username) ? data.messageHistory[0].sender : data.messageHistory[0].recipient
 			// if allMessage from user is not defined, create it otherwise append the message received
 			if (!allMessages.has(from)) {
 				allMessages.set(from, data.messageHistory);
 			} else {
-				allMessages.set(from, allMessages.get(from).concat(data.messageHistory));
+				// before concat verify that the id of the message is not already in the array
+				let oldMessages = allMessages.get(from);
+				let newMessages = data.messageHistory;
+				// for each new message, check if it is already in the old messages
+				for (let newMessage of newMessages) {
+					let found = false;
+					for (let oldMessage of oldMessages) {
+						if (oldMessage.id == newMessage.id) {
+							found = true;
+							break;
+						}
+					}
+					if (!found) {
+						oldMessages.push(newMessage);
+					}
+				}
+				allMessages.set(from, oldMessages);
 			}
 			allMessages = allMessages;
 		});
 
-		$client.socket.on("success_sendDirectMessageG", (data: any) => {
-			console.log("success_sendDirectMessageG", data);
-			$client.socket.emit("getDirectMessage", { username: user.username, limit: 1, offset: allMessages.get(selected).length});
+		// this will append when you send a message (sendDirectMessageG)
+		$client.socket.on("getDirectMessage", (lastMessage: any) => {
+			console.log("getDirectMessage", lastMessage);
+			let from = (lastMessage.recipient == userInfo.username) ? lastMessage.sender : lastMessage.recipient
+			let oldMessage = allMessages.get(from);
+			let found = false;
+			for (let message of oldMessage) {
+				if (message.id == lastMessage.id) {
+					found = true;
+					console.log("here");
+					break;
+				}
+			}
+			if (found == false)
+			{
+				oldMessage.push(lastMessage);
+				allMessages.set(from, oldMessage);
+				allMessages = allMessages;
+			}
 		});
 
 		$client.socket.on("error_getDirectMessage", (data: any) => {
 			console.log("error", data);
 		});
 
+		$client.socket.on("success_sendDirectMessageG", (data: any) => {
+			console.log("success_sendDirectMessageG", data);
+		});
+
 		$client.socket.on("newMessageArrived", async (senderUsername: string) => {
+			console.log("selected", selected, senderUsername);
 			if (selected == senderUsername) {
-				$client.socket.emit("getDirectMessage", { username: user.username, limit: 9999, offset: 0});
+				$client.socket.emit("getDirectMessage", { username: user.username, limit: 99999, offset: 0});
 			}
 			// refresh the message list
 			$client.socket.emit("getMessageUserList");

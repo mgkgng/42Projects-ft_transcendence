@@ -95,5 +95,35 @@ export class MainServerGateway {
 			return;
 		}
 	}
-	
+
+	// @SubscribeMessage('notification')
+	// async getNotification(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
+	// 	const userConnected = this.mainServerService.getUserConnectedBySocketId(client.id);
+	// 	const userSender = await this.userRepository.findOne({where: {username: userConnected.username}});
+	// 	// verify that data.user exist
+	// 	const user = await this.userRepository.findOne({where: {username: data.user}});
+	// 	if (!userConnected || !user)
+	// 		return;
+	// 	if (data.type === "ask")
+	// 	{
+	// 		let ret = await this.mainServerService.getNotificationListByUsernameAndDelete(userConnected.username);
+	// 		this.server.to(client.id).emit('notification', {...ret});
+	// 	}
+	// 	else if (data.type === "directMessage")
+	// 	{
+	// 		if (data.user != userConnected.username && !(await this.friendSystemService.isUserBlocked(user.username, userSender.username)))
+	// 		{
+	// 			let emitList = await this.mainServerService.getUserConnectedListBySocketId(this.mainServerService.getUserConnectedByUsername(data.user).socket.id);
+	// 			if (!emitList)
+	// 			{
+	// 				await this.mainServerService.addNotification(data.user, "directMessage", {});
+	// 				return ;
+	// 			}
+	// 			for (let i = 0; i < emitList.length; i++)
+	// 			{
+	// 				this.server.to(emitList[i]).emit('notification', ...(await this.mainServerService.getNotificationListByUsernameAndDelete(userConnected.username)));
+	// 			}
+	// 		}
+	// 	}
+	// }
 }

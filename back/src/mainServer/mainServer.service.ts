@@ -9,6 +9,7 @@ import { UseGuards, Request, HttpException } from '@nestjs/common';
 import { MessageBody } from '@nestjs/websockets';
 
 global.userConnectedList = []; // userConnectedList[] = {username : "username", socket : socket, status : "online" | "in game" | "offline"}
+global.notificationList = [] // notification[] = {username : "username", type : "notification", data: {data Object if theres is data}, id: "id of the notification"}
 
 @Injectable()
 export class MainServerService {
@@ -98,5 +99,39 @@ export class MainServerService {
 				return "offline";
 		}
 		return "offline";
+	}
+
+	// function that will add a notification
+	async addNotification(username : string, type : string, data : any)
+	{
+		global.notificationList.push({username : username, type : type, data : data, id: global.notificationList.length});
+	}
+
+	// function that will delete a notification
+	async deleteNotification(username : string, id: any)
+	{
+		for (let i = 0; i < global.notificationList.length; i++)
+		{
+			if (global.notificationList[i].username === username && global.notificationList.id === id)
+			{
+				global.notificationList.splice(i, 1);
+				return;
+			}
+		}
+	}
+
+	// function that will return the notification list of a user
+	async getNotificationListByUsernameAndDelete(username : string)
+	{
+		let list = [];
+		for (let i = 0; i < global.notificationList.length; i++)
+		{
+			if (global.notificationList[i].username === username)
+			{
+				list.push(global.notificationList[i]);
+				list.splice(i, 1);
+			}
+		}
+		return list;
 	}
 }
