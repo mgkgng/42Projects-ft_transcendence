@@ -441,7 +441,7 @@ export class ChatRoomService {
 				.set({is_banned: true, ban_end: ban_end})
 				.where("id_user = :u AND room = :r", {u: user_ban[0].id_g, r: room[0].id_g})
 				.execute();
-				await this.mainServer.getUserConnectedByUsername("username_ban").leave(data.id_public_room); 		//JOIN ROOM (socket.io rooms)
+				await this.mainServer.getUserConnectedByUsername(data.username_ban).leave(data.id_public_room); 		//JOIN ROOM (socket.io rooms)
 				this.server.to(data.id_public_room).emit("ban_user", data);
 			}
 	}

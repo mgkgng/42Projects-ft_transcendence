@@ -126,7 +126,20 @@
 			align-items: center;
 		}
 	}
+	.popup-container {
+		position: fixed;
+		width: 20%;
+		left: 45%;
+		top: 5%;
+		z-index: 999999;
+	}
 
+	.popup {
+		background-color: white;
+		color:#212121;
+		padding: 20px;
+		border-radius: 10px;
+	}
 </style>
 
 <script lang="ts">
@@ -163,10 +176,44 @@
 	//	{
 	//		message_zone.scroll({top: 1000000000});
 	//	}
+	let timeoutPop : any;
+	let showPop = false;
+	let popUpMessage = "BITE";
+	function showPopup(str : any) {
+		showPop = true;
+		popUpMessage = str;
+		timeoutPop = setTimeout(() => {
+     	   hidePopup();
+    	}, 2000);
+	}
 
+	function hidePopup() {
+		clearTimeout(timeoutPop);
+		showPop = false;
+	}
 	onMount (() => {
 		/* Chat Updates*/
-
+		$client.socket.on("ban_user", (data: any) => {
+			if (data.username_ban == $client.username)
+			{
+				chat.my_rooms.delete(data.id_chat_room);
+				showPopup("You are ban of room " + data.id_public_room + " until " + data.ban_end);
+			}
+			else
+			{
+				$client.socket.emit("get_users_room", {id_public_room: data.id_public_room});
+				showPopup(data.username_ban + "is ban of room " + data.id_public_room + "until " + data.ban_end);
+			}
+		});
+		$client.socket.on("mute_user", (data: any) => {
+			if (data.username_ban == $client.username)
+				showPopup("You mute of room " + data.id_public_room + "until " + data.mute_end);
+			else
+			{
+				$client.socket.emit("get_users_room", {id_public_room: data.id_public_room});
+				showPopup(data.username_ban + "is mute of room " + data.id_public_room + "until " + data.mute_end);
+			}
+		});
 		$client.socket.on("set_room_not_visible_res", (data: any) => {
 			chat.my_rooms.delete(data);
 			chat = chat;
@@ -294,6 +341,13 @@
 </Modal>
 
 <div class="flex window chat">
+	{#if showPop}
+		<div class="popup-container">
+			<div class="popup">
+				<p>{popUpMessage}</p>
+			</div>
+		</div>
+	{/if}
 	<div class="rooms">
 		<div class="flex tools">
 			<button on:click={() => { addRoomModal.open(); }}>Add</button>
