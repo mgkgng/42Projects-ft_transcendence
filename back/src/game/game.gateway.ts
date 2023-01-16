@@ -457,24 +457,24 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	// 			.createQueryBuilder("user")
 	// 			.select(["user.username"])
 	// 			.where("user.username = :u", {u: data.new_username}).getOneOrFail();
-	// 			client.emit("error_change_username", "Username already taken");
+	// 			await client.emit("error_change_username", "Username already taken");
 	// 			console.log("Username already taken ", client.id);
 	// 			return;
 	// 		} catch(e){
 	// 			if (data.new_username.length == 0 || data.new_username.length > 20)
 	// 			{
-	// 				client.emit("error_change_username", "Username not in good fromat");
+	// 				await client.emit("error_change_username", "Username not in good fromat");
 	// 				return;
 	// 			}
 	// 			const res = await this.dataSource.createQueryBuilder().update(UserEntity)
 	// 			.where("id_g = :u", {u: id_user})
 	// 			.set({username: data.new_username}).execute();
-	// 			client.emit("change_username", {new_username: data.new_username});
+	// 			await client.emit("change_username", {new_username: data.new_username});
 	// 			console.log("Username changed ", client.id);
 	// 			return;
 	// 		}
 	// 	} catch(e){
-	// 		client.emit("error_change_username", "Data error");
+	// 		await client.emit("error_change_username", "Data error");
 	// 		console.log("Data error ", client.id);
 	// 	}
 	// }
@@ -483,7 +483,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	/* I need to do this here in order to finish the project as soon as possible */
 
 	@SubscribeMessage('reqFriendAndMessage')
-	sendFriendAndMessage(@ConnectedSocket() client: Socket, @Request() req) {
+	async sendFriendAndMessage(@ConnectedSocket() client: Socket, @Request() req) {
 		let target = this.getClient(req);
 		client.emit("updateFriendAndMessage", {
 			messages: Array.from(target.newMessages.keys()),

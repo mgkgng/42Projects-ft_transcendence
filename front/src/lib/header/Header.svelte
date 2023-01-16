@@ -68,7 +68,7 @@
 			}
 		}
 		.menu {
-			// display: none;
+			display: none;
 			position: absolute;
 			top: 115px;
 			right: 0;
@@ -77,19 +77,19 @@
 
 			color: #fff;
 			z-index: 9999;
-			transform-origin: top;
+			//transform-origin: top;
 	
-			&::before {
-				content: "";
-				top: -20px;
-				right: 9px;
-				left: auto;
-				border: 8px solid transparent;
-				border-bottom-color: transparent;
-				border-bottom-color: #fff;
-				position: absolute;
-				display: inline-block;
-			}
+			// &::before {
+			// 	content: "";
+			// 	top: -20px;
+			// 	right: 9px;
+			// 	left: auto;
+			// 	border: 8px solid transparent;
+			// 	border-bottom-color: transparent;
+			// 	border-bottom-color: #fff;
+			// 	position: absolute;
+			// 	display: inline-block;
+			// }
 	
 			button {
 				position: relative;
@@ -98,20 +98,20 @@
 				cursor: pointer;
 				display: flex;
 				text-align: center;
-				transition: .1s;
+				//transition: .1s;
 
-				&:hover {
-					filter: brightness(80%);
-					background-color: transparentize(#fff, .6);
-				}
-				// &:nth-child(odd):hover { background-color: transparentize(#fff, .6); }
+				// &:hover {
+				// 	filter: brightness(80%);
+				// 	background-color: transparentize(#fff, .6);
+				// }
+				// // &:nth-child(odd):hover { background-color: transparentize(#fff, .6); }
 				// &:nth-child(even):hover { background-color: transparentize(#fff, .6); }
 			}
 		}
-		&:focus-within .menu {
-			display: block;
-			animation: grow .2s ease-in-out;
-		}
+		// &:focus-within .menu {
+		// 	display: block;
+		// 	animation: grow .2s ease-in-out;
+		// }
 
 		.notif {
 			position: absolute;
@@ -150,7 +150,7 @@
 	let newFriendRequest: Map<string, boolean> = new Map<string, boolean>();
 
 	let userInfo: any;
-
+	let is_open = {display: 'block'};
 	user.subscribe((user: any) => { userInfo = user; });
 
 	onMount(() => {
@@ -210,13 +210,13 @@
 		<div class="who">?</div>
 		{:else}
 		<div class="summary">
-			<img src={(!userInfo.img) ? userInfo.img_url : userInfo.img} alt="profile" />
+			<img src={(!userInfo.img) ? userInfo.img_url : userInfo.img} on:click={() => { is_open.display = (is_open.display == 'none' ? 'block' : 'none');}} alt="profile" />
 			{#if newMessage.size || newFriendRequest.size}
 			<div class="notif img"></div>
 			{/if}
 		</div>
 		<!-- <p>Hello {userInfo.username}!</p> -->
-		<div class="menu">
+		<div class="menu" style='display: {is_open.display};'>
 			<button on:click={() => { userProfileModal.open(); }}>Profile</button>
 			<button on:click={() => {
 				friendsModal.open();
