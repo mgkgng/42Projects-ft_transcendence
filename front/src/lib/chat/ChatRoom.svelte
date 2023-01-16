@@ -243,7 +243,8 @@
 			{/if}
 		</div>
 		<div class="vflex read">
-		{#each chat.my_rooms.get(roomID).messages as message}
+		<!-- {#each chat.my_rooms.get(roomID).messages as message} -->
+		{#each chat.my_rooms.get(roomID).messages.slice(chat.my_rooms.get(roomID).messages.length - 100  >= 1 ?  chat.my_rooms.get(roomID).messages.length - 100 : 0, chat.my_rooms.get(roomID).messages.length) as message}
 			<div class="line">
 				<div class="vflex content {(act_user.username == message.username) ? "me" : ""}">
 					<p on:click={() => {

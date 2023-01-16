@@ -95,7 +95,10 @@
 				//$client.socket.emit('verify2FAKey', verifCode);
 				let res_test_code = await try_code(verifCode);
 				if (res_test_code)
+				{
 					itself.close();
+					goto("/");
+				}
 				else
 					msg = "Bad Code";
 				loading = false;
