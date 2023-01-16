@@ -38,28 +38,44 @@ export class ChatDirectMessageGateway {
 		});
 		if (!user || !userSender)
 		{
-			this.server.to(client.id).emit('error_sendDirectMessage', {error: 'User not found'});
+			this.server.to(client.id).emit('error_sendDirectMessageG', {error: 'User not found'});
 			return;
 		}
 		if (await this.friendSystemService.isUserBlocked(userSender.username, user.username))
 		{
-			this.server.to(client.id).emit('error_sendDirectMessage', {error: 'User blocked'});
+			this.server.to(client.id).emit('error_sendDirectMessageG', {error: 'User blocked'});
 			return;
 		}
+		// NOTIFICATION PART
 		const userConnected = this.mainServerService.getUserConnectedByUsername(data.username);
-		console.log("send message" + await this.friendSystemService.isUserBlocked(user.username, userSender.username))
-		if (userConnected && !(await this.friendSystemService.isUserBlocked(user.username, userSender.username)))
-		{
-			let emitList = this.mainServerService.getUserConnectedListBySocketId(client.id);
-			emitList.forEach(element => {
-				this.server.to(element.id).emit('getDirectMessage', {sender: userSender.username, message: data.message});
-			});
+		if (!(await this.friendSystemService.isUserBlocked(user.username, userSender.username))) {
+			this.mainServerService.addNotification(user.username, "directMessage", {});
+			console.log("here")
+			if (userConnected)
+			{
+				this.server.to(this.mainServerService.getUserConnectedListBySocketId(this.mainServerService.getUserConnectedByUsername(userConnected.username).id))
+				.emit("notification", {type: "directMessage", username: userSender.username, data: {}});
+			}
+			else
+			{
+				this.mainServerService.addNotification(user.username, "directMessage", {});
+			}
 		}
 		let ret = await this.chatDirectMessageService.handleSendDirectMessage(this.mainServerService.getUserConnectedBySocketId(client.id).username, data.username, data.message);
 		if (ret)
-			this.server.to(client.id).emit('success_sendDirectMessage', {message: data.message});
+			this.server.to(client.id).emit('success_sendDirectMessageG', {message: data.message});
 		else
-			this.server.to(client.id).emit('error_sendDirectMessage', {error: 'An error occured'});
+			this.server.to(client.id).emit('error_sendDirectMessageG', {error: 'An error occured'});
+		if (userConnected && !(await this.friendSystemService.isUserBlocked(user.username, userSender.username)))
+		{
+			console.log("IM HERE")
+			let emitList = this.mainServerService.getUserConnectedListBySocketId(this.mainServerService.getUserConnectedByUsername(data.username).id);
+			// For whatever reason if i use success_getDirectMessage it doesnt work, apparently is a bug about namespaces
+			this.server.to(client.id).emit('getDirectMessage', { id: ret.id_g, sender: ret.message_sender.username, recipient: ret.message_recipient.username, message: ret.string, date: ret.date});
+			emitList.forEach(element => {
+				this.server.to(element.id).emit('getDirectMessage', { id: ret.id_g, sender: ret.message_sender.username, recipient: ret.message_recipient.username, message: ret.string, date: ret.date});
+			});
+		}
 	}
 
 	// Get all the chatDirectMessage between 2 users
