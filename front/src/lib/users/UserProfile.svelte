@@ -89,6 +89,24 @@
 					height: 32px;
 					object-fit: cover;
 				}
+				.wl {
+					border-radius: .2em;
+					padding: .1em .3em;
+				}
+
+				.win { background-color: $green; }
+				.lose { background-color: $red; }
+
+				.result {
+					.versus {
+						border: $border-thin;
+						border-radius: .2em;
+						padding: .1em .3em;
+						gap: .8em;
+						
+						&:nth-child(2) { background-color: $red;}
+					}
+				}
 			}
 		}
 	}
@@ -115,6 +133,7 @@
 
 	let gameHistory: Array<any> = [];
 	let update : boolean = false;
+
 	$: {
 		if (profileUser.username_42 != undefined && !update)
 		{
@@ -150,10 +169,13 @@
 
 		$client.socket.on("resHistory", (data: any) => {
 			gameHistory = data;
+			console.log(gameHistory);
 		});
+
 		$client.socket.on("error_resHistory", (data: any) => {
 			//Username not exist in db
 		});
+
 		return (() => {
 			$client.socket.off("resHistory");
 			$client.socket.off("error_askFriendG");
@@ -216,15 +238,26 @@
 	{/if} 
 	<div class="history">
 		{#if gameHistory.length}
+		<div class="vflex line">
 		{#each gameHistory as game}
-		<div class="flex line">
-			<div class="vflex result">
-				<div>{game.player1.username} vs {game.player2.username}</div>
-				<div>{game.player1_score} : {game.player2_score}</div>
+			<div class="flex result">
+				<div class="flex versus">
+					<div>{(game.player1_score > game.player2_score) ? game.player1.username : game.player2.username}</div>
+					<div>vs</div>
+					<div>{(game.player1_score > game.player2_score) ? game.player2.username : game.player1.username}</div>
+				</div>
+				<div class="wl {((game.player1_score > game.player2_score && game.player1.username == userInfo.username) || (game.player1_score < game.player2_score && game.player2.username == userInfo.username)) ? "win" : "lose"}">
+					{((game.player1_score > game.player2_score && game.player1.username == userInfo.username) || (game.player1_score < game.player2_score && game.player2.username == userInfo.username)) ? "W" : "L"}
+				</div>
+				<div class="flex score">
+					<div>{(game.player1_score > game.player2_score) ? game.player1_score : game.player2_score}</div>
+					<div>:</div>
+					<div>{(game.player1_score > game.player2_score) ? game.player2_score : game.player1_score}</div>
+				</div>
+				<div>{game.date_game.split("T")[0]}</div>
 			</div>
-			<div>{game.date_game.split("T")[0]}</div>
+			{/each}
 		</div>
-		{/each}
 		{:else}
 			<p>No Game History Yet</p>
 		{/if}
