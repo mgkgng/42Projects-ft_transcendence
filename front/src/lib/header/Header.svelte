@@ -17,7 +17,6 @@
 		right: 0;
 		float: right;
 		
-		// width: 50px;
 		width: 75px;
 		height: 80%;
 		border-radius: 5em;
@@ -62,15 +61,16 @@
 			position: absolute;
 			top: 5rem;
 			right: 0;
+			color: #fff;
+			width: 7rem;
 			border: 2px solid #fff;
 			border-radius: .3em;
-
-			color: #fff;
 			z-index: 9999;
-	
+			transform-origin: top;
+
 			&::before {
 				content: "";
-				top: -20px;
+				top: -16px;
 				right: 9px;
 				left: auto;
 				border: 8px solid transparent;
@@ -79,58 +79,60 @@
 				position: absolute;
 				display: inline-block;
 			}
-	
+
 			button {
+				display: flex;
 				position: relative;
 				width: 100%;
 				padding: 1em 1.2em;
 				cursor: pointer;
-				display: flex;
-				text-align: center;
+				align-items: center;
 				transition: .1s;
+				text-align: center;
 
 				&:hover {
 					filter: brightness(80%);
 					background-color: transparentize(#fff, .6);
 				}
-				// &:nth-child(odd):hover { background-color: transparentize(#fff, .6); }
+
 				&:nth-child(even):hover { background-color: transparentize(#fff, .6); }
+
+				img {
+					height: 1.5em;
+				}
+			}
+
+			.notif {
+				position: absolute;
+				top: .5em;
+				right: 0;
+				width: 15px;
+				height: 15px;
+				border-radius: 50%;
+				border: 2px solid $red-dark;
+				background-color: $red;
+			}
+
+			.img {
+				top: 0;
 			}
 		}
-
-		.notif {
-			position: absolute;
-			top: .5em;
-			right: 0;
-			width: 15px;
-			height: 15px;
-			border-radius: 50%;
-			border: 2px solid $red-dark;
-			background-color: $red;
-		}
-		.img {
-			top: 0;
-		}
 	}
-
+	.profile:focus-within .menu {
+		display: block;
+		animation: grow .1s ease-in-out;
+	}
+	
 	@keyframes grow {
 		0% {
 			transform: scaleY(0);
 			opacity: 0;
 		}
-		to {
+		100% {
 			transform: scaleY(1);
 			opacity: 1;
 		}
 	}
-	
-	.profile:focus-within .menu {
-		display: block;
-		animation: grow .5s ease-in-out;
-	}
-
-	
-
 </style>
 
 <script lang="ts">
@@ -154,7 +156,6 @@
 	let newFriendRequest: Map<string, boolean> = new Map<string, boolean>();
 
 	let userInfo: any;
-	let is_open = {display: 'block'};
 	user.subscribe((user: any) => { userInfo = user; });
 
 	onMount(() => {
@@ -213,14 +214,14 @@
 		{#if !userInfo}
 		<div class="who">?</div>
 		{:else}
-		<div class="summary">
-			<img src={(!userInfo.img) ? userInfo.img_url : userInfo.img} on:click={() => { is_open.display = (is_open.display == 'none' ? 'block' : 'none');}} alt="profile" />
+		<div class="summary" tabindex="-1">
+			<img src={(!userInfo.img) ? userInfo.img_url : userInfo.img} alt="profile" />
 			{#if newMessage.size || newFriendRequest.size}
 			<div class="notif img"></div>
 			{/if}
 		</div>
 		<!-- <p>Hello {userInfo.username}!</p> -->
-		<div class="menu" style='display: {is_open.display};'>
+		<div class="menu">
 			<button on:click={() => { userProfileModal.open(); }}>Profile</button>
 			<button on:click={() => {
 				friendsModal.open();
