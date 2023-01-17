@@ -123,15 +123,19 @@
 	import Modal from "$lib/tools/Modal.svelte";
 	import { format_date_hours } from "$lib/stores/lib";
 	import { onMount } from "svelte";
+	import { onDestroy } from "svelte";
     import { client } from "$lib/stores/client";
     import { user } from "$lib/stores/user";
 	import { afterUpdate } from 'svelte';
-
+    import ChatRoom from "../chat/ChatRoom.svelte";
 	export let itself: any;
 
 	let writeMessageModal: any;
 	let exchanges: Map<string, any> = new Map<string, any>();
 	let allMessages: Map<string, any> = new Map<string, any>();
+	let allMessagePage: number = 1;
+	let allMessagePageSize: number = 20;
+	let lastScrollHeight: number = 0; // Used to set the scrollHeight to the last value before getting last messages
 
 	let selected: string = "";
 
@@ -167,6 +171,9 @@
 					}
 					if (!found) {
 						oldMessages.push(newMessage);
+						oldMessages.sort((a: any, b: any) => {
+							return a.id - b.id;
+						});
 					}
 				}
 				allMessages.set(from, oldMessages);
@@ -187,8 +194,10 @@
 					break;
 				}
 			}
+			console.log("or here")
 			if (found == false)
 			{
+				console.log("pushed");
 				oldMessage.push(lastMessage);
 				allMessages.set(from, oldMessage);
 				allMessages = allMessages;
@@ -206,7 +215,7 @@
 		$client.socket.on("newMessageArrived", async (senderUsername: string) => {
 			console.log("selected", selected, senderUsername);
 			if (selected == senderUsername) {
-				$client.socket.emit("getDirectMessage", { username: user.username, limit: 99999, offset: 0});
+				$client.socket.emit("getDirectMessage", { username: user.username, page: allMessagePage, pageSize: allMessagePageSize});
 			}
 			// refresh the message list
 			$client.socket.emit("getMessageUserList");
@@ -229,7 +238,7 @@
 	function getMessageAndChangeSelected(selected_username: string)
 	{
 		selected = selected_username;
-		$client.socket.emit("getDirectMessage", { username: selected, limit: 9999, offset: 0});
+		$client.socket.emit("getDirectMessage", { username: selected_username, page: allMessagePage, pageSize: allMessagePageSize});
 	}
 
 	let message = '';
@@ -239,11 +248,17 @@
 		message = '';
 	}
 
+	function handleScroll(event) {
+		if (event.target.scrollTop === 0) {
+			$client.socket.emit("getDirectMessage", { username: selected, page: ++allMessagePage, pageSize: allMessagePageSize});
+		}
+	}
+
 	function scrollToBottom() {
-		let chatBox = document.querySelector('.read');
-		if (chatBox)
+		let messages = document.querySelector(".read");
+		if (messages)
 		{
-			chatBox.scrollTop = chatBox.scrollHeight;
+			messages.scrollTop = messages.scrollHeight;
 		}
 	}
 </script>
@@ -265,7 +280,7 @@
 		</div>
 		{#if allMessages.has(selected)}
 		<div class="vflex chat">
-			<div class="vflex read">
+			<div class="vflex read" on:scroll={handleScroll}>
 				{#each allMessages.get(selected) as message}
 				<div class="line">
 					<p class="content {(userInfo.username == message.sender) ? "me" : ""}">

@@ -50,7 +50,6 @@ export class ChatDirectMessageGateway {
 		const userConnected = this.mainServerService.getUserConnectedByUsername(data.username);
 		if (!(await this.friendSystemService.isUserBlocked(user.username, userSender.username))) {
 			this.mainServerService.addNotification(user.username, "directMessage", {});
-			console.log("here")
 			if (userConnected)
 			{
 				this.server.to(this.mainServerService.getUserConnectedListBySocketId(this.mainServerService.getUserConnectedByUsername(userConnected.username).id))
@@ -68,7 +67,6 @@ export class ChatDirectMessageGateway {
 			this.server.to(client.id).emit('error_sendDirectMessageG', {error: 'An error occured'});
 		if (userConnected && !(await this.friendSystemService.isUserBlocked(user.username, userSender.username)))
 		{
-			console.log("IM HERE")
 			let emitList = this.mainServerService.getUserConnectedListBySocketId(this.mainServerService.getUserConnectedByUsername(data.username).id);
 			// For whatever reason if i use success_getDirectMessage it doesnt work, apparently is a bug about namespaces
 			this.server.to(client.id).emit('getDirectMessage', { id: ret.id_g, sender: ret.message_sender.username, recipient: ret.message_recipient.username, message: ret.string, date: ret.date});
@@ -101,8 +99,13 @@ export class ChatDirectMessageGateway {
 			return;
 		}
 
-		const messages = await this.chatDirectMessageService.handleGetDirectMessageHistory(userSender.username, user.username, data.limit, data.offset);
-		// const messages = await this.chatDirectMessageService.handleGetDirectMessageHistory(userSender.username, user.username);
+		// const messages = await this.chatDirectMessageService.handleGetDirectMessageHistory(userSender.username, user.username, data.limit, data.offset);
+		if (Number(data.page) < 0 || Number(data.pageSize) < 0 || Number(data.page) == NaN || Number(data.pageSize) == NaN)
+		{
+			this.server.to(client.id).emit('error_getDirectMessage', {error: 'Invalid page or pageSize'});
+			return;
+		}
+		const messages = await this.chatDirectMessageService.handleGetDirectMessageHistory(userSender.username, user.username, data.page, data.pageSize);
 		if (messages) {
 			this.server.to(client.id).emit('success_getDirectMessage', { messageHistory: messages });
 		} else {
