@@ -132,11 +132,11 @@
 		left: 45%;
 		top: 5%;
 		z-index: 999999;
+		background-color: rgb(75, 75, 75);
 	}
 
 	.popup {
-		background-color: white;
-		color:#212121;
+		color: white;
 		padding: 20px;
 		border-radius: 10px;
 	}
@@ -157,6 +157,7 @@
     import Room from "../game/Room.svelte";
     import { Message } from "../chatt/Message";
     import { ChatRoomUser } from "../chatt/ChatRoomUser";
+    import { format_date } from "$lib/stores/lib";
 
 	export let itself: any; 
 
@@ -194,25 +195,32 @@
 	onMount (() => {
 		/* Chat Updates*/
 		$client.socket.on("ban_user", (data: any) => {
+			console.log("ban");
 			if (data.username_ban == $client.username)
 			{
 				chat.my_rooms.delete(data.id_chat_room);
-				showPopup("You are ban of room " + data.id_public_room + " until " + data.ban_end);
+				showPopup("You are ban of room " + data.id_public_room + " until " + format_date(data.ban_end));
 			}
 			else
 			{
 				$client.socket.emit("get_users_room", {id_public_room: data.id_public_room});
-				showPopup(data.username_ban + "is ban of room " + data.id_public_room + "until " + data.ban_end);
+				showPopup(data.username_ban + "is ban of room " + data.id_public_room + " until " + format_date(data.ban_end));
 			}
 		});
 		$client.socket.on("mute_user", (data: any) => {
 			if (data.username_ban == $client.username)
-				showPopup("You mute of room " + data.id_public_room + "until " + data.mute_end);
+				showPopup("You are mute of room " + data.id_public_room + " until " + format_date(data.mute_end));
 			else
 			{
 				$client.socket.emit("get_users_room", {id_public_room: data.id_public_room});
-				showPopup(data.username_ban + "is mute of room " + data.id_public_room + "until " + data.mute_end);
+				showPopup(data.username_ban + " is mute of room " + data.id_public_room + " until " + format_date(data.mute_end));
 			}
+		});
+		$client.socket.on("error_new_message_room", (data: any) => {
+			if (data.error == "You are muted")
+				showPopup("You are mute of room " + data.id_public_room + " until " + data.mute_end);
+			else if (data.error == "You are banned")
+				showPopup("You are ban of room " + data.id_public_room + " until " + data.ban_end);
 		});
 		$client.socket.on("set_room_not_visible_res", (data: any) => {
 			chat.my_rooms.delete(data);

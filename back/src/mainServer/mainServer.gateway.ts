@@ -42,7 +42,7 @@ export class MainServerGateway {
 	handleConnection(@Request() req)
 	{
 		const user : any = (this.jwtServer.decode(req.handshake?.headers?.authorization.split(' ')[1]));
-		const client_username : string = user?.username_42;
+		const client_username : string = user?.username;
 		let userConnected = {username: client_username, socket: req, status: "online"};
 		global.userConnectedList.push(userConnected);
 		this.userRepository.update({username: client_username}, {last_connection: new Date()});

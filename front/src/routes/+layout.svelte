@@ -59,7 +59,7 @@
 			{//lunch the modal qrcode
 				verifCodeModal.open();
 			}
-			else {
+		else {
 				console.log("Oupsi");
 				// while (tok.get_code != null)
 				// {
@@ -128,8 +128,18 @@
 			}, 1000);
 			
 			return (() => { 
-				$client.socket.off("get_user_info_res"); 
+				//$client.socket.off("get_user_info_res"); 
 			});
+		}
+		else if ($client.socket) {
+			console.log("hey");
+			$client.socket.on("get_user_info_res", (data: any) => {
+				console.log("get_user_info_res: ", data);
+				$client.username = data.username;
+				user.set(data);
+				login.set(true);
+			});
+			$client.socket.emit("get_user_info", {});
 		}
 	});
 </script>

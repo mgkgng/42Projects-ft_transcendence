@@ -61,17 +61,17 @@
 				}
 			});
 			if (tok.access_token) {
-				localStorage.setItem('transcendence-jwt', tok.access_token);
+				await localStorage.setItem('transcendence-jwt', tok.access_token);
 				login.set(true);
-			}
-			if ($client.socket) {
-				$client.socket.on("get_user_info_res", (data: any) => {
-					user.set(data);
-					login.set(true);
-				});
+				if ($client.socket) {
+					$client.socket.on("get_user_info_res", (data: any) => {
+						user.set(data);
+						$client.username = data.username;
+						login.set(true);
+					});
+                }
 				$client.socket.emit("get_user_info", {});
 			}
-			goto('/');
 			return true; 
 		}
 		return false;
@@ -97,7 +97,8 @@
 				if (res_test_code)
 				{
 					itself.close();
-					goto("/");
+					//location.reload();
+					goto('/');
 				}
 				else
 					msg = "Bad Code";

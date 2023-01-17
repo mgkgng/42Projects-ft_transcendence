@@ -127,10 +127,12 @@ export class ChatRoomService {
 
 			if (room.is_password_protected && (!is_good_password )) //Test password
 			{
-				//if (!(is_already_in && is_already_in.is_owner)) //Test if user is admin
+				if (is_already_in && is_already_in.is_admin) //Test if user is admin
+				{
 					console.log("Error");
 					await client.emit("error_append_user_to_room", {error: "Bad password"});
 					return;
+				}
 			}
 			if (is_already_in != undefined) //Client already in room => just make this room visible for him
 			{
@@ -161,7 +163,7 @@ export class ChatRoomService {
 			return;
 		}
 		catch(e){
-			console.log("Append message Error: bad data");
+			console.log("Append message Error: bad data", data);
 			throw new WsException("Bad data");
 		}
 	}
@@ -422,6 +424,7 @@ export class ChatRoomService {
 			let ban_end = data.ban_end;
 			if (ban_end == undefined)
 				ban_end = new Date(2999, 12, 31);
+			data.ban_end = ban_end;
 			const jwt : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
 			const user : any = await this.dataSource.getRepository(UserEntity).find({where: {username_42: jwt.username_42}});
 			const user_ban : any = await this.dataSource.getRepository(UserEntity).find({where: {username: data.username_ban}});
@@ -441,7 +444,9 @@ export class ChatRoomService {
 				.set({is_banned: true, ban_end: ban_end})
 				.where("id_user = :u AND room = :r", {u: user_ban[0].id_g, r: room[0].id_g})
 				.execute();
-				await this.mainServer.getUserConnectedByUsername(data.username_ban).leave(data.id_public_room); 		//JOIN ROOM (socket.io rooms)
+				let client = await this.mainServer.getUserConnectedByUsername(data.username_ban)
+				if (client)
+					client.leave(data.id_public_room); 		//JOIN ROOM (socket.io rooms)
 				this.server.to(data.id_public_room).emit("ban_user", data);
 			}
 	}
@@ -454,6 +459,7 @@ export class ChatRoomService {
 			let mute_end = data.mute_end;
 			if (mute_end == undefined)
 				mute_end = new Date(2999, 12, 31);
+			data.mute_end = mute_end;
 			const jwt : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
 			const user : any = await this.dataSource.getRepository(UserEntity).find({where: {username_42: jwt.username_42}});
 			const user_ban : any = await this.dataSource.getRepository(UserEntity).find({where: {username: data.username_ban}});
@@ -678,6 +684,7 @@ export class ChatRoomService {
 				const res = await this.dataSource.createQueryBuilder().update(UserEntity)
 				.where("id_g = :u", {u: id_user})
 				.set({username: data.new_username}).execute();
+				this.mainServer.updateUsernameBySocketId(client.id, data.new_username);
 				await client.emit("change_username_res", {new_username: data.new_username});
 				return;
 			}

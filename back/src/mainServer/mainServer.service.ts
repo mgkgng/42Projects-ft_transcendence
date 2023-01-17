@@ -29,7 +29,14 @@ export class MainServerService {
 			}
 			return null;
 		}
-
+		updateUsernameBySocketId(socketId: string, username : string) : any {
+			for (let i = 0; i < global.userConnectedList.length; i++) {
+				if (global.userConnectedList[i].socket.id == socketId)
+				{ 
+					global.userConnectedList[i].username = username;
+				}
+			}
+		}
 		// Take a string socketId as param and return the list of socket connected to this username linked
 		// to the socketId
 		getUserConnectedListBySocketId(socketId: string) : any {
