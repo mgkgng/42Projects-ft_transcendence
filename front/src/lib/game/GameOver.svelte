@@ -49,7 +49,7 @@
 		<h3>{winner.info.username}!</h3>
 		<img src="{winner.info.img_url}" alt="winner" />
 		<div class="flex score">
-			<h1>{scores[0]} : {scores[1]}</h1>
+			<h1>{(scores[0] > scores[1]) ? scores[0]: scores[1]} : {(scores[0] > scores[1]) ? scores[1]: scores[0]}</h1>
 		</div>
 	</div>
 	<button on:click={() => { gameModal.close(); }}>Home</button>
