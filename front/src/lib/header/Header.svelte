@@ -57,39 +57,28 @@
 			right: 2em;
 		}
 
-		@keyframes grow {
-			0% {
-				transform: scaleY(0);
-				opacity: 0;
-			}
-			to {
-				transform: scaleY(1);
-				opacity: 1;
-			}
-		}
 		.menu {
 			display: none;
 			position: absolute;
-			top: 115px;
+			top: 5rem;
 			right: 0;
 			border: 2px solid #fff;
 			border-radius: .3em;
 
 			color: #fff;
 			z-index: 9999;
-			//transform-origin: top;
 	
-			// &::before {
-			// 	content: "";
-			// 	top: -20px;
-			// 	right: 9px;
-			// 	left: auto;
-			// 	border: 8px solid transparent;
-			// 	border-bottom-color: transparent;
-			// 	border-bottom-color: #fff;
-			// 	position: absolute;
-			// 	display: inline-block;
-			// }
+			&::before {
+				content: "";
+				top: -20px;
+				right: 9px;
+				left: auto;
+				border: 8px solid transparent;
+				border-bottom-color: transparent;
+				border-bottom-color: #fff;
+				position: absolute;
+				display: inline-block;
+			}
 	
 			button {
 				position: relative;
@@ -98,20 +87,16 @@
 				cursor: pointer;
 				display: flex;
 				text-align: center;
-				//transition: .1s;
+				transition: .1s;
 
-				// &:hover {
-				// 	filter: brightness(80%);
-				// 	background-color: transparentize(#fff, .6);
-				// }
-				// // &:nth-child(odd):hover { background-color: transparentize(#fff, .6); }
-				// &:nth-child(even):hover { background-color: transparentize(#fff, .6); }
+				&:hover {
+					filter: brightness(80%);
+					background-color: transparentize(#fff, .6);
+				}
+				// &:nth-child(odd):hover { background-color: transparentize(#fff, .6); }
+				&:nth-child(even):hover { background-color: transparentize(#fff, .6); }
 			}
 		}
-		// &:focus-within .menu {
-		// 	display: block;
-		// 	animation: grow .2s ease-in-out;
-		// }
 
 		.notif {
 			position: absolute;
@@ -127,6 +112,25 @@
 			top: 0;
 		}
 	}
+
+	@keyframes grow {
+		0% {
+			transform: scaleY(0);
+			opacity: 0;
+		}
+		to {
+			transform: scaleY(1);
+			opacity: 1;
+		}
+	}
+	
+	.profile:focus-within .menu {
+		display: block;
+		animation: grow .5s ease-in-out;
+	}
+
+	
+
 </style>
 
 <script lang="ts">
