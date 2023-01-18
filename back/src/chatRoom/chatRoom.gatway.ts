@@ -262,7 +262,7 @@ export class ChatRoomService {
 	{
 		try{
 			const id_user = await this.mainServer.getIdUser(req);
-			const id_room = await this.mainServer.getIdRoom(data.room_name);
+			const id_room = await this.mainServer.getIdRoom(data);
 			try{
 				const res_is_in_room = await this.dataSource.getRepository(UserChatRoomEntity).createQueryBuilder("userChat")
 				.where("userChat.id_user = :u", {u : id_user})
@@ -277,18 +277,19 @@ export class ChatRoomService {
 				const res = await this.dataSource.getRepository(MessageChatRoomEntity).createQueryBuilder("messageChatRoomEntity")
 				.innerJoin("messageChatRoomEntity.id_chat_room", "chatRoom")
 				.innerJoin("messageChatRoomEntity.id_user", "user")
-				.select(["messageChatRoomEntity.content_message", "messageChatRoomEntity.date_message", "user.username", "chatroom.id_public_room"])
+				.select(["messageChatRoomEntity.content_message", "messageChatRoomEntity.date_message", "user.username", "chatRoom.id_public_room"])
 				.where("chatRoom.id_g = :id", {id: id_room}).orderBy("messageChatRoomEntity.date_message", "DESC")
-				.offset((parseInt(data.page_number) - 1) * parseInt(data.size_page))
+				.offset((parseInt(data.page_number)) * parseInt(data.size_page))
 				.limit(parseInt(data.size_page))
 				.getMany();
-				await client.emit('get_message_room', res);
+				await client.emit('get_message_room_page_res', {messages : res.reverse(), id_public_room: data.id_public_room, page_number: data.page_number});
+				console.log("Page send", res);
 			} catch (e) {
-				// console.log("getMessage Error", e);
+				console.log("getMessage Error", e);
 				throw new WsException("No message in this room");
 			}
 		}catch(e){
-			// console.log("getMessage Error: bad data");
+			console.log("getMessage Error: bad data",e, data);
 			throw new WsException("Bad data");
 		}
 	}

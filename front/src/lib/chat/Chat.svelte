@@ -273,7 +273,7 @@
 			for (let x of data) {
 				if (chat.my_rooms.get(x.id_public_room) == undefined) {
 					chat.my_rooms.set(x.room.id_public_room, new ChattRoom(x.room.id_public_room, x.room.name, x.room.is_password_protected, x.room.is_private, x.is_admin, x.is_owner));
-					$client.socket.emit("get_message_room", { id_public_room: x.room.id_public_room });
+					$client.socket.emit("get_message_room_page", { id_public_room: x.room.id_public_room, page_number: 0 , size_page: 100});
 				}
 				$client.socket.emit("get_users_room", {id_public_room: x.room.id_public_room })
 			}
@@ -302,7 +302,19 @@
 				chatRoom.messages.push(new Message(message.id_chat_room.id_public_room, message.id_user.username, message.content_message, message.date_message))
 			chat = chat;
 		});
-
+		$client.socket.on("get_message_room_page_res", (data: any) => {
+			console.log("Get Messages page :", data);
+			let chatRoom = chat.my_rooms.get(data.id_public_room);
+			let new_page : Array<Message> = [];
+			for (let message of data.messages)
+			{
+				new_page.push(new Message(message.id_chat_room.id_public_room, message.id_user.username, message.content_message, message.date_message))
+			}
+			if (chatRoom.pages_messages.length < data.page_number + 1)
+				chatRoom.pages_messages.push([]);
+			chatRoom.pages_messages[data.page_number] = new_page;
+			chat = chat;
+		});
 		$client.socket.on("get_users_room_res", (data: any) => {
 			console.log("Get User:", data);
 			let chatRoom = chat.my_rooms.get(data.id_public_room);
@@ -316,6 +328,8 @@
 
 		$client.socket.on("new_message_room", (data: any) => {
 			chat.my_rooms.get(data.id_public_room).messages.push(new Message(data.id_public_room, data.username, data.content_message, data.date_message));
+			chat.my_rooms.get(data.id_public_room).pages_messages[0].push(new Message(data.id_public_room, data.username, data.content_message, data.date_message));
+			console.log("new_message_room: ",chat.my_rooms);
 			chat = chat;
 		});
 

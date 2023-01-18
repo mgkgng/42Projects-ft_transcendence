@@ -244,20 +244,23 @@
 		</div>
 		<div class="vflex read">
 		<!-- {#each chat.my_rooms.get(roomID).messages as message} -->
-		{#each chat.my_rooms.get(roomID).messages.slice(chat.my_rooms.get(roomID).messages.length - 100  >= 1 ?  chat.my_rooms.get(roomID).messages.length - 100 : 0, chat.my_rooms.get(roomID).messages.length) as message}
-			<div class="line">
-				<div class="vflex content {(act_user.username == message.username) ? "me" : ""}">
-					<p on:click={() => {
-					//TODO get profile User info
-					profileUser = {};
-					$client.socket.emit("getUserinDB", {username : message.username});
-					userProfileModal.open();
-				}}><u class="username">{message.username}:</u></p>
-					<div>{message.message}</div>
-					<div>{format_date_hours(message.date)}</div>
+		<!-- {#each chat.my_rooms.get(roomID).messages.slice(chat.my_rooms.get(roomID).messages.length - 100  >= 1 ?  chat.my_rooms.get(roomID).messages.length - 100 : 0, chat.my_rooms.get(roomID).messages.length) as message} -->
+		{#if chat.my_rooms.get(roomID).pages_messages[chat.my_rooms.get(roomID).actual_page] != null}
+			{#each chat.my_rooms.get(roomID).pages_messages[chat.my_rooms.get(roomID).actual_page] as message}
+				<div class="line">
+					<div class="vflex content {(act_user.username == message.username) ? "me" : ""}">
+						<p on:click={() => {
+						//TODO get profile User info
+						profileUser = {};
+						$client.socket.emit("getUserinDB", {username : message.username});
+						userProfileModal.open();
+					}}><u class="username">{message.username}:</u></p>
+						<div>{message.message}</div>
+						<div>{format_date_hours(message.date)}</div>
+					</div>
 				</div>
-			</div>
-		{/each}
+			{/each}
+		{/if}
 		</div>
 		<div class="write">
 			<input class="text-input" placeholder="write your message here..." bind:value={newMessage} on:keydown={event => {if (event.key === 'Enter') sendMessageAndUpdate()}} >
