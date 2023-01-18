@@ -221,8 +221,6 @@
 
 	let newMessage: string = "";
 
-	$: console.log(newMessage, newMessage.length);
-
 	user.subscribe((value : any) => {
 		act_user= value;
 	});	
@@ -247,7 +245,6 @@
 			content_message: newMessage
 		});
 		newMessage = "";
-		console.log("je suis la", newMessage.length);
 	}
 	afterUpdate(() => {
 		scrollToBottom();
