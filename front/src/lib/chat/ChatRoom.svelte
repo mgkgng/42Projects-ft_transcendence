@@ -47,29 +47,61 @@
 				height: 90%;
 				width: 100%;
 				overflow-y: scroll;
+				gap: 0;
+
 				.line {
 					width: 100%;
 					position: relative;
 					.content {
+						min-width: 25%;
 						word-wrap: break-word;
 						max-width: 50%;
 						padding: .3em .5em;
-						background-color: rgb(75, 75, 75);
+						background-color: $main-lowshade;
 						border-radius: .4em;
+						margin-top: .3em;
+						margin-right: .5em;
+						gap: 0;
 
-						.username{
-							cursor: pointer;
-							text-decoration: underline;
+						.info {
+							height: 1.5em;
+							position: relative;
+							
+							.username{
+								cursor: pointer;
+								text-decoration: underline;
+								padding: 0 .3em;
+								padding-bottom: .2em;
+								border-radius: .4em;
+								text-underline-offset: .1em;
+								transition: .2s;
+
+								&:hover {
+									background-color: transparentize(#fff, .8);
+								}
+							}
+
+							.date {
+								position: absolute;
+								right: 0;
+								padding-top: .3em;
+								font-size: 14px;
+							}
+						}
+
+						.message {
+							padding-left: .3em;
 						}
 					}
 					.me {
 						float: right;
-						background-color: blue;
+						background-color: $submain-lowshadeblue;
 						grid-column: 2;
 					}
 					.date {
 						font-size: 12px;
 					}
+					&:last-child { margin-bottom: .5em; }
 				}
 			}
 			.write {
@@ -77,9 +109,12 @@
 				width: 100%;
 				height: 20%;
 		
-				input {
-					padding-left: 1.5em;
+				textarea {
+					padding-top: 2em;
+					padding-left: 1em;
+					padding-right: 1em;
 					border-radius: .3em 0 .8em 0;
+					white-space: pre-wrap;
 		
 					width: 100%;
 					height: 100%;
@@ -104,7 +139,8 @@
 					}
 				}
 			}
-		}	
+		}
+
 		.users {
 			position: relative;
 			width: 20%;
@@ -118,7 +154,6 @@
 				overflow-y: overlay;
 				
 				.user {
-					
 					cursor: pointer;
 					width: 100%;
 					padding: .5em .5em;
@@ -170,6 +205,7 @@
 	import { afterUpdate } from 'svelte';
 	import {format_date_hours} from "$lib/stores/lib.ts"
     import { user} from "../stores/user.ts";
+    import Layout from "../../routes/+layout.svelte";
 
 	export let chat: Chatt;
 	export let roomID: string;
@@ -183,11 +219,14 @@
 	let profileUser: any;
 	let act_user : any = { username : ""};
 
-	let newMessage: string = "";	
+	let newMessage: string = "";
+
+	$: console.log(newMessage, newMessage.length);
 
 	user.subscribe((value : any) => {
 		act_user= value;
 	});	
+
 	onMount(() => {
 		$client.socket.on("success_getUserinDB", (data: any) => {
 			profileUser = data.users[0]; 
@@ -208,6 +247,7 @@
 			content_message: newMessage
 		});
 		newMessage = "";
+		console.log("je suis la", newMessage.length);
 	}
 	afterUpdate(() => {
 		scrollToBottom();
@@ -249,21 +289,27 @@
 			{#each chat.my_rooms.get(roomID).pages_messages[chat.my_rooms.get(roomID).actual_page] as message}
 				<div class="line">
 					<div class="vflex content {(act_user.username == message.username) ? "me" : ""}">
-						<p on:click={() => {
-						//TODO get profile User info
-						profileUser = {};
-						$client.socket.emit("getUserinDB", {username : message.username});
-						userProfileModal.open();
-					}}><u class="username">{message.username}:</u></p>
-						<div>{message.message}</div>
-						<div>{format_date_hours(message.date)}</div>
+						<div class="flex info">
+							<u class="username" on:click={() => {
+								//TODO get profile User info
+								profileUser = {};
+								$client.socket.emit("getUserinDB", {username : message.username});
+								userProfileModal.open();
+								}}>{message.username}
+							</u>
+							<div class="date">{format_date_hours(message.date)}</div>
+						</div>
+						<div class="message">{message.message}</div>
 					</div>
 				</div>
 			{/each}
 		{/if}
 		</div>
 		<div class="write">
-			<input class="text-input" placeholder="write your message here..." bind:value={newMessage} on:keydown={event => {if (event.key === 'Enter') sendMessageAndUpdate()}} >
+			<textarea class="text-input" placeholder="write your message here..." bind:value={newMessage} on:keypress={(e) => {
+				if (e.key == 'Enter')
+					e.preventDefault();
+			}}></textarea>
 			<button on:click={() => {sendMessageAndUpdate()}}>Send</button>
 		</div>
 	</div>
@@ -298,3 +344,10 @@
 	</div>
 </div>
 {/if}
+
+<svelte:window
+	on:keydown={(e) => {
+		if (e.key === 'Enter' && newMessage.length)
+				sendMessageAndUpdate();
+	}}
+/>
