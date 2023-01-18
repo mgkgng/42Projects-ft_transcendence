@@ -118,7 +118,7 @@
 				<p>{rank.campus_name}, {rank.campus_country}</p>
 				<p>{rank.nb_victory}</p>
 				<p>{rank.nb_game}</p>
-				<p>{rank.win_rate}%</p>
+				<p>{rank.win_rate.toFixed(2)}%</p>
 			</div>
 			{/each}
 		{:else}
