@@ -23,14 +23,19 @@
 	export let pucks: Array<any>;
 </script>
 
+{#if pucks.length > 4}
+<div class="shadow"
+	style="top: {pucks[4][0]}px; left: {pucks[4][1]}px; --opacity: 15%">
+</div>
+{/if}
 {#if pucks.length > 3}
 <div class="shadow"
-	style="top: {pucks[3][0]}px; left: {pucks[3][1]}px; --opacity: 15%">
+	style="top: {pucks[3][0]}px; left: {pucks[3][1]}px; --opacity: 25%">
 </div>
 {/if}
 {#if pucks.length > 2}
 <div class="shadow"
-	style="top: {pucks[2][0]}px; left: {pucks[2][1]}px; --opacity: 30%">
+	style="top: {pucks[2][0]}px; left: {pucks[2][1]}px; --opacity: 40%">
 </div>
 {/if}
 {#if pucks.length > 1}

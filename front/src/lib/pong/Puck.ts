@@ -15,15 +15,15 @@ export class Puck {
 		// Move
 		let newPos = [this.pos[0][0] + this.vec[0], this.pos[0][1] + this.vec[1]];
 		this.pos.unshift(newPos);
-		if (this.pos.length > 4)
-			this.pos.splice(4, 1);
+		if (this.pos.length > 5)
+			this.pos.splice(5, 1);
 
 		// If the puck has hit the wall, change the direction on X vector
 		if (this.pos[0][0] < 0) {
 			this.pos[0][0] *= -1;
 			this.vec[0] *= -1;
-		} else if (this.pos[0][0] > this.mapSize[0]) {
-			this.pos[0][0] = this.mapSize[0] - (this.pos[0][0] - this.mapSize[0]);
+		} else if (this.pos[0][0] > this.mapSize[0] - PongConfig.PuckSize / 2) {
+			this.pos[0][0] = this.mapSize[0] - PongConfig.PuckSize / 2 - (this.pos[0][0] - this.mapSize[0] + PongConfig.PuckSize / 2);
 			this.vec[0] *= -1;
 		}
 	}
