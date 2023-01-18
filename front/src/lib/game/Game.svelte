@@ -33,6 +33,8 @@
 	let posHorizontal: Array<number>;
 	let prevY: number = 0;
 
+	$: puckPos = translatePucks(puck);
+
 	function convertPixelWithHeight(where: number) {
 		return (Math.floor((gameSize.height * where) / MapSize[gameInfo.mapSize][0]));
 	}
@@ -49,6 +51,18 @@
 		paddleWidth = convertPixelWithHeight(PaddleSize[gameInfo.paddleSize]);
 		initPos = convertPixelWithHeight((MapSize[gameInfo?.mapSize][0] - PaddleSize[gameInfo?.paddleSize]) / 2);
 		posHorizontal = [convertPixelWithWidth(PongConfig.DeadZoneHeight), convertPixelWithWidth(MapSize[gameInfo.mapSize][1] - PongConfig.DeadZoneHeight - PongConfig.PaddleHeight)];
+	}
+
+	function translatePucks(puck: any) {
+		if (!puck)
+			return ;
+		let res = [];
+		for (let pos of puck.pos) {
+			res.push([(!switched) ? convertPixelWithHeight(pos[0]) : convertPixelWithHeight(MapSize[gameInfo.mapSize][0] - pos[0]),
+			(!switched) ? convertPixelWithWidth(MapSize[gameInfo.mapSize][1] - pos[1]) : convertPixelWithWidth(pos[1])]);
+		}
+		console.log("testing: ", res);
+		return (res);
 	}
 
 	window.addEventListener('resize', () => {
@@ -68,30 +82,29 @@
 
 <div id="game" class="pong-game">
 	{#if gameSize}
-	<Paddle pos={(!switched) ? convertPixelWithHeight(player2?.pos) : convertPixelWithHeight(MapSize[gameInfo.mapSize][0] - player1?.pos - PaddleSize[gameInfo.paddleSize])} paddleWidth={paddleWidth}
-		mapSize={MapSize[gameInfo.mapSize]}
-		switched={switched}
-		playerType={(!switched) ? 2 : 1}
-		left={posHorizontal[0]}
-		user={(!switched) ? player2 : player1}
-		initPos={initPos}
-		gameSize={gameSize}
-		gameInfo={gameInfo}
-		/>
-	{#if puck}
-	<PPuck pos={[(!switched) ? convertPixelWithHeight(puck.pos[0]) : convertPixelWithHeight(MapSize[gameInfo.mapSize][0] - puck.pos[0]),
-		(!switched) ? convertPixelWithWidth(MapSize[gameInfo.mapSize][1] - puck.pos[1]) : convertPixelWithWidth(puck.pos[1])]} />
-	{/if}
-	<Paddle pos={(!switched) ? convertPixelWithHeight(player1?.pos) : convertPixelWithHeight(MapSize[gameInfo.mapSize][0] - player2?.pos - PaddleSize[gameInfo.paddleSize])} paddleWidth={paddleWidth}
-		mapSize={MapSize[gameInfo.mapSize]}
-		switched={switched}
-		playerType={(!switched) ? 1 : 2}
-		left={posHorizontal[1]}
-		user={(!switched) ? player1 : player2}
-		initPos={initPos}
-		gameSize={gameSize}
-		gameInfo={gameInfo}
-		/>;
+		<Paddle pos={(!switched) ? convertPixelWithHeight(player2?.pos) : convertPixelWithHeight(MapSize[gameInfo.mapSize][0] - player1?.pos - PaddleSize[gameInfo.paddleSize])} paddleWidth={paddleWidth}
+			mapSize={MapSize[gameInfo.mapSize]}
+			switched={switched}
+			playerType={(!switched) ? 2 : 1}
+			left={posHorizontal[0]}
+			user={(!switched) ? player2 : player1}
+			initPos={initPos}
+			gameSize={gameSize}
+			gameInfo={gameInfo}
+			/>
+		{#if puckPos}
+		<PPuck pucks={puckPos} />
+		{/if}
+		<Paddle pos={(!switched) ? convertPixelWithHeight(player1?.pos) : convertPixelWithHeight(MapSize[gameInfo.mapSize][0] - player2?.pos - PaddleSize[gameInfo.paddleSize])} paddleWidth={paddleWidth}
+			mapSize={MapSize[gameInfo.mapSize]}
+			switched={switched}
+			playerType={(!switched) ? 1 : 2}
+			left={posHorizontal[1]}
+			user={(!switched) ? player1 : player2}
+			initPos={initPos}
+			gameSize={gameSize}
+			gameInfo={gameInfo}
+			/>
 	{/if}
 </div>
 
