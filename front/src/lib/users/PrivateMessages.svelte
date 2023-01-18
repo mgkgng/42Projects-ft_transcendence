@@ -136,6 +136,8 @@
 	let allMessagePage: number = 1;
 	let allMessagePageSize: number = 20;
 	let lastScrollHeight: number = 0; // Used to set the scrollHeight to the last value before getting last messages
+	let renderButtonToGetMoreMessages = true;
+	let allMessagesHaveChanged = false;
 
 	let selected: string = "";
 
@@ -152,6 +154,10 @@
 		
 		$client.socket.on("success_getDirectMessage", (data: any) => {
 			console.log("success_getDirectMessage", data);
+			if (data.messageHistory.length == 0)
+			{
+				renderButtonToGetMoreMessages = false;
+			}
 			let from = (data.messageHistory[0].recipient == userInfo.username) ? data.messageHistory[0].sender : data.messageHistory[0].recipient
 			// if allMessage from user is not defined, create it otherwise append the message received
 			if (!allMessages.has(from)) {
@@ -179,6 +185,7 @@
 				allMessages.set(from, oldMessages);
 			}
 			allMessages = allMessages;
+			allMessagesHaveChanged = true;
 		});
 
 		// this will append when you send a message (sendDirectMessageG)
@@ -201,6 +208,7 @@
 				oldMessage.push(lastMessage);
 				allMessages.set(from, oldMessage);
 				allMessages = allMessages;
+				allMessagesHaveChanged = true;
 			}
 		});
 
@@ -231,7 +239,11 @@
 	});
 
 	afterUpdate(() => {
-		scrollToBottom();
+		if (allMessagesHaveChanged)
+		{
+			scrollToBottom();
+			allMessagesHaveChanged = false;
+		}
 	});
 
 
@@ -248,10 +260,8 @@
 		message = '';
 	}
 
-	function handleScroll(event) {
-		if (event.target.scrollTop === 0) {
-			$client.socket.emit("getDirectMessage", { username: selected, page: ++allMessagePage, pageSize: allMessagePageSize});
-		}
+	function handleLoadMoreMessage(event) {
+		$client.socket.emit("getDirectMessage", { username: selected, page: ++allMessagePage, pageSize: allMessagePageSize});
 	}
 
 	function scrollToBottom() {
@@ -280,7 +290,10 @@
 		</div>
 		{#if allMessages.has(selected)}
 		<div class="vflex chat">
-			<div class="vflex read" on:scroll={handleScroll}>
+			<div class="vflex read">
+				{#if renderButtonToGetMoreMessages}
+					<button on:click={handleLoadMoreMessage}>Load more message</button>
+				{/if}
 				{#each allMessages.get(selected) as message}
 				<div class="line">
 					<p class="content {(userInfo.username == message.sender) ? "me" : ""}">
