@@ -283,7 +283,7 @@ export class ChatRoomService {
 				.limit(parseInt(data.size_page))
 				.getMany();
 				await client.emit('get_message_room_page_res', {messages : res.reverse(), id_public_room: data.id_public_room, page_number: data.page_number});
-				console.log("Page send", res);
+				//console.log("Page send", res);
 			} catch (e) {
 				console.log("getMessage Error", e);
 				throw new WsException("No message in this room");

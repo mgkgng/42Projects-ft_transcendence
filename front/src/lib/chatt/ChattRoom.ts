@@ -11,6 +11,7 @@ export class ChattRoom {
 	is_owner : boolean = false;
 	messages : Array<Message>;
 	actual_page : number = 0;
+	old_page : number = 0;
 	pages_messages : Array<Array<Message>> = [[]];
 	users : Array<ChatRoomUser>;
 	size_page : number = 100;

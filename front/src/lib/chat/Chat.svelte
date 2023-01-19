@@ -313,6 +313,8 @@
 			if (chatRoom.pages_messages.length < data.page_number + 1)
 				chatRoom.pages_messages.push([]);
 			chatRoom.pages_messages[data.page_number] = new_page;
+			if (!new_page.length && chatRoom.actual_page > 0)
+				chatRoom.actual_page--;
 			chat = chat;
 		});
 		$client.socket.on("get_users_room_res", (data: any) => {
