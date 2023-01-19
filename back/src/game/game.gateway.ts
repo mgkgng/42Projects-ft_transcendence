@@ -282,7 +282,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 
 		// If the user wants to play
-		if (data.play) {
+		if (data.play === true) {
 			// broadcast to the users in the room that there is a new player then add player in the room
 			const newPlayer = await this.getPlayerInfo(target.username);
 			room.broadcast("PlayerUpdate", {
@@ -299,6 +299,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			// If the user only wants to watch, add the user in the client list
 			target.isWatching(room.id);
 			room.addClient(target);
+			target.broadcast("JoinRoomRes", {
+				allowed: true,
+				roomID: room.id
+			});
+	
 		}
 	}
 

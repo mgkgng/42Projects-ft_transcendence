@@ -260,7 +260,7 @@
 				tryStart = true;
 				$client.socket.emit("StartGame", roomID)
 			}}>START</button>
-			{:else}
+			{:else if player1?.info.username == userInfo.username || player2?.info.username == userInfo.username}
 			<button class="ready" on:click={()=>{
 				$client.socket.emit("isReady", {
 					roomID: roomID,

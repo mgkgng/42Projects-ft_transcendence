@@ -48,9 +48,12 @@
 				width: 100%;
 				overflow-y: scroll;
 				scroll-behavior: auto;
+				gap: 0;
+
 				.line {
 					width: 100%;
 					position: relative;
+
 					.content {
 						min-width: 25%;
 						word-wrap: break-word;
@@ -61,6 +64,10 @@
 						margin-top: .3em;
 						margin-right: .5em;
 						gap: 0;
+
+						&:last-of-type {
+							//TODO margin bottom for the last message
+						}
 
 						.info {
 							height: 1.5em;
@@ -88,10 +95,12 @@
 							}
 						}
 
-						.message {
-							padding-left: .3em;
-						}
+						.message { padding-left: .3em; }
+
 					}
+
+					
+
 					.me {
 						float: right;
 						background-color: $submain-lowshadeblue;
@@ -100,7 +109,6 @@
 					.date {
 						font-size: 12px;
 					}
-					&:last-child { margin-bottom: .5em; }
 				}
 			}
 			.write {
