@@ -239,10 +239,19 @@
 		//{
 			//chatBox.scrollTop = chatBox.scrollHeight;
 		//}
-		if (sep && chat.my_rooms.get(roomID).actual_page != chat.my_rooms.get(roomID).old_page)
+		if (sep && (chat.my_rooms.get(roomID).actual_page != chat.my_rooms.get(roomID).old_page || chat.my_rooms.get(roomID).is_new_message))
 		{
-			sep.scrollIntoView();
+			if (chat.my_rooms.get(roomID).is_new_message)
+			{
+				chatBox.scrollTo({top: chatBox.scrollHeight,behavior: "smooth"});
+				chat.my_rooms.get(roomID).actual_page = 0;
+				chat.my_rooms.get(roomID).old_page = chat.my_rooms.get(roomID).actual_page;
+			}
+			else
+				sep.scrollIntoView();
 			chat.my_rooms.get(roomID).old_page = chat.my_rooms.get(roomID).actual_page;
+			chat.my_rooms.get(roomID).is_new_message = false;
+			chat = chat;
 		}
 			//chatBox.scrollTo({top: scrollHeight, behavior: 'auto'});
 	}

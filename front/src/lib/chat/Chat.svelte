@@ -331,6 +331,7 @@
 		$client.socket.on("new_message_room", (data: any) => {
 			chat.my_rooms.get(data.id_public_room).messages.push(new Message(data.id_public_room, data.username, data.content_message, data.date_message));
 			chat.my_rooms.get(data.id_public_room).pages_messages[0].push(new Message(data.id_public_room, data.username, data.content_message, data.date_message));
+			chat.my_rooms.get(data.id_public_room).is_new_message = true;
 			console.log("new_message_room: ",chat.my_rooms);
 			chat = chat;
 		});

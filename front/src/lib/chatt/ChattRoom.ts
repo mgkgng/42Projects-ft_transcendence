@@ -13,6 +13,7 @@ export class ChattRoom {
 	actual_page : number = 0;
 	old_page : number = 0;
 	pages_messages : Array<Array<Message>> = [[]];
+	is_new_message = false;
 	users : Array<ChatRoomUser>;
 	size_page : number = 100;
 	
