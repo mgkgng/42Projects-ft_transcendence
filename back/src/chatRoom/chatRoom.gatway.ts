@@ -12,7 +12,7 @@ import { AuthGuard } from "@nestjs/passport";
 import { toDataURL } from "qrcode";
 import { authenticator } from "otplib";
 
-import * as bcrypt from 'bcrypt';
+// import * as bcrypt from 'bcrypt'; BCRYPT LINE
 
 @WebSocketGateway({
 	cors: {
@@ -53,8 +53,9 @@ export class ChatRoomService {
 	{
 		// console.log("new room", data);
 		const id_user = await this.mainServer.getIdUser(req);
-		const is_password_protected : boolean = data.is_password_protected;	
-		const password : string = is_password_protected ? await bcrypt.hash(data.room_password, 10) : "";
+		const is_password_protected : boolean = data.is_password_protected;
+		const password  : string = is_password_protected ? data.room_password : "";
+		// const password : string = is_password_protected ? await bcrypt.hash(data.room_password, 10) : ""; BCRYPT LINE
 		const name : string = data.room_name;
 		const date_creation : Date = new Date();
 		const  querry = this.dataSource.createQueryRunner(); 
@@ -119,7 +120,8 @@ export class ChatRoomService {
 			
 			let is_good_password = false;
 			if (room.is_password_protected)
-				is_good_password = await bcrypt.compare(data.room_password, room.password);
+				is_good_password = (data.room_password == room.password);
+				// is_good_password = await bcrypt.compare(data.room_password, room.password); BCRYPT LINE
 			//const is_good_password = (data.room_password == room.password);
 
 			const is_already_in = await this.dataSource.getRepository(UserChatRoomEntity).createQueryBuilder("userRoom").
@@ -588,7 +590,8 @@ export class ChatRoomService {
 			await client.emit("error_set_password_room", {error: "You are not owner of the room."});
 			return ;
 		}
-		const password = await bcrypt.hash(data.password, 10);
+		const password = data.password;
+		// const password = await bcrypt.hash(data.password, 10); BCRYPT LINE
 		const res = await this.dataSource.createQueryBuilder().update(ChatRoomEntity)
 				.where("id_g = :r", {r: room})
 				.set({password: data.password, is_password_protected: true}).execute();
