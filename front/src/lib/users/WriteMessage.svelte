@@ -62,7 +62,7 @@
 			border: $border-thin;
 			border-radius: .3em;
 
-			input {
+			textarea {
 				width: 100%;
 				height: 100%;
 				padding: 1em .6em;
@@ -162,7 +162,7 @@
 		</div>
 	</div>
 	<div class="content">
-		<input type="text" placeholder="Write your message here..." bind:value={message}>
+		<textarea placeholder="Write your message here..." bind:value={message}></textarea>
 		<button on:click={() => {
 			if (!sendTo.length) {
 				errorMessage = "Please put at least one destination."

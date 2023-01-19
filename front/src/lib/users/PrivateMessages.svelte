@@ -4,6 +4,7 @@
 		height: 560px;
 		display: flex;
 		padding: 0;
+		gap: 0;
 
 		.from {
 			position: relative;
@@ -33,56 +34,102 @@
 					object-fit: cover;
 				}
 			}
-
-			
 		}
 
 		.chat {
-			width: 80%;
+			width: 70%;
 			height: 100%;
 			gap: 0;
+
 			.read {
+				position: relative;
 				height: 90%;
 				width: 100%;
 				overflow-y: scroll;
+				gap: 0;
+
+				.load-more {
+					position: absolute;
+					top: 0;
+					left: 20%;
+					justify-content: center;
+					width: 60%;
+					height: 2em;
+					transition: .3s;
+					border-radius: 0 0 .5em .5em;
+
+					&:hover {
+						background-color: transparentize(#fff, .8);
+					}
+				}
+
 				.line {
 					width: 100%;
-					position: relative;
+
+					&:first-child { margin-top: 2.2em; }
+
 					.content {
+						position: relative;
 						word-wrap: break-word;
+						min-width: 15%;
 						max-width: 50%;
 						padding: .3em .5em;
-						background-color: rgb(75, 75, 75);
+						background-color: $main-lowshade;
 						border-radius: .4em;
+						margin-bottom: .2em;
+						margin-left: .4em;
+						margin-right: .4em;
+						float: left;
 
-						.username{
-							cursor: pointer;
-							text-decoration: underline;
+						.message {
+							min-height: 1em;
+							padding-right: 2.5em;
+							letter-spacing: .5px;
+						}
+						.date {
+							position: absolute;
+							right: .5em;
+							top: .7em;
+							font-size: 12px;
 						}
 					}
+
 					.me {
 						float: right;
-						background-color: blue;
+						background-color: $submain-lowshadeblue;
 						grid-column: 2;
-					}
-					.date {
-						font-size: 12px;
 					}
 				}
 			}
-			.write{
+			.write {
+				position: relative;
 				width: 100%;
 				height: 10%;
 				padding:0;
 				display: flex;
 				flex-direction: row;
 				align-items: center;
-			input[type="text"]{
-				width: 80%;
-			}
-			button{
-				width: 20%;
-			}
+
+				input {
+					width: 85%;
+					height: 100%;
+					padding-left: .8em;
+					padding-right: .5em;
+					transition: .2s;
+					&:hover, &:focus-within {
+						background-color: transparentize(#fff, .8);
+					}
+				}
+				button {
+					position: absolute;
+					width: 15%;
+					height: 100%;
+					right: 0;
+					// border-radius: .3em;
+					transition: .2s;
+
+					&:hover { background-color: transparentize(#fff, .9); }
+				}
 		}
 		}
 
@@ -107,11 +154,17 @@
 		.add {
 			position: absolute;
 			border-radius: .2rem;
+			justify-content: center;
+			align-items: center;
+			width: 2rem;
+			height: 2rem;
 			right: 0;
 			bottom: 0;
-			font-size: 56px;
+			font-size: 36px;
+			transition: .3s;
+			padding-bottom: .2aem;
 			&:hover {
-				background-color: transparentize(#fff, .6);
+				background-color: transparentize(#fff, .5);
 			}
 		}
 	}
@@ -256,6 +309,8 @@
 	let message = '';
 
 	async function sendDirectMessageAndUpdate() {
+		if (!message.length)
+			return ;
 		$client.socket.emit('sendDirectMessageG', {username: selected, message: message});
 		message = '';
 	}
@@ -286,22 +341,24 @@
 				<p>{user.username}</p>
 			</div>
 			{/each}
-			<button class="add" on:click={() => {writeMessageModal.open(); }}>+</button>
+			<button class="flex add" on:click={() => {writeMessageModal.open(); }}>+</button>
 		</div>
 		{#if allMessages.has(selected)}
 		<div class="vflex chat">
 			<div class="vflex read">
-				{#if renderButtonToGetMoreMessages}
-					<button on:click={handleLoadMoreMessage}>Load more message</button>
-				{/if}
 				{#each allMessages.get(selected) as message}
 				<div class="line">
-					<p class="content {(userInfo.username == message.sender) ? "me" : ""}">
-						{message.message}
-					</p>
-					<div class="date">{format_date_hours(message.date)}</div>
+					<div class="content {(userInfo.username == message.sender) ? "me" : ""}">
+						<div class="message">{message.message}</div>
+						<div class="date">{format_date_hours(message.date)}</div>
+					</div>
 				</div>
 				{/each}
+				{#if renderButtonToGetMoreMessages}
+				<div class="flex load-more">
+					<button on:click={handleLoadMoreMessage}>Load more message</button>
+				</div>
+				{/if}
 			</div>
 			<div class="write">
 				<input type="text" bind:value={message} placeholder="Type your message here" class="messageInput" on:keydown={event => {if (event.key === 'Enter') sendDirectMessageAndUpdate()} } />
@@ -317,7 +374,7 @@
 		<div class="flex no-users">
 			<p>You don't have any message yet.</p>
 		</div>
-		<button class="add" on:click={() => { writeMessageModal.open(); }}>+</button>
+		<button class="flex add" on:click={() => { writeMessageModal.open(); }}>+</button>
 	{/if}
 	<CloseButton window={itself} />
 </div>

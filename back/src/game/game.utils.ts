@@ -42,7 +42,8 @@ export const UserState = {
 	Available: 0,
 	Waiting: 1,
 	Playing: 2,
-	Watching: 3
+	Watching: 3,
+	Inviting: 4
 }
 
 export const ErrorMessage = {
