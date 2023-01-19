@@ -185,7 +185,6 @@
 					padding-top: .6em;
 					padding-left: 1em;
 					padding-right: 1em;
-
 				}
 				button {
 					position: absolute;
@@ -228,8 +227,6 @@
 	let puckSpeed: number = 1;
 	let mapSize: number = 1;
 	let paddleSize: number = 1;
-	let isPrivate: boolean = false;
-	let roomTitle: string = "";
 		
 	$: searchUser = "";
 	$: searchUser = searchUser.toLowerCase();
@@ -238,9 +235,7 @@
 	$: console.log(sendTo);
 
 	function createInvitationMessage(message: string) {
-		let res = "/gameInvitation/";
-		
-		return (res);
+		return (`/gameInvitation/mapSize=${mapSize}&speed=${puckSpeed}&paddleSize=${paddleSize}&maxPoint=${maxPoint}&msg=${message}`);
 	}
 
 	onMount(() => {
@@ -386,6 +381,7 @@
 				if (sendTo[0] == userInfo.username) {
 					errorMessage = "You cannot send a game invitation to yourself.";
 					alertMessageModal.open();
+					return ;
 				}
 				console.log(createInvitationMessage(message));
 				// $client.socket.emit("sendDirectMessageG", {

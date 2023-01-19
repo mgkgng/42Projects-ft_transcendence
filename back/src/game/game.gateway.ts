@@ -570,6 +570,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage('sendDirectMessageG')
 	async sendMessage(@MessageBody() data: any, @ConnectedSocket() client: any) {
+		if (data.message.startsWith("/gameInvitation/")) {
+			// Create Room
+			// Send websocket message to the sender
+		}
+
 		console.log("sendMessageG")
 		const user = await this.userRepository.findOne({
 			where: {username: data.username}
