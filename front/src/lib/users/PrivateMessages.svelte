@@ -34,6 +34,10 @@
 					object-fit: cover;
 				}
 			}
+			.add {
+				position: absolute;
+				left: 0;
+			}
 		}
 
 		.chat {
@@ -193,8 +197,10 @@
 	let allMessagesHaveChanged = false;
 
 	let selected: string = "";
-
 	let userInfo: any;
+
+	let message = '';
+
 	user.subscribe((user: any) => { userInfo = user; });
 
 	onMount(() => {
@@ -250,11 +256,9 @@
 			for (let message of oldMessage) {
 				if (message.id == lastMessage.id) {
 					found = true;
-					console.log("here");
 					break;
 				}
 			}
-			console.log("or here")
 			if (found == false)
 			{
 				console.log("pushed");
@@ -299,14 +303,11 @@
 		}
 	});
 
-
 	function getMessageAndChangeSelected(selected_username: string)
 	{
 		selected = selected_username;
 		$client.socket.emit("getDirectMessage", { username: selected_username, page: allMessagePage, pageSize: allMessagePageSize});
 	}
-
-	let message = '';
 
 	async function sendDirectMessageAndUpdate() {
 		if (!message.length)
