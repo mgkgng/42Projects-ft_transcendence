@@ -47,12 +47,7 @@
 				height: 90%;
 				width: 100%;
 				overflow-y: scroll;
-<<<<<<< HEAD
 				scroll-behavior: auto;
-=======
-				gap: 0;
-
->>>>>>> 6a70497cf483fc04caaa12646987750fa4cb741d
 				.line {
 					width: 100%;
 					position: relative;
