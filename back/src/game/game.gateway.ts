@@ -568,14 +568,47 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 	}
 
+	@SubscribeMessage('answerToInvitation')
+	answerToInvitation(@MessageBody() data: any, @ConnectedSocket() client: any) {
+
+	}
+
 	@SubscribeMessage('sendDirectMessageG')
-	async sendMessage(@MessageBody() data: any, @ConnectedSocket() client: any) {
-		if (data.message.startsWith("/gameInvitation/")) {
-			// Create Room
-			// Send websocket message to the sender
+	async sendMessage(@MessageBody() data: any, @ConnectedSocket() client: any, @Request() req) {
+		let gameInvitation = data.message.startsWith("/gameInvitation/");
+		let messageToSave = data.message;
+		if (gameInvitation) {
+			let target = this.getClient(req);
+			if (target.state !== UserState.Available) {
+				client.emit("gameInvitationRes", {
+					success: false,
+					msg: "You are currently not able to create a new game."
+				})
+				return ;
+			}
+			let player = await this.getPlayerInfo(target.username);
+			let args = messageToSave.split("/")[1].split("&");
+			let gameInfo = {
+				title: "", 
+				mapSize: args[0].split('=')[1], 
+				maxPoint: args[0].split('=')[1], 
+				puckSpeed: args[0].split('=')[1],
+				paddleSize: args[0].split('=')[1],
+				isPrivate: true
+			};
+			
+			let room = new Room([player], [target], gameInfo, target.username, this, this.gameRep, this.mainServerService, this.dataSource, this.userService)
+			this.rooms.set(room.id, room);
+			target.isPlaying(room.id);
+
+			client.emit("gameInvitationRes", {
+				success: true,
+				msg: "The game has been created. Do you want to join the room?",
+				roomID: room.id
+			});
+			messageToSave += `&roomID=${room.id}`;
 		}
 
-		console.log("sendMessageG")
 		const user = await this.userRepository.findOne({
 			where: {username: data.username}
 		});
@@ -598,9 +631,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			let target = this.clients.get(username42);
 			target.newMessageReceived(userSender.username);
 		}
-		let ret = await this.chatDirectMessageService.handleSendDirectMessage(this.mainServerService.getUserConnectedBySocketId(client.id).username, data.username, data.message);
+		let ret = await this.chatDirectMessageService.handleSendDirectMessage(this.mainServerService.getUserConnectedBySocketId(client.id).username, data.username, messageToSave);
 		if (ret)
-			this.server.to(client.id).emit('success_sendDirectMessageG', {message: data.message});
+			this.server.to(client.id).emit('success_sendDirectMessageG', {message: messageToSave});
 		else
 			this.server.to(client.id).emit('error_sendDirectMessageG', {error: 'An error occured'});
 		if (!(await this.friendSystemService.isUserBlocked(user.username, userSender.username)))
