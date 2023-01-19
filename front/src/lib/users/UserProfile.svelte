@@ -76,35 +76,74 @@
 			text-align: center;
 	
 			border: $border-thin;
-			padding: 1.2em;
+			padding: 0.5em 1em;
 	
 			color: #e6e6e6;
 			font-size: 18px;
 	
 			overflow-y: scroll;
+			gap: .2em;
 
+			h1 {
+				font-size: 36px;
+			}
 			.line {
 				img {
 					width: 32px;
 					height: 32px;
 					object-fit: cover;
 				}
-				.wl {
-					border-radius: .2em;
-					padding: .1em .3em;
-				}
 
-				.win { background-color: $green; }
-				.lose { background-color: $red; }
 
 				.result {
+					display: grid;
+					grid-template-columns: 50% 5% 10% 20%;
+					
 					.versus {
+						display: grid;
 						border: $border-thin;
 						border-radius: .2em;
-						padding: .1em .3em;
-						gap: .8em;
+						grid-template-columns: 44% 12% 44%;
 						
-						&:nth-child(2) { background-color: $red;}
+						.mid {
+							border-left: $border-thin;
+							border-right: $border-thin;
+						}
+
+						.uname {
+							overflow: hidden;
+							cursor: pointer;
+							transition: .3s;
+							&:hover { background-color: transparentize(#fff, .6)}
+						}
+					}
+
+					.wl {
+						width: 1.5em;
+						height: 1.5em;
+						border-radius: .2em;
+						padding: .2em .3em;
+					
+					}
+
+					.win { background-color: $green; }
+					.lose {
+						padding-top: .1em;
+						background-color: $red;
+					}
+
+
+					.score {
+						justify-content: center;
+						align-items: center;
+						gap: .3em;
+
+						.mid { padding-bottom: .3em; }
+					}
+
+					.date {
+						padding-top: .3em;
+						font-size: 15px; 
 					}
 				}
 			}
@@ -239,23 +278,25 @@
 	<div class="history">
 		{#if gameHistory.length}
 		<div class="vflex line">
-		{#each gameHistory as game}
-			<div class="flex result">
-				<div class="flex versus">
-					<div>{(game.player1_score > game.player2_score) ? game.player1.username : game.player2.username}</div>
-					<div>vs</div>
-					<div>{(game.player1_score > game.player2_score) ? game.player2.username : game.player1.username}</div>
+			<h1>- Match History -</h1>
+			{#each gameHistory as game}
+				<div class="flex result">
+					<div class="versus">
+						<!-- TODO: open other's profile when clicked -->
+						<div class="uname">{(game.player1_score > game.player2_score) ? game.player1.username : game.player2.username}</div>
+						<div class="mid">vs</div>
+						<div class="uname">{(game.player1_score > game.player2_score) ? game.player2.username : game.player1.username}</div>
+					</div>
+					<div class="wl {((game.player1_score > game.player2_score && game.player1.username == userInfo.username) || (game.player1_score < game.player2_score && game.player2.username == userInfo.username)) ? "win" : "lose"}">
+						{((game.player1_score > game.player2_score && game.player1.username == userInfo.username) || (game.player1_score < game.player2_score && game.player2.username == userInfo.username)) ? "W" : "L"}
+					</div>
+					<div class="flex score">
+						<div>{(game.player1_score > game.player2_score) ? game.player1_score : game.player2_score}</div>
+						<div class="mid">:</div>
+						<div>{(game.player1_score > game.player2_score) ? game.player2_score : game.player1_score}</div>
+					</div>
+					<div class="date">{game.date_game.split("T")[0]}</div>
 				</div>
-				<div class="wl {((game.player1_score > game.player2_score && game.player1.username == userInfo.username) || (game.player1_score < game.player2_score && game.player2.username == userInfo.username)) ? "win" : "lose"}">
-					{((game.player1_score > game.player2_score && game.player1.username == userInfo.username) || (game.player1_score < game.player2_score && game.player2.username == userInfo.username)) ? "W" : "L"}
-				</div>
-				<div class="flex score">
-					<div>{(game.player1_score > game.player2_score) ? game.player1_score : game.player2_score}</div>
-					<div>:</div>
-					<div>{(game.player1_score > game.player2_score) ? game.player2_score : game.player1_score}</div>
-				</div>
-				<div>{game.date_game.split("T")[0]}</div>
-			</div>
 			{/each}
 		</div>
 		{:else}

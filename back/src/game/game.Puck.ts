@@ -73,8 +73,8 @@ export class Puck {
 			if (deathPointX < 0) {
 				deathPointX *= -1;
 				this.vec[0] *= -1;
-			} else if (deathPointX > this.mapSize[0]) {
-				deathPointX = this.mapSize[0] - (deathPointX - this.mapSize[0]);
+			} else if (deathPointX > this.mapSize[0] - PongConfig.PuckSize / 2) {
+				deathPointX = this.mapSize[0] - PongConfig.PuckSize / 2 - (deathPointX - this.mapSize[0] + PongConfig.PuckSize / 2);
 				this.vec[0] *= -1;
 			}
 		}
