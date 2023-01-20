@@ -199,18 +199,26 @@
 	}
 
 	function convertPixelWithHeight(where: number) {
+		if (!gameSize)
+			return (initPos);
 		return (Math.floor((gameSize.height * where) / MapSize[gameInfo.mapSize][0]));
 	}
 
 	function convertPixelWithWidth(where: number) {
+		if (!gameSize)
+			return (initPos);
 		return (Math.floor((gameSize.width * where) / MapSize[gameInfo.mapSize][1]));
 	}
 
 	function convertFromPixelWithHeight(pixel: number) {
+		if (!gameSize)
+			return (initPos);
 		return (Math.floor((pixel * MapSize[gameInfo.mapSize][0]) / gameSize.height));
 	}
 
 	function defineValues() {
+		if (!gameSize)
+			return ;
 		paddleWidth = convertPixelWithHeight(PaddleSize[gameInfo.paddleSize]);
 		initPos = convertPixelWithHeight((MapSize[gameInfo?.mapSize][0] - PaddleSize[gameInfo?.paddleSize]) / 2);
 		posHorizontal = [convertPixelWithWidth(PongConfig.DeadZoneHeight), convertPixelWithWidth(MapSize[gameInfo.mapSize][1] - PongConfig.DeadZoneHeight - PongConfig.PaddleHeight / 2)];
@@ -265,8 +273,7 @@
 				player2 = data.player;
 			} else {
 				if (started) {
-					if (puckMoving)
-						clearInterval(puckMoving);
+					clearInterval(puckMoving);
 					return ;
 				}
 				if (data.username == player1.info.username_42)
@@ -278,6 +285,9 @@
 		});
 		
 		$client.socket.on("PaddleUpdate", (data: any) => {
+			if ((data.type === 0 && player1.info.username_42 === userInfo.username_42)
+				|| (data.type === 1 && player2.info.username_42 === userInfo.username_42))
+				return ;
 			if (data.type === 0)
 				player1.pos = data.pos;
 			else
@@ -288,6 +298,7 @@
 
 		$client.socket.on("PongStart", () => {
 			console.log("PongStart");
+			clearInterval(puckMoving)
 			puckMoving = setInterval(() => {
 				puck.move();
 				puck = puck;
@@ -422,9 +433,10 @@
 
 <svelte:window
 	on:mousemove={(event) => {
+		if (![player1?.info.username_42, player2?.info.username_42].includes(userInfo.username_42))
+			return ;
 		if (!gameSize)
 			return ;
-		// console.log("testing: ", gameSize);
 		let pos = Math.floor(event.clientY - gameSize?.y) - paddleWidth / 2;
 		if (pos < 0)
 			pos = 0;
@@ -439,5 +451,9 @@
 			pos: posConverted,
 			roomID: roomID
 		});
+		if (player1.info.username_42 === userInfo.username_42)
+			player1.pos = posConverted;
+		else
+			player2.pos = posConverted;
 	}}
 />
