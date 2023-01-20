@@ -1,7 +1,7 @@
 <style lang="scss">
 	.write {
 		width: 640px;
-		height: 320px;
+		height: 480px;
 		border: $border;
 		border-radius: .3em;
 		padding: 2em 2em;
@@ -9,16 +9,21 @@
 
 		.tab {
 			justify-content: center;
-			border: $border-thin;
+			align-items: center;
 			gap: 0;
 			border-radius: .2em;
-			margin: .5em 0;
+			// margin-bottom: .5em;
+			width: 100%;
 
 			input { display: none; }
 
 			label {
+				border: $border-thin;
+				border-bottom: 0;
 				text-align: center;
-				width: 50%;
+				width: 40%;
+				cursor: pointer;
+
 				&:hover {
 					background-color: transparentize(#fff, .8);
 				}
@@ -66,7 +71,7 @@
 		.send-to {
 			width: 100%;
 			border-radius: .3em;
-
+			margin: .5em;
 			.dist {
 				.to {
 					align-items: center;
@@ -235,7 +240,7 @@
 	$: console.log(sendTo);
 
 	function createInvitationMessage(message: string) {
-		return (`/gameInvitation/mapSize=${mapSize}&speed=${puckSpeed}&paddleSize=${paddleSize}&maxPoint=${maxPoint}&msg=${message}`);
+		return (`/gameInvitation/mapSize=${mapSize}&speed=${puckSpeed}&paddleSize=${paddleSize}&maxPoint=${maxPoint}&msg=${(message.length) ? message : "Let's play a game together!"}`);
 	}
 
 	onMount(() => {
@@ -246,9 +251,16 @@
 			itself.close();
 		});
 
+		$client.socket.on("gameInvitationRes", (data: any) => {
+			if (!data.success) {
+				return ;
+			}
+		});
+
 		return (() => {
 			$client.socket.off("success_getUserinDB");
 			$client.socket.off("success_sendDirectMessageG");
+			$client.socket.off("gameInvitationRes");
 		});
 	});
 </script>
@@ -283,12 +295,6 @@
 			</div>
 			{/if}
 	</div>
-	<div class="flex tab">
-		<input type=radio id="directMessage" bind:group={directMessage} name="directMessage" value={true}> 
-		<label for="directMessage">Direct Message</label>
-		<input type=radio id="gameInvitation" bind:group={directMessage} name="directMessage" value={false}> 
-		<label for="gameInvitation">Game Invitation</label>
-	</div>
 	<div class="vflex send-to">
 		<div class="flex dist">
 			{#each sendTo as user}
@@ -301,6 +307,12 @@
 			</div>
 			{/each}
 		</div>
+	</div>
+	<div class="flex tab">
+		<input type=radio id="directMessage" bind:group={directMessage} name="directMessage" value={true}> 
+		<label for="directMessage">Direct Message</label>
+		<input type=radio id="gameInvitation" bind:group={directMessage} name="directMessage" value={false}> 
+		<label for="gameInvitation">Game Invitation</label>
 	</div>
 	{#if directMessage === true}
 	<div class="content">
@@ -384,10 +396,10 @@
 					return ;
 				}
 				console.log(createInvitationMessage(message));
-				// $client.socket.emit("sendDirectMessageG", {
-				// 	username: sendTo[0],
-				// 	message: createInvitationMessage(message)
-				// });
+				$client.socket.emit("sendDirectMessageG", {
+					username: sendTo[0],
+					message: createInvitationMessage(message)
+				});
 				message = "";
 			}}>Send</button>
 		</div>

@@ -577,23 +577,26 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	async sendMessage(@MessageBody() data: any, @ConnectedSocket() client: any, @Request() req) {
 		let gameInvitation = data.message.startsWith("/gameInvitation/");
 		let messageToSave = data.message;
+		console.log(gameInvitation);
 		if (gameInvitation) {
 			let target = this.getClient(req);
 			if (target.state !== UserState.Available) {
+				console.log("bonjour?");
 				client.emit("gameInvitationRes", {
 					success: false,
 					msg: "You are currently not able to create a new game."
 				})
 				return ;
 			}
+			//TODO protection contre '&' dans le message
 			let player = await this.getPlayerInfo(target.username);
-			let args = messageToSave.split("/")[1].split("&");
+			let args = messageToSave.split("/")[2].split("&");
 			let gameInfo = {
 				title: "", 
-				mapSize: args[0].split('=')[1], 
-				maxPoint: args[0].split('=')[1], 
-				puckSpeed: args[0].split('=')[1],
-				paddleSize: args[0].split('=')[1],
+				mapSize: parseInt(args[0].split('=')[1]), 
+				maxPoint: parseInt(args[0].split('=')[1]), 
+				puckSpeed: parseInt(args[0].split('=')[1]),
+				paddleSize: parseInt(args[0].split('=')[1]),
 				isPrivate: true
 			};
 			
@@ -608,6 +611,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			});
 			messageToSave += `&roomID=${room.id}`;
 		}
+		console.log("what to send?", messageToSave);
 
 		const user = await this.userRepository.findOne({
 			where: {username: data.username}
