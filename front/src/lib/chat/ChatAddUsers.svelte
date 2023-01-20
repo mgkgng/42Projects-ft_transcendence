@@ -294,7 +294,11 @@
 					searchUser = "";
 					userSearchList = [];
 				}}>
+				{#if user.img_url.includes("cdn.intra.42.fr")}
 					<img src="{user.img_url}" alt="user">
+				{:else}
+					<img src="http://{location.hostname}:3000{user.img_url}" alt="user">
+				{/if}
 					<div class="user">{user.username}</div>
 					<div class="status {(user.status == "online") ? "online" : (user.status == "in game") ? "playing" : ""}"></div>
 				</div>

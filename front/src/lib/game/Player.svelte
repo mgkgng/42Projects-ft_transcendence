@@ -87,7 +87,11 @@
 		{:else if ready}
 		<span class="ready">READY</span>
 		{/if}
-		<img src={player.info.img_url} alt="profile"/>
+		{#if player.info.img_url.includes("cdn.intra.42.fr")}
+			<img src={player.info.img_url} alt="profile"/>
+		{:else}
+			<img src='http://{location.hostname}:3000{player.info.img_url}' alt="profile"/>
+		{/if}
 	</div>
 	<div class="username">{player.info.username_42}</div>
 	{:else}

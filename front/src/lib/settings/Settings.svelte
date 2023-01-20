@@ -155,6 +155,7 @@
 	}
 
 	onMount(() => {
+		console.log(image);
 		$client.socket.on("change_username_res", (data: any) => {
 			user.update((u: any) => {
 				u.username = data.new_username;
@@ -209,7 +210,11 @@
 <div class="vflex window settings">
 	<h2>Settings</h2>
 	<div class="image">
-		<img src="{image}" alt="profile">
+		{#if image.includes("cdn.intra.42.fr")}
+			<img src="{image}" alt="profile">
+		{:else}
+			<img src="http://{location.hostname}:3000{image}" alt="profile">
+		{/if}
 		<button on:click={() => { fileInput.click(); }}>modify</button>
 		<input style="display:none" type="file" accept=".jpg, .jpeg, .png" on:change={(e) => onFileSelected(e)} bind:this={fileInput}/>
 	</div>

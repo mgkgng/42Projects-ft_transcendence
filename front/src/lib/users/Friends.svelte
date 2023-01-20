@@ -371,7 +371,11 @@
 					searchUser = "";
 					userSearchList = [];
 				}}>
-					<img src="{user.img_url}" alt="user">
+					{#if user.img_url.includes("cdn.intra.42.fr")}
+						<img src="{user.img_url}" alt="user">
+					{:else}
+						<img src="http://{location.hostname}:3000{user.img_url}" alt="user">
+					{/if}
 					<div class="user">{user.username}</div>
 					<div class="status {(user.status == "online") ? "online" : (user.status == "in game") ? "playing" : ""}"></div>
 				</div>
@@ -392,7 +396,11 @@
 		<div class="vflex requests">
 			{#each [...friendRequests.values()] as request}
 			<div class="flex line">
-				<img src={(request.img) ? request.img : request.img_url} alt="user" />
+					{#if ((request.img) ? request.img : request.img_url).includes("cdn.intra.42.fr")}
+						<img src={(request.img) ? request.img : request.img_url} alt="user" />
+					{:else}
+						<img src='http://{location.hostname}:3000{(request.img) ? request.img : request.img_url}' alt="user" />
+					{/if}
 				<div class="user" on:click={() => {
 					$client.socket.emit("getFriendList", { username: userInfo.username });
 					$client.socket.emit("getAskList");

@@ -215,7 +215,11 @@
 		<div class="who">?</div>
 		{:else}
 		<div class="summary" tabindex="-1">
-			<img src={(!userInfo.img) ? userInfo.img_url : userInfo.img} alt="profile" />
+			{#if ((!userInfo.img) ? userInfo.img_url : userInfo.img).includes("cdn.intra.42.fr")}
+				<img src="{(!userInfo.img) ? userInfo.img_url : userInfo.img}" alt="profile" />
+			{:else}
+				<img src="http://{location.hostname}:3000{(!userInfo.img) ? userInfo.img_url : userInfo.img}" alt="profile" />
+			{/if}
 			{#if newMessage.size || newFriendRequest.size}
 			<div class="notif img"></div>
 			{/if}

@@ -247,7 +247,11 @@
 {#if profileUser != null && profileUser.created_at != null}
 	<div class="flex info">
 		<div class="photo">
-			<img src={profileUser.img_url} alt="grosse-tete">
+			{#if profileUser.img_url.includes("cdn.intra.42.fr")}
+				<img src='{profileUser.img_url}' alt="grosse-tete">
+			{:else}
+				<img src='http://{location.hostname}:3000{profileUser.img_url}' alt="grosse-tete">
+			{/if}
 		</div>
 		<div class="vflex data">
 			<p class="username">{profileUser.displayname} a.k.a. {profileUser.username}</p>
