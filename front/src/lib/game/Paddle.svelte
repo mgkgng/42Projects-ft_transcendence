@@ -29,21 +29,13 @@
 	export let playerType: number;
 	export let switched: boolean;
 
-	export let mapSize: Array<number>;
 	export let paddleWidth : number;
-
 	export let pos : number;
 	export let left: number;
 	export let initPos: number;
 
-	export let gameSize: any;
-	export let gameInfo: any;
-
 	if (!pos)
 		pos = initPos;
-
-	$: console.log(pos);
-		
 </script>
 
 <div class="paddle {(playerType == 1) ? "user" : ""} {(!user) ? "absent" : ""}"

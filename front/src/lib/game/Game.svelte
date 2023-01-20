@@ -90,6 +90,30 @@
 	.right {
 		right: 0;
 	}
+
+	.paddle {
+		position: absolute;
+		margin: 0;
+		width: 12px;
+		background-color: #fff;
+
+		border-radius: .2em;
+
+		z-index: 2;
+
+		// border: 5px solid $red;
+		box-shadow: 0px 0px 5px 5px $main-bright;
+	}
+
+	.absent {
+		background-color: rgb(90, 84, 84);
+		box-shadow: none;
+	}
+
+	.user {
+		margin: 0;
+		box-shadow: 0px 0px 5px 5px $submain-blue;
+	}
 </style>
 
 <script lang="ts">
@@ -142,7 +166,7 @@
 			res.push([(!switched) ? convertPixelWithHeight(pos[0]) : convertPixelWithHeight(MapSize[gameInfo.mapSize][0] - pos[0]),
 			(!switched) ? convertPixelWithWidth(MapSize[gameInfo.mapSize][1] - pos[1]) : convertPixelWithWidth(pos[1])]);
 		}
-		console.log("testing: ", res);
+		// console.log("testing: ", res);
 		return (res);
 	}
 
@@ -150,8 +174,8 @@
 		game = document.getElementById("game");
 		gameSize = game?.getBoundingClientRect();
 		defineValues();
-		console.log(gameSize);
-		console.log(MapSize[gameInfo.mapSize]);
+		// console.log(gameSize);
+		// console.log(MapSize[gameInfo.mapSize]);
 	});
 
 	onMount(() => {
@@ -164,29 +188,33 @@
 <div id="game" class="pong-game">
 	{#if gameSize}
 		<div class="zone-limit left {(!switched) ? "player2" : "player1"}" style="--shadow: {convertPixelWithWidth(PongConfig.DeadZoneHeight)}px 0px 16px aqua"></div>
-		<Paddle pos={(!switched) ? convertPixelWithHeight(player2?.pos) : convertPixelWithHeight(MapSize[gameInfo.mapSize][0] - player1?.pos - PaddleSize[gameInfo.paddleSize])} paddleWidth={paddleWidth}
-			mapSize={MapSize[gameInfo.mapSize]}
-			switched={switched}
-			playerType={(!switched) ? 2 : 1}
-			left={posHorizontal[0]}
-			user={(!switched) ? player2 : player1}
-			initPos={initPos}
-			gameSize={gameSize}
-			gameInfo={gameInfo}
-			/>
+		<div class="paddle {(switched) ? "user" : ""} {((!switched && !player2) || (switched && !player1)) ? "absent" : ""}"
+			style="left: {posHorizontal[(!switched) ? 0 : 1]}px;
+			top: {((!switched && !player2) || (switched && !player1)) ? initPos : (!switched) ? convertPixelWithHeight(player2?.pos) : convertPixelWithHeight(MapSize[gameInfo.mapSize][0] - player1?.pos - PaddleSize[gameInfo.paddleSize])}px;
+			height: {paddleWidth}px">
+		</div>
+		<!-- <Paddle pos={(!switched) ? convertPixelWithHeight(player2?.pos) : convertPixelWithHeight(MapSize[gameInfo.mapSize][0] - player1?.pos - PaddleSize[gameInfo.paddleSize])} paddleWidth={paddleWidth}
+		switched={switched}
+		playerType={(!switched) ? 2 : 1}
+		left={posHorizontal[0]}
+		user={(!switched) ? player2 : player1}
+		initPos={initPos}
+		/> -->
 		{#if puckPos}
 		<PPuck pucks={puckPos} />
 		{/if}
-		<Paddle pos={(!switched) ? convertPixelWithHeight(player1?.pos) : convertPixelWithHeight(MapSize[gameInfo.mapSize][0] - player2?.pos - PaddleSize[gameInfo.paddleSize])} paddleWidth={paddleWidth}
-			mapSize={MapSize[gameInfo.mapSize]}
+		<div class="paddle {(!switched) ? "user" : ""} {((switched && !player2) || (!switched && !player1)) ? "absent" : ""}"
+			style="left: {posHorizontal[(!switched) ? 1 : 0]}px;
+			top: {((switched && !player2) || (!switched && !player1)) ? initPos : (!switched) ? convertPixelWithHeight(player1?.pos) : convertPixelWithHeight(MapSize[gameInfo.mapSize][0] - player2?.pos - PaddleSize[gameInfo.paddleSize])}px;
+			height: {paddleWidth}px">
+		</div>
+		<!-- <Paddle pos={(!switched) ? convertPixelWithHeight(player1?.pos) : convertPixelWithHeight(MapSize[gameInfo.mapSize][0] - player2?.pos - PaddleSize[gameInfo.paddleSize])} paddleWidth={paddleWidth}
 			switched={switched}
 			playerType={(!switched) ? 1 : 2}
 			left={posHorizontal[1]}
 			user={(!switched) ? player1 : player2}
 			initPos={initPos}
-			gameSize={gameSize}
-			gameInfo={gameInfo}
-			/>
+			/> -->
 		<div class="zone-limit right {(!switched) ? "player1" : "player2"}" style="--width: {convertPixelWithWidth(PongConfig.DeadZoneHeight)}px"></div>
 	{/if}
 </div>

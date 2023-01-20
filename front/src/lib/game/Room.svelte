@@ -166,8 +166,8 @@
 		});
 		
 		$client.socket.on("PaddleUpdate", (data: any) => {
-			console.log(data);
-			if (data.type == 0)
+			// console.log(data);
+			if (data.type === 0)
 				player1.pos = data.pos;
 			else
 				player2.pos = data.pos;
