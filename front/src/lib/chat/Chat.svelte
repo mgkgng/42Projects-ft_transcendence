@@ -192,6 +192,7 @@
 		clearTimeout(timeoutPop);
 		showPop = false;
 	}
+	
 	onMount (() => {
 		/* Chat Updates*/
 		$client.socket.on("ban_user", (data: any) => {
@@ -301,6 +302,7 @@
 			for (let message of data.messages)
 				chatRoom.messages.push(new Message(message.id_chat_room.id_public_room, message.id_user.username, message.content_message, message.date_message))
 			chat = chat;
+			scrollToBottom();
 		});
 		$client.socket.on("get_message_room_page_res", (data: any) => {
 			console.log("Get Messages page :", data);

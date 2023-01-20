@@ -43,9 +43,12 @@ export class ImageController {
             imageEntity.img_type = file.mimetype;
             imageEntity.img_data = file.buffer.toString('base64');
             const imageSaved = await this.imageService.saveImage(imageEntity);
-            const imageChanged = await this.imageService.changeUserImage(user.username, imageSaved);
+            const imageChanged = await this.imageService.changeUserImage(user.username_42, imageSaved);
             if (!imageChanged)
+            {
+                console.log(imageSaved, imageChanged);
                 return { error: "Error changing image" };
+            }
             else
                 return { success: "Image changed" };
         }
