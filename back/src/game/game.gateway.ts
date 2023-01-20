@@ -371,6 +371,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	async getHistGame(@MessageBody() data: any, @ConnectedSocket() client: Socket, @Request() req) {
 		try{
 			let id_user = await this.mainServerService.getIdUserByUsername(data.username);
+			console.log(id_user);
 			//let id_user = await this.mainServerService.getIdUser(req);
 			const res = await this.dataSource.getRepository(GameEntity).createQueryBuilder("game")
 			.innerJoin("game.player1", "user1")
@@ -379,6 +380,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			.select(["game.player1_score", "game.player2_score", "user1.username", "user2.username", "game.date_game"]).getMany();
 			client.emit("resHistory", res);
 		}catch (e){
+			console.log("error get_history", e);
 			client.emit("error_resHistory", {error : "Bad data"});
 		}
 	}

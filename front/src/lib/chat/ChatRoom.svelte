@@ -254,11 +254,11 @@
 				chatBox.scrollTo({top: chatBox.scrollHeight,behavior: "smooth"});
 				chat.my_rooms.get(roomID).actual_page = 0;
 				chat.my_rooms.get(roomID).old_page = chat.my_rooms.get(roomID).actual_page;
+				chat.my_rooms.get(roomID).is_new_message = false;
 			}
 			else
 				sep.scrollIntoView();
 			chat.my_rooms.get(roomID).old_page = chat.my_rooms.get(roomID).actual_page;
-			chat.my_rooms.get(roomID).is_new_message = false;
 			chat = chat;
 		}
 			//chatBox.scrollTo({top: scrollHeight, behavior: 'auto'});
@@ -276,7 +276,7 @@
 			console.log("emit");
 			$client.socket.emit("get_message_room_page", { id_public_room: roomID, page_number: ++chat.my_rooms.get(roomID).actual_page , size_page: 100});
 		}
-		else if(event.target.scrollTop === event.target.scrollHeight - event.target.clientHeight && chat.my_rooms.get(roomID).actual_page > 0)
+		else if(event.target.scrollTop >= event.target.scrollHeight - event.target.clientHeight - 1 && chat.my_rooms.get(roomID).actual_page > 0)
 		{
 			chat.my_rooms.get(roomID).actual_page--;
 			chat = chat;

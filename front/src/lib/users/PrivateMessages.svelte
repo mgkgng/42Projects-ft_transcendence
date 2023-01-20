@@ -369,7 +369,11 @@
 		<div class="from">
 			{#each [...exchanges.values()] as user}
 			<div class="flex line" on:click={() => {getMessageAndChangeSelected(user.username)}}>
-				<img src="{(user.img) ? user.img : user.img_url}" alt="from">
+				{#if ((user.img) ? user.img : user.img_url).includes("cdn.intra.42.fr")}
+					<img src="{(user.img) ? user.img : user.img_url}" alt="from">
+				{:else}
+					<img src="http://{location.hostname}:3000{(user.img) ? user.img : user.img_url}" alt="from">
+				{/if}
 				<p>{user.username}</p>
 			</div>
 			{/each}

@@ -297,9 +297,17 @@
 				{room.gameInfo.title}
 			</div>
 			<div class="flex players">
-				<img src={room.players[0].img_url} alt="player1" />
+				{#if room.players[0].img_url.includes("cdn.intra.42.fr")}
+					<img src={room.players[0].img_url} alt="player1" />
+				{:else}
+					<img src='http://{location.hostname}:3000{room.players[0].img_url}' alt="player1" />
+				{/if}
 				{#if room.players.length > 1}
-				<img src={room.players[1].img_url} alt="player2" />
+					{#if room.players[1].img_url.includes("cdn.intra.42.fr")}
+						<img src={room.players[1].img_url} alt="player2" />
+					{:else}
+						<img src='http://{location.hostname}:3000{room.players[1].img_url}' alt="player2" />
+					{/if}
 				{:else}
 				<div class="grey-box">?</div>
 				{/if}

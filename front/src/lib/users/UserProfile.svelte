@@ -183,8 +183,8 @@
 
 	function lunch_update() {
 		console.log("test:", profileUser);
-		$client.socket.emit("getHistory", { username: profileUser.username_42 });
-		$client.socket.emit("isUserBlocked", { username: profileUser.username_42 });
+		$client.socket.emit("getHistory", { username: profileUser.username });
+		$client.socket.emit("isUserBlocked", { username: profileUser.username });
 	}
 
 	onMount(() => {
@@ -247,7 +247,11 @@
 {#if profileUser != null && profileUser.created_at != null}
 	<div class="flex info">
 		<div class="photo">
-			<img src={profileUser.img_url} alt="grosse-tete">
+			{#if profileUser.img_url.includes("cdn.intra.42.fr")}
+				<img src='{profileUser.img_url}' alt="grosse-tete">
+			{:else}
+				<img src='http://{location.hostname}:3000{profileUser.img_url}' alt="grosse-tete">
+			{/if}
 		</div>
 		<div class="vflex data">
 			<p class="username">{profileUser.displayname} a.k.a. {profileUser.username}</p>
