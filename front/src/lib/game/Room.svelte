@@ -75,20 +75,73 @@
 		.ready:hover { background-color: $yellow; }
 		.exit:hover { background-color: $main-dark; }
 	}
+
+	.pong-game {
+		position: relative;
+		height: 100%;
+		width: 100%;
+
+		padding: 0;
+		border-radius: .5em;
+
+		background-color: #212121;
+		.zone-limit {
+			position: absolute;
+			width: 1px;
+			height: 100%;
+		}
+	
+		.left {
+			left: 0;
+			// box-shadow: 1px 0px 120px 50px rgba(0,255,255,0.5), 
+			//       2px 0px 4px rgba(0,255,255,0.5), 
+			//       4px 0px 8px rgba(0,255,255,0.5), 
+			//       var(--shadow);
+		}
+	
+		.right {
+			right: 0;
+		}
+	
+		.paddle {
+			position: absolute;
+			margin: 0;
+			width: 12px;
+			background-color: #fff;
+	
+			border-radius: .2em;
+	
+			z-index: 2;
+	
+			// border: 5px solid $red;
+			box-shadow: 0px 0px 5px 5px $main-bright;
+		}
+	
+		.absent {
+			background-color: rgb(90, 84, 84);
+			box-shadow: none;
+		}
+	
+		.user {
+			margin: 0;
+			box-shadow: 0px 0px 5px 5px $submain-blue;
+		}
+	}
+
 </style>
 
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { client } from "$lib/stores/client";
-	import { UserType, MapSize, PaddleSize } from '$lib/stores/var';
+	import { UserType, MapSize, PaddleSize, PongConfig } from '$lib/stores/var';
 	import { Puck } from '$lib/pong/Puck';
     import Modal from '$lib/tools/Modal.svelte';
     import GameOver from '$lib/game/GameOver.svelte';
     import ConfirmMsg from '$lib/modals/ConfirmMsg.svelte';
     import { user } from '$lib/stores/user';
     import Player from '$lib/game/Player.svelte';
-	import Game from '$lib/game/Game.svelte';
 	import AlertMessage from '$lib/modals/AlertMessage.svelte';
+    import PPuck from './PPuck.svelte';
 
 	export let roomID: string;
 	export let itself: any;	
@@ -107,13 +160,16 @@
 	let alertMessage: string;
 
 	let ready: boolean = false;
-	let tryStart: boolean = false;
 	let started: boolean = false;
 
 	let winner: any;
 
 	/* Room Info */
+	let game: any ;
 	let gameInfo: any;
+	let gameSize: any;
+	let gameReady: boolean = false;
+	let tryStart: boolean = false;
 	let hostname: string;
 	let player1: any = undefined;
 	let player2: any = undefined;
@@ -124,8 +180,61 @@
 	user.subscribe((user: any) => { userInfo = user; });
 
 	$: console.log("this is the roomID", roomID);
+	$: console.log("gameSIze: ", gameSize);
+
+	$: if (!gameReady && (game = document.getElementById("game")) && gameInfo) {
+		console.log("good2");
+        gameSize = game.getBoundingClientRect();
+		defineValues();
+		gameReady = true;
+		console.log("good");
+    }
+	
+	let paddleWidth: number;
+	let posHorizontal: Array<number>;
+	let prevY: number = 0;
+
+	$: puckPos = translatePucks(puck);
+
+	function convertPixelWithHeight(where: number) {
+		console.log("etrange", gameSize, where);
+		return (Math.floor((gameSize.height * where) / MapSize[gameInfo.mapSize][0]));
+	}
+
+	function convertPixelWithWidth(where: number) {
+		return (Math.floor((gameSize.width * where) / MapSize[gameInfo.mapSize][1]));
+	}
+
+	function convertFromPixelWithHeight(pixel: number) {
+		return (Math.floor((pixel * MapSize[gameInfo.mapSize][0]) / gameSize.height));
+	}
+
+	function defineValues() {
+		paddleWidth = convertPixelWithHeight(PaddleSize[gameInfo.paddleSize]);
+		initPos = convertPixelWithHeight((MapSize[gameInfo?.mapSize][0] - PaddleSize[gameInfo?.paddleSize]) / 2);
+		posHorizontal = [convertPixelWithWidth(PongConfig.DeadZoneHeight), convertPixelWithWidth(MapSize[gameInfo.mapSize][1] - PongConfig.DeadZoneHeight - PongConfig.PaddleHeight / 2)];
+	}
+
+	function translatePucks(puck: any) {
+		if (!puck)
+			return ;
+		let res = [];
+		for (let pos of puck.pos) {
+			res.push([(!switched) ? convertPixelWithHeight(pos[0]) : convertPixelWithHeight(MapSize[gameInfo.mapSize][0] - pos[0]),
+			(!switched) ? convertPixelWithWidth(MapSize[gameInfo.mapSize][1] - pos[1]) : convertPixelWithWidth(pos[1])]);
+		}
+		// console.log("testing: ", res);
+		return (res);
+	}
+
+	window.addEventListener('resize', () => {
+		game = document.getElementById("game");
+		gameSize = game?.getBoundingClientRect();
+		defineValues();
+	});
 
 	onMount(()=> {
+
 		if (!roomID)
 			return ;
 		
@@ -145,6 +254,7 @@
 
 			// By default, player1 is on the right side unless user is the player2
 			switched = (userInfo.username == player2?.info.username_42);
+			console.log("c'est bon");
 		});
 
 		$client.socket.on("PlayerUpdate", (data: any) => {
@@ -240,8 +350,25 @@
 			<Player player={(!switched) ? player2 : player1} left={true} hostname={hostname} ready={ready}/>	
 			<h1>{(!switched && player2) ? player2.score : ((!switched && !player2) || (switched && !player1)) ? "0" : player1?.score}</h1>
 		</div>
-		<Game bind:player1={player1} bind:player2={player2} bind:gameInfo={gameInfo} bind:switched={switched}
-			userType={userType} roomID={roomID} puck={puck}/>
+		<div id="pong-game" class="pong-game">
+			{#if gameReady}
+				<div class="zone-limit left {(!switched) ? "player2" : "player1"}" style="--shadow: {convertPixelWithWidth(PongConfig.DeadZoneHeight)}px 0px 16px aqua"></div>
+				<div class="paddle {(switched) ? "user" : ""} {((!switched && !player2) || (switched && !player1)) ? "absent" : ""}"
+					style="left: {posHorizontal[(!switched) ? 0 : 1]}px;
+					top: {((!switched && !player2) || (switched && !player1)) ? initPos : (!switched) ? convertPixelWithHeight(player2?.pos) : convertPixelWithHeight(MapSize[gameInfo?.mapSize][0] - player1?.pos - PaddleSize[gameInfo.paddleSize])}px;
+					height: {paddleWidth}px">
+				</div>
+				{#if puckPos}
+				<PPuck pucks={puckPos} />
+				{/if}
+				<div class="paddle {(!switched) ? "user" : ""} {((switched && !player2) || (!switched && !player1)) ? "absent" : ""}"
+					style="left: {posHorizontal[(!switched) ? 1 : 0]}px;
+					top: {((switched && !player2) || (!switched && !player1)) ? initPos : (!switched) ? convertPixelWithHeight(player1?.pos) : convertPixelWithHeight(MapSize[gameInfo?.mapSize][0] - player2?.pos - PaddleSize[gameInfo?.paddleSize])}px;
+					height: {paddleWidth}px">
+				</div>
+				<div class="zone-limit right {(!switched) ? "player1" : "player2"}" style="--width: {convertPixelWithWidth(PongConfig.DeadZoneHeight)}px"></div>
+			{/if}
+		</div>
 		<div class="vflex side right">
 			<Player player={(!switched) ? player1 : player2} left={false} hostname={hostname} ready={ready}/>
 			<h1>{(!switched && player1) ? player1?.score : (player2) ? player2.score : "0"}</h1>
@@ -289,3 +416,25 @@
 <Modal bind:this={alertMessageModal}>
 	<AlertMessage msg={alertMessage} itself={alertMessageModal} />
 </Modal>
+
+<svelte:window
+	on:mousemove={(event) => {
+		if (!gameSize)
+			return ;
+		console.log("testing: ", gameSize);
+		let pos = Math.floor(event.clientY - gameSize?.y) - paddleWidth / 2;
+		if (pos < 0)
+			pos = 0;
+		if (pos > gameSize.height - paddleWidth)
+			pos = gameSize.height - paddleWidth;
+		
+		let posConverted = Math.floor(convertFromPixelWithHeight((!switched) ? pos : gameSize.height - pos - paddleWidth));
+		if (posConverted == prevY)
+			return ;
+		prevY = posConverted;
+		$client.socket.emit("PaddleMoveMouse", {
+			pos: posConverted,
+			roomID: roomID
+		});
+	}}
+/>
