@@ -583,22 +583,22 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		if (gameInvitation) {
 			let target = this.getClient(req);
 			if (target.state !== UserState.Available) {
-				console.log("bonjour?");
 				client.emit("gameInvitationRes", {
 					success: false,
 					msg: "You are currently not able to create a new game."
 				})
 				return ;
 			}
-			//TODO protection contre '&' dans le message
 			let player = await this.getPlayerInfo(target.username);
-			let args = messageToSave.split("/")[2].split("&");
+			let args = messageToSave.split("/");
+			console.log(args);
+			//TODO parsing + error
 			let gameInfo = {
 				title: "", 
-				mapSize: parseInt(args[0].split('=')[1]), 
-				maxPoint: parseInt(args[0].split('=')[1]), 
-				puckSpeed: parseInt(args[0].split('=')[1]),
-				paddleSize: parseInt(args[0].split('=')[1]),
+				mapSize: parseInt(args[2]), 
+				maxPoint: parseInt(args[5]), 
+				puckSpeed: parseInt(args[3]),
+				paddleSize: parseInt(args[4]),
 				isPrivate: true
 			};
 			
@@ -611,7 +611,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				msg: "The game has been created. Do you want to join the room?",
 				roomID: room.id
 			});
-			messageToSave += `&roomID=${room.id}`;
+			messageToSave = `/gameInvitation/${room.id}/${args[6]}`;
 		}
 		console.log("what to send?", messageToSave);
 

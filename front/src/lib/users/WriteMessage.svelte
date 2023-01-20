@@ -240,7 +240,7 @@
 	$: console.log(sendTo);
 
 	function createInvitationMessage(message: string) {
-		return (`/gameInvitation/mapSize=${mapSize}&speed=${puckSpeed}&paddleSize=${paddleSize}&maxPoint=${maxPoint}&msg=${(message.length) ? message : "Let's play a game together!"}`);
+		return (`/gameInvitation/${mapSize}/${puckSpeed}/${paddleSize}/${maxPoint}/${(message.length) ? message.replaceAll('/', '&sl') : "Let's play a game together!"}`);
 	}
 
 	onMount(() => {

@@ -85,6 +85,31 @@
 						margin-right: .4em;
 						float: left;
 
+						.invitation {
+							width: 15em;
+							padding-right: 3em;
+							gap: .2em;
+
+							.invite-from {
+								width: 100%;
+							}
+
+							.invitation-msg {
+								border-radius: .5em;
+								margin-top: .2em;
+								background-color: transparentize(#fff, .6);
+								padding: .6em .4em;
+							}
+
+							button {
+								height: 2em;
+								&:hover {
+									background-color: transparentize(#fff, .8);
+									border-radius: .3em;
+								}
+							}
+						}
+
 						.message {
 							min-height: 1em;
 							padding-right: 2.5em;
@@ -134,7 +159,7 @@
 
 					&:hover { background-color: transparentize(#fff, .9); }
 				}
-		}
+			}
 		}
 
 		.no-selected {
@@ -354,7 +379,19 @@
 				{#each allMessages.get(selected) as message}
 				<div class="line">
 					<div class="content {(userInfo.username == message.sender) ? "me" : ""}">
+						{#if !message.message.startsWith('/gameInvitation/')}
 						<div class="message">{message.message}</div>
+						{:else}
+						<div class="vflex invitation">
+							<div class="invite-from">{message.sender} is inviting to play a game!</div>
+							<div class="invitation-msg">{message.message.split('/')[3].replaceAll('&sl', '/')}</div>
+							<button on:click={() => {``
+								console.log(message.message.split('/')[2]);
+								// $client.socket.emit('JoinRoomByInvitation', message.message.split('/')[2]);
+							}}>Join</button>
+						</div>
+						{/if}
+						<div class="invitation"></div>
 						<div class="date">{format_date_hours(message.date)}</div>
 					</div>
 				</div>
