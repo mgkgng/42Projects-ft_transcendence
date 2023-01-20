@@ -183,8 +183,8 @@
 
 	function lunch_update() {
 		console.log("test:", profileUser);
-		$client.socket.emit("getHistory", { username: profileUser.username_42 });
-		$client.socket.emit("isUserBlocked", { username: profileUser.username_42 });
+		$client.socket.emit("getHistory", { username: profileUser.username });
+		$client.socket.emit("isUserBlocked", { username: profileUser.username });
 	}
 
 	onMount(() => {
