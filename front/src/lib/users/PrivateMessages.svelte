@@ -209,7 +209,9 @@
     import { client } from "$lib/stores/client";
     import { user } from "$lib/stores/user";
 	import { afterUpdate } from 'svelte';
+	import { beforeUpdate } from 'svelte';
     import ChatRoom from "../chat/ChatRoom.svelte";
+    import Chat from "../chat/Chat.svelte";
 	export let itself: any;
 
 	let writeMessageModal: any;
@@ -217,9 +219,8 @@
 	let allMessages: Map<string, any> = new Map<string, any>();
 	let allMessagePage: number = 1;
 	let allMessagePageSize: number = 20;
-	let lastScrollHeight: number = 0; // Used to set the scrollHeight to the last value before getting last messages
 	let renderButtonToGetMoreMessages = true;
-	let allMessagesHaveChanged = false;
+	let getDirectMessage = false;
 
 	let selected: string = "";
 	let userInfo: any;
@@ -227,7 +228,7 @@
 	let message = '';
 
 	user.subscribe((user: any) => { userInfo = user; });
-
+	
 	onMount(() => {
 		$client.socket.on("success_getMessageUserList", (data: any) => {
 			for (let user of data.messageUserList) {
@@ -269,7 +270,6 @@
 				allMessages.set(from, oldMessages);
 			}
 			allMessages = allMessages;
-			allMessagesHaveChanged = true;
 		});
 
 		// this will append when you send a message (sendDirectMessageG)
@@ -286,11 +286,10 @@
 			}
 			if (found == false)
 			{
-				console.log("pushed");
 				oldMessage.push(lastMessage);
 				allMessages.set(from, oldMessage);
 				allMessages = allMessages;
-				allMessagesHaveChanged = true;
+				getDirectMessage = true;
 			}
 		});
 
@@ -303,7 +302,6 @@
 		});
 
 		$client.socket.on("newMessageArrived", async (senderUsername: string) => {
-			console.log("selected", selected, senderUsername);
 			if (selected == senderUsername) {
 				$client.socket.emit("getDirectMessage", { username: user.username, page: allMessagePage, pageSize: allMessagePageSize});
 			}
@@ -320,11 +318,44 @@
 		});
 	});
 
+	let lastDiv = [];
+	beforeUpdate(() => {
+		if (!getDirectMessage)
+		{
+			// get the last line children of the read div
+			let read = document.querySelector(".read");
+			if (read)
+			{
+				// get the second children with line class of div read
+				let lastLine = read.children[0];
+				if (lastLine)
+				{
+					// push only if it is not already in the array
+					lastDiv.push(lastLine);
+				}
+			}
+			console.log("lastDiv", lastDiv)
+		}
+	})
+
 	afterUpdate(() => {
-		if (allMessagesHaveChanged)
+		if (getDirectMessage)
 		{
 			scrollToBottom();
-			allMessagesHaveChanged = false;
+			getDirectMessage = false;
+		}
+		else
+		{
+			// console.log("scrollToSeparatorPage", document.querySelector('.separator-page'));
+			// scrollToSeparatorPage();
+			// deleteSeparator();
+
+			// set the scroll height to heigh
+			if (lastDiv.length > 0)
+			{
+				// scroll to lastDiv
+				lastDiv[lastDiv.length - 1].scrollIntoView();
+			}
 		}
 	});
 
@@ -341,9 +372,9 @@
 		message = '';
 	}
 
-	function handleLoadMoreMessage(event) {
-		$client.socket.emit("getDirectMessage", { username: selected, page: ++allMessagePage, pageSize: allMessagePageSize});
-	}
+    let handleLoadMoreMessage = () => {
+        $client.socket.emit("getDirectMessage", { username: selected, page: ++allMessagePage, pageSize: allMessagePageSize});
+    }
 
 	function scrollToBottom() {
 		let messages = document.querySelector(".read");
