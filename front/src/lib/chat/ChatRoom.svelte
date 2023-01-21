@@ -242,15 +242,13 @@
 	function scrollToBottom() {
 		let chatBox : any = document.querySelector('.read');
 		let sep: any = document.getElementById('separator-page');
-		if (firstUpdate == false)
+		if (firstUpdate == false && sep)
 		{
-			while(!sep)
-				sep = document.getElementById('separator-page');
 			sep.scrollIntoView();
 			firstUpdate = true;
 			return;
 		}	
-		if (sep && (chat.my_rooms.get(roomID).actual_page != chat.my_rooms.get(roomID).old_page || chat.my_rooms.get(roomID).is_new_message))
+		else if (sep && (chat.my_rooms.get(roomID).actual_page != chat.my_rooms.get(roomID).old_page || chat.my_rooms.get(roomID).is_new_message))
 		{
 			if (chat.my_rooms.get(roomID).is_new_message)
 			{
