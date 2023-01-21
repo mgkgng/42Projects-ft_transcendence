@@ -116,6 +116,18 @@ export class MainServerService {
 		return "offline";
 	}
 
+	getUserStatusByUsername42(username_42 : string) : string
+	{
+		for (let i = 0; i < global.userConnectedList.length; i++)
+		{
+			if (global.userConnectedList[i].username_42 === username_42)
+				return global.userConnectedList[i].status;
+			else
+				return "offline";
+		}
+		return "offline";
+	}
+
 	// function that will add a notification
 	async addNotification(username : string, type : string, data : any)
 	{
