@@ -317,7 +317,8 @@ export class ChatRoomService {
 		const id_room = await this.mainServer.getIdRoom(data);
 		const message : any = data.content_message;
 		const date_creation : Date = new Date();
-		const user : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
+		const user : any = await this.dataSource.getRepository(UserEntity).findOne({where: {id_g: id_user}});
+		console.log(user);
 		const client_username = user.username;
 		const  querry = this.dataSource.createQueryRunner(); 
 		try{
