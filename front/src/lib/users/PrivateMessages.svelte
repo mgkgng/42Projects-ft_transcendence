@@ -328,7 +328,6 @@
 			// 	separator.parentNode.scrollTop = separator.offsetTop;
 			document.querySelector(".separator")?.scrollIntoView(true);
 		}
-		console.log("separator", document.querySelector(".separator"))
 	});
 
 	function getMessageAndChangeSelected(selected_username: string)
