@@ -18,14 +18,14 @@ export class ChatDirectMessageService {
         private mainServerService : MainServerService
         ) {}
 
-    async handleSendDirectMessage(username_sender_arg: string, username_receiver_arg: string, message: string)
+    async handleSendDirectMessage(username42_sender_arg: string, username42_receiver_arg: string, message: string)
     {
         const qb = this.chatDirectMessageRepository.createQueryBuilder('u');
         const qbu = this.userRepository.createQueryBuilder('u');
 
         const newDirectMessage = new ChatDirectMessageEntity();
-        newDirectMessage.message_sender = await qbu.select().where(`u.username = :username_sender`, {username_sender: username_sender_arg}).getOneOrFail();
-        newDirectMessage.message_recipient = await qbu.select().where(`u.username = :username_receiver`, {username_receiver: username_receiver_arg}).getOneOrFail();
+        newDirectMessage.message_sender = await qbu.select().where(`u.username_42 = :username_sender`, {username_sender: username42_sender_arg}).getOneOrFail();
+        newDirectMessage.message_recipient = await qbu.select().where(`u.username_42 = :username_receiver`, {username_receiver: username42_receiver_arg}).getOneOrFail();
         newDirectMessage.string = message.toString();
         newDirectMessage.date = new Date();
         return this.chatDirectMessageRepository.save(newDirectMessage);
@@ -57,8 +57,8 @@ export class ChatDirectMessageService {
 			return messages.map(message => {
 				return {
 					id: message.id_g,
-					sender: message.message_sender.username,
-					recipient: message.message_recipient.username,
+					sender: message.message_sender.username_42,
+					recipient: message.message_recipient.username_42,
 					message: message.string,
 					date: message.date
 				}
@@ -97,9 +97,9 @@ export class ChatDirectMessageService {
 
 	// Take string : username as parameter and return a list of the 
 	// user that u have message with in descending order of the last message send or received
-	async handleGetMessageUserList(username: string) {
+	async handleGetMessageUserList(username42: string) {
 		const user = await this.userRepository.createQueryBuilder('u')
-			.where('u.username = :username', { username })
+			.where('u.username_42 = :username42', { username42 })
 			.getOne();
 
 		if (!user) {
@@ -109,7 +109,7 @@ export class ChatDirectMessageService {
 		const directMessages = await this.chatDirectMessageRepository.createQueryBuilder('dm')
 			.innerJoinAndSelect('dm.message_sender', 'message_sender')
 			.innerJoinAndSelect('dm.message_recipient', 'message_recipient')
-			.where('message_sender.username = :username OR message_recipient.username = :username', { username })
+			.where('message_sender.username_42 = :username42 OR message_recipient.username_42 = :username42', { username42 })
 			.getMany();
 
 		if (!directMessages || directMessages.length === 0) {
@@ -118,25 +118,25 @@ export class ChatDirectMessageService {
 
 		const uniqueUsers = new Set<UserEntity>();
 		directMessages
-			.filter(dm => dm.message_sender.username !== username || dm.message_recipient.username !== username)
+			.filter(dm => dm.message_sender.username_42 !== username42 || dm.message_recipient.username_42 !== username42)
 			.forEach(dm => {
-				const sender = dm.message_sender.username;
-				const recipient = dm.message_recipient.username;
-				if (sender !== username) {
+				const sender = dm.message_sender.username_42;
+				const recipient = dm.message_recipient.username_42;
+				if (sender !== username42) {
 					uniqueUsers.add({ ...dm.message_sender });
 				}
-				if (recipient !== username) {
+				if (recipient !== username42) {
 					uniqueUsers.add(dm.message_recipient);
 				}
 			});
 
 		const messageDateMap = new Map<string, Date>();
 		directMessages
-			.filter(dm => dm.message_sender.username !== username || dm.message_recipient.username !== username)
+			.filter(dm => dm.message_sender.username !== username42 || dm.message_recipient.username !== username42)
 			.forEach(dm => {
-				const sender = dm.message_sender.username;
-				const recipient = dm.message_recipient.username;
-				if (sender !== username) {
+				const sender = dm.message_sender.username_42;
+				const recipient = dm.message_recipient.username_42;
+				if (sender !== username42) {
 					if (messageDateMap.has(sender)) {
 						if (messageDateMap.get(sender) < dm.date) {
 							messageDateMap.set(sender, dm.date);
@@ -145,7 +145,7 @@ export class ChatDirectMessageService {
 						messageDateMap.set(sender, dm.date);
 					}
 				}
-				if (recipient !== username) {
+				if (recipient !== username42) {
 					if (messageDateMap.has(recipient)) {
 						if (messageDateMap.get(recipient) < dm.date) {
 							messageDateMap.set(recipient, dm.date);
@@ -159,6 +159,7 @@ export class ChatDirectMessageService {
 		return Array.from(uniqueUsers)
 			.map(user => ({
 				username: user.username,
+				username_42: user.username_42,
 				display_name: user.displayname,
 				campus_name: user.campus_name,
 				campus_country: user.campus_country,
