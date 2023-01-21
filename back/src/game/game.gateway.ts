@@ -582,13 +582,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			target.updateRequest(user.username_42, false);
 
 			this.server.to(client.id).emit('success_unAskFriendG', {friend: friend.username});
-			return;
+			return ;
 		}
-	}
-
-	@SubscribeMessage('answerToInvitation')
-	answerToInvitation(@MessageBody() data: any, @ConnectedSocket() client: any) {
-
 	}
 
 	@SubscribeMessage('sendDirectMessageG')
