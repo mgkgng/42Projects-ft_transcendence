@@ -76,9 +76,9 @@
             }
         });
 
-        $client.socket.on("active_double_auth_res", () => {
-            itself.close();
-        })
+        // $client.socket.on("active_double_auth_res", () => {
+        //     itself.close();
+        // })
     });
 </script>
 
