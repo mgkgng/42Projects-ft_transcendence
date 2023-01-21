@@ -277,7 +277,7 @@
 <div class="vflex window friends">
 	<h2>Friends</h2>
 	<button class="update" on:click={() => {
-		$client.socket.emit("getFriendList", { username: userInfo.username });
+		$client.socket.emit("getFriendList", { username_42: userInfo.username_42 });
 		$client.socket.emit("getAskList");
 	}}>
 		<img src="update.png" alt="update">

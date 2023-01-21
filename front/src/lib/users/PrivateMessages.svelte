@@ -387,7 +387,7 @@
 			<div class="vflex read">
 				{#each allMessages.get(selected) as message, i}
 				<div class="line" style="margin-top: {(i == 0 && renderButtonToGetMoreMessages) ? "2.2em" : "0em"}">
-					<div class="content {(userInfo.username == message.sender) ? "me" : ""}">
+					<div class="content {(userInfo.username_42 == message.sender) ? "me" : ""}">
 						{#if !message.message.startsWith('/gameInvitation/')}
 						<div class="message">{message.message}</div>
 						{:else}

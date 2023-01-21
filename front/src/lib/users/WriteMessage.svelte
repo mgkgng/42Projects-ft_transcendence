@@ -245,7 +245,7 @@
 
 	onMount(() => {
 		$client.socket.on("success_getUserinDB", (data: any) => {
-			userSearchList = data.users.filter((user: any) => !sendTo.includes(user.username)); });
+			userSearchList = data.users.filter((user: any) => !sendTo.includes(user.username_42)); });
 	
 		$client.socket.on("success_sendDirectMessageG", (data: any) => {
 			itself.close();
@@ -278,7 +278,7 @@
 				{#each userSearchList as user}
 				<div class="user" on:click={() => {
 					if (sendTo.length < 5) {
-						sendTo.push(user.username);
+						sendTo.push(user.username_42);
 						sendTo = sendTo;
 					} else {
 						errorMessage = "You can write to maximum five people.";
@@ -329,7 +329,7 @@
 			}
 			for (let dest of sendTo)
 				$client.socket.emit("sendDirectMessageG", {
-					username: dest,
+					username_42: dest,
 					message: message
 				});
 				message = "";
@@ -390,14 +390,14 @@
 					alertMessageModal.open();
 					return ;
 				}
-				if (sendTo[0] == userInfo.username) {
+				if (sendTo[0] == userInfo.username_42) {
 					errorMessage = "You cannot send a game invitation to yourself.";
 					alertMessageModal.open();
 					return ;
 				}
 				console.log(createInvitationMessage(message));
 				$client.socket.emit("sendDirectMessageG", {
-					username: sendTo[0],
+					username_42: sendTo[0],
 					message: createInvitationMessage(message)
 				});
 				message = "";

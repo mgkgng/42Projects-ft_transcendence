@@ -184,7 +184,7 @@
 	function lunch_update() {
 		console.log("test:", profileUser);
 		$client.socket.emit("getHistory", { username: profileUser.username });
-		$client.socket.emit("isUserBlocked", { username: profileUser.username });
+		$client.socket.emit("isUserBlocked", { username_42: profileUser.username_42 });
 	}
 
 	onMount(() => {
@@ -228,10 +228,10 @@
 
 	function toggleBlock() {
 		if (profileUser.is_blocked) {
-			$client.socket.emit("unblockUser", { username: profileUser.username });
+			$client.socket.emit("unblockUser", { username_42: profileUser.username_42 });
 			profileUser.is_blocked = false;
 		} else {
-			$client.socket.emit("blockUser", { username: profileUser.username });
+			$client.socket.emit("blockUser", { username_42: profileUser.username_42 });
 			profileUser.is_blocked = true;
 		}
 		profileUser = profileUser;
@@ -239,7 +239,7 @@
 </script>
 
 <Modal bind:this={writeMessageModal}>
-	<WriteMessage itself={writeMessageModal} sendTo={[profileUser.username]}/>
+	<WriteMessage itself={writeMessageModal} sendTo={[profileUser.username_42]}/>
 </Modal>
 
 
@@ -264,11 +264,11 @@
 	<div class="flex tools">
 		{#if !profileUser.is_friend && !profileUser.is_asked}
 		<button on:click={() => {
-			$client.socket.emit("askFriendG", { username: profileUser.username });
+			$client.socket.emit("askFriendG", { username_42: profileUser.username_42 });
 		}}>Add</button>
 		{:else if !profileUser.is_friend && profileUser.is_asked}
 		<button on:click={() => {
-			$client.socket.emit("unAskFriendG", { username: profileUser.username });
+			$client.socket.emit("unAskFriendG", { username_42: profileUser.username_42 });
 		}}>Cancel</button>
 		{/if}
 		{#if !profileUser.is_blocked}

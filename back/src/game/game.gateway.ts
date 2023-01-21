@@ -512,8 +512,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage('askFriendG')
 	async askFriend(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
-		const user = await this.userRep.findOne({where: {username: this.mainServerService.getUserConnectedBySocketId(client.id).username}});
-		const friend = await this.userRep.findOne({where: {username: data.username}});
+		const user = await this.userRep.findOne({where: {username_42: this.mainServerService.getUserConnectedBySocketId(client.id).username_42}});
+		const friend = await this.userRep.findOne({where: {username_42: data.username_42}});
 
 		if (!user || !friend) {
 			this.server.to(client.id).emit('error_askFriendG', {error: "User not found"});
@@ -540,8 +540,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage('unAskFriendG')
 	async unAskFriend(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
-		const user = await this.userRep.findOne({where: {username: this.mainServerService.getUserConnectedBySocketId(client.id).username}});
-		const friend = await this.userRep.findOne({where: {username: data.username}});
+		const user = await this.userRep.findOne({where: {username_42: this.mainServerService.getUserConnectedBySocketId(client.id).username_42}});
+		const friend = await this.userRep.findOne({where: {username_42: data.username_42}});
 		if (!user || !friend)
 		{
 			this.server.to(client.id).emit('error_unAskFriendG', {error: "User not found"});
@@ -613,7 +613,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			});
 			messageToSave = `/gameInvitation/${room.id}/${args[6]}`;
 		}
-		console.log("what to send?", messageToSave);
 
 		const user = await this.userRepository.findOne({
 			where: {username_42: data.username_42}

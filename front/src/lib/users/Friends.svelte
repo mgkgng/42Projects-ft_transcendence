@@ -323,22 +323,22 @@
 		});
 
 		$client.socket.on("error_getAskList", (data: any) => {
-			console.log("error: ", data);
+			console.log("error_getAskList: ", data);
 		});
 
-		$client.socket.emit("getFriendList", { username: userInfo.username });
+		$client.socket.emit("getFriendList");
 		$client.socket.emit("getAskList");
 
 		return (() => {
-			$client.socket.off("error_getFriendList");
-			$client.socket.off("success_getUserinDB");
-			$client.socket.off("success_getFriendList");
-			$client.socket.off("error_getUserinDB");
-			$client.socket.off("resUserProfile");
-			$client.socket.off("success_removeFriend");
-			$client.socket.off("success_acceptFriend");
-			$client.socket.off("success_refuseFriend");
-			$client.socket.off("success_getAskList");
+			// $client.socket.off("error_getFriendList");
+			// $client.socket.off("success_getUserinDB");
+			// $client.socket.off("success_getFriendList");
+			// $client.socket.off("error_getUserinDB");
+			// $client.socket.off("resUserProfile");
+			// $client.socket.off("success_removeFriend");
+			// $client.socket.off("success_acceptFriend");
+			// $client.socket.off("success_refuseFriend");
+			// $client.socket.off("success_getAskList");
 		});
 	});
 </script>
@@ -354,7 +354,7 @@
 <div class="vflex window friends">
 	<h2>Friends</h2>
 	<button class="update" on:click={() => {
-		$client.socket.emit("getFriendList", { username: userInfo.username });
+		$client.socket.emit("getFriendList");
 		$client.socket.emit("getAskList");
 	}}>
 		<img src="update.png" alt="update">
@@ -402,17 +402,17 @@
 						<img src='http://{location.hostname}:3000{(request.img) ? request.img : request.img_url}' alt="user" />
 					{/if}
 				<div class="user" on:click={() => {
-					$client.socket.emit("getFriendList", { username: userInfo.username });
+					$client.socket.emit("getFriendList");
 					$client.socket.emit("getAskList");
 				}}>
 				<p>{request.username}</p>
 				</div>
 				<div class="flex buttons">
 					<button on:click={() => {
-						$client.socket.emit("acceptFriend", { username: request.username });
+						$client.socket.emit("acceptFriend", { username_42: request.username_42 });
 					}}>Accept</button>
 					<button on:click={() => {
-						$client.socket.emit("refuseFriend", { username: request.username });
+						$client.socket.emit("refuseFriend", { username_42: request.username_42 });
 					}}>Refuse</button>
 				</div>
 			</div> 
@@ -426,12 +426,12 @@
 				<div class="friend">{friend.username}</div>
 				<div class="flex tools">
 					<button on:click={() => {
-						destMsg = [friend.username];
+						destMsg = [friend.username_42];
 						writeMessageModal.open();
 					}}><img src="/icon-mail.png" alt="mail"></button>
 					<button on:click={() => {
 						//TODO confirmMessage
-						$client.socket.emit("removeFriend", { username: friend.username });
+						$client.socket.emit("removeFriend", { username_42: friend.username_42 });
 					}}>-</button>
 				</div>
 			</div>
