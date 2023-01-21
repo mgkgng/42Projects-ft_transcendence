@@ -70,7 +70,7 @@
 				.line {
 					width: 100%;
 
-					&:first-child { margin-top: 2.2em; }
+					// &:first-child { margin-top: '2.2em'; }
 
 					.content {
 						position: relative;
@@ -380,7 +380,7 @@
 		<div class="vflex chat">
 			<div class="vflex read">
 				{#each allMessages.get(selected) as message, i}
-				<div class="line">
+				<div class="line" style="margin-top: {(i == 0 && renderButtonToGetMoreMessages) ? "2.2em" : "0em"}">
 					<div class="content {(userInfo.username == message.sender) ? "me" : ""}">
 						{#if !message.message.startsWith('/gameInvitation/')}
 						<div class="message">{message.message}</div>
