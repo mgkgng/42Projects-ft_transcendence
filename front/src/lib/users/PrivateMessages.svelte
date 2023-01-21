@@ -220,7 +220,7 @@
 	let allMessagePage: number = 1;
 	let allMessagePageSize: number = 20;
 	let renderButtonToGetMoreMessages = true;
-	let getDirectMessage = false;
+	let getDirectMessage = true;
 
 	let selected: string = "";
 	let userInfo: any;
@@ -238,8 +238,7 @@
 		});
 		
 		$client.socket.on("success_getDirectMessage", (data: any) => {
-			console.log("success_getDirectMessage", data);
-			if (data.messageHistory.length == 0)
+			if (data.messageHistory.length < 20)
 			{
 				renderButtonToGetMoreMessages = false;
 			}
@@ -274,7 +273,6 @@
 
 		// this will append when you send a message (sendDirectMessageG)
 		$client.socket.on("getDirectMessage", (lastMessage: any) => {
-			console.log("getDirectMessage", lastMessage);
 			let from = (lastMessage.recipient == userInfo.username) ? lastMessage.sender : lastMessage.recipient
 			let oldMessage = allMessages.get(from);
 			let found = false;
@@ -318,44 +316,13 @@
 		});
 	});
 
-	let lastDiv = [];
 	beforeUpdate(() => {
-		if (!getDirectMessage)
-		{
-			// get the last line children of the read div
-			let read = document.querySelector(".read");
-			if (read)
-			{
-				// get the second children with line class of div read
-				let lastLine = read.children[0];
-				if (lastLine)
-				{
-					// push only if it is not already in the array
-					lastDiv.push(lastLine);
-				}
-			}
-			console.log("lastDiv", lastDiv)
-		}
 	})
 
 	afterUpdate(() => {
 		if (getDirectMessage)
 		{
 			scrollToBottom();
-			getDirectMessage = false;
-		}
-		else
-		{
-			// console.log("scrollToSeparatorPage", document.querySelector('.separator-page'));
-			// scrollToSeparatorPage();
-			// deleteSeparator();
-
-			// set the scroll height to heigh
-			if (lastDiv.length > 0)
-			{
-				// scroll to lastDiv
-				lastDiv[lastDiv.length - 1].scrollIntoView();
-			}
 		}
 	});
 
@@ -381,6 +348,7 @@
 		if (messages)
 		{
 			messages.scrollTop = messages.scrollHeight;
+			getDirectMessage = false;
 		}
 	}
 </script>
