@@ -217,7 +217,6 @@
 	export let chat: Chatt;
 	export let roomID: string;
 
-
 	let chatRoomSettingsModal: any;
 	let chatUsersSettingsModal: any;
 	let chatAddUsers : any;
@@ -225,7 +224,8 @@
 
 	let profileUser: any;
 	let act_user : any = { username : ""};
-
+	let firstUpdate : boolean = false;
+	$: setFirstUpdate(roomID);
 	let newMessage: string = "";
 
 	user.subscribe((value : any) => {
@@ -237,16 +237,19 @@
 			profileUser = data.users[0]; 
 			console.log("succes_getUserinDB: ", profileUser, data)
 		});
-		chat.my_rooms.get(roomID).old_page = -1;
-		scrollToBottom();
+		firstUpdate = false;
 	});
 	function scrollToBottom() {
 		let chatBox : any = document.querySelector('.read');
 		let sep: any = document.getElementById('separator-page');
-		//if (chatBox)
-		//{
-			//chatBox.scrollTop = chatBox.scrollHeight;
-		//}
+		if (firstUpdate == false)
+		{
+			while(!sep)
+				sep = document.getElementById('separator-page');
+			sep.scrollIntoView();
+			firstUpdate = true;
+			return;
+		}	
 		if (sep && (chat.my_rooms.get(roomID).actual_page != chat.my_rooms.get(roomID).old_page || chat.my_rooms.get(roomID).is_new_message))
 		{
 			if (chat.my_rooms.get(roomID).is_new_message)
@@ -261,7 +264,6 @@
 			chat.my_rooms.get(roomID).old_page = chat.my_rooms.get(roomID).actual_page;
 			chat = chat;
 		}
-			//chatBox.scrollTo({top: scrollHeight, behavior: 'auto'});
 	}
 	function sendMessageAndUpdate()
 	{
@@ -281,6 +283,10 @@
 			chat.my_rooms.get(roomID).actual_page--;
 			chat = chat;
 		}
+	}
+	function setFirstUpdate(roomID : any)
+	{
+		firstUpdate = false;
 	}
 	afterUpdate(() => {
 		scrollToBottom();
@@ -336,7 +342,9 @@
 					</div>
 				</div>
 			{/each}
-			<div id="separator-page"></div>
+			{#if chat.my_rooms.get(roomID).pages_messages[0].length}
+				<div id="separator-page"></div>
+			{/if}
 			{#if  chat.my_rooms.get(roomID).actual_page > 0}
 				{#each chat.my_rooms.get(roomID).pages_messages[chat.my_rooms.get(roomID).actual_page - 1] as message}
 					<div class="line">
