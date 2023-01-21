@@ -16,6 +16,7 @@ export class Room {
 	id: string;
 	gameInfo: any;
 	hostname: string;
+	invited: any;
 
 	/* RoomState */
 	isPrivate: boolean;
@@ -35,7 +36,8 @@ export class Room {
 	/* Server */
 	gameServer: GameGateway;
 		
-	constructor(playersInfo: Array<any>, clients: Array<any>, gameInfo: any, hostname: string = "",
+	constructor(playersInfo: Array<any>, clients: Array<any>, gameInfo: any,
+		hostname: string = "", invited: any = undefined,
 		gameServer: GameGateway, // TODO is it the best way to use it?
 		@InjectRepository(GameEntity) private gameRep: Repository<GameEntity>, 
 				private mainServerService : MainServerService,
@@ -44,6 +46,7 @@ export class Room {
 		/* Room Info */
 		this.id = uid();
 		this.hostname = hostname;
+		this.invited = invited;
 		this.gameInfo = gameInfo;
 
 		/* Room State */

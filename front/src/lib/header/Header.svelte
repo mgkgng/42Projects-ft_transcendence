@@ -145,15 +145,19 @@
 	import { onMount } from "svelte";
     import { client } from "$lib/stores/client";
     import PrivateMessages from "$lib/users/PrivateMessages.svelte";
+    import AlertMessage from "$lib/modals/AlertMessage.svelte";
 
 
 	let userProfileModal: any;
 	let friendsModal: any;
 	let settingsModal: any;
 	let privateMessagesModal: any;
+	let messageModal: any;
 
 	let newMessage: Map<string, boolean> = new Map<string, boolean>();
 	let newFriendRequest: Map<string, boolean> = new Map<string, boolean>();
+
+	let modalMessage: string;
 
 	let userInfo: any;
 	user.subscribe((user: any) => { userInfo = user; });
@@ -186,12 +190,24 @@
 			newFriendRequest = newFriendRequest;
 		});
 
+		$client.socket.on("JoinRoomRes", (data: any) => {
+			console.log(data);
+			privateMessagesModal.close();
+		});
+
+		$client.socket.on("JoinRoomError", (data: any) => {
+			modalMessage = data;
+			messageModal.open();
+		});
+
 		$client.socket.emit("reqFriendAndMessage");
 
 		return(() => {
 			$client.socket.off("updateFriendAndMessage");
 			$client.socket.off("newMessageArrived");
 			$client.socket.off("askFriendGNotification");
+			$client.socket.off("JoinRoomRes");
+			$client.socket.off("JoinRoomError");
 		});
 	});
 </script>
@@ -207,6 +223,9 @@
 </Modal>
 <Modal bind:this={privateMessagesModal}>
 	<PrivateMessages itself={privateMessagesModal} />
+</Modal>
+<Modal bind:this={messageModal}>
+	<AlertMessage itself={messageModal} msg={modalMessage}/>
 </Modal>
 
 <header>

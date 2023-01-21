@@ -67,10 +67,16 @@
 					}
 				}
 
+				&:first-child { 
+					.content {
+						margin-top: '2.2em'; 
+					}
+				}
+
+
 				.line {
 					width: 100%;
 
-					// &:first-child { margin-top: '2.2em'; }
 
 					.content {
 						position: relative;
@@ -212,9 +218,13 @@
 	import { beforeUpdate } from 'svelte';
     import ChatRoom from "../chat/ChatRoom.svelte";
     import Chat from "../chat/Chat.svelte";
+    import Invitation from "./Invitation.svelte";
+
 	export let itself: any;
 
 	let writeMessageModal: any;
+	let invitationModal: any;
+
 	let exchanges: Map<string, any> = new Map<string, any>();
 	let allMessages: Map<string, any> = new Map<string, any>();
 	let allMessagePage: number = 1;
@@ -225,6 +235,7 @@
 	let selected: string = "";
 	let userInfo: any;
 
+	let roomID: string = "";
 	let message = '';
 
 	user.subscribe((user: any) => { userInfo = user; });
@@ -298,10 +309,15 @@
 
 		$client.socket.on("success_sendDirectMessageG", (data: any) => {
 			console.log("success_sendDirectMessageG", data);
+			writeMessageModal.close();
+			if (data.message.startsWith('/gameInvitation/')) {
+				roomID = data.message.split('/')[2];
+				invitationModal.open();
+			}
 		});
 
 		$client.socket.on("error_sendDirectMessageG", (data: any) => {
-			console.log("success_sendDirectMessageG", data);
+			console.log("error_sendDirectMessageG", data);
 		});
 
 		$client.socket.on("newMessageArrived", async (senderUsername: string) => {
@@ -367,6 +383,10 @@
 	<WriteMessage itself={writeMessageModal} sendTo={[]}/>
 </Modal>
 
+<Modal bind:this={invitationModal}>
+	<Invitation itself={invitationModal} roomID={roomID}/>
+</Modal>
+
 <div class="flex window messages">
 	{#if exchanges.size}
 		<div class="from">
@@ -394,9 +414,11 @@
 						<div class="vflex invitation">
 							<div class="invite-from">{message.sender} is inviting to play a game!</div>
 							<div class="invitation-msg">{message.message.split('/')[3].replaceAll('&sl', '/')}</div>
-							<button on:click={() => {``
-								console.log(message.message.split('/')[2]);
-								// $client.socket.emit('JoinRoomByInvitation', message.message.split('/')[2]);
+							<button on:click={() => {
+								$client.socket.emit("JoinRoom", {
+									roomID: message.message.split('/')[2],
+									play: true
+								});
 							}}>Join</button>
 						</div>
 						{/if}

@@ -32,3 +32,9 @@ export const PongConfig = {
 	DeadZoneHeight: 30,
 	PaddleHeight: 12
 }
+
+export const JoinType = {
+	Play: 0,
+	Watch: 1,
+	Invited: 2
+}
