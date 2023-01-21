@@ -304,6 +304,7 @@
 
 		$client.socket.on("success_sendDirectMessageG", (data: any) => {
 			console.log("success_sendDirectMessageG", data);
+			writeMessageModal.close();
 		});
 
 		$client.socket.on("error_sendDirectMessageG", (data: any) => {
