@@ -647,7 +647,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			let target = this.clients.get(user.username_42);
 			target.newMessageReceived(userSender.username);
 		}
-		let ret = await this.chatDirectMessageService.handleSendDirectMessage(this.mainServerService.getUserConnectedBySocketId(client.id).username_42, data.username_42, messageToSave);
+		let ret = await this.chatDirectMessageService.handleSendDirectMessage(this.mainServerService.getUserConnectedBySocketId(client.id).username_42, user.username_42, messageToSave);
 		if (ret)
 			this.server.to(client.id).emit('success_sendDirectMessageG', {message: messageToSave});
 		else
