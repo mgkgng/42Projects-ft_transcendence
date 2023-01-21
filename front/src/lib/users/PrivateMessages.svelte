@@ -238,7 +238,7 @@
 	onMount(() => {
 		$client.socket.on("success_getMessageUserList", (data: any) => {
 			for (let user of data.messageUserList) {
-				exchanges.set(user.username, user);
+				exchanges.set(user.username_42, user);
 				exchanges = exchanges;
 			}
 		});
@@ -248,7 +248,7 @@
 			{
 				renderButtonToGetMoreMessages = false;
 			}
-			let from = (data.messageHistory[0].recipient == userInfo.username) ? data.messageHistory[0].sender : data.messageHistory[0].recipient
+			let from = (data.messageHistory[0].recipient == userInfo.username_42) ? data.messageHistory[0].sender : data.messageHistory[0].recipient
 			// if allMessage from user is not defined, create it otherwise append the message received
 			if (!allMessages.has(from)) {
 				allMessages.set(from, data.messageHistory);
@@ -279,7 +279,7 @@
 
 		// this will append when you send a message (sendDirectMessageG)
 		$client.socket.on("getDirectMessage", (lastMessage: any) => {
-			let from = (lastMessage.recipient == userInfo.username) ? lastMessage.sender : lastMessage.recipient
+			let from = (lastMessage.recipient == userInfo.username_42) ? lastMessage.sender : lastMessage.recipient
 			let oldMessage = allMessages.get(from);
 			let found = false;
 			for (let message of oldMessage) {
@@ -295,6 +295,7 @@
 				allMessages = allMessages;
 				getDirectMessage = true;
 			}
+			console.log("getDirectMessage", lastMessage)
 		});
 
 		$client.socket.on("error_getDirectMessage", (data: any) => {
@@ -305,9 +306,13 @@
 			console.log("success_sendDirectMessageG", data);
 		});
 
+		$client.socket.on("error_sendDirectMessageG", (data: any) => {
+			console.log("success_sendDirectMessageG", data);
+		});
+
 		$client.socket.on("newMessageArrived", async (senderUsername: string) => {
 			if (selected == senderUsername) {
-				$client.socket.emit("getDirectMessage", { username: user.username, page: allMessagePage, pageSize: allMessagePageSize});
+				$client.socket.emit("getDirectMessage", { username_42: user.username_42, page: allMessagePage, pageSize: allMessagePageSize});
 			}
 			// refresh the message list
 			$client.socket.emit("getMessageUserList");
@@ -336,21 +341,22 @@
 		}
 	});
 
-	function getMessageAndChangeSelected(selected_username: string)
+	function getMessageAndChangeSelected(selected_username_42: string)
 	{
-		selected = selected_username;
-		$client.socket.emit("getDirectMessage", { username: selected_username, page: allMessagePage, pageSize: allMessagePageSize});
+		selected = selected_username_42;
+		$client.socket.emit("getDirectMessage", { username_42: selected_username_42, page: allMessagePage, pageSize: allMessagePageSize});
 	}
 
-	async function sendDirectMessageAndUpdate() {
+	function sendDirectMessageAndUpdate() {
 		if (!message.length)
 			return ;
-		$client.socket.emit('sendDirectMessageG', {username: selected, message: message});
+		console.log("sendDirectMessageG", {username_42: selected, message: message})
+		$client.socket.emit('sendDirectMessageG', {username_42: selected, message: message});
 		message = '';
 	}
 
     let handleLoadMoreMessage = () => {
-        $client.socket.emit("getDirectMessage", { username: selected, page: ++allMessagePage, pageSize: allMessagePageSize});
+        $client.socket.emit("getDirectMessage", { username_42: selected, page: ++allMessagePage, pageSize: allMessagePageSize});
     }
 
 	function scrollToBottom() {
@@ -371,7 +377,7 @@
 	{#if exchanges.size}
 		<div class="from">
 			{#each [...exchanges.values()] as user}
-			<div class="flex line" on:click={() => {getMessageAndChangeSelected(user.username)}}>
+			<div class="flex line" on:click={() => {getMessageAndChangeSelected(user.username_42)}}>
 				{#if ((user.img) ? user.img : user.img_url).includes("cdn.intra.42.fr")}
 					<img src="{(user.img) ? user.img : user.img_url}" alt="from">
 				{:else}

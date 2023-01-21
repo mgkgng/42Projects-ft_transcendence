@@ -93,7 +93,7 @@
 	});
 </script>
 
-<Modal bind:this={chatModal} closeOnBgClick={false}>
+<Modal bind:this={chatModal} closeOnBgClick={true}>
 	<Chat itself={chatModal} />
 </Modal>
 
