@@ -316,14 +316,19 @@
 		});
 	});
 
-	beforeUpdate(() => {
-	})
-
 	afterUpdate(() => {
 		if (getDirectMessage)
 		{
 			scrollToBottom();
 		}
+		else
+		{
+			// const separator = document.querySelector('.separator');
+			// if (separator)
+			// 	separator.parentNode.scrollTop = separator.offsetTop;
+			document.querySelector(".separator")?.scrollIntoView(true);
+		}
+		console.log("separator", document.querySelector(".separator"))
 	});
 
 	function getMessageAndChangeSelected(selected_username: string)
@@ -375,7 +380,7 @@
 		{#if allMessages.has(selected)}
 		<div class="vflex chat">
 			<div class="vflex read">
-				{#each allMessages.get(selected) as message}
+				{#each allMessages.get(selected) as message, i}
 				<div class="line">
 					<div class="content {(userInfo.username == message.sender) ? "me" : ""}">
 						{#if !message.message.startsWith('/gameInvitation/')}
@@ -394,6 +399,9 @@
 						<div class="date">{format_date_hours(message.date)}</div>
 					</div>
 				</div>
+				{#if i % 19 == 0 && i != 0 && renderButtonToGetMoreMessages}
+					<div class="separator"></div>
+				{/if}
 				{/each}
 				{#if renderButtonToGetMoreMessages}
 				<div class="flex load-more">
