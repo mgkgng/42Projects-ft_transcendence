@@ -98,6 +98,11 @@ export class ChatDirectMessageGateway {
 			this.server.to(client.id).emit('error_getDirectMessage', {error: 'User blocked'});
 			return;
 		}
+		if (await this.friendSystemService.isUserBlocked(user.username, userSender.username))
+		{
+			this.server.to(client.id).emit('error_getDirectMessage', {error: 'You\'ve been blocked by this user'});
+			return;
+		}
 
 		// const messages = await this.chatDirectMessageService.handleGetDirectMessageHistory(userSender.username, user.username, data.limit, data.offset);
 		if (Number(data.page) < 0 || Number(data.pageSize) < 0 || Number(data.page) == NaN || Number(data.pageSize) == NaN)

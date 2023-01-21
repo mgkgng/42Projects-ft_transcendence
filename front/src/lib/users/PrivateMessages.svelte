@@ -231,6 +231,7 @@
 	let allMessagePageSize: number = 20;
 	let renderButtonToGetMoreMessages = true;
 	let getDirectMessage = true;
+	let selectMessageOrBlocked : string = "Please select a message";
 
 	let selected: string = "";
 	let userInfo: any;
@@ -280,6 +281,7 @@
 				allMessages.set(from, oldMessages);
 			}
 			allMessages = allMessages;
+			selectMessageOrBlocked = "Please select a message";
 		});
 
 		// this will append when you send a message (sendDirectMessageG)
@@ -305,6 +307,7 @@
 
 		$client.socket.on("error_getDirectMessage", (data: any) => {
 			console.log("error", data);
+			selectMessageOrBlocked = data.error;
 		});
 
 		$client.socket.on("success_sendDirectMessageG", (data: any) => {
@@ -443,7 +446,7 @@
 		</div>
 		{:else}
 		<div class="flex no-selected">
-			<p>Please select a message</p>
+			<p>{selectMessageOrBlocked}</p>
 		</div>
 		{/if}
 	{:else}

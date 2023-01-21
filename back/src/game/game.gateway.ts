@@ -642,6 +642,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			this.server.to(client.id).emit('error_sendDirectMessageG', {error: 'User blocked'});
 			return;
 		}
+		if (await this.friendSystemService.isUserBlocked(user.username, userSender.username))
+		{
+			this.server.to(client.id).emit('error_sendDirectMessageG', {error: 'You\'ve been blocked by this user'});
+			return;
+		}
 		const userConnected = this.mainServerService.getUserConnectedByUsername42(data.username_42);
 		if (userConnected && !(await this.friendSystemService.isUserBlocked(user.username, userSender.username))) {
 			let target = this.clients.get(user.username_42);
