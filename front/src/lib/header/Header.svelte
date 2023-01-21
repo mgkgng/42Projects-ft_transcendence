@@ -186,12 +186,19 @@
 			newFriendRequest = newFriendRequest;
 		});
 
+		$client.socket.on("JoinRoomRes", (data: any) => {
+			console.log(data);
+			privateMessagesModal.close();
+		});
+
+
 		$client.socket.emit("reqFriendAndMessage");
 
 		return(() => {
 			$client.socket.off("updateFriendAndMessage");
 			$client.socket.off("newMessageArrived");
 			$client.socket.off("askFriendGNotification");
+			$client.socket.off("JoinRoomRes");
 		});
 	});
 </script>

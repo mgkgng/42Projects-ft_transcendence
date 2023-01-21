@@ -109,7 +109,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			let [target1, target2] = [this.clients.get(this.queue[0][0]), this.clients.get(this.queue[1][0])];
 			let [player1, player2] = [await this.getPlayerInfo(target1.username), await this.getPlayerInfo(target2.username)];
 			let gameInfo = { title: "", mapSize: getRandomInt(3), maxPoint: 10, puckSpeed: getRandomInt(3), paddleSize: getRandomInt(3), isPrivate: true }
-			let room = new Room([player1, player2], [target1, target2], gameInfo, undefined, 
+			let room = new Room([player1, player2], [target1, target2], gameInfo, "", undefined, 
 				this,
 				this.gameRep, this.mainServerService, this.dataSource, this.userService);
 			this.rooms.set(room.id, room);
@@ -150,6 +150,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			return ;
 		}
 
+		if (room.invited.length && target.username !== room.invited && target.username !== room.hostname) {
+			client.emit("RoomCheckError", ErrorMessage.NotInvited);
+			return ;
+		}
+
 		// Give the user the room information
 		let players = Array.from(room.players.values());
 		target.broadcast("RoomFound", {
@@ -164,6 +169,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				pos: players[1].paddle.pos
 			} : undefined,
 			hostname: room.hostname,
+			invited: room.invited,
 			gameInfo: room.gameInfo,
 			puck: (room.puck) ? {
 				pos: room.puck.pos,
@@ -258,7 +264,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 		// Get the player's info and create the room with the data
 		let player = await this.getPlayerInfo(target.username);
-		let room = new Room([player], [target], data, target.username,
+		let room = new Room([player], [target], data, target.username, undefined,
 			this,
 			this.gameRep, this.mainServerService, this.dataSource, this.userService);
 		this.rooms.set(room.id, room);
@@ -276,8 +282,19 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		if (!room) {
 			client.emit("JoinRoomError", ErrorMessage.RoomNotFound);
 			return ;
+		} else if ([...room.players.keys()].includes(target.username)) {
+			client.emit("JoinRoomRes", {
+				allowed: true,
+				roomID: room.id
+			});
+			return ;
 		} else if (room.players.size > 1 && data.play) {
 			client.emit("JoinRoomError", ErrorMessage.RoomNotAvailble);
+			return ;
+		}
+
+		if (!room.invited && !(target.username == room.invited.username || target.username == room.hostname)) {
+			client.emit("RoomCheckError", ErrorMessage.NotInvited);
 			return ;
 		}
 
@@ -303,7 +320,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				allowed: true,
 				roomID: room.id
 			});
-	
 		}
 	}
 
@@ -579,7 +595,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	async sendMessage(@MessageBody() data: any, @ConnectedSocket() client: any, @Request() req) {
 		let gameInvitation = data.message.startsWith("/gameInvitation/");
 		let messageToSave = data.message;
-		console.log(gameInvitation);
 		if (gameInvitation) {
 			let target = this.getClient(req);
 			if (target.state !== UserState.Available) {
@@ -590,6 +605,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				return ;
 			}
 			let player = await this.getPlayerInfo(target.username);
+			let invited = await this.getPlayerInfo(data.username);
 			let args = messageToSave.split("/");
 			console.log(args);
 			//TODO parsing + error
@@ -602,7 +618,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				isPrivate: true
 			};
 			
-			let room = new Room([player], [target], gameInfo, target.username, this, this.gameRep, this.mainServerService, this.dataSource, this.userService)
+			//TODO get username by username42 (for the invited)
+			let room = new Room([player], [target], gameInfo, target.username, invited, this, this.gameRep, this.mainServerService, this.dataSource, this.userService)
 			this.rooms.set(room.id, room);
 			target.isPlaying(room.id);
 
@@ -613,7 +630,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			});
 			messageToSave = `/gameInvitation/${room.id}/${args[6]}`;
 		}
-		console.log("what to send?", messageToSave);
 
 		const user = await this.userRepository.findOne({
 			where: {username: data.username}

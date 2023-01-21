@@ -67,10 +67,16 @@
 					}
 				}
 
+				&:first-child { 
+					.content {
+						margin-top: '2.2em'; 
+					}
+				}
+
+
 				.line {
 					width: 100%;
 
-					// &:first-child { margin-top: '2.2em'; }
 
 					.content {
 						position: relative;
@@ -388,9 +394,12 @@
 						<div class="vflex invitation">
 							<div class="invite-from">{message.sender} is inviting to play a game!</div>
 							<div class="invitation-msg">{message.message.split('/')[3].replaceAll('&sl', '/')}</div>
-							<button on:click={() => {``
+							<button on:click={() => {
 								console.log(message.message.split('/')[2]);
-								// $client.socket.emit('JoinRoomByInvitation', message.message.split('/')[2]);
+								$client.socket.emit("JoinRoom", {
+									roomID: message.message.split('/')[2],
+									play: true
+								});
 							}}>Join</button>
 						</div>
 						{/if}
