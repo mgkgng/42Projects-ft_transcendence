@@ -616,10 +616,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		console.log("what to send?", messageToSave);
 
 		const user = await this.userRepository.findOne({
-			where: {username: data.username}
+			where: {username_42: data.username_42}
 		});
 		const userSender = await this.userRepository.findOne({
-			where: {username: this.mainServerService.getUserConnectedBySocketId(client.id).username}
+			where: {username_42: this.mainServerService.getUserConnectedBySocketId(client.id).username_42}
 		});
 		if (!user || !userSender)
 		{
@@ -631,13 +631,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			this.server.to(client.id).emit('error_sendDirectMessageG', {error: 'User blocked'});
 			return;
 		}
-		const userConnected = this.mainServerService.getUserConnectedByUsername(data.username);
+		const userConnected = this.mainServerService.getUserConnectedByUsername42(data.username_42);
 		if (userConnected && !(await this.friendSystemService.isUserBlocked(user.username, userSender.username))) {
-			let username42 = await this.getUsername42ByUsername(data.username);
-			let target = this.clients.get(username42);
+			let target = this.clients.get(user.username_42);
 			target.newMessageReceived(userSender.username);
 		}
-		let ret = await this.chatDirectMessageService.handleSendDirectMessage(this.mainServerService.getUserConnectedBySocketId(client.id).username, data.username, messageToSave);
+		let ret = await this.chatDirectMessageService.handleSendDirectMessage(this.mainServerService.getUserConnectedBySocketId(client.id).username_42, data.username_42, messageToSave);
 		if (ret)
 			this.server.to(client.id).emit('success_sendDirectMessageG', {message: messageToSave});
 		else
@@ -645,12 +644,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		if (!(await this.friendSystemService.isUserBlocked(user.username, userSender.username)))
 		{
 			// For whatever reason if i use success_getDirectMessage it doesnt work, apparently is a bug about namespaces
-			this.server.to(client.id).emit('getDirectMessage', { id: ret.id_g, sender: ret.message_sender.username, recipient: ret.message_recipient.username, message: ret.string, date: ret.date});
+			this.server.to(client.id).emit('getDirectMessage', { id: ret.id_g, sender: ret.message_sender.username_42, recipient: ret.message_recipient.username_42, message: ret.string, date: ret.date});
 			if (userConnected)
 			{
-				let emitList = this.mainServerService.getUserConnectedListBySocketId(this.mainServerService.getUserConnectedByUsername(data.username).id);
+				let emitList = this.mainServerService.getUserConnectedListBySocketId(this.mainServerService.getUserConnectedByUsername42(data.username_42).id);
 				emitList.forEach(element => {
-					this.server.to(element.id).emit('getDirectMessage', { id: ret.id_g, sender: ret.message_sender.username, recipient: ret.message_recipient.username, message: ret.string, date: ret.date});
+					this.server.to(element.id).emit('getDirectMessage', { id: ret.id_g, sender: ret.message_sender.username_42, recipient: ret.message_recipient.username_42, message: ret.string, date: ret.date});
 				});
 			}
 		}

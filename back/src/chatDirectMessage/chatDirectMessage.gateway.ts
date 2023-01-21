@@ -27,66 +27,66 @@ export class ChatDirectMessageGateway {
 
 	@WebSocketServer() server;
 
-	@SubscribeMessage('sendDirectMessage')
-	async sendMessage(@MessageBody() data: any, @ConnectedSocket() client: any) {
-		console.log("sendMessage")
-		const user = await this.userRepository.findOne({
-			where: {username: data.username}
-		});
-		const userSender = await this.userRepository.findOne({
-			where: {username: this.mainServerService.getUserConnectedBySocketId(client.id).username}
-		});
-		if (!user || !userSender)
-		{
-			this.server.to(client.id).emit('error_sendDirectMessageG', {error: 'User not found'});
-			return;
-		}
-		if (await this.friendSystemService.isUserBlocked(userSender.username, user.username))
-		{
-			this.server.to(client.id).emit('error_sendDirectMessageG', {error: 'User blocked'});
-			return;
-		}
-		// NOTIFICATION PART
-		const userConnected = this.mainServerService.getUserConnectedByUsername(data.username);
-		if (!(await this.friendSystemService.isUserBlocked(user.username, userSender.username))) {
-			this.mainServerService.addNotification(user.username, "directMessage", {});
-			if (userConnected)
-			{
-				this.server.to(this.mainServerService.getUserConnectedListBySocketId(this.mainServerService.getUserConnectedByUsername(userConnected.username).id))
-				.emit("notification", {type: "directMessage", username: userSender.username, data: {}});
-			}
-			else
-			{
-				this.mainServerService.addNotification(user.username, "directMessage", {});
-			}
-		}
-		let ret = await this.chatDirectMessageService.handleSendDirectMessage(this.mainServerService.getUserConnectedBySocketId(client.id).username, data.username, data.message);
-		if (ret)
-			this.server.to(client.id).emit('success_sendDirectMessageG', {message: data.message});
-		else
-			this.server.to(client.id).emit('error_sendDirectMessageG', {error: 'An error occured'});
-		if (userConnected && !(await this.friendSystemService.isUserBlocked(user.username, userSender.username)))
-		{
-			let emitList = this.mainServerService.getUserConnectedListBySocketId(this.mainServerService.getUserConnectedByUsername(data.username).id);
-			// For whatever reason if i use success_getDirectMessage it doesnt work, apparently is a bug about namespaces
-			this.server.to(client.id).emit('getDirectMessage', { id: ret.id_g, sender: ret.message_sender.username, recipient: ret.message_recipient.username, message: ret.string, date: ret.date});
-			emitList.forEach(element => {
-				this.server.to(element.id).emit('getDirectMessage', { id: ret.id_g, sender: ret.message_sender.username, recipient: ret.message_recipient.username, message: ret.string, date: ret.date});
-			});
-		}
-	}
+	// @SubscribeMessage('sendDirectMessage')
+	// async sendMessage(@MessageBody() data: any, @ConnectedSocket() client: any) {
+	// 	console.log("sendMessage")
+	// 	const user = await this.userRepository.findOne({
+	// 		where: {username: data.username}
+	// 	});
+	// 	const userSender = await this.userRepository.findOne({
+	// 		where: {username: this.mainServerService.getUserConnectedBySocketId(client.id).username}
+	// 	});
+	// 	if (!user || !userSender)
+	// 	{
+	// 		this.server.to(client.id).emit('error_sendDirectMessageG', {error: 'User not found'});
+	// 		return;
+	// 	}
+	// 	if (await this.friendSystemService.isUserBlocked(userSender.username, user.username))
+	// 	{
+	// 		this.server.to(client.id).emit('error_sendDirectMessageG', {error: 'User blocked'});
+	// 		return;
+	// 	}
+	// 	// NOTIFICATION PART
+	// 	const userConnected = this.mainServerService.getUserConnectedByUsername(data.username);
+	// 	if (!(await this.friendSystemService.isUserBlocked(user.username, userSender.username))) {
+	// 		this.mainServerService.addNotification(user.username, "directMessage", {});
+	// 		if (userConnected)
+	// 		{
+	// 			this.server.to(this.mainServerService.getUserConnectedListBySocketId(this.mainServerService.getUserConnectedByUsername(userConnected.username).id))
+	// 			.emit("notification", {type: "directMessage", username: userSender.username, data: {}});
+	// 		}
+	// 		else
+	// 		{
+	// 			this.mainServerService.addNotification(user.username, "directMessage", {});
+	// 		}
+	// 	}
+	// 	let ret = await this.chatDirectMessageService.handleSendDirectMessage(this.mainServerService.getUserConnectedBySocketId(client.id).username, data.username, data.message);
+	// 	if (ret)
+	// 		this.server.to(client.id).emit('success_sendDirectMessageG', {message: data.message});
+	// 	else
+	// 		this.server.to(client.id).emit('error_sendDirectMessageG', {error: 'An error occured'});
+	// 	if (userConnected && !(await this.friendSystemService.isUserBlocked(user.username, userSender.username)))
+	// 	{
+	// 		let emitList = this.mainServerService.getUserConnectedListBySocketId(this.mainServerService.getUserConnectedByUsername(data.username).id);
+	// 		// For whatever reason if i use success_getDirectMessage it doesnt work, apparently is a bug about namespaces
+	// 		this.server.to(client.id).emit('getDirectMessage', { id: ret.id_g, sender: ret.message_sender.username, recipient: ret.message_recipient.username, message: ret.string, date: ret.date});
+	// 		emitList.forEach(element => {
+	// 			this.server.to(element.id).emit('getDirectMessage', { id: ret.id_g, sender: ret.message_sender.username, recipient: ret.message_recipient.username, message: ret.string, date: ret.date});
+	// 		});
+	// 	}
+	// }
 
 	// Get all the chatDirectMessage between 2 users
 	@SubscribeMessage('getDirectMessage')
 	async getDirectMessage(@MessageBody() data: any, @ConnectedSocket() client: any) {
 		const user = await this.userRepository.findOne({
-			where: {username: data.username},
-			select: ["username"]
+			where: {username_42: data.username_42},
+			select: ["username", "username_42"]
 		});
 
 		const userSender = await this.userRepository.findOne({
-			where: {username: this.mainServerService.getUserConnectedBySocketId(client.id).username},
-			select: ["username"]
+			where: {username_42: this.mainServerService.getUserConnectedBySocketId(client.id).username_42},
+			select: ["username", "username_42"]
 		});
 		if (!user || !userSender)
 		{
@@ -115,7 +115,7 @@ export class ChatDirectMessageGateway {
 
 	@SubscribeMessage('getMessageUserList')
 	async getMessageUserList(@MessageBody() data: any, @ConnectedSocket() client: any) {
-		let ret = await this.chatDirectMessageService.handleGetMessageUserList(this.mainServerService.getUserConnectedBySocketId(client.id).username);
+		let ret = await this.chatDirectMessageService.handleGetMessageUserList(this.mainServerService.getUserConnectedBySocketId(client.id).username_42);
 		if (ret)
 			this.server.to(client.id).emit('success_getMessageUserList', {messageUserList: ret});
 		else
