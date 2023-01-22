@@ -180,11 +180,14 @@
 	user.subscribe((user: any) => { userInfo = user; });
 
 	$: console.log("this is the roomID", roomID);
-	// $: console.log("gameSIze: ", gameSize);
 	
 	let paddleWidth: number;
 	let posHorizontal: Array<number>;
 	let prevY: number = 0;
+
+	let timeoutId: any;
+	let isMouseMoveDisabled = false;
+
 
 	$: puckPos = translatePucks(puck);
 	$: setGame(gameReady, game);
@@ -286,7 +289,6 @@
 		});
 		
 		$client.socket.on("PaddleUpdate", (data: any) => {
-			console.log("PaddleUpdate: ", data);
 			if ((data.type === 0 && player1.info.username_42 === userInfo.username_42)
 				|| (data.type === 1 && player2.info.username_42 === userInfo.username_42))
 				return ;
@@ -299,7 +301,6 @@
 		$client.socket.on("LoadBall", (data: any) => { puck = new Puck(data.vec, data.pos, MapSize[gameInfo.mapSize]); });
 
 		$client.socket.on("PongStart", () => {
-			console.log("PongStart");
 			clearInterval(puckMoving)
 			puckMoving = setInterval(() => {
 				puck.move();
@@ -310,6 +311,7 @@
 		$client.socket.on("PuckHit", (data: any) => {
 			puck.vec[1] += (puck.vec[1] > 0) ? 1 : -1;
 			puck.vec[1] *= -1;
+			puck = puck;
 		});
 
 		$client.socket.on("ScoreUpdate", (data: any) => {
@@ -343,17 +345,17 @@
 		return (() => {
 			if (puckMoving)
 				clearInterval(puckMoving);
-			// $client.socket.off("RoomFound");
-			// $client.socket.off("PlayerUpdate");
-			// $client.socket.off("PaddleUpdate");
-			// $client.socket.off("LoadBall");
-			// $client.socket.off("PongStart");
-			// $client.socket.off("PuckHit");
-			// $client.socket.off("ScoreUpdate");
-			// $client.socket.off("ReadyUpdate");
-			// $client.socket.off("GameFinished");
-			// $client.socket.off("GameStartFail");
-			// $client.socket.off("GameStart");
+			$client.socket.off("RoomFound");
+			$client.socket.off("PlayerUpdate");
+			$client.socket.off("PaddleUpdate");
+			$client.socket.off("LoadBall");
+			$client.socket.off("PongStart");
+			$client.socket.off("PuckHit");
+			$client.socket.off("ScoreUpdate");
+			$client.socket.off("ReadyUpdate");
+			$client.socket.off("GameFinished");
+			$client.socket.off("GameStartFail");
+			$client.socket.off("GameStart");
 		});
 	});
 </script>
@@ -437,6 +439,8 @@
 
 <svelte:window
 	on:mousemove={(event) => {
+		if (isMouseMoveDisabled === true)
+			return ;
 		if (![player1?.info.username_42, player2?.info.username_42].includes(userInfo.username_42))
 			return ;
 		if (!gameSize)
@@ -459,5 +463,10 @@
 			player1.pos = posConverted;
 		else
 			player2.pos = posConverted;
+		isMouseMoveDisabled = true;
+        setTimeout(() => {
+            isMouseMoveDisabled = false;
+        }, 20);
+
 	}}
 />

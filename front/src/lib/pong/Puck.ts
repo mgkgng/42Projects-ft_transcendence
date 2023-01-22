@@ -18,6 +18,10 @@ export class Puck {
 		if (this.pos.length > 5)
 			this.pos.splice(5, 1);
 
+		if (this.pos[0][1] < PongConfig.DeadZoneHeight + PongConfig.PaddleHeight)
+			this.pos[0][1] = PongConfig.DeadZoneHeight + PongConfig.PaddleHeight;
+		else if (this.pos[0][1] > this.mapSize[1] - PongConfig.DeadZoneHeight - PongConfig.PaddleHeight)
+			this.pos[0][1] = this.mapSize[1] - PongConfig.DeadZoneHeight - PongConfig.PaddleHeight;
 		// If the puck has hit the wall, change the direction on X vector
 		if (this.pos[0][0] < 0) {
 			this.pos[0][0] *= -1;
