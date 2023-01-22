@@ -150,7 +150,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			return ;
 		}
 
-		if (room.invited.length && target.username !== room.invited && target.username !== room.hostname) {
+		console.log(room);
+		if (room.invited && target.username !== room.invited && target.username !== room.hostname) {
 			client.emit("RoomCheckError", ErrorMessage.NotInvited);
 			return ;
 		}
@@ -176,29 +177,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				vec: room.puck.vec
 			} : undefined
 		});
-	}
-
-	@SubscribeMessage("PaddleMoveKey")
-	paddleMoveKey(@MessageBody() data: any, @Request() req) {
-		// Check if the request came from a proper player
-		let target = this.getClient(req);
-		let room = this.getRoom(data.room);
-		if (!room || !room.players.has(target.username))
-			return ;
-
-		// Get the player
-		let player = room.players.get(target.username);
-
-		// TODO protection switching between keyboard and mouse
-		// Paddle starts to move, Websocket Messages set with interval
-		let intervalID = setInterval(() => {
-			player.paddle.move(data.left);
-			room.broadcast("PaddleUpdate", {
-				type: player.index,
-				pos: player.paddle.pos
-			});
-		}, 20);
-		player.control[0] = intervalID;
 	}
 
 	@SubscribeMessage("RoomListReq")
@@ -258,7 +236,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			return ;
 		}
 
-		if (!room.invited && !(target.username == room.invited.username || target.username == room.hostname)) {
+		console.log(target, room);
+		if (room.invited && !(target.username == room.invited.username || target.username == room.hostname)) {
 			client.emit("RoomCheckError", ErrorMessage.NotInvited);
 			return ;
 		}
@@ -490,6 +469,25 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		let target = this.getClient(req);
 		target.newMessages.clear();
 	}
+
+	@SubscribeMessage("PaddleMoveMouse")
+	paddleMoveMouse(@MessageBody() data: any, @Request() req) {
+		// Check if the request came from a proper player
+
+		let target = this.getClient(req);
+		let room = this.getRoom(data.roomID);
+		if (!room || !room.players.has(target.username))
+			return ;
+
+		// Get the player
+		let player = room.players.get(target.username);
+		player.paddle.pos = data.pos;
+		room.broadcast("PaddleUpdate", {
+			type: player.index,
+			pos: data.pos
+		});
+	}
+
 
 	@SubscribeMessage('askFriendG')
 	async askFriend(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
