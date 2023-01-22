@@ -252,6 +252,7 @@
 			console.log("RoomFound", data);
 
 			// Get room information
+			console.log(userInfo);
 			gameInfo = data.gameInfo;
 			hostname = data.hostname;
 			if (!hostname.length)
@@ -285,6 +286,7 @@
 		});
 		
 		$client.socket.on("PaddleUpdate", (data: any) => {
+			console.log("PaddleUpdate: ", data);
 			if ((data.type === 0 && player1.info.username_42 === userInfo.username_42)
 				|| (data.type === 1 && player2.info.username_42 === userInfo.username_42))
 				return ;
@@ -341,17 +343,17 @@
 		return (() => {
 			if (puckMoving)
 				clearInterval(puckMoving);
-			$client.socket.off("RoomFound");
-			$client.socket.off("PlayerUpdate");
-			$client.socket.off("PaddleUpdate");
-			$client.socket.off("LoadBall");
-			$client.socket.off("PongStart");
-			$client.socket.off("PuckHit");
-			$client.socket.off("ScoreUpdate");
-			$client.socket.off("ReadyUpdate");
-			$client.socket.off("GameFinished");
-			$client.socket.off("GameStartFail");
-			$client.socket.off("GameStart");
+			// $client.socket.off("RoomFound");
+			// $client.socket.off("PlayerUpdate");
+			// $client.socket.off("PaddleUpdate");
+			// $client.socket.off("LoadBall");
+			// $client.socket.off("PongStart");
+			// $client.socket.off("PuckHit");
+			// $client.socket.off("ScoreUpdate");
+			// $client.socket.off("ReadyUpdate");
+			// $client.socket.off("GameFinished");
+			// $client.socket.off("GameStartFail");
+			// $client.socket.off("GameStart");
 		});
 	});
 </script>
@@ -393,7 +395,7 @@
 	<div class="button-container">
 		<!-- there should be a difference between host-guest mode and random matching mode -->
 		{#if !started && hostname.length}
-			{#if userInfo.username == hostname}
+			{#if userInfo.username_42 == hostname}
 			<button class="start" on:click={()=>{
 				if (!ready) {
 					alertMessage = "The guest is not ready yet";
