@@ -16,6 +16,24 @@ body {
 	margin: 0 !important;
 }
 
+::-webkit-scrollbar {
+    background-color: transparent;
+	width: .3em;
+}
+::-moz-scrollbar {
+    background-color: transparent;
+}
+::-ms-scrollbar {
+    background-color: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+	width: .5em;
+	right: .5em;
+	border-radius: 5em;
+	background-color: transparentize(#fff, .9);
+}
+
 main {
 	height: 100%;
 	padding: 0;

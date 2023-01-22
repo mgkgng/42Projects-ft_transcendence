@@ -1,5 +1,7 @@
 <style lang="scss">
 	.messages {
+		position: relative;
+
 		width: 720px;
 		height: 560px;
 		display: flex;
@@ -7,13 +9,10 @@
 		gap: 0;
 
 		.from {
-			position: relative;
 			width: 30%;
-			height: 100%;
+			max-height: 100%;
 			border-right: $border;
-
 			padding: 1.5em .5em;
-
 			overflow-y: overlay;
 			cursor: pointer;
 
@@ -23,9 +22,7 @@
 				border-bottom: $border-thin;
 				align-items: center;
 				transition: .2s;
-
 				&:hover { background-color: transparentize(#fff, .6); }
-
 				img {
 					width: 45px;
 					height: 45px;
@@ -39,7 +36,6 @@
 				left: 0;
 			}
 		}
-
 		.chat {
 			width: 70%;
 			height: 100%;
@@ -49,7 +45,7 @@
 				position: relative;
 				height: 90%;
 				width: 100%;
-				overflow-y: scroll;
+				overflow-y: overlay;
 				gap: 0;
 
 				.load-more {
@@ -61,23 +57,16 @@
 					height: 2em;
 					transition: .3s;
 					border-radius: 0 0 .5em .5em;
-
 					&:hover {
 						background-color: transparentize(#fff, .8);
 					}
 				}
-
-				&:first-child { 
-					.content {
-						margin-top: '2.2em'; 
-					}
-				}
-
-
 				.line {
 					width: 100%;
-
-
+					&:first-child {
+						margin-top: 2em;
+					}
+					gap: 0;
 					.content {
 						position: relative;
 						word-wrap: break-word;
@@ -92,21 +81,20 @@
 						float: left;
 
 						.invitation {
-							width: 15em;
-							padding-right: 3em;
+							width: 100%;
 							gap: .2em;
 
 							.invite-from {
 								width: 100%;
+								padding-right: 2.5em;
 							}
-
 							.invitation-msg {
+								max-width: 100%;
 								border-radius: .5em;
 								margin-top: .2em;
 								background-color: transparentize(#fff, .6);
 								padding: .6em .4em;
 							}
-
 							button {
 								height: 2em;
 								&:hover {
@@ -115,7 +103,6 @@
 								}
 							}
 						}
-
 						.message {
 							min-height: 1em;
 							padding-right: 2.5em;
@@ -128,7 +115,6 @@
 							font-size: 12px;
 						}
 					}
-
 					.me {
 						float: right;
 						background-color: $submain-lowshadeblue;
@@ -144,7 +130,6 @@
 				display: flex;
 				flex-direction: row;
 				align-items: center;
-
 				input {
 					width: 85%;
 					height: 100%;
@@ -162,30 +147,23 @@
 					right: 0;
 					// border-radius: .3em;
 					transition: .2s;
-
 					&:hover { background-color: transparentize(#fff, .9); }
 				}
 			}
 		}
-
 		.no-selected {
 			width: 70%;
 			height: 100%;
-
 			justify-content: center;
 			align-items: center;
 		}
-
 		.no-users {
 			width: 100%;
 			height: 100%;
-
 			justify-content: center;
 			align-items: center;
-
 			font-size: 24px;
 		}
-
 		.add {
 			position: absolute;
 			border-radius: .2rem;
@@ -219,12 +197,9 @@
     import ChatRoom from "../chat/ChatRoom.svelte";
     import Chat from "../chat/Chat.svelte";
     import Invitation from "./Invitation.svelte";
-
 	export let itself: any;
-
 	let writeMessageModal: any;
 	let invitationModal: any;
-
 	let exchanges: Map<string, any> = new Map<string, any>();
 	let allMessages: Map<string, any> = new Map<string, any>();
 	let allMessagePage: number = 1;
@@ -232,13 +207,10 @@
 	let renderButtonToGetMoreMessages = true;
 	let getDirectMessage = true;
 	let selectMessageOrBlocked : string = "Please select a message";
-
 	let selected: string = "";
 	let userInfo: any;
-
 	let roomID: string = "";
 	let message = '';
-
 	user.subscribe((user: any) => { userInfo = user; });
 	
 	onMount(() => {
@@ -283,7 +255,6 @@
 			allMessages = allMessages;
 			selectMessageOrBlocked = "Please select a message";
 		});
-
 		// this will append when you send a message (sendDirectMessageG)
 		$client.socket.on("getDirectMessage", (lastMessage: any) => {
 			let from = (lastMessage.recipient == userInfo.username_42) ? lastMessage.sender : lastMessage.recipient
@@ -304,12 +275,10 @@
 			}
 			console.log("getDirectMessage", lastMessage)
 		});
-
 		$client.socket.on("error_getDirectMessage", (data: any) => {
 			console.log("error", data);
 			selectMessageOrBlocked = data.error;
 		});
-
 		$client.socket.on("success_sendDirectMessageG", (data: any) => {
 			console.log("success_sendDirectMessageG", data);
 			writeMessageModal.close();
@@ -318,11 +287,9 @@
 				invitationModal.open();
 			}
 		});
-
 		$client.socket.on("error_sendDirectMessageG", (data: any) => {
 			console.log("error_sendDirectMessageG", data);
 		});
-
 		$client.socket.on("newMessageArrived", async (senderUsername: string) => {
 			if (selected == senderUsername) {
 				$client.socket.emit("getDirectMessage", { username_42: user.username_42, page: allMessagePage, pageSize: allMessagePageSize});
@@ -330,16 +297,13 @@
 			// refresh the message list
 			$client.socket.emit("getMessageUserList");
 		});
-
 		$client.socket.emit("getMessageUserList");
-
 		return (() => {
 			$client.socket.off("success_getMessageUserList");
 			$client.socket.off("success_getDirectMessage");
 			$client.socket.off("success_sendDirectMessageG");
 		});
 	});
-
 	afterUpdate(() => {
 		if (getDirectMessage)
 		{
@@ -353,13 +317,11 @@
 			document.querySelector(".separator")?.scrollIntoView(true);
 		}
 	});
-
 	function getMessageAndChangeSelected(selected_username_42: string)
 	{
 		selected = selected_username_42;
 		$client.socket.emit("getDirectMessage", { username_42: selected_username_42, page: allMessagePage, pageSize: allMessagePageSize});
 	}
-
 	function sendDirectMessageAndUpdate() {
 		if (!message.length)
 			return ;
@@ -367,11 +329,9 @@
 		$client.socket.emit('sendDirectMessageG', {username_42: selected, message: message});
 		message = '';
 	}
-
     let handleLoadMoreMessage = () => {
         $client.socket.emit("getDirectMessage", { username_42: selected, page: ++allMessagePage, pageSize: allMessagePageSize});
     }
-
 	function scrollToBottom() {
 		let messages = document.querySelector(".read");
 		if (messages)
@@ -381,15 +341,12 @@
 		}
 	}
 </script>
-
 <Modal bind:this={writeMessageModal}>
 	<WriteMessage itself={writeMessageModal} sendTo={[]}/>
 </Modal>
-
 <Modal bind:this={invitationModal}>
 	<Invitation itself={invitationModal} roomID={roomID}/>
 </Modal>
-
 <div class="flex window messages">
 	{#if exchanges.size}
 		<div class="from">
@@ -409,7 +366,7 @@
 		<div class="vflex chat">
 			<div class="vflex read">
 				{#each allMessages.get(selected) as message, i}
-				<div class="line" style="margin-top: {(i == 0 && renderButtonToGetMoreMessages) ? "2.2em" : "0em"}">
+				<div class="line">
 					<div class="content {(userInfo.username_42 == message.sender) ? "me" : ""}">
 						{#if !message.message.startsWith('/gameInvitation/')}
 						<div class="message">{message.message}</div>
