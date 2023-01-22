@@ -150,7 +150,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			return ;
 		}
 
-		console.log(room);
 		if (room.invited && target.username !== room.invited && target.username !== room.hostname) {
 			client.emit("RoomCheckError", ErrorMessage.NotInvited);
 			return ;
@@ -236,7 +235,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			return ;
 		}
 
-		console.log(target, room);
 		if (room.invited && !(target.username == room.invited.username || target.username == room.hostname)) {
 			client.emit("RoomCheckError", ErrorMessage.NotInvited);
 			return ;

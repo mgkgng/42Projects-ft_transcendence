@@ -80,14 +80,16 @@
 		position: relative;
 		height: 100%;
 		width: 100%;
+		border: $border;
 
 		padding: 0;
 		border-radius: .5em;
 
 		background-color: #212121;
+
 		.zone-limit {
 			position: absolute;
-			width: 1px;
+			width: var(--width);
 			height: 100%;
 		}
 	
@@ -128,6 +130,24 @@
 		}
 	}
 
+	.puck, .shadow {
+		position: absolute;
+		margin: 0;
+
+		z-index: 1;
+		aspect-ratio: 1 / 1;
+		border-radius: 50%;
+		background-color: #fff;
+	}
+
+	.puck {
+		box-shadow: 0px 0px 5px 3px $yellow;
+	}
+
+	.shadow {
+		opacity: var(--opacity);
+	}
+
 </style>
 
 <script lang="ts">
@@ -141,7 +161,6 @@
     import { user } from '$lib/stores/user';
     import Player from '$lib/game/Player.svelte';
 	import AlertMessage from '$lib/modals/AlertMessage.svelte';
-    import PPuck from './PPuck.svelte';
 
 	export let roomID: string;
 	export let itself: any;	
@@ -185,10 +204,9 @@
 	let paddleWidth: number;
 	let posHorizontal: Array<number>;
 	let prevY: number = 0;
+	let zoneLimitWidth: number = 20;
 
-	let timeoutId: any;
 	let isMouseMoveDisabled = false;
-
 
 	$: puckPos = translatePucks(puck);
 	$: setGame(gameReady, game);
@@ -225,7 +243,11 @@
 			return ;
 		paddleWidth = convertPixelWithHeight(PaddleSize[gameInfo.paddleSize]);
 		initPos = convertPixelWithHeight((MapSize[gameInfo?.mapSize][0] - PaddleSize[gameInfo?.paddleSize]) / 2);
-		posHorizontal = [convertPixelWithWidth(PongConfig.DeadZoneHeight), convertPixelWithWidth(MapSize[gameInfo.mapSize][1] - PongConfig.DeadZoneHeight - PongConfig.PaddleHeight / 2)];
+		console.log(PongConfig.DeadZoneHeight, PongConfig.PaddleHeight);
+		zoneLimitWidth = convertPixelWithWidth(PongConfig.DeadZoneHeight);
+		let test = convertPixelWithWidth(PongConfig.DeadZoneHeight) - 12;
+		posHorizontal = [test, convertPixelWithWidth(MapSize[gameInfo.mapSize][1] - PongConfig.DeadZoneHeight)];
+		console.log(posHorizontal);
 	}
 
 	function translatePucks(puck: any) {
@@ -233,9 +255,12 @@
 			return ;
 		let res = [];
 		for (let pos of puck.pos) {
-			res.push([(!switched) ? convertPixelWithHeight(pos[0]) : convertPixelWithHeight(MapSize[gameInfo.mapSize][0] - pos[0]),
-			(!switched) ? convertPixelWithWidth(MapSize[gameInfo.mapSize][1] - pos[1]) : convertPixelWithWidth(pos[1])]);
+			res.push([
+				(!switched) ? convertPixelWithHeight(pos[0]) : convertPixelWithHeight(MapSize[gameInfo.mapSize][0] - pos[0]),
+				(!switched) ? convertPixelWithWidth(MapSize[gameInfo.mapSize][1] - pos[1]) : convertPixelWithWidth(pos[1])
+			]);
 		}
+		console.log("what is wrong?", res);
 		return (res);
 	}
 
@@ -307,7 +332,7 @@
 			puckMoving = setInterval(() => {
 				puck.move();
 				puck = puck;
-			}, 20);
+			}, 40);
 		});
 
 		$client.socket.on("PuckHit", (data: any) => {
@@ -372,7 +397,7 @@
 		</div>
 		<div bind:this={game} class="pong-game">
 			{#if gameSize}
-				<div class="zone-limit left {(!switched) ? "player2" : "player1"}" style="--shadow: {convertPixelWithWidth(PongConfig.DeadZoneHeight)}px 0px 16px aqua"></div>
+				<div class="zone-limit left {(!switched) ? "player2" : "player1"}" style="--width: {zoneLimitWidth}px"></div>
 				<!-- Player 1 Paddle -->
 				<div class="paddle {(!player1) ? "absent" : ""}"
 					style="left: {posHorizontal[(!switched) ? 1 : 0]}px;
@@ -385,10 +410,27 @@
 					top: {(!player2) ? initPos : (!switched) ? convertPixelWithHeight(player2?.pos) : convertPixelWithHeight(MapSize[gameInfo?.mapSize][0] - player2?.pos - PaddleSize[gameInfo?.paddleSize])}px;
 					height: {paddleWidth}px">
 				</div>
+				<div class="zone-limit right {(!switched) ? "player1" : "player2"}" style="--width: {zoneLimitWidth}px"></div>
+
 				{#if puckPos}
-				<PPuck pucks={puckPos} />
+					{#if puckPos.length > 4}
+					<div class="shadow" style="top: {puckPos[4][0]}px; left: {puckPos[4][1]}px; --opacity: 15%"></div>
+					{/if}
+					{#if puckPos.length > 3}
+					<div class="shadow" style="top: {puckPos[3][0]}px; left: {puckPos[3][1]}px; --opacity: 25%"></div>
+					{/if}
+					{#if puckPos.length > 2}
+					<div class="shadow" style="top: {puckPos[2][0]}px; left: {puckPos[2][1]}px; --opacity: 40%"></div>
+					{/if}
+					{#if puckPos.length > 1}
+					<div class="shadow" style="top: {puckPos[1][0]}px; left: {puckPos[1][1]}px; --opacity: 60%"></div>
+					{/if}
+					{#if puckPos.length}
+					<div class="puck" style="top: {puckPos[0][0]}px; left: {puckPos[0][1]}px;"></div>
+					{/if}
 				{/if}
-				<div class="zone-limit right {(!switched) ? "player1" : "player2"}" style="--width: {convertPixelWithWidth(PongConfig.DeadZoneHeight)}px"></div>
+
+
 			{/if}
 		</div>
 		<div class="vflex side right">

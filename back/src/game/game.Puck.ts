@@ -20,7 +20,7 @@ export class Puck {
 	setCheckPuck(room: any) {
 		if (room.isOver)
 			return ;
-		let distToDeath = (this.mapSize[1] / 2 - PongConfig.PaddleHeight - PongConfig.DeadZoneHeight) * 2;
+		let distToDeath = (this.mapSize[1] / 2 - PongConfig.DeadZoneHeight) * 2;
 		if (this.initialized) {
 			distToDeath /= 2;
 			this.initialized = false;
@@ -36,15 +36,15 @@ export class Puck {
 				return ;
 			let paddlePos = player.paddle.pos;
 			// console.log(paddlePos, deathPointX);
-			if (deathPointX > paddlePos - PongConfig.PaddleBumper && deathPointX < paddlePos + PaddleSize[room.gameInfo.paddleSize] + PongConfig.PaddleBumper) {
+			if (deathPointX >= paddlePos - PongConfig.PaddleBumper && deathPointX <= paddlePos + PaddleSize[room.gameInfo.paddleSize] + PongConfig.PaddleBumper) {
 				// if paddle hits the puck
 				this.pos[0] = deathPointX;
-				this.pos[1] = (this.vec[1] > 0) ? (this.mapSize[1] - PongConfig.DeadZoneHeight - PongConfig.PaddleHeight)
-					: PongConfig.DeadZoneHeight + PongConfig.PaddleHeight;
+				this.pos[1] = (this.vec[1] > 0) ? (this.mapSize[1] - PongConfig.DeadZoneHeight)
+					: PongConfig.DeadZoneHeight;
 				this.vec[1] += (this.vec[1] > 0) ? 1 : -1;
 				this.vec[1] *= -1;
-				this.setCheckPuck(room);
 				room.broadcast("PuckHit");
+				this.setCheckPuck(room);
 				return ;
 			} else {
 				// if not, update the score, if the score reached the max point, finish the match

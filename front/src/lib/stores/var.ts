@@ -27,9 +27,9 @@ export const RoomUpdate = {
 }
 
 export const PongConfig = {
-	PuckSize: 15,
-	FrameDuration: 20,
-	DeadZoneHeight: 30,
+	PuckSize: 12,
+	FrameDuration: 40,
+	DeadZoneHeight: 20,
 	PaddleHeight: 12
 }
 
