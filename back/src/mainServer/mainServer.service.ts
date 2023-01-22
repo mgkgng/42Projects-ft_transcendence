@@ -8,7 +8,7 @@ import {InjectRepository} from '@nestjs/typeorm';
 import { UseGuards, Request, HttpException } from '@nestjs/common';
 import { MessageBody } from '@nestjs/websockets';
 
-global.userConnectedList = []; // userConnectedList[] = {username : "username", socket : socket, status : "online" | "in game" | "offline"}
+global.userConnectedList = []; // userConnectedList[] = {username : "username", username_42: "username42", socket : socket, status : "online" | "in game" | "offline"}
 global.notificationList = [] // notification[] = {username : "username", type : "notification", data: {data Object if theres is data}, id: "id of the notification"}
 
 @Injectable()
@@ -58,6 +58,14 @@ export class MainServerService {
 			return null;
 		}
 
+		// Function that will return the userConnectList entry by username42 if found
+		getUserConnectedByUsername42(username42Arg : string) : any {
+			for (let i = 0; i < global.userConnectedList.length; i++) {
+				if (global.userConnectedList[i].username_42 == username42Arg)
+					return global.userConnectedList[i].socket;
+			}
+			return null;
+		}
 	async getIdUser(@Request() req) //GET THE UNIQ ID OF A USER
 	{
 		 const user : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
@@ -101,6 +109,18 @@ export class MainServerService {
 		for (let i = 0; i < global.userConnectedList.length; i++)
 		{
 			if (global.userConnectedList[i].username === username)
+				return global.userConnectedList[i].status;
+			else
+				return "offline";
+		}
+		return "offline";
+	}
+
+	getUserStatusByUsername42(username_42 : string) : string
+	{
+		for (let i = 0; i < global.userConnectedList.length; i++)
+		{
+			if (global.userConnectedList[i].username_42 === username_42)
 				return global.userConnectedList[i].status;
 			else
 				return "offline";

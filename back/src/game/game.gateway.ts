@@ -109,7 +109,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			let [target1, target2] = [this.clients.get(this.queue[0][0]), this.clients.get(this.queue[1][0])];
 			let [player1, player2] = [await this.getPlayerInfo(target1.username), await this.getPlayerInfo(target2.username)];
 			let gameInfo = { title: "", mapSize: getRandomInt(3), maxPoint: 10, puckSpeed: getRandomInt(3), paddleSize: getRandomInt(3), isPrivate: true }
-			let room = new Room([player1, player2], [target1, target2], gameInfo, undefined, 
+			let room = new Room([player1, player2], [target1, target2], gameInfo, "", undefined, 
 				this,
 				this.gameRep, this.mainServerService, this.dataSource, this.userService);
 			this.rooms.set(room.id, room);
@@ -150,6 +150,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			return ;
 		}
 
+		if (room.invited.length && target.username !== room.invited && target.username !== room.hostname) {
+			client.emit("RoomCheckError", ErrorMessage.NotInvited);
+			return ;
+		}
+
 		// Give the user the room information
 		let players = Array.from(room.players.values());
 		target.broadcast("RoomFound", {
@@ -164,6 +169,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				pos: players[1].paddle.pos
 			} : undefined,
 			hostname: room.hostname,
+			invited: room.invited,
 			gameInfo: room.gameInfo,
 			puck: (room.puck) ? {
 				pos: room.puck.pos,
@@ -260,7 +266,7 @@ async (params:type) => {
 
 		// Get the player's info and create the room with the data
 		let player = await this.getPlayerInfo(target.username);
-		let room = new Room([player], [target], data, target.username,
+		let room = new Room([player], [target], data, target.username, undefined,
 			this,
 			this.gameRep, this.mainServerService, this.dataSource, this.userService);
 		this.rooms.set(room.id, room);
@@ -278,13 +284,24 @@ async (params:type) => {
 		if (!room) {
 			client.emit("JoinRoomError", ErrorMessage.RoomNotFound);
 			return ;
+		} else if ([...room.players.keys()].includes(target.username)) {
+			client.emit("JoinRoomRes", {
+				allowed: true,
+				roomID: room.id
+			});
+			return ;
 		} else if (room.players.size > 1 && data.play) {
 			client.emit("JoinRoomError", ErrorMessage.RoomNotAvailble);
 			return ;
 		}
 
+		if (!room.invited && !(target.username == room.invited.username || target.username == room.hostname)) {
+			client.emit("RoomCheckError", ErrorMessage.NotInvited);
+			return ;
+		}
+
 		// If the user wants to play
-		if (data.play) {
+		if (data.play === true) {
 			// broadcast to the users in the room that there is a new player then add player in the room
 			const newPlayer = await this.getPlayerInfo(target.username);
 			room.broadcast("PlayerUpdate", {
@@ -301,6 +318,10 @@ async (params:type) => {
 			// If the user only wants to watch, add the user in the client list
 			target.isWatching(room.id);
 			room.addClient(target);
+			target.broadcast("JoinRoomRes", {
+				allowed: true,
+				roomID: room.id
+			});
 		}
 	}
 
@@ -368,6 +389,7 @@ async (params:type) => {
 	async getHistGame(@MessageBody() data: any, @ConnectedSocket() client: Socket, @Request() req) {
 		try{
 			let id_user = await this.mainServerService.getIdUserByUsername(data.username);
+			console.log(id_user);
 			//let id_user = await this.mainServerService.getIdUser(req);
 			const res = await this.dataSource.getRepository(GameEntity).createQueryBuilder("game")
 			.innerJoin("game.player1", "user1")
@@ -376,6 +398,7 @@ async (params:type) => {
 			.select(["game.player1_score", "game.player2_score", "user1.username", "user2.username", "game.date_game"]).getMany();
 			client.emit("resHistory", res);
 		}catch (e){
+			console.log("error get_history", e);
 			client.emit("error_resHistory", {error : "Bad data"});
 		}
 	}
@@ -507,8 +530,8 @@ async (params:type) => {
 
 	@SubscribeMessage('askFriendG')
 	async askFriend(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
-		const user = await this.userRep.findOne({where: {username: this.mainServerService.getUserConnectedBySocketId(client.id).username}});
-		const friend = await this.userRep.findOne({where: {username: data.username}});
+		const user = await this.userRep.findOne({where: {username_42: this.mainServerService.getUserConnectedBySocketId(client.id).username_42}});
+		const friend = await this.userRep.findOne({where: {username_42: data.username_42}});
 
 		if (!user || !friend) {
 			this.server.to(client.id).emit('error_askFriendG', {error: "User not found"});
@@ -535,8 +558,8 @@ async (params:type) => {
 
 	@SubscribeMessage('unAskFriendG')
 	async unAskFriend(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
-		const user = await this.userRep.findOne({where: {username: this.mainServerService.getUserConnectedBySocketId(client.id).username}});
-		const friend = await this.userRep.findOne({where: {username: data.username}});
+		const user = await this.userRep.findOne({where: {username_42: this.mainServerService.getUserConnectedBySocketId(client.id).username_42}});
+		const friend = await this.userRep.findOne({where: {username_42: data.username_42}});
 		if (!user || !friend)
 		{
 			this.server.to(client.id).emit('error_unAskFriendG', {error: "User not found"});
@@ -561,18 +584,55 @@ async (params:type) => {
 			target.updateRequest(user.username_42, false);
 
 			this.server.to(client.id).emit('success_unAskFriendG', {friend: friend.username});
-			return;
+			return ;
 		}
 	}
 
 	@SubscribeMessage('sendDirectMessageG')
-	async sendMessage(@MessageBody() data: any, @ConnectedSocket() client: any) {
-		console.log("sendMessageG")
+	async sendMessage(@MessageBody() data: any, @ConnectedSocket() client: any, @Request() req) {
+		let gameInvitation = data.message.startsWith("/gameInvitation/");
+		let messageToSave = data.message;
+		if (gameInvitation) {
+			let target = this.getClient(req);
+			if (target.state !== UserState.Available) {
+				client.emit("gameInvitationRes", {
+					success: false,
+					msg: "You are currently not able to create a new game."
+				})
+				return ;
+			}
+			let player = await this.getPlayerInfo(target.username);
+			let invited = await this.getPlayerInfo(data.username);
+			let args = messageToSave.split("/");
+			console.log(args);
+			//TODO parsing + error
+			let gameInfo = {
+				title: "", 
+				mapSize: parseInt(args[2]), 
+				maxPoint: parseInt(args[5]), 
+				puckSpeed: parseInt(args[3]),
+				paddleSize: parseInt(args[4]),
+				isPrivate: true
+			};
+			
+			//TODO get username by username42 (for the invited)
+			let room = new Room([player], [target], gameInfo, target.username, invited, this, this.gameRep, this.mainServerService, this.dataSource, this.userService)
+			this.rooms.set(room.id, room);
+			target.isPlaying(room.id);
+
+			client.emit("gameInvitationRes", {
+				success: true,
+				msg: "The game has been created. Do you want to join the room?",
+				roomID: room.id
+			});
+			messageToSave = `/gameInvitation/${room.id}/${args[6]}`;
+		}
+
 		const user = await this.userRepository.findOne({
-			where: {username: data.username}
+			where: {username_42: data.username_42}
 		});
 		const userSender = await this.userRepository.findOne({
-			where: {username: this.mainServerService.getUserConnectedBySocketId(client.id).username}
+			where: {username_42: this.mainServerService.getUserConnectedBySocketId(client.id).username_42}
 		});
 		if (!user || !userSender)
 		{
@@ -584,26 +644,30 @@ async (params:type) => {
 			this.server.to(client.id).emit('error_sendDirectMessageG', {error: 'User blocked'});
 			return;
 		}
-		const userConnected = this.mainServerService.getUserConnectedByUsername(data.username);
+		if (await this.friendSystemService.isUserBlocked(user.username, userSender.username))
+		{
+			this.server.to(client.id).emit('error_sendDirectMessageG', {error: 'You\'ve been blocked by this user'});
+			return;
+		}
+		const userConnected = this.mainServerService.getUserConnectedByUsername42(data.username_42);
 		if (userConnected && !(await this.friendSystemService.isUserBlocked(user.username, userSender.username))) {
-			let username42 = await this.getUsername42ByUsername(data.username);
-			let target = this.clients.get(username42);
+			let target = this.clients.get(user.username_42);
 			target.newMessageReceived(userSender.username);
 		}
-		let ret = await this.chatDirectMessageService.handleSendDirectMessage(this.mainServerService.getUserConnectedBySocketId(client.id).username, data.username, data.message);
+		let ret = await this.chatDirectMessageService.handleSendDirectMessage(this.mainServerService.getUserConnectedBySocketId(client.id).username_42, user.username_42, messageToSave);
 		if (ret)
-			this.server.to(client.id).emit('success_sendDirectMessageG', {message: data.message});
+			this.server.to(client.id).emit('success_sendDirectMessageG', {message: messageToSave});
 		else
 			this.server.to(client.id).emit('error_sendDirectMessageG', {error: 'An error occured'});
 		if (!(await this.friendSystemService.isUserBlocked(user.username, userSender.username)))
 		{
 			// For whatever reason if i use success_getDirectMessage it doesnt work, apparently is a bug about namespaces
-			this.server.to(client.id).emit('getDirectMessage', { id: ret.id_g, sender: ret.message_sender.username, recipient: ret.message_recipient.username, message: ret.string, date: ret.date});
+			this.server.to(client.id).emit('getDirectMessage', { id: ret.id_g, sender: ret.message_sender.username_42, recipient: ret.message_recipient.username_42, message: ret.string, date: ret.date});
 			if (userConnected)
 			{
-				let emitList = this.mainServerService.getUserConnectedListBySocketId(this.mainServerService.getUserConnectedByUsername(data.username).id);
+				let emitList = this.mainServerService.getUserConnectedListBySocketId(this.mainServerService.getUserConnectedByUsername42(data.username_42).id);
 				emitList.forEach(element => {
-					this.server.to(element.id).emit('getDirectMessage', { id: ret.id_g, sender: ret.message_sender.username, recipient: ret.message_recipient.username, message: ret.string, date: ret.date});
+					this.server.to(element.id).emit('getDirectMessage', { id: ret.id_g, sender: ret.message_sender.username_42, recipient: ret.message_recipient.username_42, message: ret.string, date: ret.date});
 				});
 			}
 		}

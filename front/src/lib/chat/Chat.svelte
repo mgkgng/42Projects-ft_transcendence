@@ -192,6 +192,7 @@
 		clearTimeout(timeoutPop);
 		showPop = false;
 	}
+	
 	onMount (() => {
 		/* Chat Updates*/
 		$client.socket.on("ban_user", (data: any) => {
@@ -301,6 +302,7 @@
 			for (let message of data.messages)
 				chatRoom.messages.push(new Message(message.id_chat_room.id_public_room, message.id_user.username, message.content_message, message.date_message))
 			chat = chat;
+			scrollToBottom();
 		});
 		$client.socket.on("get_message_room_page_res", (data: any) => {
 			console.log("Get Messages page :", data);
@@ -313,6 +315,8 @@
 			if (chatRoom.pages_messages.length < data.page_number + 1)
 				chatRoom.pages_messages.push([]);
 			chatRoom.pages_messages[data.page_number] = new_page;
+			if (!new_page.length && chatRoom.actual_page > 0)
+				chatRoom.actual_page--;
 			chat = chat;
 		});
 		$client.socket.on("get_users_room_res", (data: any) => {
@@ -329,6 +333,7 @@
 		$client.socket.on("new_message_room", (data: any) => {
 			chat.my_rooms.get(data.id_public_room).messages.push(new Message(data.id_public_room, data.username, data.content_message, data.date_message));
 			chat.my_rooms.get(data.id_public_room).pages_messages[0].push(new Message(data.id_public_room, data.username, data.content_message, data.date_message));
+			chat.my_rooms.get(data.id_public_room).is_new_message = true;
 			console.log("new_message_room: ",chat.my_rooms);
 			chat = chat;
 		});

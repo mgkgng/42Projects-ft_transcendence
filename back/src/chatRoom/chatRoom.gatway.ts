@@ -284,7 +284,7 @@ export class ChatRoomService {
 				.limit(parseInt(data.size_page))
 				.getMany();
 				await client.emit('get_message_room_page_res', {messages : res.reverse(), id_public_room: data.id_public_room, page_number: data.page_number});
-				console.log("Page send", res);
+				//console.log("Page send", res);
 			} catch (e) {
 				console.log("getMessage Error", e);
 				throw new WsException("No message in this room");
@@ -318,7 +318,8 @@ export class ChatRoomService {
 		const id_room = await this.mainServer.getIdRoom(data);
 		const message : any = data.content_message;
 		const date_creation : Date = new Date();
-		const user : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
+		const user : any = await this.dataSource.getRepository(UserEntity).findOne({where: {id_g: id_user}});
+		console.log(user);
 		const client_username = user.username;
 		const  querry = this.dataSource.createQueryRunner(); 
 		try{

@@ -87,13 +87,14 @@
 			$client.socket.off("JoinRoomRes");
 			$client.socket.off("JoinQueueError");
 			$client.socket.off("MatchFound");
+			$client.socket.off("OnGoingRes");
 			$client.socket.off("CreateRoomError"); 
 			$client.socket.off("RoomCheckError");
 		});
 	});
 </script>
 
-<Modal bind:this={chatModal} closeOnBgClick={false}>
+<Modal bind:this={chatModal} closeOnBgClick={true}>
 	<Chat itself={chatModal} />
 </Modal>
 
@@ -117,12 +118,12 @@
 	<JoinGame itself={joinGameModal} enterGameModal={enterGameModal}/>
 </Modal>
 
-<Modal bind:this={messageModal}>
-	<AlertMessage itself={messageModal} msg={modalMessage}/>
-</Modal>
-
 <Modal bind:this={roomModal} closeOnBgClick={false}>
 	<Room itself={roomModal} roomID={roomID}/>
+</Modal>
+
+<Modal bind:this={messageModal}>
+	<AlertMessage itself={messageModal} msg={modalMessage}/>
 </Modal>
 
 {#if $loaded}

@@ -43,7 +43,8 @@ export class MainServerGateway {
 	{
 		const user : any = (this.jwtServer.decode(req.handshake?.headers?.authorization.split(' ')[1]));
 		const client_username : string = user?.username;
-		let userConnected = {username: client_username, socket: req, status: "online"};
+		const client_username42 : string = user?.username_42;
+		let userConnected = {username: client_username, username_42: client_username42, socket: req, status: "online"};
 		global.userConnectedList.push(userConnected);
 		this.userRepository.update({username: client_username}, {last_connection: new Date()});
 	}
@@ -75,13 +76,14 @@ export class MainServerGateway {
 		}
 		else
 		{
+
 			const promiseParsedList = users.map( async (user) => {
 				let isUserFriendWithConnectedUser = await this.friendSystemService.isFriendWithByUsernameGetEnt(this.mainServerService.getUserConnectedBySocketId(client.id).username, user.username);
 				let isUserAskedByConnectedUser = await (await this.friendSystemService.getAskList(user.username)).find((ask) => ask.username === this.mainServerService.getUserConnectedBySocketId(client.id).username);
 				return {username: user.username, username_42: user.username_42, displayname: user.displayname, img_url: user.img_url,
 					campus_name: user.campus_name, campus_country: user.campus_country,
 					last_connection: user.last_connection, created_at: user.created_at,
-					status: this.mainServerService.getUserStatus(user.username),
+					status: this.mainServerService.getUserConnectedByUsername42(user.username_42) ? "online" : "offline",
 					is_friend: isUserFriendWithConnectedUser ? true : false,
 					is_asked: isUserAskedByConnectedUser ? true : false
 				}});

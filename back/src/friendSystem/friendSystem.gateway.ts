@@ -37,10 +37,10 @@ export class friendSystemGateway {
 
 	@SubscribeMessage('getFriendList')
 	async getFriendList(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
-		const user = await this.userRepository.findOne({where: {username: this.mainServerService.getUserConnectedBySocketId(client.id).username}});
+		const user = await this.userRepository.findOne({where: {username_42: this.mainServerService.getUserConnectedBySocketId(client.id).username_42}});
 		if (!user)
 		{
-			this.server.to(client.id).emit('error_getFriendList', {error: "User not found"});
+			this.server.to(client.id).emit('error_getFriendList', {error: "User not found SEXXX"});
 			return;
 		}
 		const friends = await this.friendSystemService.getFriendList(user.username);
@@ -69,7 +69,7 @@ export class friendSystemGateway {
 
 	@SubscribeMessage('getAskList')
 	async getAskedFriendList(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
-		const user = await this.userRepository.findOne({where: {username: this.mainServerService.getUserConnectedBySocketId(client.id).username}});
+		const user = await this.userRepository.findOne({where: {username_42: this.mainServerService.getUserConnectedBySocketId(client.id).username_42}});
 		if (!user)
 		{
 			this.server.to(client.id).emit('error_getAskList', {error: "User not found"});
@@ -94,8 +94,8 @@ export class friendSystemGateway {
 
 	@SubscribeMessage('askFriend')
 	async askFriend(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
-		const user = await this.userRepository.findOne({where: {username: this.mainServerService.getUserConnectedBySocketId(client.id).username}});
-		const friend = await this.userRepository.findOne({where: {username: data.username}});
+		const user = await this.userRepository.findOne({where: {username_42: this.mainServerService.getUserConnectedBySocketId(client.id).username_42}});
+		const friend = await this.userRepository.findOne({where: {username_42: data.username_42}});
 
 		if (!user || !friend)
 		{
@@ -127,8 +127,8 @@ export class friendSystemGateway {
 
 	@SubscribeMessage('unAskFriend')
 	async unAskFriend(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
-		const user = await this.userRepository.findOne({where: {username: this.mainServerService.getUserConnectedBySocketId(client.id).username}});
-		const friend = await this.userRepository.findOne({where: {username: data.username}});
+		const user = await this.userRepository.findOne({where: {username_42: this.mainServerService.getUserConnectedBySocketId(client.id).username_42}});
+		const friend = await this.userRepository.findOne({where: {username_42: data.username_42}});
 		if (!user || !friend)
 		{
 			this.server.to(client.id).emit('error_unAskFriend', {error: "User not found"});
@@ -156,8 +156,8 @@ export class friendSystemGateway {
 
 	@SubscribeMessage('acceptFriend')
 	async acceptFriend(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
-		const user = await this.userRepository.findOne({where: {username: this.mainServerService.getUserConnectedBySocketId(client.id).username}});
-		const friend = await this.userRepository.findOne({where: {username: data.username}});
+		const user = await this.userRepository.findOne({where: {username_42: this.mainServerService.getUserConnectedBySocketId(client.id).username_42}});
+		const friend = await this.userRepository.findOne({where: {username_42: data.username_42}});
 		if (!user || !friend)
 		{
 			this.server.to(client.id).emit('error_acceptFriend', {error: "User not found"});
@@ -185,8 +185,8 @@ export class friendSystemGateway {
 
 	@SubscribeMessage('refuseFriend')
 	async refuseFriend(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
-		const user = await this.userRepository.findOne({where: {username: this.mainServerService.getUserConnectedBySocketId(client.id).username}});
-		const friend = await this.userRepository.findOne({where: {username: data.username}});
+		const user = await this.userRepository.findOne({where: {username_42: this.mainServerService.getUserConnectedBySocketId(client.id).username_42}});
+		const friend = await this.userRepository.findOne({where: {username_42: data.username_42}});
 		if (!user || !friend)
 		{
 			this.server.to(client.id).emit('error_refuseFriend', {error: "User not found"});
@@ -219,8 +219,8 @@ export class friendSystemGateway {
 
 	@SubscribeMessage('removeFriend')
 	async removeFriend(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
-		const user = await this.userRepository.findOne({where: {username: this.mainServerService.getUserConnectedBySocketId(client.id).username}});
-		const friend = await this.userRepository.findOne({where: {username: data.username}});
+		const user = await this.userRepository.findOne({where: {username_42: this.mainServerService.getUserConnectedBySocketId(client.id).username_42}});
+		const friend = await this.userRepository.findOne({where: {username_42: data.username_42}});
 		if (!user || !friend)
 		{
 			this.server.to(client.id).emit('error_removeFriend', {error: "User not found"});
@@ -247,8 +247,15 @@ export class friendSystemGateway {
 
 	@SubscribeMessage('unblockUser')
 	async unblockUser(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
+		const user = await this.userRepository.findOne({where: {username_42: this.mainServerService.getUserConnectedBySocketId(client.id).username_42}});
+		const dude = await this.userRepository.findOne({where: {username_42: data.username_42}});
+		if (!user || !dude)
+		{
+			this.server.to(client.id).emit('error_unblockUser', {error: "User not found"});
+			return;
+		}
 	  try {
-		const success = await this.friendSystemService.unblockUser(this.mainServerService.getUserConnectedBySocketId(client.id).username, data.username);
+		const success = await this.friendSystemService.unblockUser(user.username, dude.username);
 		this.server.to(client.id).emit('success_unblockUser', {success: true});
 	  } catch (error) {
 		this.server.to(client.id).emit('error_unblockUser', {error: error.message});
@@ -257,8 +264,15 @@ export class friendSystemGateway {
 
 	@SubscribeMessage('blockUser')
 	async blockUser(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
+		const user = await this.userRepository.findOne({where: {username_42: this.mainServerService.getUserConnectedBySocketId(client.id).username_42}});
+		const dude = await this.userRepository.findOne({where: {username_42: data.username_42}});
+		if (!user || !dude)
+		{
+			this.server.to(client.id).emit('error_blockUser', {error: "User not found"});
+			return;
+		}
 	  try {
-		const success = await this.friendSystemService.blockUser(this.mainServerService.getUserConnectedBySocketId(client.id).username, data.username);
+		const success = await this.friendSystemService.blockUser(user.username, dude.username);
 		this.server.to(client.id).emit('success_blockUser', {success: true});
 	  } catch (error) {
 		this.server.to(client.id).emit('error_blockUser', {error: error.message});
@@ -267,8 +281,15 @@ export class friendSystemGateway {
 
 	@SubscribeMessage('isUserBlocked')
 	async isUserBlocked(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
-	  try {
-		const success = await this.friendSystemService.isUserBlocked(this.mainServerService.getUserConnectedBySocketId(client.id).username, data.username);
+		const user = await this.userRepository.findOne({where: {username_42: this.mainServerService.getUserConnectedBySocketId(client.id).username_42}});
+		const dude = await this.userRepository.findOne({where: {username_42: data.username_42}});
+		if (!user || !dude)
+		{
+			this.server.to(client.id).emit('error_isUserBlocked', {error: "User not found"});
+			return;
+		}
+		try {
+		const success = await this.friendSystemService.isUserBlocked(user.username, dude.username);
 		this.server.to(client.id).emit('success_isUserBlocked', {success: true, isUserBlocked: success});
 	  } catch (error) {
 		this.server.to(client.id).emit('error_isUserBlocked', {error: error.message});

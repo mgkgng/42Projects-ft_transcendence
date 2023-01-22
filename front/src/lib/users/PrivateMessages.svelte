@@ -4,6 +4,7 @@
 		height: 560px;
 		display: flex;
 		padding: 0;
+		gap: 0;
 
 		.from {
 			position: relative;
@@ -33,57 +34,138 @@
 					object-fit: cover;
 				}
 			}
-
-			
+			.add {
+				position: absolute;
+				left: 0;
+			}
 		}
 
 		.chat {
-			width: 80%;
+			width: 70%;
 			height: 100%;
 			gap: 0;
+
 			.read {
+				position: relative;
 				height: 90%;
 				width: 100%;
 				overflow-y: scroll;
+				gap: 0;
+
+				.load-more {
+					position: absolute;
+					top: 0;
+					left: 20%;
+					justify-content: center;
+					width: 60%;
+					height: 2em;
+					transition: .3s;
+					border-radius: 0 0 .5em .5em;
+
+					&:hover {
+						background-color: transparentize(#fff, .8);
+					}
+				}
+
+				&:first-child { 
+					.content {
+						margin-top: '2.2em'; 
+					}
+				}
+
+
 				.line {
 					width: 100%;
-					position: relative;
+
+
 					.content {
+						position: relative;
 						word-wrap: break-word;
+						min-width: 15%;
 						max-width: 50%;
 						padding: .3em .5em;
-						background-color: rgb(75, 75, 75);
+						background-color: $main-lowshade;
 						border-radius: .4em;
+						margin-bottom: .2em;
+						margin-left: .4em;
+						margin-right: .4em;
+						float: left;
 
-						.username{
-							cursor: pointer;
-							text-decoration: underline;
+						.invitation {
+							width: 15em;
+							padding-right: 3em;
+							gap: .2em;
+
+							.invite-from {
+								width: 100%;
+							}
+
+							.invitation-msg {
+								border-radius: .5em;
+								margin-top: .2em;
+								background-color: transparentize(#fff, .6);
+								padding: .6em .4em;
+							}
+
+							button {
+								height: 2em;
+								&:hover {
+									background-color: transparentize(#fff, .8);
+									border-radius: .3em;
+								}
+							}
+						}
+
+						.message {
+							min-height: 1em;
+							padding-right: 2.5em;
+							letter-spacing: .5px;
+						}
+						.date {
+							position: absolute;
+							right: .5em;
+							top: .7em;
+							font-size: 12px;
 						}
 					}
+
 					.me {
 						float: right;
-						background-color: blue;
+						background-color: $submain-lowshadeblue;
 						grid-column: 2;
-					}
-					.date {
-						font-size: 12px;
 					}
 				}
 			}
-			.write{
+			.write {
+				position: relative;
 				width: 100%;
 				height: 10%;
 				padding:0;
 				display: flex;
 				flex-direction: row;
 				align-items: center;
-			input[type="text"]{
-				width: 80%;
+
+				input {
+					width: 85%;
+					height: 100%;
+					padding-left: .8em;
+					padding-right: .5em;
+					transition: .2s;
+					&:hover, &:focus-within {
+						background-color: transparentize(#fff, .8);
+					}
+				}
+				button {
+					position: absolute;
+					width: 15%;
+					height: 100%;
+					right: 0;
+					// border-radius: .3em;
+					transition: .2s;
+
+					&:hover { background-color: transparentize(#fff, .9); }
+				}
 			}
-			button{
-				width: 20%;
-			}
-		}
 		}
 
 		.no-selected {
@@ -107,11 +189,17 @@
 		.add {
 			position: absolute;
 			border-radius: .2rem;
+			justify-content: center;
+			align-items: center;
+			width: 2rem;
+			height: 2rem;
 			right: 0;
 			bottom: 0;
-			font-size: 56px;
+			font-size: 36px;
+			transition: .3s;
+			padding-bottom: .2aem;
 			&:hover {
-				background-color: transparentize(#fff, .6);
+				background-color: transparentize(#fff, .5);
 			}
 		}
 	}
@@ -127,38 +215,46 @@
     import { client } from "$lib/stores/client";
     import { user } from "$lib/stores/user";
 	import { afterUpdate } from 'svelte';
+	import { beforeUpdate } from 'svelte';
     import ChatRoom from "../chat/ChatRoom.svelte";
+    import Chat from "../chat/Chat.svelte";
+    import Invitation from "./Invitation.svelte";
+
 	export let itself: any;
 
 	let writeMessageModal: any;
+	let invitationModal: any;
+
 	let exchanges: Map<string, any> = new Map<string, any>();
 	let allMessages: Map<string, any> = new Map<string, any>();
 	let allMessagePage: number = 1;
 	let allMessagePageSize: number = 20;
-	let lastScrollHeight: number = 0; // Used to set the scrollHeight to the last value before getting last messages
 	let renderButtonToGetMoreMessages = true;
-	let allMessagesHaveChanged = false;
+	let getDirectMessage = true;
+	let selectMessageOrBlocked : string = "Please select a message";
 
 	let selected: string = "";
-
 	let userInfo: any;
-	user.subscribe((user: any) => { userInfo = user; });
 
+	let roomID: string = "";
+	let message = '';
+
+	user.subscribe((user: any) => { userInfo = user; });
+	
 	onMount(() => {
 		$client.socket.on("success_getMessageUserList", (data: any) => {
 			for (let user of data.messageUserList) {
-				exchanges.set(user.username, user);
+				exchanges.set(user.username_42, user);
 				exchanges = exchanges;
 			}
 		});
 		
 		$client.socket.on("success_getDirectMessage", (data: any) => {
-			console.log("success_getDirectMessage", data);
-			if (data.messageHistory.length == 0)
+			if (data.messageHistory.length < 20)
 			{
 				renderButtonToGetMoreMessages = false;
 			}
-			let from = (data.messageHistory[0].recipient == userInfo.username) ? data.messageHistory[0].sender : data.messageHistory[0].recipient
+			let from = (data.messageHistory[0].recipient == userInfo.username_42) ? data.messageHistory[0].sender : data.messageHistory[0].recipient
 			// if allMessage from user is not defined, create it otherwise append the message received
 			if (!allMessages.has(from)) {
 				allMessages.set(from, data.messageHistory);
@@ -185,45 +281,51 @@
 				allMessages.set(from, oldMessages);
 			}
 			allMessages = allMessages;
-			allMessagesHaveChanged = true;
+			selectMessageOrBlocked = "Please select a message";
 		});
 
 		// this will append when you send a message (sendDirectMessageG)
 		$client.socket.on("getDirectMessage", (lastMessage: any) => {
-			console.log("getDirectMessage", lastMessage);
-			let from = (lastMessage.recipient == userInfo.username) ? lastMessage.sender : lastMessage.recipient
+			let from = (lastMessage.recipient == userInfo.username_42) ? lastMessage.sender : lastMessage.recipient
 			let oldMessage = allMessages.get(from);
 			let found = false;
 			for (let message of oldMessage) {
 				if (message.id == lastMessage.id) {
 					found = true;
-					console.log("here");
 					break;
 				}
 			}
-			console.log("or here")
 			if (found == false)
 			{
-				console.log("pushed");
 				oldMessage.push(lastMessage);
 				allMessages.set(from, oldMessage);
 				allMessages = allMessages;
-				allMessagesHaveChanged = true;
+				getDirectMessage = true;
 			}
+			console.log("getDirectMessage", lastMessage)
 		});
 
 		$client.socket.on("error_getDirectMessage", (data: any) => {
 			console.log("error", data);
+			selectMessageOrBlocked = data.error;
 		});
 
 		$client.socket.on("success_sendDirectMessageG", (data: any) => {
 			console.log("success_sendDirectMessageG", data);
+			writeMessageModal.close();
+			if (data.message.startsWith('/gameInvitation/')) {
+				roomID = data.message.split('/')[2];
+				invitationModal.open();
+			}
+		});
+
+		$client.socket.on("error_sendDirectMessageG", (data: any) => {
+			console.log("error_sendDirectMessageG", data);
 		});
 
 		$client.socket.on("newMessageArrived", async (senderUsername: string) => {
-			console.log("selected", selected, senderUsername);
 			if (selected == senderUsername) {
-				$client.socket.emit("getDirectMessage", { username: user.username, page: allMessagePage, pageSize: allMessagePageSize});
+				$client.socket.emit("getDirectMessage", { username_42: user.username_42, page: allMessagePage, pageSize: allMessagePageSize});
 			}
 			// refresh the message list
 			$client.socket.emit("getMessageUserList");
@@ -239,36 +341,43 @@
 	});
 
 	afterUpdate(() => {
-		if (allMessagesHaveChanged)
+		if (getDirectMessage)
 		{
 			scrollToBottom();
-			allMessagesHaveChanged = false;
+		}
+		else
+		{
+			// const separator = document.querySelector('.separator');
+			// if (separator)
+			// 	separator.parentNode.scrollTop = separator.offsetTop;
+			document.querySelector(".separator")?.scrollIntoView(true);
 		}
 	});
 
-
-	function getMessageAndChangeSelected(selected_username: string)
+	function getMessageAndChangeSelected(selected_username_42: string)
 	{
-		selected = selected_username;
-		$client.socket.emit("getDirectMessage", { username: selected_username, page: allMessagePage, pageSize: allMessagePageSize});
+		selected = selected_username_42;
+		$client.socket.emit("getDirectMessage", { username_42: selected_username_42, page: allMessagePage, pageSize: allMessagePageSize});
 	}
 
-	let message = '';
-
-	async function sendDirectMessageAndUpdate() {
-		$client.socket.emit('sendDirectMessageG', {username: selected, message: message});
+	function sendDirectMessageAndUpdate() {
+		if (!message.length)
+			return ;
+		console.log("sendDirectMessageG", {username_42: selected, message: message})
+		$client.socket.emit('sendDirectMessageG', {username_42: selected, message: message});
 		message = '';
 	}
 
-	function handleLoadMoreMessage(event) {
-		$client.socket.emit("getDirectMessage", { username: selected, page: ++allMessagePage, pageSize: allMessagePageSize});
-	}
+    let handleLoadMoreMessage = () => {
+        $client.socket.emit("getDirectMessage", { username_42: selected, page: ++allMessagePage, pageSize: allMessagePageSize});
+    }
 
 	function scrollToBottom() {
 		let messages = document.querySelector(".read");
 		if (messages)
 		{
 			messages.scrollTop = messages.scrollHeight;
+			getDirectMessage = false;
 		}
 	}
 </script>
@@ -277,31 +386,58 @@
 	<WriteMessage itself={writeMessageModal} sendTo={[]}/>
 </Modal>
 
+<Modal bind:this={invitationModal}>
+	<Invitation itself={invitationModal} roomID={roomID}/>
+</Modal>
+
 <div class="flex window messages">
 	{#if exchanges.size}
 		<div class="from">
 			{#each [...exchanges.values()] as user}
-			<div class="flex line" on:click={() => {getMessageAndChangeSelected(user.username)}}>
-				<img src="{(user.img) ? user.img : user.img_url}" alt="from">
+			<div class="flex line" on:click={() => {getMessageAndChangeSelected(user.username_42)}}>
+				{#if ((user.img) ? user.img : user.img_url).includes("cdn.intra.42.fr")}
+					<img src="{(user.img) ? user.img : user.img_url}" alt="from">
+				{:else}
+					<img src="http://{location.hostname}:3000{(user.img) ? user.img : user.img_url}" alt="from">
+				{/if}
 				<p>{user.username}</p>
 			</div>
 			{/each}
-			<button class="add" on:click={() => {writeMessageModal.open(); }}>+</button>
+			<button class="flex add" on:click={() => {writeMessageModal.open(); }}>+</button>
 		</div>
 		{#if allMessages.has(selected)}
 		<div class="vflex chat">
 			<div class="vflex read">
-				{#if renderButtonToGetMoreMessages}
-					<button on:click={handleLoadMoreMessage}>Load more message</button>
-				{/if}
-				{#each allMessages.get(selected) as message}
-				<div class="line">
-					<p class="content {(userInfo.username == message.sender) ? "me" : ""}">
-						{message.message}
-					</p>
-					<div class="date">{format_date_hours(message.date)}</div>
+				{#each allMessages.get(selected) as message, i}
+				<div class="line" style="margin-top: {(i == 0 && renderButtonToGetMoreMessages) ? "2.2em" : "0em"}">
+					<div class="content {(userInfo.username_42 == message.sender) ? "me" : ""}">
+						{#if !message.message.startsWith('/gameInvitation/')}
+						<div class="message">{message.message}</div>
+						{:else}
+						<div class="vflex invitation">
+							<div class="invite-from">{message.sender} is inviting to play a game!</div>
+							<div class="invitation-msg">{message.message.split('/')[3].replaceAll('&sl', '/')}</div>
+							<button on:click={() => {
+								$client.socket.emit("JoinRoom", {
+									roomID: message.message.split('/')[2],
+									play: true
+								});
+							}}>Join</button>
+						</div>
+						{/if}
+						<div class="invitation"></div>
+						<div class="date">{format_date_hours(message.date)}</div>
+					</div>
 				</div>
+				{#if i % 19 == 0 && i != 0 && renderButtonToGetMoreMessages}
+					<div class="separator"></div>
+				{/if}
 				{/each}
+				{#if renderButtonToGetMoreMessages}
+				<div class="flex load-more">
+					<button on:click={handleLoadMoreMessage}>Load more message</button>
+				</div>
+				{/if}
 			</div>
 			<div class="write">
 				<input type="text" bind:value={message} placeholder="Type your message here" class="messageInput" on:keydown={event => {if (event.key === 'Enter') sendDirectMessageAndUpdate()} } />
@@ -310,14 +446,14 @@
 		</div>
 		{:else}
 		<div class="flex no-selected">
-			<p>Please select a message</p>
+			<p>{selectMessageOrBlocked}</p>
 		</div>
 		{/if}
 	{:else}
 		<div class="flex no-users">
 			<p>You don't have any message yet.</p>
 		</div>
-		<button class="add" on:click={() => { writeMessageModal.open(); }}>+</button>
+		<button class="flex add" on:click={() => { writeMessageModal.open(); }}>+</button>
 	{/if}
 	<CloseButton window={itself} />
 </div>

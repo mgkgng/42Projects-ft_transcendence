@@ -17,4 +17,5 @@ import { ChatRoomService } from './chatRoom.gatway';
 	],				
     providers: [ChatRoomService, MainServerService, JwtService,]
 })
+
 export class ChatRoomModule{}

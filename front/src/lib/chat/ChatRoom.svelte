@@ -47,11 +47,13 @@
 				height: 90%;
 				width: 100%;
 				overflow-y: scroll;
+				scroll-behavior: auto;
 				gap: 0;
 
 				.line {
 					width: 100%;
 					position: relative;
+
 					.content {
 						min-width: 25%;
 						word-wrap: break-word;
@@ -62,6 +64,10 @@
 						margin-top: .3em;
 						margin-right: .5em;
 						gap: 0;
+
+						&:last-of-type {
+							//TODO margin bottom for the last message
+						}
 
 						.info {
 							height: 1.5em;
@@ -89,10 +95,12 @@
 							}
 						}
 
-						.message {
-							padding-left: .3em;
-						}
+						.message { padding-left: .3em; }
+
 					}
+
+					
+
 					.me {
 						float: right;
 						background-color: $submain-lowshadeblue;
@@ -101,7 +109,6 @@
 					.date {
 						font-size: 12px;
 					}
-					&:last-child { margin-bottom: .5em; }
 				}
 			}
 			.write {
@@ -210,7 +217,6 @@
 	export let chat: Chatt;
 	export let roomID: string;
 
-
 	let chatRoomSettingsModal: any;
 	let chatUsersSettingsModal: any;
 	let chatAddUsers : any;
@@ -218,7 +224,8 @@
 
 	let profileUser: any;
 	let act_user : any = { username : ""};
-
+	let firstUpdate : boolean = false;
+	$: setFirstUpdate(roomID);
 	let newMessage: string = "";
 
 	user.subscribe((value : any) => {
@@ -230,12 +237,30 @@
 			profileUser = data.users[0]; 
 			console.log("succes_getUserinDB: ", profileUser, data)
 		});
+		firstUpdate = false;
 	});
 	function scrollToBottom() {
-		let chatBox = document.querySelector('.read');
-		if (chatBox)
+		let chatBox : any = document.querySelector('.read');
+		let sep: any = document.getElementById('separator-page');
+		if (firstUpdate == false && sep)
 		{
-			chatBox.scrollTop = chatBox.scrollHeight;
+			sep.scrollIntoView();
+			firstUpdate = true;
+			return;
+		}	
+		else if (sep && (chat.my_rooms.get(roomID).actual_page != chat.my_rooms.get(roomID).old_page || chat.my_rooms.get(roomID).is_new_message))
+		{
+			if (chat.my_rooms.get(roomID).is_new_message)
+			{
+				chatBox.scrollTo({top: chatBox.scrollHeight,behavior: "smooth"});
+				chat.my_rooms.get(roomID).actual_page = 0;
+				chat.my_rooms.get(roomID).old_page = chat.my_rooms.get(roomID).actual_page;
+				chat.my_rooms.get(roomID).is_new_message = false;
+			}
+			else
+				sep.scrollIntoView();
+			chat.my_rooms.get(roomID).old_page = chat.my_rooms.get(roomID).actual_page;
+			chat = chat;
 		}
 	}
 	function sendMessageAndUpdate()
@@ -245,6 +270,21 @@
 			content_message: newMessage
 		});
 		newMessage = "";
+	}
+	function handleScroll(event) {
+		if (event.target.scrollTop === 0) {
+			console.log("emit");
+			$client.socket.emit("get_message_room_page", { id_public_room: roomID, page_number: ++chat.my_rooms.get(roomID).actual_page , size_page: 100});
+		}
+		else if(event.target.scrollTop >= event.target.scrollHeight - event.target.clientHeight - 1 && chat.my_rooms.get(roomID).actual_page > 0)
+		{
+			chat.my_rooms.get(roomID).actual_page--;
+			chat = chat;
+		}
+	}
+	function setFirstUpdate(roomID : any)
+	{
+		firstUpdate = false;
 	}
 	afterUpdate(() => {
 		scrollToBottom();
@@ -279,10 +319,10 @@
 			</button>
 			{/if}
 		</div>
-		<div class="vflex read">
+		<div class="vflex read"  on:scroll={handleScroll}>
 		<!-- {#each chat.my_rooms.get(roomID).messages as message} -->
 		<!-- {#each chat.my_rooms.get(roomID).messages.slice(chat.my_rooms.get(roomID).messages.length - 100  >= 1 ?  chat.my_rooms.get(roomID).messages.length - 100 : 0, chat.my_rooms.get(roomID).messages.length) as message} -->
-		{#if chat.my_rooms.get(roomID).pages_messages[chat.my_rooms.get(roomID).actual_page] != null}
+		{#if  chat.my_rooms.get(roomID).pages_messages[chat.my_rooms.get(roomID).actual_page] != null}
 			{#each chat.my_rooms.get(roomID).pages_messages[chat.my_rooms.get(roomID).actual_page] as message}
 				<div class="line">
 					<div class="vflex content {(act_user.username == message.username) ? "me" : ""}">
@@ -300,6 +340,25 @@
 					</div>
 				</div>
 			{/each}
+			{#if chat.my_rooms.get(roomID).pages_messages[0].length}
+				<div id="separator-page"></div>
+			{/if}
+			{#if  chat.my_rooms.get(roomID).actual_page > 0}
+				{#each chat.my_rooms.get(roomID).pages_messages[chat.my_rooms.get(roomID).actual_page - 1] as message}
+					<div class="line">
+						<div class="vflex content {(act_user.username == message.username) ? "me" : ""}">
+							<p on:click={() => {
+							//TODO get profile User info
+							profileUser = {};
+							$client.socket.emit("getUserinDB", {username : message.username});
+							userProfileModal.open();
+						}}><u class="username">{message.username}:</u></p>
+							<div>{message.message}</div>
+							<div>{format_date_hours(message.date)}</div>
+						</div>
+					</div>
+				{/each}
+			{/if}
 		{/if}
 		</div>
 		<div class="write">

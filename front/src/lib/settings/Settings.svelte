@@ -96,11 +96,25 @@
 			}
 		}		
 	}
+	.popup-container {
+		position: fixed;
+		width: 20%;
+		left: 45%;
+		top: 5%;
+		z-index: 999999;
+		background-color: rgb(75, 75, 75);
+	}
+
+	.popup {
+		color: white;
+		padding: 20px;
+		border-radius: 10px;
+	}
 </style>
 
 <script lang="ts">
     import { user } from "$lib/stores/user";
-    import { onMount } from "svelte";
+    import { onMount, afterUpdate, beforeUpdate } from "svelte";
     import { client } from "$lib/stores/client";
     import Modal from "$lib/tools/Modal.svelte";
     import ChangeUsername from "$lib/settings/ChangeUsername.svelte";
@@ -112,6 +126,7 @@
 	export let itself: any;
 
 	let image: any = ($user.img) ? $user.img : $user.img_url;
+	$ : updateFrontImg($user);
 	let username = $user.username
 	let doubleAuth: boolean = $user.is_2fa;
 
@@ -121,19 +136,46 @@
 
 	let changeUsernameModal: any;
 	let confirmLeaveModal: any;
-	let qrCodeModal: any;
+	let qrCodeModalll: any;
 	let qrCodeUrl: any;
+	let fileInput: any = null;
+
+	/*Popup utils*/
+	let showPop = false;
+	let popUpMessage = "BITE";
+	let timeoutPop : any;
+
+	function updateFrontImg(user : any)
+	{
+		image = (user.img) ? user.img : user.img_url;
+		original[0] = image; 
+	}
+	function showPopup(str : any) {
+		showPop = true;
+		popUpMessage = str;
+		timeoutPop = setTimeout(() => {
+     	   hidePopup();
+    	}, 2000);
+	}
+
+	function hidePopup() {
+		clearTimeout(timeoutPop);
+		showPop = false;
+	}
 
 	/* Image */
-	let fileInput: any;
 
 	const onFileSelected = (e: any) => {
 		let file = e.target.files[0];
 		let reader = new FileReader();
+		try{
 			reader.readAsDataURL(file);
 			reader.onload = e => {
 				image = e.target?.result
 			};
+		}catch(e){
+			console.log("error file");
+		}
 	}
 
 	const uploadImage = async () => {
@@ -152,9 +194,23 @@
 
 		let result = await response.json();
 		console.log("uploadImage",result);
+		if (result.success == "Image changed")
+		{
+			$client.socket.emit("get_user_info");
+			showPopup("Image changed");
+		}
+		else
+		{
+			image = original[0];
+			showPopup(result.message);
+		}
 	}
-
+	function lunchVerif(data : any)
+	{
+		qrCodeUrl = data;
+	}
 	onMount(() => {
+		console.log(image);
 		$client.socket.on("change_username_res", (data: any) => {
 			user.update((u: any) => {
 				u.username = data.new_username;
@@ -164,9 +220,8 @@
 		});
 
 		$client.socket.on("try_active_double_auth_res", (data: any) => {
-			console.log(data);
-			qrCodeUrl = data;
-			qrCodeModal.open();
+			console.log("QrCode:", data);
+			lunchVerif(data);
 		});
 
 		$client.socket.on("active_double_auth_res", (data: any) => {
@@ -184,13 +239,16 @@
 			});
 			original[2] = false;
 		});
-
 		return (() => {
-			$client.socket.off("change_username_res");
-			$client.socket.off("active_double_auth_res");
-			$client.socket.off("disable_double_auth_res");
+			//$client.socket.off("change_username_res");
+			//$client.socket.off("active_double_auth_res");
+			//$client.socket.off("disable_double_auth_res");
 		});
 
+	});
+	afterUpdate(() => {
+	});
+	beforeUpdate(() =>{
 	});
 </script>
 
@@ -202,14 +260,29 @@
 	<ConfirmLeave itself={confirmLeaveModal} settingModal={itself} />
 </Modal>
 
-<Modal bind:this={qrCodeModal} closeOnBgClick={false}>
-	<QRCodeModal itself={qrCodeModal} qrCodeUrl={qrCodeUrl} />
+<Modal bind:this={qrCodeModalll} closeOnBgClick={false}>
+	<QRCodeModal itself={qrCodeModalll} qrCodeUrl={qrCodeUrl} />
 </Modal>
 
 <div class="vflex window settings">
+	{#if showPop}
+		<div class="popup-container">
+			<div class="popup">
+				<p>{popUpMessage}</p>
+			</div>
+		</div>
+	{/if}
 	<h2>Settings</h2>
 	<div class="image">
-		<img src="{image}" alt="profile">
+		{#if image == (($user.img) ? $user.img : $user.img_url)}
+			{#if image.includes("cdn.intra.42.fr")}
+				<img src="{image}" alt="profile">
+			{:else}
+				<img src="http://{location.hostname}:3000{image}" alt="profile">
+			{/if}
+		{:else}
+			<img src={image} alt="profile">
+		{/if}
 		<button on:click={() => { fileInput.click(); }}>modify</button>
 		<input style="display:none" type="file" accept=".jpg, .jpeg, .png" on:change={(e) => onFileSelected(e)} bind:this={fileInput}/>
 	</div>
@@ -239,7 +312,11 @@
 			if (original[1] != username)
 				$client.socket.emit("change_username", { new_username: username });
 			if (original[2] != doubleAuth)
+			{
 				$client.socket.emit((doubleAuth) ? "try_active_double_auth" : "disable_double_auth");
+				if (doubleAuth)
+					qrCodeModalll.open();
+			}
 		}}>Save Changes</button>
 	</div>
 </div>

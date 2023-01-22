@@ -22,7 +22,7 @@ export class ImageService {
     }
 
     async changeUserImage(username : string, image : ImageEntity) {
-        const user = await this.userRepository.findOne({where:{username : username}});
+        const user = await this.userRepository.findOne({where:{username_42 : username}});
         if (!user)
             return null;
         if (user.img_url.includes("/image/"))

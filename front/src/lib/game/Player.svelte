@@ -26,6 +26,7 @@
 				font-size: 12px;
 				border-radius: .1em;
 			}
+
 			.host {
 				border: 1.5px solid $red;
 				color: $red;
@@ -62,6 +63,8 @@
 			padding-top: .08em;
 			margin-top: 5px;
 		}
+
+		.invited { filter: brightness(50%); }
 	}
 
 	.left {
@@ -74,22 +77,35 @@
 	export let player: any;
 	export let left: boolean;
 	export let hostname: string;
+	export let invited: any;
 	export let ready: boolean;
 
 	//TODO precision username_42 & username
 </script>
 
 <div class="vflex player {(left) ? "left" : ""}">
-	{#if player}
+	{#if player || invited}
 	<div class="img-box">
-		{#if player.info.username == hostname}
-		<span class="host">HOST</span>
-		{:else if ready}
-		<span class="ready">READY</span>
+		{#if player}
+			{#if player.info.username == hostname}
+			<span class="host">HOST</span>
+			{:else if ready}
+			<span class="ready">READY</span>
+			{/if}
+			{#if player.info.img_url.includes("cdn.intra.42.fr")}
+			<img src={player.info.img_url} alt="profile"/>
+			{:else}
+			<img src='http://{location.hostname}:3000{player.info.img_url}' alt="profile"/>
+			{/if}
+		{:else}
+			{#if invited.img_url.includes("cdn.intra.42.fr")}
+			<img class="invited" src={invited.img_url} alt="profile"/>
+			{:else}
+			<img class="invited" src='http://{location.hostname}:3000{invited.img_url}' alt="profile"/>
+			{/if}
 		{/if}
-		<img src={player.info.img_url} alt="profile"/>
 	</div>
-	<div class="username">{player.info.username_42}</div>
+	<div class="username {(player) ? "" : "invited"}">{(player) ? player.info.username_42 : invited.username}</div>
 	{:else}
 	<div class="who">?</div>
 	{/if}

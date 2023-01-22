@@ -277,7 +277,7 @@
 <div class="vflex window friends">
 	<h2>Friends</h2>
 	<button class="update" on:click={() => {
-		$client.socket.emit("getFriendList", { username: userInfo.username });
+		$client.socket.emit("getFriendList", { username_42: userInfo.username_42 });
 		$client.socket.emit("getAskList");
 	}}>
 		<img src="update.png" alt="update">
@@ -294,7 +294,11 @@
 					searchUser = "";
 					userSearchList = [];
 				}}>
+				{#if user.img_url.includes("cdn.intra.42.fr")}
 					<img src="{user.img_url}" alt="user">
+				{:else}
+					<img src="http://{location.hostname}:3000{user.img_url}" alt="user">
+				{/if}
 					<div class="user">{user.username}</div>
 					<div class="status {(user.status == "online") ? "online" : (user.status == "in game") ? "playing" : ""}"></div>
 				</div>

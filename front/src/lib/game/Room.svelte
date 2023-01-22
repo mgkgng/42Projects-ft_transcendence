@@ -173,6 +173,7 @@
 	let hostname: string;
 	let player1: any = undefined;
 	let player2: any = undefined;
+	let invited: any = undefined;
 
 	let switched: boolean = false;
 	let update: boolean = false;
@@ -262,6 +263,7 @@
 				started = true;
 			player1 = data.player1;
 			player2 = data.player2;
+			invited = data.invited;
 			userType = (player1?.info.username_42 == userInfo.username) ? UserType.Player1 :
 				(player2?.info.username_42 == userInfo.username) ? UserType.Player2 :
 				UserType.Watcher;
@@ -365,7 +367,7 @@
 	<!-- <div class="flex pong" style="width: {MapSize[gameInfo.mapSize][1] + 200}px; height: {MapSize[gameInfo.mapSize][0]}px;"> -->
 	<div class="flex pong">
 		<div class="vflex side">
-			<Player player={(!switched) ? player2 : player1} left={true} hostname={hostname} ready={ready}/>	
+			<Player player={(!switched) ? player2 : player1} left={true} hostname={hostname} invited={invited} ready={ready}/>	
 			<h1>{(!switched && player2) ? player2.score : ((!switched && !player2) || (switched && !player1)) ? "0" : player1?.score}</h1>
 		</div>
 		<div bind:this={game} class="pong-game">
@@ -390,7 +392,7 @@
 			{/if}
 		</div>
 		<div class="vflex side right">
-			<Player player={(!switched) ? player1 : player2} left={false} hostname={hostname} ready={ready}/>
+			<Player player={(!switched) ? player1 : player2} left={false} hostname={hostname} invited={undefined} ready={ready}/>
 			<h1>{(!switched && player1) ? player1?.score : (player2) ? player2.score : "0"}</h1>
 		</div>
 	</div>
@@ -407,7 +409,7 @@
 				tryStart = true;
 				$client.socket.emit("StartGame", roomID)
 			}}>START</button>
-			{:else}
+			{:else if player1?.info.username == userInfo.username || player2?.info.username == userInfo.username}
 			<button class="ready" on:click={()=>{
 				$client.socket.emit("isReady", {
 					roomID: roomID,

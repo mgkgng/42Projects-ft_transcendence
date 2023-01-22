@@ -47,7 +47,11 @@
 	<div class="vflex msg">
 		<h2>THE WINNER IS ...</h2>
 		<h3>{winner.info.username}!</h3>
-		<img src="{winner.info.img_url}" alt="winner" />
+		{#if winner.info.img_url.includes("cdn.intra.42.fr")}
+			<img src="{winner.info.img_url}" alt="winner" />
+		{:else}
+			<img src="http://{location.hostname}:3000{winner.info.img_url}" alt="winner" />
+		{/if}
 		<div class="flex score">
 			<h1>{(scores[0] > scores[1]) ? scores[0]: scores[1]} : {(scores[0] > scores[1]) ? scores[1]: scores[0]}</h1>
 		</div>

@@ -42,7 +42,8 @@ export const UserState = {
 	Available: 0,
 	Waiting: 1,
 	Playing: 2,
-	Watching: 3
+	Watching: 3,
+	Inviting: 4
 }
 
 export const ErrorMessage = {
@@ -54,7 +55,8 @@ export const ErrorMessage = {
 	RoomDestroyed: "This room doesn't exist anymore.",
 	RoomNotAvailble: "The room is not available.",
 	RoomNotReady: "Your opponent should be ready.",
-	TakenUsername: "The username is already taken."
+	TakenUsername: "The username is already taken.",
+	NotInvited: "You are not invited to this room."
 }
 
 export const PongConfig = {
