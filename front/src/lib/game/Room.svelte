@@ -133,7 +133,7 @@
 	.puck, .shadow {
 		position: absolute;
 		margin: 0;
-
+		width: 16px;
 		z-index: 1;
 		aspect-ratio: 1 / 1;
 		border-radius: 50%;
@@ -243,7 +243,6 @@
 			return ;
 		paddleWidth = convertPixelWithHeight(PaddleSize[gameInfo.paddleSize]);
 		initPos = convertPixelWithHeight((MapSize[gameInfo?.mapSize][0] - PaddleSize[gameInfo?.paddleSize]) / 2);
-		console.log(PongConfig.DeadZoneHeight, PongConfig.PaddleHeight);
 		zoneLimitWidth = convertPixelWithWidth(PongConfig.DeadZoneHeight);
 		let test = convertPixelWithWidth(PongConfig.DeadZoneHeight) - 12;
 		posHorizontal = [test, convertPixelWithWidth(MapSize[gameInfo.mapSize][1] - PongConfig.DeadZoneHeight)];
@@ -260,7 +259,6 @@
 				(!switched) ? convertPixelWithWidth(MapSize[gameInfo.mapSize][1] - pos[1]) : convertPixelWithWidth(pos[1])
 			]);
 		}
-		console.log("what is wrong?", res);
 		return (res);
 	}
 
