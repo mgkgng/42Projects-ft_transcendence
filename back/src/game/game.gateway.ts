@@ -201,43 +201,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		player.control[0] = intervalID;
 	}
 
-	@SubscribeMessage("PaddleMoveMouse")
-	paddleMoveMouse(@MessageBody() data: any, @Request() req) {
-		// Check if the request came from a proper player
-
-		let target = this.getClient(req);
-		let room = this.getRoom(data.roomID);
-		if (!room || !room.players.has(target.username))
-			return ;
-
-		// Get the player
-		let player = room.players.get(target.username);
-		player.paddle.pos = data.pos;
-		room.broadcast("PaddleUpdate", {
-			type: player.index,
-			pos: data.pos
-		});
-	}
-
-	@SubscribeMessage("PaddleStopKey")
-	paddleStopKey(@MessageBody() data: any, @Request() req) {
-async (params:type) => {
-			// TODO is there any more efficient way to handle this?
-			// Check if the request came from a proper player
-			let target = this.getClient(req);
-			let room = this.getRoom(data);
-			if (!room || !room.players.has(target.username))
-				return ;
-	
-}
-		// Get the player
-		let player = room.players.get(target.username);
-
-		// clear the interval and delete it
-		clearInterval(player.control[0]);
-		player.control[0] = undefined
-	}
-
 	@SubscribeMessage("RoomListReq")
 	roomList(@ConnectedSocket() client: Socket) {
 		// Get rooms which are not private
