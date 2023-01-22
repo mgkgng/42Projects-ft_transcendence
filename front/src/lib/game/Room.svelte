@@ -367,19 +367,21 @@
 		<div bind:this={game} class="pong-game">
 			{#if gameSize}
 				<div class="zone-limit left {(!switched) ? "player2" : "player1"}" style="--shadow: {convertPixelWithWidth(PongConfig.DeadZoneHeight)}px 0px 16px aqua"></div>
-				<div class="paddle {(switched) ? "user" : ""} {((!switched && !player2) || (switched && !player1)) ? "absent" : ""}"
+				<!-- Player 1 Paddle -->
+				<div class="paddle {(!player1) ? "absent" : ""}"
+					style="left: {posHorizontal[(!switched) ? 1 : 0]}px;
+					top: {(!player1) ? initPos : (!switched) ? convertPixelWithHeight(player1?.pos) : convertPixelWithHeight(MapSize[gameInfo?.mapSize][0] - player1?.pos - PaddleSize[gameInfo.paddleSize])}px;
+					height: {paddleWidth}px">
+				</div>
+				<!-- Player 2 Paddle -->
+				<div class="paddle {(!player2) ? "absent" : ""}"
 					style="left: {posHorizontal[(!switched) ? 0 : 1]}px;
-					top: {((!switched && !player2) || (switched && !player1)) ? initPos : (!switched) ? convertPixelWithHeight(player2?.pos) : convertPixelWithHeight(MapSize[gameInfo?.mapSize][0] - player1?.pos - PaddleSize[gameInfo.paddleSize])}px;
+					top: {(!player2) ? initPos : (!switched) ? convertPixelWithHeight(player2?.pos) : convertPixelWithHeight(MapSize[gameInfo?.mapSize][0] - player2?.pos - PaddleSize[gameInfo?.paddleSize])}px;
 					height: {paddleWidth}px">
 				</div>
 				{#if puckPos}
 				<PPuck pucks={puckPos} />
 				{/if}
-				<div class="paddle {(!switched) ? "user" : ""} {((switched && !player2) || (!switched && !player1)) ? "absent" : ""}"
-					style="left: {posHorizontal[(!switched) ? 1 : 0]}px;
-					top: {((switched && !player2) || (!switched && !player1)) ? initPos : (!switched) ? convertPixelWithHeight(player1?.pos) : convertPixelWithHeight(MapSize[gameInfo?.mapSize][0] - player2?.pos - PaddleSize[gameInfo?.paddleSize])}px;
-					height: {paddleWidth}px">
-				</div>
 				<div class="zone-limit right {(!switched) ? "player1" : "player2"}" style="--width: {convertPixelWithWidth(PongConfig.DeadZoneHeight)}px"></div>
 			{/if}
 		</div>

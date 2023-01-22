@@ -215,13 +215,15 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage("PaddleStopKey")
 	paddleStopKey(@MessageBody() data: any, @Request() req) {
-		// TODO is there any more efficient way to handle this?
-		// Check if the request came from a proper player
-		let target = this.getClient(req);
-		let room = this.getRoom(data);
-		if (!room || !room.players.has(target.username))
-			return ;
-
+async (params:type) => {
+			// TODO is there any more efficient way to handle this?
+			// Check if the request came from a proper player
+			let target = this.getClient(req);
+			let room = this.getRoom(data);
+			if (!room || !room.players.has(target.username))
+				return ;
+	
+}
 		// Get the player
 		let player = room.players.get(target.username);
 
