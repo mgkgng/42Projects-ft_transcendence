@@ -120,7 +120,7 @@
 		$client.socket.emit("get_all_rooms_begin_by", { research: "" });
 
 		return (() => {
-			//$client.socket.off("success_append_user_to_room");
+			$client.socket.off("success_append_user_to_room");
 			$client.socket.off("get_all_rooms_begin_by_res");
 		});
 	});

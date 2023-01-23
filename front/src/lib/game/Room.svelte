@@ -370,17 +370,17 @@
 		return (() => {
 			if (puckMoving)
 				clearInterval(puckMoving);
-			// $client.socket.off("RoomFound");
-			// $client.socket.off("PlayerUpdate");
-			// $client.socket.off("PaddleUpdate");
-			// $client.socket.off("LoadBall");
-			// $client.socket.off("PongStart");
-			// $client.socket.off("PuckHit");
-			// $client.socket.off("ScoreUpdate");
-			// $client.socket.off("ReadyUpdate");
-			// $client.socket.off("GameFinished");
-			// $client.socket.off("GameStartFail");
-			// $client.socket.off("GameStart");
+			$client.socket.off("RoomFound");
+			$client.socket.off("PlayerUpdate");
+			$client.socket.off("PaddleUpdate");
+			$client.socket.off("LoadBall");
+			$client.socket.off("PongStart");
+			$client.socket.off("PuckHit");
+			$client.socket.off("ScoreUpdate");
+			$client.socket.off("ReadyUpdate");
+			$client.socket.off("GameFinished");
+			$client.socket.off("GameStartFail");
+			$client.socket.off("GameStart");
 		});
 	});
 </script>

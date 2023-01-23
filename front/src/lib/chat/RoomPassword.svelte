@@ -24,8 +24,8 @@
 		// });
 
 		return(() => {
-			//$client.socket.off("success_append_user_to_room");
-			//$client.socket.off("error_append_user_to_room");
+			$client.socket.off("success_append_user_to_room");
+			$client.socket.off("error_append_user_to_room");
 		});
 		
 	})

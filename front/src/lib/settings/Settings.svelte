@@ -240,9 +240,9 @@
 			original[2] = false;
 		});
 		return (() => {
-			//$client.socket.off("change_username_res");
-			//$client.socket.off("active_double_auth_res");
-			//$client.socket.off("disable_double_auth_res");
+			$client.socket.off("change_username_res");
+			$client.socket.off("active_double_auth_res");
+			$client.socket.off("disable_double_auth_res");
 		});
 
 	});
