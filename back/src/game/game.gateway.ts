@@ -25,6 +25,7 @@ import { UserEntity } from "src/entity/User.entity";
 import { friendSystemService } from "src/friendSystem/friendSystem.service";
 import { UserFriendEntity } from "src/entity/UserFriend.entity";
 import { ChatDirectMessageService } from "src/chatDirectMessage/chatDirectMessage.service";
+import { Player } from "./game.Player";
 
 //TODO Too many connections for a client
 //TODO if the client websocket contains request, handshake..
@@ -277,8 +278,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		if (room.players.has(target.username)) 
 			room.playerExit(target);
 		else // if the user is a watcher, remove the user from clients of the room
+		{
 			room.clients.delete(target.username);
+			target.room = "";
+		}
 	}
+
 
 	@SubscribeMessage("isReady")
 	setReady(@MessageBody() data: any, @Request() req) {
