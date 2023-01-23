@@ -66,9 +66,12 @@ export class MainServerGateway {
 
 	@SubscribeMessage('getUserinDB')
 	async getUserinDB(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
+		const qb = this.userRepository.createQueryBuilder('user');
 		if (data.username.length < 1)
 			return;
-		const users = await this.userRepository.find({where: {username: Like(data.username + "%")}, take: 8});
+		const users = await qb.where("LOWER(user.username) LIKE :username", {username: data.username + "%"})
+		// .orWhere("LOWER(user.displayname) LIKE :displayname", {displayname: data.username + "%"})
+		.take(8).getMany();
 		if (!users || users.length < 1)
 		{
 			this.server.to(client.id).emit('error_getUserinDB', {error: "No user found"});
