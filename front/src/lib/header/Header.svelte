@@ -218,7 +218,7 @@
 <Modal bind:this={friendsModal}>
 	<Friends itself={friendsModal} />
 </Modal>
-<Modal bind:this={settingsModal} closeOnBgClick={false}>
+<Modal bind:this={settingsModal} closeOnBgClick={true}>
 	<Settings itself={settingsModal} />
 </Modal>
 <Modal bind:this={privateMessagesModal}>

@@ -142,7 +142,7 @@
 
 	/*Popup utils*/
 	let showPop = false;
-	let popUpMessage = "BITE";
+	let popUpMessage = "";
 	let timeoutPop : any;
 
 	function updateFrontImg(user : any)
