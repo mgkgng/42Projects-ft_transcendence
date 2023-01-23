@@ -173,12 +173,16 @@ export class Room {
 	}
 
 	async storeGame() {
-		const id_player1 : any = await this.mainServerService.getIdUserByUsername(this.players.get(this.playerIndex[0]).username);
-		const id_player2 : any = await this.mainServerService.getIdUserByUsername(this.players.get(this.playerIndex[1]).username);
-		const res_user_chat_room = await this.dataSource.createQueryBuilder().insert().into(GameEntity).values
-			([ 
-				{ player1: id_player1, player2: id_player2, is_finished: true, player1_score: this.players.get(this.playerIndex[0]).score, player2_score: this.players.get(this.playerIndex[1]).score, date_game: new Date() }
-			]).execute();
+		try{
+			const id_player1 : any = await this.mainServerService.getIdUserByUsername(this.players.get(this.playerIndex[0]).info.username);
+			const id_player2 : any = await this.mainServerService.getIdUserByUsername(this.players.get(this.playerIndex[1]).info.username);
+			const res_user_chat_room = await this.dataSource.createQueryBuilder().insert().into(GameEntity).values
+				([ 
+					{ player1: id_player1, player2: id_player2, is_finished: true, player1_score: this.players.get(this.playerIndex[0]).score, player2_score: this.players.get(this.playerIndex[1]).score, date_game: new Date() }
+				]).execute();
+		}catch(e){
+			console.log(e);
+		}
 	}
 
 	destroyRoom() {
