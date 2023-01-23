@@ -69,12 +69,14 @@ export class MainServerGateway {
 		const qb = this.userRepository.createQueryBuilder('user');
 		if (data.username.length < 1)
 			return;
-		const users = await qb.where("LOWER(user.username) LIKE :username", {username: data.username + "%"})
+		const users = await qb.where("LOWER(user.username) LIKE LOWER(:username)", {username: data.username + "%"})
 		// .orWhere("LOWER(user.displayname) LIKE :displayname", {displayname: data.username + "%"})
 		.take(8).getMany();
+		console.log(data, users);
 		if (!users || users.length < 1)
 		{
 			this.server.to(client.id).emit('error_getUserinDB', {error: "No user found"});
+			console.log("error");
 			return;
 		}
 		else
@@ -95,7 +97,7 @@ export class MainServerGateway {
 			if (index > -1) {
 				parsedList.splice(index, 1);
 			}
-			// console.log(parsedList);
+			 console.log(parsedList);
 			this.server.to(client.id).emit('success_getUserinDB', {users: parsedList});
 			return;
 		}
