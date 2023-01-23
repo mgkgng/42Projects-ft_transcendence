@@ -334,15 +334,15 @@
 		$client.socket.emit("getAskList");
 
 		return (() => {
-			// $client.socket.off("error_getFriendList");
-			// $client.socket.off("success_getUserinDB");
-			// $client.socket.off("success_getFriendList");
-			// $client.socket.off("error_getUserinDB");
-			// $client.socket.off("resUserProfile");
-			// $client.socket.off("success_removeFriend");
-			// $client.socket.off("success_acceptFriend");
-			// $client.socket.off("success_refuseFriend");
-			// $client.socket.off("success_getAskList");
+			$client.socket.off("error_getFriendList");
+			$client.socket.off("success_getUserinDB");
+			$client.socket.off("success_getFriendList");
+			$client.socket.off("error_getUserinDB");
+			$client.socket.off("resUserProfile");
+			$client.socket.off("success_removeFriend");
+			$client.socket.off("success_acceptFriend");
+			$client.socket.off("success_refuseFriend");
+			$client.socket.off("success_getAskList");
 		});
 	});
 </script>

@@ -128,7 +128,7 @@
 			}, 1000);
 			
 			return (() => { 
-				//$client.socket.off("get_user_info_res"); 
+				$client.socket.off("get_user_info_res"); 
 			});
 		}
 		else if ($client.socket) {

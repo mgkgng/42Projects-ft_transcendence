@@ -197,6 +197,7 @@
 	let switched: boolean = false;
 	let update: boolean = false;
 	let userInfo: any;
+	let can_hit : boolean = true;
 	user.subscribe((user: any) => { userInfo = user; });
 
 	$: console.log("this is the roomID", roomID);
@@ -330,13 +331,19 @@
 			puckMoving = setInterval(() => {
 				puck.move();
 				puck = puck;
-			}, 40);
+			}, 80);
 		});
 
 		$client.socket.on("PuckHit", (data: any) => {
-			puck.vec[1] += (puck.vec[1] > 0) ? 1 : -1;
-			puck.vec[1] *= -1;
-			puck = puck;
+			if (can_hit)
+			{
+				// puck.vec[1] += (puck.vec[1] > 0) ? 1 : -1;
+				puck.vec[1] *= -1;
+				puck = puck;
+				console.log("PuuckIT", puck);
+				can_hit = false;
+				setInterval(() => {can_hit = true;}, 500)
+			}
 		});
 
 		$client.socket.on("ScoreUpdate", (data: any) => {
@@ -370,17 +377,17 @@
 		return (() => {
 			if (puckMoving)
 				clearInterval(puckMoving);
-			// $client.socket.off("RoomFound");
-			// $client.socket.off("PlayerUpdate");
-			// $client.socket.off("PaddleUpdate");
-			// $client.socket.off("LoadBall");
-			// $client.socket.off("PongStart");
-			// $client.socket.off("PuckHit");
-			// $client.socket.off("ScoreUpdate");
-			// $client.socket.off("ReadyUpdate");
-			// $client.socket.off("GameFinished");
-			// $client.socket.off("GameStartFail");
-			// $client.socket.off("GameStart");
+			$client.socket.off("RoomFound");
+			$client.socket.off("PlayerUpdate");
+			$client.socket.off("PaddleUpdate");
+			$client.socket.off("LoadBall");
+			$client.socket.off("PongStart");
+			$client.socket.off("PuckHit");
+			$client.socket.off("ScoreUpdate");
+			$client.socket.off("ReadyUpdate");
+			$client.socket.off("GameFinished");
+			$client.socket.off("GameStartFail");
+			$client.socket.off("GameStart");
 		});
 	});
 </script>

@@ -329,6 +329,18 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		for (let client of clients)
 			client.emit(event, data);
 	}
+	@SubscribeMessage("puckHit")
+	async puck(@MessageBody() data: any, @ConnectedSocket() client: Socket, @Request() req) {
+		let target = this.getClient(req);
+		let room = this.getRoom(data);
+		let timeNow : Date = new Date();
+		if (!room.puck.puck_it(room, timeNow.getTime()))
+		{
+			room.broadcast("error_puckHit", {message: "Cheater MTF !"});
+			return ;
+		}
+		room.broadcast("success_puckHit", { vect: room.puck.vec, pos: room.puck.pos });
+	}
 
 	@SubscribeMessage("getHistory")
 	async getHistGame(@MessageBody() data: any, @ConnectedSocket() client: Socket, @Request() req) {

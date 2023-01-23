@@ -29,7 +29,7 @@ export const MapSize = [
 	[400, 700]
 ]
 
-export const PuckSpeed = [2, 4, 6]
+export const PuckSpeed = [2, 4, 12]
 
 export const RoomUpdate = {
 	NewRoom: 0,
@@ -61,7 +61,7 @@ export const ErrorMessage = {
 
 export const PongConfig = {
 	PuckSize: 12,
-	FrameDuration: 40,
+	FrameDuration: 80,
 	DeadZoneHeight: 20,
 	PaddleHeight: 12,
 	PaddleBumper: 8

@@ -342,19 +342,19 @@
 		$client.socket.emit("get_all_rooms");
 
 		return(() => {
-			//$client.socket.off("get_my_rooms_res");
-			// $client.socket.off("get_all_rooms_res");
-			// $client.socket.off("set_room_not_visible_res");
-			// $client.socket.off("set_room_visible");
-			// $client.socket.off("set_room_private");
-			// $client.socket.off("unset_room_private");
-			// $client.socket.off("set_password_room");
-			// $client.socket.off("unset_password_room");
-			// $client.socket.off("new_room_res");
-			// $client.socket.off("append_user_to_room_res");
-			// $client.socket.off("get_message_room_res");
-			// $client.socket.off("get_users_room_res");
-			// $client.socket.off("new_message_room_res");
+			$client.socket.off("get_my_rooms_res");
+			$client.socket.off("get_all_rooms_res");
+			$client.socket.off("set_room_not_visible_res");
+			$client.socket.off("set_room_visible");
+			$client.socket.off("set_room_private");
+			$client.socket.off("unset_room_private");
+			$client.socket.off("set_password_room");
+			$client.socket.off("unset_password_room");
+			$client.socket.off("new_room_res");
+			$client.socket.off("append_user_to_room_res");
+			$client.socket.off("get_message_room_res");
+			$client.socket.off("get_users_room_res");
+			$client.socket.off("new_message_room_res");
 		});
 	});
 </script>
