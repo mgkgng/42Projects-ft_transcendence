@@ -113,6 +113,11 @@
 				<h3>#{i + 1}</h3>
 				<p class="user" on:click={() => {
 					profileUser = rank;
+					// check if the user is the current user
+					if (profileUser.username == userInfo.username) {
+						profileUser.username_42 = profileUser.username_42 = JSON.parse(atob(localStorage.getItem("transcendence-jwt").split(".")[1])).username_42;
+						userProfileModal.open();
+					}
 					userProfileModal.open();
 				}}>{rank.username}</p>
 				<p>{rank.campus_name}, {rank.campus_country}</p>
