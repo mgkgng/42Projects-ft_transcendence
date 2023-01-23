@@ -73,8 +73,10 @@
 				position: absolute;
 				top: 2em;
 				width: 85%;
-				background-color: transparentize(#fff, .8);
+				// background-color: transparentize(#fff, .8);
+				background-color: #313131;
 				border-radius: .1em;
+				z-index: 3;
 
 				.line {
 					padding: .5em .6em;
@@ -120,6 +122,7 @@
 			border: none;
 
 			.line {
+				z-index: 1;
 				position: relative;
 
 				.friend {
@@ -260,6 +263,7 @@
 	let userSearchList: Array<any> = [];
 	let userProfileModal: any;
 	let profileUser: any;
+	let showResultBlockOrNone: string = "none";
 
 	$: searchUser = "";
 	$: searchUser = searchUser.toLowerCase();
@@ -360,9 +364,10 @@
 		<img src="update.png" alt="update">
 	</button>
 	<div class="flex search-bar">
-		<input class="bar" type="text" placeholder="Search for users" bind:value={searchUser}>
+		<input class="bar" type="text" placeholder="Search for users" bind:value={searchUser}
+		on:focus={() => showResultBlockOrNone = "block"} on:blur={() => {!user ? showResultBlockOrNone = "none" : null;}}>
 			{#if searchUser.length}
-			<div class="result">
+			<div class="result" style="display: {showResultBlockOrNone}">
 				{#if userSearchList.length}
 				{#each userSearchList as user}
 				<div class="flex line" on:click={() => {
