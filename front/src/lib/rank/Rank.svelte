@@ -85,8 +85,15 @@
 			myPos = data.map((x: any) => x.username).indexOf(userInfo.username);
 		});
 
+		$client.socket.on("success_getUserinDB", (data: any) => {
+			profileUser.username_42 = data.users[0].username_42;
+			profileUser = profileUser;
+			userProfileModal.open();
+		});
+
 		return (() => {
 			$client.socket.off("RankingRes");
+			$client.socket.off("success_getUserinDB");
 		});
 	});
 </script>
@@ -118,7 +125,10 @@
 						profileUser.username_42 = profileUser.username_42 = JSON.parse(atob(localStorage.getItem("transcendence-jwt").split(".")[1])).username_42;
 						userProfileModal.open();
 					}
-					userProfileModal.open();
+					else
+					{
+						$client.socket.emit("getUserinDB", {username: profileUser.username});
+					}
 				}}>{rank.username}</p>
 				<p>{rank.campus_name}, {rank.campus_country}</p>
 				<p>{rank.nb_victory}</p>
