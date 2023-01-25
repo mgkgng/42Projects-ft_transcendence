@@ -336,6 +336,7 @@
 			puck.vec[1] += (puck.vec[1] > 0) ? 1 : -1;
 			puck.vec[1] *= -1;
 			puck = puck;
+			console.log("=================");
 		});
 
 		$client.socket.on("ScoreUpdate", (data: any) => {

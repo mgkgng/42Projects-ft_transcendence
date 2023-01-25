@@ -17,10 +17,27 @@ export class Puck {
 		this.initialized = true;
 	}
 
+	setScore(room: any) {
+		// if not, update the score, if the score reached the max point, finish the match
+		let winner = (this.vec[1] > 0) ? room.players.get(room.playerIndex[0]) : room.players.get(room.playerIndex[1]);
+		if (!winner || room.isOver)
+			return ;
+		room.broadcast("ScoreUpdate", winner?.info.username);
+		winner.score++;
+
+		if (winner.score == room.gameInfo.maxPoint) {
+			room.broadcast("GameFinished",  winner.info.username);
+			room.endGame(winner.info.username);
+			return ;
+		}
+
+		setTimeout(() => { Room.startPong(room); }, 2000);
+	}
+
 	setCheckPuck(room: any) {
 		if (room.isOver)
 			return ;
-		let distToDeath = (this.mapSize[1] / 2 - PongConfig.DeadZoneHeight) * 2;
+		let distToDeath = this.mapSize[1] - PongConfig.DeadZoneHeight * 2 - PongConfig.PuckSize;
 		if (this.initialized) {
 			distToDeath /= 2;
 			this.initialized = false;
@@ -48,22 +65,8 @@ export class Puck {
 				room.broadcast("PuckHit");
 				this.setCheckPuck(room);
 				return ;
-			} else {
-				// if not, update the score, if the score reached the max point, finish the match
-				let winner = (this.vec[1] > 0) ? room.players.get(room.playerIndex[0]) : room.players.get(room.playerIndex[1]);
-				if (!winner || room.isOver)
-					return ;
-				room.broadcast("ScoreUpdate", winner?.info.username);
-				winner.score++;
-
-				if (winner.score == room.gameInfo.maxPoint) {
-					room.broadcast("GameFinished",  winner.info.username);
-					room.endGame(winner.info.username);
-					return ;
-				}
-
-				setTimeout(() => { Room.startPong(room); }, 2000);
-			}
+			} else
+				this.setScore(room);
 		}, timeOut);
 	}
 

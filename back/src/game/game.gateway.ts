@@ -494,7 +494,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			});
 			if (player.paddle.pos == 0 || player.paddle.pos == player.paddle.moveLimit[1])
 				clearInterval(intervalID);
-		}, 20);
+		}, 40);
 		player.control = intervalID;
 	}
 
