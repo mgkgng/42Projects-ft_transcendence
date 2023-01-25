@@ -7,7 +7,7 @@ export class Player {
 	score: number;
 	index: number;
 	paddle: Paddle;
-	control: Array<any>;
+	control: any;
 
 	constructor(userInfo: any, isHost: boolean, index: number, mapSize: Array<number>, paddleWidth: number) {
 		this.username = userInfo.username_42;
@@ -16,6 +16,6 @@ export class Player {
 		this.score = 0;
 		this.index = index;
 		this.paddle = new Paddle(mapSize, paddleWidth);
-		this.control = [undefined, undefined];
+		this.control = undefined;
 	}
 }

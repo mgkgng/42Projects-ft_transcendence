@@ -315,9 +315,6 @@
 		});
 		
 		$client.socket.on("PaddleUpdate", (data: any) => {
-			if ((data.type === 0 && player1.info.username_42 === userInfo.username_42)
-				|| (data.type === 1 && player2.info.username_42 === userInfo.username_42))
-				return ;
 			if (data.type === 0)
 				player1.pos = data.pos;
 			else
@@ -331,7 +328,7 @@
 			puckMoving = setInterval(() => {
 				puck.move();
 				puck = puck;
-			}, 20);
+			}, 40);
 		});
 
 		$client.socket.on("PuckHit", (data: any) => {
@@ -527,14 +524,16 @@ on:keypress={(event) => {
 		left: (userType == UserType.Player1 && event.code == 'KeyD'
 			|| userType == UserType.Player2 && event.code == 'KeyA')
 	});
+	console.log("sent!");
 }}
 on:keyup={(event)=>{
 	if (event.code != 'KeyA' && event.code != 'KeyD')
 		return ;
 	
 	//* TODO some precision to make
-	$client.socket.emit("PaddleStopKey");
+	$client.socket.emit("PaddleStopKey", roomID);
 	moving = false;
+	console.log("also sent!");
 }}
 />
 

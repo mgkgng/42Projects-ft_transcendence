@@ -492,8 +492,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				type: player.index,
 				pos: player.paddle.pos
 			});
+			if (player.paddle.pos == 0 || player.paddle.pos == player.paddle.moveLimit[1])
+				clearInterval(intervalID);
 		}, 20);
-		player.control[0] = intervalID;
+		player.control = intervalID;
 	}
 
 	@SubscribeMessage("PaddleStopKey")
@@ -507,10 +509,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 		// Get the player
 		let player = room.players.get(target.username);
-
 		// clear the interval and delete it
-		clearInterval(player.control[0]);
-		player.control[0] = undefined
+		clearInterval(player.control);
+		player.control = undefined
+		player.paddle.stop();
 	}
 
 	@SubscribeMessage('askFriendG')
