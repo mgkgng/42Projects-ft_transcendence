@@ -332,6 +332,7 @@
 		});
 
 		$client.socket.on("PuckHit", (data: any) => {
+			console.log("Puck hit received");
 			puck.vec[1] += (puck.vec[1] > 0) ? 1 : -1;
 			puck.vec[1] *= -1;
 			puck = puck;
@@ -524,7 +525,6 @@ on:keypress={(event) => {
 		left: (userType == UserType.Player1 && event.code == 'KeyD'
 			|| userType == UserType.Player2 && event.code == 'KeyA')
 	});
-	console.log("sent!");
 }}
 on:keyup={(event)=>{
 	if (event.code != 'KeyA' && event.code != 'KeyD')
@@ -533,7 +533,6 @@ on:keyup={(event)=>{
 	//* TODO some precision to make
 	$client.socket.emit("PaddleStopKey", roomID);
 	moving = false;
-	console.log("also sent!");
 }}
 />
 

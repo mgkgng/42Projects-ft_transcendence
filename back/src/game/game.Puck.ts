@@ -26,7 +26,7 @@ export class Puck {
 			this.initialized = false;
 		}
 
-		let frameNb = Math.round(distToDeath / Math.abs(this.vec[1]));
+		let frameNb = Math.floor(distToDeath / Math.abs(this.vec[1]));
 		let timeOut = frameNb * PongConfig.FrameDuration;
 		let deathPointX = this.calculPosX(frameNb);
 
@@ -36,6 +36,8 @@ export class Puck {
 				return ;
 			let paddlePos = player.paddle.pos;
 			// console.log(paddlePos, deathPointX);
+			console.log("should be at", deathPointX);
+			console.log("paddle at", paddlePos);
 			if (deathPointX >= paddlePos - PongConfig.PaddleBumper && deathPointX <= paddlePos + PaddleSize[room.gameInfo.paddleSize] + PongConfig.PaddleBumper) {
 				// if paddle hits the puck
 				this.pos[0] = deathPointX;
@@ -66,9 +68,13 @@ export class Puck {
 	}
 
 	calculPosX(frameNb: number) {
-		let posX = frameNb * this.vec[0];
-		let bounded = (posX / this.mapSize[0]);
-		posX = (bounded % 2) ? posX % this.mapSize[0] : this.mapSize[0] - posX % this.mapSize[0];
+		let posX = this.pos[0] + frameNb * this.vec[0];
+		let bounded = Math.abs(Math.floor(posX / this.mapSize[0]));
+		if (posX >= 0)
+			posX = (!(bounded % 2)) ? posX % this.mapSize[0] : this.mapSize[0] - posX % this.mapSize[0];
+		else
+			posX = ((bounded % 2)) ? Math.abs(posX % this.mapSize[0]) : this.mapSize[0] - Math.abs(posX % this.mapSize[0]);
+		
 		if (bounded % 2)
 			this.vec[0] *= -1;
 		return (posX);
