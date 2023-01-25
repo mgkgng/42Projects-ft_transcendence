@@ -145,7 +145,6 @@ export class Room {
 	// need static because used often with setTimeOut() func
 	// sent by setTimeOut(), 'this' is initialised by timeOut class
 	static startPong(room: any) {
-		room.puck.init_time_hit();
 		// Create the puck and broadcast its information
 		room.puck = new Puck(MapSize[room.gameInfo.mapSize], PuckSpeed[room.gameInfo.puckSpeed]);
 		room.broadcast("LoadBall", {
@@ -155,7 +154,7 @@ export class Room {
 		
 		setTimeout(() => {
 			room.broadcast("PongStart");
-			//room.puck.setCheckPuck(room);
+			room.puck.setCheckPuck(room);
 		}, 2000);
 	}
 

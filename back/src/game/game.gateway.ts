@@ -329,18 +329,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		for (let client of clients)
 			client.emit(event, data);
 	}
-	@SubscribeMessage("puckHit")
-	async puck(@MessageBody() data: any, @ConnectedSocket() client: Socket, @Request() req) {
-		let target = this.getClient(req);
-		let room = this.getRoom(data);
-		let timeNow : Date = new Date();
-		if (!room.puck.puck_it(room, timeNow.getTime()))
-		{
-			room.broadcast("error_puckHit", {message: "Cheater MTF !"});
-			return ;
-		}
-		room.broadcast("success_puckHit", { vect: room.puck.vec, pos: room.puck.pos });
-	}
 
 	@SubscribeMessage("getHistory")
 	async getHistGame(@MessageBody() data: any, @ConnectedSocket() client: Socket, @Request() req) {
@@ -485,24 +473,45 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		target.newMessages.clear();
 	}
 
-	@SubscribeMessage("PaddleMoveMouse")
-	paddleMoveMouse(@MessageBody() data: any, @Request() req) {
+	@SubscribeMessage("PaddleMoveKey")
+	paddleMoveKey(@MessageBody() data: any, @Request() req) {
 		// Check if the request came from a proper player
-
 		let target = this.getClient(req);
-		let room = this.getRoom(data.roomID);
+		let room = this.getRoom(data.room);
 		if (!room || !room.players.has(target.username))
 			return ;
 
 		// Get the player
 		let player = room.players.get(target.username);
-		player.paddle.pos = data.pos;
-		room.broadcast("PaddleUpdate", {
-			type: player.index,
-			pos: data.pos
-		});
+
+		// TODO protection switching between keyboard and mouse
+		// Paddle starts to move, Websocket Messages set with interval
+		let intervalID = setInterval(() => {
+			player.paddle.move(data.left);
+			room.broadcast("PaddleUpdate", {
+				type: player.index,
+				pos: player.paddle.pos
+			});
+		}, 20);
+		player.control[0] = intervalID;
 	}
 
+	@SubscribeMessage("PaddleStopKey")
+	paddleStopKey(@MessageBody() data: any, @Request() req) {
+		// TODO is there any more efficient way to handle this?
+		// Check if the request came from a proper player
+		let target = this.getClient(req);
+		let room = this.getRoom(data);
+		if (!room || !room.players.has(target.username))
+			return ;
+
+		// Get the player
+		let player = room.players.get(target.username);
+
+		// clear the interval and delete it
+		clearInterval(player.control[0]);
+		player.control[0] = undefined
+	}
 
 	@SubscribeMessage('askFriendG')
 	async askFriend(@MessageBody() data: any, @ConnectedSocket() client: Socket) {

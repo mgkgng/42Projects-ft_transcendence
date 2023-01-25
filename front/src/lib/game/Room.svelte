@@ -166,6 +166,7 @@
 	export let itself: any;	
 
 	let puck: any = undefined;
+	let moving: boolean = false;
 
 	let userType: number;
 	let initPos: number;
@@ -197,7 +198,6 @@
 	let switched: boolean = false;
 	let update: boolean = false;
 	let userInfo: any;
-	let can_hit : boolean = true;
 	user.subscribe((user: any) => { userInfo = user; });
 
 	$: console.log("this is the roomID", roomID);
@@ -331,19 +331,13 @@
 			puckMoving = setInterval(() => {
 				puck.move();
 				puck = puck;
-			}, 80);
+			}, 20);
 		});
 
 		$client.socket.on("PuckHit", (data: any) => {
-			if (can_hit)
-			{
-				// puck.vec[1] += (puck.vec[1] > 0) ? 1 : -1;
-				puck.vec[1] *= -1;
-				puck = puck;
-				console.log("PuuckIT", puck);
-				can_hit = false;
-				setInterval(() => {can_hit = true;}, 500)
-			}
+			puck.vec[1] += (puck.vec[1] > 0) ? 1 : -1;
+			puck.vec[1] *= -1;
+			puck = puck;
 		});
 
 		$client.socket.on("ScoreUpdate", (data: any) => {
@@ -486,7 +480,7 @@
 	<AlertMessage msg={alertMessage} itself={alertMessageModal} />
 </Modal>
 
-<svelte:window
+<!-- <svelte:window
 	on:mousemove={(event) => {
 		if (isMouseMoveDisabled === true)
 			return ;
@@ -518,4 +512,29 @@
         }, 20);
 
 	}}
+/> -->
+
+<svelte:window
+on:keypress={(event) => {
+	if (userType == UserType.Watcher
+		|| (event.code != 'KeyA' && event.code != 'KeyD'))
+		return ;
+	if (moving) //* TODO should make movement more fluent
+		return ;
+	moving = true;
+	$client.socket.emit("PaddleMoveKey", {
+		room: roomID,
+		left: (userType == UserType.Player1 && event.code == 'KeyD'
+			|| userType == UserType.Player2 && event.code == 'KeyA')
+	});
+}}
+on:keyup={(event)=>{
+	if (event.code != 'KeyA' && event.code != 'KeyD')
+		return ;
+	
+	//* TODO some precision to make
+	$client.socket.emit("PaddleStopKey");
+	moving = false;
+}}
 />
+
