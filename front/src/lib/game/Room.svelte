@@ -288,12 +288,11 @@
 			player1 = data.player1;
 			player2 = data.player2;
 			invited = data.invited;
-			userType = (player1?.info.username_42 == userInfo.username) ? UserType.Player1 :
-				(player2?.info.username_42 == userInfo.username) ? UserType.Player2 :
+			userType = (player1?.info.username_42 == userInfo.username_42) ? UserType.Player1 :
+				(player2?.info.username_42 == userInfo.username_42) ? UserType.Player2 :
 				UserType.Watcher;
-
 			// By default, player1 is on the right side unless user is the player2
-			switched = (userInfo.username == player2?.info.username_42);
+			switched = (userInfo.username_42 == player2?.info.username_42);
 			gameReady = true;
 		});
 
@@ -449,7 +448,7 @@
 				tryStart = true;
 				$client.socket.emit("StartGame", roomID)
 			}}>START</button>
-			{:else if player1?.info.username == userInfo.username || player2?.info.username == userInfo.username}
+			{:else if player1?.info.username_42 == userInfo.username_42 || player2?.info.username_42 == userInfo.username_42}
 			<button class="ready" on:click={()=>{
 				$client.socket.emit("isReady", {
 					roomID: roomID,
@@ -515,9 +514,10 @@
 
 <svelte:window
 on:keypress={(event) => {
-	if (userType == UserType.Watcher
-		|| (event.code != 'KeyA' && event.code != 'KeyD'))
-		return ;
+	if (
+		// userType == UserType.Watcher ||
+		(event.code != 'KeyA' && event.code != 'KeyD'))
+	return ;
 	if (moving) //* TODO should make movement more fluent
 		return ;
 	moving = true;
