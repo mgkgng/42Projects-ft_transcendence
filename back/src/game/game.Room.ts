@@ -83,8 +83,8 @@ export class Room {
 			client.broadcast(event, data);
 	}
 
-	addClient(client: Client) { this.clients.set(client.username, client); }
-	removeClient(client: any) { this.clients.delete(client.username); }
+	addClient(client: Client) { this.clients.set(client.username_42, client); }
+	removeClient(client: any) { this.clients.delete(client.username_42); }
 
 	addClients(clients: Array<Client>) {
 		for (let client of clients)
@@ -92,15 +92,15 @@ export class Room {
 	}
 
 	deleteClient(client: Client) {
-		this.clients.delete(client.username);
-		this.players.delete(client.username);
+		this.clients.delete(client.username_42);
+		this.players.delete(client.username_42);
 		client.isAvailable();
 	}
 
 	playerJoin(playerInfo: any, client: Client) {
 		let index = (this.playerIndex[0]) ? 1 : 0;
-		this.players.set(client.username, new Player(playerInfo, false, index, MapSize[this.gameInfo.mapSize], PaddleSize[this.gameInfo.paddleSize]));
-		this.playerIndex[index] = client.username;
+		this.players.set(client.username_42, new Player(playerInfo, false, index, MapSize[this.gameInfo.mapSize], PaddleSize[this.gameInfo.paddleSize]));
+		this.playerIndex[index] = client.username_42;
 		this.addClient(client);
 		this.isAvailable = false;
 		client.broadcast("JoinRoomRes", {
@@ -124,20 +124,20 @@ export class Room {
 			this.broadcast("RoomAlert", ErrorMessage.RoomDestroyed);
 			this.destroyRoom();
 			return ;
-		} else if (this.hostname.length && client.username == this.hostname) { // If the user who just quitted was a host, change the host and make room available again
+		} else if (this.hostname.length && client.username_42 == this.hostname) { // If the user who just quitted was a host, change the host and make room available again
 			// console.log(this.players);
-			this.hostname = this.players.get(this.players.keys().next().value).username;
+			this.hostname = this.players.get(this.players.keys().next().value).username_42;
 			this.isAvailable = true;
 		}
 		// Player index update
-		if (client.username == this.playerIndex[0])
+		if (client.username_42 == this.playerIndex[0])
 			this.playerIndex[0] = undefined;
 		else
 			this.playerIndex[1] = undefined;
 		// Broadcast
 		this.broadcast("PlayerUpdate", {
 			join: false,
-			username: client.username,
+			username: client.username_42,
 			hostname: this.hostname
 		});
 		return (true);
@@ -151,10 +151,20 @@ export class Room {
 		// Create the puck and broadcast its information
 		room.puck = new Puck(MapSize[room.gameInfo.mapSize], PuckSpeed[room.gameInfo.puckSpeed]);
 		room.broadcast("LoadBall", {
-			vec: room.puck.vec,
 			pos: room.puck.pos,
+			vec: room.puck.vec,
 		});
-		
+		if (room.newWatchers.length) {
+			for (let client of room.newWatchers)
+				client.broadcast("showGame", {
+					pos: room.puck.pos,		
+					vec: room.puck.vec,
+					isGoingOn: false
+				})
+			room.addClients(room.newWatchers);
+			room.newWatchers = [];
+		}
+
 		setTimeout(() => {
 			room.broadcast("PongStart");
 			room.puck.setCheckPuck(room);

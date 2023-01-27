@@ -87,7 +87,7 @@
 	{#if player || invited}
 	<div class="img-box">
 		{#if player}
-			{#if player.info.username == hostname}
+			{#if player.info.username_42 == hostname}
 			<span class="host">HOST</span>
 			{:else if ready}
 			<span class="ready">READY</span>

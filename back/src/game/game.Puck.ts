@@ -66,7 +66,8 @@ export class Puck {
 					for (let client of room.newWatchers) {
 						client.broadcast('showGame', {
 							pos: this.pos,
-							vec: this.vec
+							vec: this.vec,
+							isGoingOn: true
 						});
 						room.addClient(client);
 					}

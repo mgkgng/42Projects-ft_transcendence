@@ -181,6 +181,7 @@
 
 	let ready: boolean = false;
 	let started: boolean = false;
+	let readyToShow: boolean = false;
 
 	let winner: any;
 
@@ -294,6 +295,8 @@
 			// By default, player1 is on the right side unless user is the player2
 			switched = (userInfo.username_42 == player2?.info.username_42);
 			gameReady = true;
+			if (data.readyToShow)
+				readyToShow = true;
 		});
 
 		$client.socket.on("PlayerUpdate", (data: any) => {
@@ -305,7 +308,7 @@
 					clearInterval(puckMoving);
 					return ;
 				}
-				if (data.username == player1.info.username_42)
+				if (data.username_42 == player1.info.username_42)
 					player1 = undefined;
 				else
 					player2 = undefined;
@@ -362,6 +365,17 @@
 		$client.socket.on("GameStartFail", () => { tryStart = false; });
 		$client.socket.on("GameStart", () => { started = true });
 
+		$client.socket.on("showGame", (data: any) => {
+			puck = new Puck(data.vec, data.pos, MapSize[gameInfo.mapSize]);
+			if (data.isGoingOn) {
+				puckMoving = setInterval(() => {
+					puck.move();
+					puck = puck;
+				}, 40);
+			}
+			readyToShow = true;
+		});
+
 		$client.socket.emit("RoomCheck", roomID);
 
 		console.log("onMount is here");
@@ -384,7 +398,7 @@
 	});
 </script>
 
-{#if gameInfo}
+{#if gameInfo && readyToShow}
 <div class="container">
 	<!-- <div class="flex pong" style="width: {MapSize[gameInfo.mapSize][1] + 200}px; height: {MapSize[gameInfo.mapSize][0]}px;"> -->
 	<div class="flex pong">

@@ -576,7 +576,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				isPrivate: true
 			};
 			
-			//TODO get username by username42 (for the invited)
 			let room = new Room([player], [target], gameInfo, target.username_42, invited, this, this.gameRep, this.mainServerService, this.dataSource, this.userService)
 			this.rooms.set(room.id, room);
 			target.isPlaying(room.id);
