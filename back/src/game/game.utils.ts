@@ -64,5 +64,5 @@ export const PongConfig = {
 	FrameDuration: 40,
 	DeadZoneHeight: 20,
 	PaddleHeight: 12,
-	PaddleBumper: 8
+	PaddleBumper: 12
 }

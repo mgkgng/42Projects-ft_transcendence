@@ -101,14 +101,14 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 
 		// Join Queue
-		this.queue.push([target.username, target]);
+		this.queue.push([target.username_42, target]);
 		target.state = UserState.Waiting
 
 		// Game distribution
 		if (this.queue.length > 1) {
 			// create a random room for two players
 			let [target1, target2] = [this.clients.get(this.queue[0][0]), this.clients.get(this.queue[1][0])];
-			let [player1, player2] = [await this.getPlayerInfo(target1.username), await this.getPlayerInfo(target2.username)];
+			let [player1, player2] = [await this.getPlayerInfo(target1.username_42), await this.getPlayerInfo(target2.username_42)];
 			let gameInfo = { title: "", mapSize: getRandomInt(3), maxPoint: 10, puckSpeed: getRandomInt(3), paddleSize: getRandomInt(3), isPrivate: true }
 			let room = new Room([player1, player2], [target1, target2], gameInfo, "", undefined, 
 				this,
@@ -133,7 +133,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			return ;
 
 		// Get rid of the client from the queue and turn them back available
-		let index = this.queue.findIndex(x => x[0] == target.username);
+		let index = this.queue.findIndex(x => x[0] == target.username_42);
 		this.queue.splice(index, 1);
 		target.isAvailable();
 	}
@@ -146,12 +146,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		if (!room) {
 			client.emit("RoomCheckError", ErrorMessage.RoomNotFound);
 			return ;
-		} else if (!room.clients.has(target.username)) {
+		} else if (!room.clients.has(target.username_42)) {
 			client.emit("RoomCheckError", ErrorMessage.AccessNotPermitted);
 			return ;
 		}
 
-		if (room.invited && target.username !== room.invited && target.username !== room.hostname) {
+		if (room.invited && target.username_42 !== room.invited.username_42 && target.username_42 !== room.hostname) {
 			client.emit("RoomCheckError", ErrorMessage.NotInvited);
 			return ;
 		}
@@ -175,7 +175,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			puck: (room.puck) ? {
 				pos: room.puck.pos,
 				vec: room.puck.vec
-			} : undefined
+			} : undefined,
+			playMode: (target.username_42 == players[0].username_42 || target.username_42 == players[1].username_42)
 		});
 	}
 
@@ -206,8 +207,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 
 		// Get the player's info and create the room with the data
-		let player = await this.getPlayerInfo(target.username);
-		let room = new Room([player], [target], data, target.username, undefined,
+		let player = await this.getPlayerInfo(target.username_42);
+		let room = new Room([player], [target], data, target.username_42, undefined,
 			this,
 			this.gameRep, this.mainServerService, this.dataSource, this.userService);
 		this.rooms.set(room.id, room);
@@ -225,10 +226,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		if (!room) {
 			client.emit("JoinRoomError", ErrorMessage.RoomNotFound);
 			return ;
-		} else if ([...room.players.keys()].includes(target.username)) {
+		} else if ([...room.players.keys()].includes(target.username_42)) {
 			client.emit("JoinRoomRes", {
 				allowed: true,
-				roomID: room.id
+				roomID: room.id,
+				mode: 1
 			});
 			return ;
 		} else if (room.players.size > 1 && data.play) {
@@ -236,7 +238,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			return ;
 		}
 
-		if (room.invited && !(target.username == room.invited.username || target.username == room.hostname)) {
+		if (room.invited && !(target.username_42 == room.invited.username_42 || target.username_42 == room.hostname)) {
 			client.emit("RoomCheckError", ErrorMessage.NotInvited);
 			return ;
 		}
@@ -244,7 +246,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		// If the user wants to play
 		if (data.play === true) {
 			// broadcast to the users in the room that there is a new player then add player in the room
-			const newPlayer = await this.getPlayerInfo(target.username);
+			const newPlayer = await this.getPlayerInfo(target.username_42);
 			room.broadcast("PlayerUpdate", {
 				join: true,
 				player: {
@@ -258,10 +260,14 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		} else {
 			// If the user only wants to watch, add the user in the client list
 			target.isWatching(room.id);
-			room.addClient(target);
+			if (room.isStarted)
+				room.newWatchers.push(target);
+			else 
+				room.addClient(target);
 			target.broadcast("JoinRoomRes", {
 				allowed: true,
-				roomID: room.id
+				roomID: room.id,
+				mode: 2
 			});
 		}
 	}
@@ -271,15 +277,15 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		// Check if the user is in the room
 		let target = this.getClient(req);
 		let room = this.getRoom(data.roomID);
-		if (!room || !room.clients.has(target.username))
+		if (!room || !room.clients.has(target.username_42))
 			return ;
 	
 		// Check if the user is one of the players
-		if (room.players.has(target.username)) 
+		if (room.players.has(target.username_42)) 
 			room.playerExit(target);
 		else // if the user is a watcher, remove the user from clients of the room
 		{
-			room.clients.delete(target.username);
+			room.clients.delete(target.username_42);
 			target.room = "";
 		}
 	}
@@ -292,7 +298,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		// Check if the client is a guest player in the room
 		let target = this.getClient(req);
 		let room = this.getRoom(data.roomID);
-		if (!room || !room.players.has(target.username) || room.hostname == target.username)
+		if (!room || !room.players.has(target.username_42) || room.hostname == target.username_42)
 			return ;
 
 		// Set room state and broadcast
@@ -305,7 +311,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		// Check if the client is a host player in the room and room is full
 		let target = this.getClient(req);
 		let room = this.getRoom(data);
-		if (!room || !room.players.has(target.username) || room.hostname != target.username || room.players.size != 2)
+		if (!room || !room.players.has(target.username_42) || room.hostname != target.username_42 || room.players.size != 2)
 			return ;
 
 		// Check if the guest player is ready
@@ -417,38 +423,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		});
 	}
 
-	// @SubscribeMessage('CheckNewUsername')
-	// async checkNewUsername(@ConnectedSocket() client: Socket, @MessageBody() data, @Request() req)
-	// {
-	// 	try {
-	// 		const id_user = await this.mainServerService.getIdUser(req);
-	// 		try{
-	// 			const res = await this.dataSource.getRepository(UserEntity)
-	// 			.createQueryBuilder("user")
-	// 			.select(["user.username"])
-	// 			.where("user.username = :u", {u: data.new_username}).getOneOrFail();
-	// 			await client.emit("error_change_username", "Username already taken");
-	// 			console.log("Username already taken ", client.id);
-	// 			return;
-	// 		} catch(e){
-	// 			if (data.new_username.length == 0 || data.new_username.length > 20)
-	// 			{
-	// 				await client.emit("error_change_username", "Username not in good fromat");
-	// 				return;
-	// 			}
-	// 			const res = await this.dataSource.createQueryBuilder().update(UserEntity)
-	// 			.where("id_g = :u", {u: id_user})
-	// 			.set({username: data.new_username}).execute();
-	// 			await client.emit("change_username", {new_username: data.new_username});
-	// 			console.log("Username changed ", client.id);
-	// 			return;
-	// 		}
-	// 	} catch(e){
-	// 		await client.emit("error_change_username", "Data error");
-	// 		console.log("Data error ", client.id);
-	// 	}
-	// }
-
 	/** From here, it is about friend system, direct messages and the notification */
 	/* I need to do this here in order to finish the project as soon as possible */
 
@@ -478,11 +452,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		// Check if the request came from a proper player
 		let target = this.getClient(req);
 		let room = this.getRoom(data.room);
-		if (!room || !room.players.has(target.username))
+		if (!room || !room.players.has(target.username_42))
 			return ;
 
 		// Get the player
-		let player = room.players.get(target.username);
+		let player = room.players.get(target.username_42);
 
 		// TODO protection switching between keyboard and mouse
 		// Paddle starts to move, Websocket Messages set with interval
@@ -504,11 +478,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		// Check if the request came from a proper player
 		let target = this.getClient(req);
 		let room = this.getRoom(data);
-		if (!room || !room.players.has(target.username))
+		if (!room || !room.players.has(target.username_42))
 			return ;
 
 		// Get the player
-		let player = room.players.get(target.username);
+		let player = room.players.get(target.username_42);
 		// clear the interval and delete it
 		clearInterval(player.control);
 		player.control = undefined
@@ -588,8 +562,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				})
 				return ;
 			}
-			let player = await this.getPlayerInfo(target.username);
-			let invited = await this.getPlayerInfo(data.username);
+			let player = await this.getPlayerInfo(target.username_42);
+			let invited = await this.getPlayerInfo(data.username_42);
 			let args = messageToSave.split("/");
 			console.log(args);
 			//TODO parsing + error
@@ -603,7 +577,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			};
 			
 			//TODO get username by username42 (for the invited)
-			let room = new Room([player], [target], gameInfo, target.username, invited, this, this.gameRep, this.mainServerService, this.dataSource, this.userService)
+			let room = new Room([player], [target], gameInfo, target.username_42, invited, this, this.gameRep, this.mainServerService, this.dataSource, this.userService)
 			this.rooms.set(room.id, room);
 			target.isPlaying(room.id);
 

@@ -32,6 +32,7 @@ export class Room {
 	players: Map<string, Player>;
 	playerIndex: Array<string>;
 	clients: Map<string, Client>;
+	newWatchers: Array<any>;
 
 	/* Server */
 	gameServer: GameGateway;
@@ -62,6 +63,7 @@ export class Room {
 		/* Users */
 		this.players = new Map();
 		this.clients = new Map<string, Client>();
+		this.newWatchers = [];
 		this.playerIndex = [playersInfo[0].username_42, (playersInfo.length > 1) ? playersInfo[1].username_42 : undefined];
 		this.players.set(playersInfo[0].username_42, new Player(playersInfo[0], (hostname == playersInfo[0].usename_42), 0, MapSize[gameInfo.mapSize], PaddleSize[gameInfo.paddleSize]));
 		if (playersInfo.length > 1)
@@ -103,7 +105,8 @@ export class Room {
 		this.isAvailable = false;
 		client.broadcast("JoinRoomRes", {
 			allowed: true,
-			roomID: this.id
+			roomID: this.id,
+			mode: 1
 		});
 	}
 

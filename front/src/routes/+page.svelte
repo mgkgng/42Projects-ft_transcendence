@@ -103,7 +103,7 @@
 </Modal>
 
 <Modal bind:this={enterModal}>
-	<Enter itself={enterModal} enterGameModal={enterGameModal} rankModal={rankModal} chatModal={chatModal}/>
+	<Enter itself={enterModal} rankModal={rankModal} chatModal={chatModal}/>
 </Modal>
 
 <Modal bind:this={createGameModal}>

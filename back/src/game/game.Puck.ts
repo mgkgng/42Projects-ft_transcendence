@@ -53,8 +53,6 @@ export class Puck {
 				return ;
 			let paddlePos = player.paddle.pos;
 			// console.log(paddlePos, deathPointX);
-			console.log("should be at", deathPointX);
-			console.log("paddle at", paddlePos);
 			if (deathPointX >= paddlePos - PongConfig.PaddleBumper && deathPointX <= paddlePos + PaddleSize[room.gameInfo.paddleSize] + PongConfig.PaddleBumper) {
 				// if paddle hits the puck
 				this.pos[0] = deathPointX;
@@ -64,6 +62,16 @@ export class Puck {
 				this.vec[1] *= -1;
 				room.broadcast("PuckHit");
 				this.setCheckPuck(room);
+				if (room.newWatchers.length) {
+					for (let client of room.newWatchers) {
+						client.broadcast('showGame', {
+							pos: this.pos,
+							vec: this.vec
+						});
+						room.addClient(client);
+					}
+					room.newWatchers = [];
+				}
 				return ;
 			} else
 				this.setScore(room);

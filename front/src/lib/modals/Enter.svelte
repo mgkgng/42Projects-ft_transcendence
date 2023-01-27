@@ -35,7 +35,6 @@
 	export let rankModal: any;
 
 	let loading: boolean = false;
-	
 </script>
 
 <div class="flex buttons">
