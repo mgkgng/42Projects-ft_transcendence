@@ -146,7 +146,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		if (!room) {
 			client.emit("RoomCheckError", ErrorMessage.RoomNotFound);
 			return ;
-		} else if (!room.clients.has(target.username_42)) {
+		} else if (!room.clients.has(target.username_42) && !room.newWatchers.has(target.username_42)) {
 			client.emit("RoomCheckError", ErrorMessage.AccessNotPermitted);
 			return ;
 		}
@@ -176,7 +176,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				pos: room.puck.pos,
 				vec: room.puck.vec
 			} : undefined,
-			playMode: (target.username_42 == players[0].username_42 || target.username_42 == players[1].username_42)
+			isNewWatcher: room.newWatchers.has(target.username_42)
 		});
 	}
 
@@ -261,7 +261,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			// If the user only wants to watch, add the user in the client list
 			target.isWatching(room.id);
 			if (room.isStarted)
-				room.newWatchers.push(target);
+				room.newWatchers.set(target.username_42, target);
 			else 
 				room.addClient(target);
 			target.broadcast("JoinRoomRes", {

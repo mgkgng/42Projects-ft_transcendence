@@ -32,7 +32,7 @@ export class Room {
 	players: Map<string, Player>;
 	playerIndex: Array<string>;
 	clients: Map<string, Client>;
-	newWatchers: Array<any>;
+	newWatchers: Map<string, Client>;
 
 	/* Server */
 	gameServer: GameGateway;
@@ -63,7 +63,7 @@ export class Room {
 		/* Users */
 		this.players = new Map();
 		this.clients = new Map<string, Client>();
-		this.newWatchers = [];
+		this.newWatchers = new Map<string, Client>();
 		this.playerIndex = [playersInfo[0].username_42, (playersInfo.length > 1) ? playersInfo[1].username_42 : undefined];
 		this.players.set(playersInfo[0].username_42, new Player(playersInfo[0], (hostname == playersInfo[0].usename_42), 0, MapSize[gameInfo.mapSize], PaddleSize[gameInfo.paddleSize]));
 		if (playersInfo.length > 1)
@@ -154,15 +154,16 @@ export class Room {
 			pos: room.puck.pos,
 			vec: room.puck.vec,
 		});
-		if (room.newWatchers.length) {
-			for (let client of room.newWatchers)
+		if (room.newWatchers.size) {
+			let newWatchers = [...room.newWatchers.values()]
+			for (let client of newWatchers)
 				client.broadcast("showGame", {
 					pos: room.puck.pos,		
 					vec: room.puck.vec,
 					isGoingOn: false
-				})
-			room.addClients(room.newWatchers);
-			room.newWatchers = [];
+				});
+			room.addClients(newWatchers);
+			room.newWatchers.clear();
 		}
 
 		setTimeout(() => {

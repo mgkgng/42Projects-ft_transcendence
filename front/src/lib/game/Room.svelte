@@ -295,7 +295,7 @@
 			// By default, player1 is on the right side unless user is the player2
 			switched = (userInfo.username_42 == player2?.info.username_42);
 			gameReady = true;
-			if (data.readyToShow)
+			if (!data.isNewWatcher)
 				readyToShow = true;
 		});
 
@@ -366,6 +366,7 @@
 		$client.socket.on("GameStart", () => { started = true });
 
 		$client.socket.on("showGame", (data: any) => {
+			console.log("showGame", data);
 			puck = new Puck(data.vec, data.pos, MapSize[gameInfo.mapSize]);
 			if (data.isGoingOn) {
 				puckMoving = setInterval(() => {
@@ -423,7 +424,7 @@
 				</div>
 				<div class="zone-limit right {(!switched) ? "player1" : "player2"}" style="--width: {zoneLimitWidth}px"></div>
 
-				{#if puckPos}
+				{#if puck && puckPos}
 					{#if puckPos.length > 4}
 					<div class="shadow" style="top: {puckPos[4][0]}px; left: {puckPos[4][1]}px; --opacity: 15%"></div>
 					{/if}

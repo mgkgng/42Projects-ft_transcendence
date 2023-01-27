@@ -62,8 +62,8 @@ export class Puck {
 				this.vec[1] *= -1;
 				room.broadcast("PuckHit");
 				this.setCheckPuck(room);
-				if (room.newWatchers.length) {
-					for (let client of room.newWatchers) {
+				if (room.newWatchers.size) {
+					for (let client of [...room.newWatchers.values()]) {
 						client.broadcast('showGame', {
 							pos: this.pos,
 							vec: this.vec,
@@ -71,7 +71,7 @@ export class Puck {
 						});
 						room.addClient(client);
 					}
-					room.newWatchers = [];
+					room.newWatchers.clear();
 				}
 				return ;
 			} else
