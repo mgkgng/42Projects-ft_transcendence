@@ -31,7 +31,6 @@
     import { client } from "$lib/stores/client";
 
 	export let itself: any;
-	export let enterGameModal: any;
 	export let chatModal: any;
 	export let rankModal: any;
 

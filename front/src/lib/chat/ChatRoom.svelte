@@ -43,6 +43,7 @@
 					&:hover { background-color: transparentize(#fff, .6); }
 				}
 			}
+
 			.read {
 				height: 90%;
 				width: 100%;
@@ -168,16 +169,10 @@
 					border-radius: 0 0 .5em 0;
 
 					&:hover { background-color: transparentize(#fff, .7); }
-				
-					input {
-						position: absolute;
-						top: 0.8em;
-						right: 0;
-					}
 				}
 			}
 
-			
+			    
 			button {
 				position: absolute;
 				right: .2em;

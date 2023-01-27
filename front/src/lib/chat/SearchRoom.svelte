@@ -22,7 +22,7 @@
 				width: 4em;
 				height: 1.5em;
 
-				&.hover { filter: brightness(85%); }
+				&:hover { filter: brightness(85%); }
 			}
 		}
 
@@ -58,26 +58,6 @@
 				}
 			}
 		}
-	}
-
-	.back{
-		padding: 0em;
-		width: 50px;
-		height: 50px;
-		margin-right: 1em;
-		border-radius: 0.5em;
-		color:rgb(255, 255, 255);
-		text-align: center;
-		background-color: rgba(97, 97, 97, 0.5);
-		cursor: pointer;
-	}
-
-	.research-zone{
-		display: flex;
-		flex-direction: row;
-		padding: 0.2em;
-		margin: 0.5em;
-		height: 40px;
 	}
 </style>
 

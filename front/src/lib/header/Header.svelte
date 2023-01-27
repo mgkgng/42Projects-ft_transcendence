@@ -49,13 +49,6 @@
 			}
 		}
 
-		p {
-			position: absolute;		
-			color: #fff;
-			width: 10em;
-			right: 2em;
-		}
-
 		.menu {
 			display: none;
 			position: absolute;

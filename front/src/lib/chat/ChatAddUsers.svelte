@@ -37,23 +37,6 @@
 				position: relative;
 			}
 		}
-		.search {
-			position: absolute;
-			top: 1.6em;
-			right: 1em;
-			padding: .5em;
-			border-radius: 50%;
-			transition: .1s;
-			cursor: pointer;
-			
-			img {
-				width: 2em;
-			}
-
-			&:hover {
-				background-color: transparentize(#fff, .9);
-			}
-		}
 
 		.search-bar {
 			position: relative;
@@ -162,62 +145,6 @@
 						
 						&:hover {
 							background-color: transparentize(#fff, .8	);
-						}
-					}
-				}
-			}
-		}
-
-		.requests {
-			width: 90%;
-			max-height: 35%;
-			overflow-y: overlay;
-			gap: .2em;
-			border: $border;
-			border-radius: .2em;
-
-			justify-content: space-between;
-			
-			.line {
-				padding: .5em .5em;
-				align-items: center;
-				display: grid;
-				grid-template-columns: 12% 40% 35%;
-
-				.user {
-					transition: .2s;
-					padding: .1em .3em;
-					border-radius: .2em;
-					font-size: 15px;
-					cursor: pointer;
-
-					p {
-						border-radius: .3em;
-						padding: 0 .1em;
-						&:hover {
-							background-color: transparentize(#fff, .6);
-						}
-					}
-				}
-				img {
-					width: 45px;
-					height: 45px;
-					border-radius: 50%;
-					object-fit: cover;
-				}
-				.buttons {
-					gap: .2em;
-					font-size: 13px;
-
-					button {
-						background-color: $red;
-						border-radius: .2em;
-						width: 4em;
-						height: 2em;
-						transition: .2s;
-						&:first-child { background-color: $green; }
-						&:hover {
-							transform: scale(1.05);
 						}
 					}
 				}

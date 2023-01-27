@@ -64,11 +64,6 @@
 					border-left: none;
 				}
 
-				.choose{
-					background-color: rgba(207, 196, 196, 0.5);
-					text-decoration: underline;
-				}
-
 				&:hover {
 					.room {
 						background-color: rgb(94, 94, 94);

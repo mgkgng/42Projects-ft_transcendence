@@ -131,15 +131,6 @@
 					width: 90%;
 					gap: .2em;
 	
-					.text-input {
-						padding-left: .5em;
-						width: 95%;
-						height: 1.8em;
-						border-radius: .2em;
-						background-color: #fff;
-						color: #000;
-					}
-	
 					.choice {
 						gap: .2em;
 						justify-content: center;
@@ -166,10 +157,7 @@
 					label {
 						padding: 0 1em; 
 					}
-	
-					input[type="range"] {
-						width: 80%;
-					}
+
 					.number-input {
 						align-items: center;
 						gap: .3em;

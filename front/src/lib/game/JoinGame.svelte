@@ -101,28 +101,6 @@
 			}
 		}
 
-		.info {
-			width: 100%;
-			height: 3.5em;
-			border-top: $border-thin;
-			border-bottom: $border-thin;
-			padding: .5em;
-			font-size: 12px;
-
-			display: grid;
-			grid-template-columns: 30% 20% 20% 20%;
-			text-align: center;
-			
-			div {
-				padding: .2em;
-				border-right: $border-thin;
-
-				&:last-child {
-					border-right: none;
-				}
-			}
-		}
-
 		.buttons {
 			// margin-top: .5em;
 			gap: .5em;

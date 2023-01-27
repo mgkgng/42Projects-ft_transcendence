@@ -37,23 +37,6 @@
 				position: relative;
 			}
 		}
-		.search {
-			position: absolute;
-			top: 1.6em;
-			right: 1em;
-			padding: .5em;
-			border-radius: 50%;
-			transition: .1s;
-			cursor: pointer;
-			
-			img {
-				width: 2em;
-			}
-
-			&:hover {
-				background-color: transparentize(#fff, .9);
-			}
-		}
 
 		.search-bar {
 			position: relative;

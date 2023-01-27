@@ -85,7 +85,7 @@
 <div class="window vflex qrcode">
     <h3>Scan the QR code with Google Authenticator</h3>
     <div class="qrcode-wrapper">
-        <img src={qrCodeUrl} />
+        <img src={qrCodeUrl} alt={code}/>
     </div>
     <div class="flex verify">
         <input type="text-input" placeholder="Code for validation" bind:value={verifKey}>
