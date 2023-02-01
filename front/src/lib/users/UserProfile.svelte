@@ -290,8 +290,8 @@
 						<div class="mid">vs</div>
 						<div class="uname">{(game.player1_score > game.player2_score) ? game.player2.username : game.player1.username}</div>
 					</div>
-					<div class="wl {((game.player1_score > game.player2_score && game.player1.username == userInfo.username) || (game.player1_score < game.player2_score && game.player2.username == userInfo.username)) ? "win" : "lose"}">
-						{((game.player1_score > game.player2_score && game.player1.username == userInfo.username) || (game.player1_score < game.player2_score && game.player2.username == userInfo.username)) ? "W" : "L"}
+					<div class="wl {((game.player1_score > game.player2_score && game.player1.username == profileUser.username) || (game.player1_score < game.player2_score && game.player2.username == profileUser.username)) ? "win" : "lose"}">
+						{((game.player1_score > game.player2_score && game.player1.username == profileUser.username) || (game.player1_score < game.player2_score && game.player2.username == profileUser.username)) ? "W" : "L"}
 					</div>
 					<div class="flex score">
 						<div>{(game.player1_score > game.player2_score) ? game.player1_score : game.player2_score}</div>
