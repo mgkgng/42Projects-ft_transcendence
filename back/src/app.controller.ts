@@ -30,7 +30,9 @@ export class AppController {
       if (req.user.error)
           return ({get_code : req.user.error, tmp_jwt: await this.authService.sign_tmp_jwt(req.user.user)});
       else
+      {
         return (this.authService.login(req.user));
+      }
   }
 }
 

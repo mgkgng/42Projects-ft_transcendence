@@ -152,7 +152,6 @@ export class ChatRoomService {
 				await client.join(data.id_public_room); 		//JOIN ROOM (socket.io rooms)
 				this.server.to(data.id_public_room).emit("success_append_user_to_room", {id_public_room: room.id_public_room, room_name: room.name, username: client_username_42});
 				//this.server.to(data.id_public_room).emit("append_user_to_room_res", {id_public_room: room.id_public_room, is_admin: false, username: user.username});
-				console.log("Append user to room finish1");
 				return;
 			}
 			const res_user_chat_room = await this.dataSource.createQueryBuilder().insert().into(UserChatRoomEntity).values
@@ -239,7 +238,6 @@ export class ChatRoomService {
 				}
 				if (res_is_in_room[0].is_banned && res_is_in_room[0].ban_end > new Date())
 				{
-					console.log("Banned Error");
 					await client.emit("error_get_message_room", {error: "You are banned"});
 					throw new WsException("Your are ban");
 				}
@@ -353,6 +351,7 @@ export class ChatRoomService {
 			//await querry.rollbackTransaction();
 			await client.emit("error_new_message_room", {error: "Can't create message"});
 			throw new WsException("Can't send message");
+			console.log("Error Create message:", e)
 		}
 	}
 	//OK
@@ -361,7 +360,6 @@ export class ChatRoomService {
 	@SubscribeMessage('get_my_rooms')
 	async getMyRoom(@MessageBody() data, @ConnectedSocket() client: Socket)
 	{
-		console.log("get_My_rooms",data);
 		const res : any = await this.mainServer.getNamesRoomsForUser(client);
 		await client.emit("get_my_rooms_res", res);
 	}

@@ -180,7 +180,7 @@ export class ChatDirectMessageService {
 					acc.push(user);
 				}
 				return acc;
-			}, [])
-			.sort((user1, user2) => messageDateMap.get(user2.username).getTime() - messageDateMap.get(user1.username).getTime());
+			}, []);
+			//.sort((user1, user2) => messageDateMap.get(user2.username).getTime() - messageDateMap.get(user1.username).getTime());
 	}
 }

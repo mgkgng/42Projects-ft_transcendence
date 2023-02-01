@@ -193,6 +193,7 @@
 		});
 		$client.socket.on("success_askFriendG", (data: any) => {
 			profileUser.is_asked = true;
+			profileUser.asked_by = data.asked_by;
 			profileUser = profileUser;
 		});
 

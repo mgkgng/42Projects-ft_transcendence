@@ -266,7 +266,7 @@
 				{#each userSearchList as user}
 				<div class="user" on:click={() => {
 					if (sendTo.length < 5) {
-						sendTo.push(user.username_42);
+						sendTo.push(user);
 						sendTo = sendTo;
 					} else {
 						errorMessage = "You can write to maximum five people.";
@@ -287,7 +287,7 @@
 		<div class="flex dist">
 			{#each sendTo as user}
 			<div class="flex to">
-				<p>{user}</p>
+				<p>{user.username}</p>
 				<button on:click={() => {
 					sendTo.splice(sendTo.indexOf(user), 1);
 					sendTo = sendTo;
@@ -317,7 +317,7 @@
 			}
 			for (let dest of sendTo)
 				$client.socket.emit("sendDirectMessageG", {
-					username_42: dest,
+					username_42: dest.username_42,
 					message: message
 				});
 				message = "";
@@ -378,14 +378,14 @@
 					alertMessageModal.open();
 					return ;
 				}
-				if (sendTo[0] == userInfo.username_42) {
+				if (sendTo[0].username_42 == userInfo.username_42) {
 					errorMessage = "You cannot send a game invitation to yourself.";
 					alertMessageModal.open();
 					return ;
 				}
 				console.log(createInvitationMessage(message));
 				$client.socket.emit("sendDirectMessageG", {
-					username_42: sendTo[0],
+					username_42: sendTo[0].username_42,
 					message: createInvitationMessage(message)
 				});
 				message = "";

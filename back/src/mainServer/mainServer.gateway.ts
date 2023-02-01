@@ -72,7 +72,7 @@ export class MainServerGateway {
 		const users = await qb.where("LOWER(user.username) LIKE LOWER(:username)", {username: data.username + "%"})
 		// .orWhere("LOWER(user.displayname) LIKE :displayname", {displayname: data.username + "%"})
 		.take(8).getMany();
-		console.log(data, users);
+		//console.log(data, users);
 		if (!users || users.length < 1)
 		{
 			this.server.to(client.id).emit('error_getUserinDB', {error: "No user found"});

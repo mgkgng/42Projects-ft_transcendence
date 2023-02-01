@@ -13,7 +13,7 @@
 			border-right: $border;
 			border-radius: 0 0 .8em 0;
 			padding-left: .5em;
-			
+			overflow-y: scroll;	
 			.title {
 				position: relative;
 				width: 95%;
@@ -232,6 +232,7 @@
 			profileUser = data.users[0]; 
 			console.log("succes_getUserinDB: ", profileUser, data)
 		});
+		chat.my_rooms.get(roomID).actual_page = 0;
 		firstUpdate = false;
 	});
 	function scrollToBottom() {

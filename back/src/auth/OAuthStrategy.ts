@@ -61,6 +61,7 @@ export class OAuthStrategy extends PassportStrategy(Strategy, "oauth") {
 				campus_name: data.campus[0].name,
 				campus_country: data.campus[0].country,
 				email: data.email,
+				try_2fa : false 
 			});
 			if (user_bd.is_2fa)
 			{
@@ -68,6 +69,7 @@ export class OAuthStrategy extends PassportStrategy(Strategy, "oauth") {
 				{
 					//console.log("2FA", code, code_2fa);
 					//console.log(authenticator.check(code_2fa, user_bd.secret_2fa))
+					find.try_2fa = true;
 					return ({error: "2FA code is not valid", user: find});
 				}
 			}
@@ -96,7 +98,8 @@ export class OAuthStrategy extends PassportStrategy(Strategy, "oauth") {
 					img_url: data.image.link,
 					campus_name: data.campus[0].name,
 					campus_country: data.campus[0].country,
-					email: data.email
+					email: data.email,
+					try_2fa: false
 				});
 			}
 			catch

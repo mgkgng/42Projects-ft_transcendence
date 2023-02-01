@@ -49,7 +49,7 @@ export class AuthService {
 			img_url: user.img_url,
 			campus_name: user.campus_name,
 			campus_country: user.campus_country,
-			double_auth_ok : true
+			try_2fa: false 
 		};
 		return {
 		  access_token: this.jwtService.sign(payload, {secret: process.env.SECRET}),

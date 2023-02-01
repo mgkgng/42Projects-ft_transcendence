@@ -39,6 +39,7 @@
 			padding-right: .5em;
 			height: 93%;
 			gap: 0.1em;
+			overflow-y: scroll;
 
 			p {
 				text-align: center;

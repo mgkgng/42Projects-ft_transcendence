@@ -36,20 +36,22 @@ export class WsAdapter extends IoAdapter {
 	  verify(socket.handshake.headers.authorization.split(' ')[1] as string, process.env.SECRET, (err, decoded : any) => { 
 		if (err)
 		{
-			// console.log("ERROR", err);
+			console.log("ERROR", err);
 			socket.emit("errors", {message: "UnauthorizedJwt"});
 			return (null);
 		}
 		else
 		{
-		  if(new Date((decoded.iat + 60 * 60 * 24) * 1000) > (new Date(Date.now())))
+		  if(new Date((decoded.iat + 60 * 60 * 24) * 1000) > (new Date(Date.now())) && decoded.try_2fa == false)
 		  {
 			socket.emit("connection", {});
 		  	next();
 		  }
 		  else
+		  {
 			socket.emit("errors", {message: "UnauthorizedJwt"});
 			return (null);
+		  }
 		}
 	  });
     });

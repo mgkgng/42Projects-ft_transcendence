@@ -1,9 +1,10 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
 import { ChatRoomEntity } from "./ChatRoom.entity";
 import { UserEntity } from "./User.entity";
 
 //All informations about a User in a specific room
 @Entity()
+@Unique(["id_user", "room"]) // named; multiple fields
 export class UserChatRoomEntity {
 	@PrimaryGeneratedColumn()
 	id: number;

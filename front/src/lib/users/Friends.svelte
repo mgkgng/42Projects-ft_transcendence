@@ -235,6 +235,7 @@
     import Modal from "$lib/tools/Modal.svelte";
     import UserProfile from "$lib/users/UserProfile.svelte";
 	import WriteMessage from "$lib/users/WriteMessage.svelte";
+    import ChangeUsername from "../settings/ChangeUsername.svelte";
 
 	export let itself: any;
 
@@ -418,6 +419,7 @@
 		{#if friends && friends.size}
 		<div class="vflex friends-list">
 			{#each [...friends.values()] as friend}
+			{#if friend.username != $client.username}
 			<div class="flex line">
 				<div class="friend" on:click={() => {
 					$client.socket.emit("getUserProfile", {username_42 : friend.username_42});
@@ -433,6 +435,7 @@
 					}}><img src="/remove.png" alt="remove"></button>
 				</div>
 			</div>
+			{/if}
 			{/each}
 		</div>
 		{:else}

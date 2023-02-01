@@ -339,7 +339,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	async getHistGame(@MessageBody() data: any, @ConnectedSocket() client: Socket, @Request() req) {
 		try{
 			let id_user = await this.mainServerService.getIdUserByUsername(data.username);
-			console.log(id_user);
+			//console.log(id_user);
 			//let id_user = await this.mainServerService.getIdUser(req);
 			const res = await this.dataSource.getRepository(GameEntity).createQueryBuilder("game")
 			.innerJoin("game.player1", "user1")
@@ -509,9 +509,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		{
 			const userFriend = await this.friendSystemService.askFriend(user.username, friend.username);
 			let target = this.clients.get(friend.username_42);
-			target.updateRequest(user.username_42, true);
-
-			this.server.to(client.id).emit('success_askFriendG', {friend: friend.username});
+			if (target) {
+				target.updateRequest(user.username_42, true);
+			}
+			this.server.to(client.id).emit('success_askFriendG', {asked_by: this.mainServerService.getUserConnectedBySocketId(client.id).username_42});
 			return;
 		}
 	}
@@ -541,8 +542,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		{
 			await this.friendSystemService.unAskFriend(user.username, friend.username);
 			let target = this.clients.get(friend.username_42);
-			target.updateRequest(user.username_42, false);
-
+			if (target){
+				target.updateRequest(user.username_42, false);
+			}
 			this.server.to(client.id).emit('success_unAskFriendG', {friend: friend.username});
 			return ;
 		}
