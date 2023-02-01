@@ -182,7 +182,8 @@ export class ChatRoomService {
 			try{
 				const res_is_in_room = await this.dataSource.getRepository(UserChatRoomEntity).createQueryBuilder("userChat")
 				.where("userChat.id_user = :u", {u : id_user})
-				.andWhere("userChat.room = :r", {r: id_room}).getMany();
+				.andWhere("userChat.room = :r", {r: id_room})
+				.getMany();
 				if (!res_is_in_room.length)
 				{
 					await client.emit("error_get_users_room", {error: "You are not in this room"});
@@ -197,7 +198,7 @@ export class ChatRoomService {
 				.innerJoin("userChatRoomEntity.room", "chatRoom")
 				.innerJoin("userChatRoomEntity.id_user", "user")
 				.select(["user.username", "userChatRoomEntity.is_admin","userChatRoomEntity.is_owner"])
-				.where("chatRoom.id_g = :id and userChatRoomEntity.is_banned = FALSE", {id: id_room}).getMany();
+				.where("chatRoom.id_g = :id and userChatRoomEntity.is_banned = FALSE and userChatRoomEntity.is_visible = TRUE", {id: id_room}).getMany();
 				let end : any = [];
 				for (let user of res)
 				{
@@ -321,7 +322,6 @@ export class ChatRoomService {
 		const message : any = data.content_message;
 		const date_creation : Date = new Date();
 		const user : any = await this.dataSource.getRepository(UserEntity).findOne({where: {id_g: id_user}});
-		console.log(user);
 		const client_username = user.username;
 		const  querry = this.dataSource.createQueryRunner(); 
 		try{
@@ -332,12 +332,12 @@ export class ChatRoomService {
 				throw new WsException("Not in the room");
 			if (res[0].is_banned && res[0].ban_end > new Date())
 			{
-				await client.emit("error_new_message_room", {error: "You are banned"});
+				await client.emit("error_new_message_room", {error: "You are banned", id_public_room: data.id_public_room, ban_end: res[0].ban_end});
 				throw new WsException("You are ban of the room");
 			}
 			if (res[0].is_muted && res[0].mute_end > new Date())
 			{
-				await client.emit("error_new_message_room", {error: "You are muted"});
+				await client.emit("error_new_message_room", {error: "You are muted", id_public_room: data.id_public_room, mute_end: res[0].mute_end});
 				throw new WsException("You are mute");
 			}
 			const newMessage = new MessageChatRoomEntity();
@@ -361,6 +361,7 @@ export class ChatRoomService {
 	@SubscribeMessage('get_my_rooms')
 	async getMyRoom(@MessageBody() data, @ConnectedSocket() client: Socket)
 	{
+		console.log("get_My_rooms",data);
 		const res : any = await this.mainServer.getNamesRoomsForUser(client);
 		await client.emit("get_my_rooms_res", res);
 	}
@@ -483,7 +484,6 @@ export class ChatRoomService {
 				.set({is_muted: true, mute_end: mute_end})
 				.where("id_user = :u AND room = :r", {u: user_ban[0].id_g, r: room[0].id_g})
 				.execute();
-				await client.leave(data.id_public_room);
 				this.server.to(data.id_public_room).emit("mute_user", data);
 			}
 	}
@@ -520,12 +520,15 @@ export class ChatRoomService {
 	async setRoomNotVisible(@MessageBody() data, @ConnectedSocket() client: Socket, @Request() req) {
 		// console.log("set_room_not_visible", data)
 		const user = await this.mainServer.getIdUser(req);
+		const user_jwt : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
+		const client_username = user_jwt.username;
 		const room : any = await this.mainServer.getIdRoom(data);
 		// console.log("set_room_not_visible", data, user, room);
 		const res = await this.dataSource.createQueryBuilder().update(UserChatRoomEntity)
 				.where("id_user = :u AND room = :r", {u: user, r: room})
 				.set({is_visible: false}).execute();
-		await client.emit("set_room_not_visible_res", data.id_public_room);
+		//await client.emit("set_room_not_visible_res", data.id_public_room);
+		this.server.to(data.id_public_room).emit("set_room_not_visible_res", {id_public_room : data.id_public_room, username: client_username });;
 	}
 	//Put a room in state "visible" for a user
 	//{id_public_room:string}

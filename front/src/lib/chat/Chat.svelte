@@ -214,21 +214,27 @@
 		});
 		$client.socket.on("error_new_message_room", (data: any) => {
 			if (data.error == "You are muted")
-				showPopup("You are mute of room " + data.id_public_room + " until " + data.mute_end);
+				showPopup("You are mute of room " + data.id_public_room + " until " + format_date(data.mute_end));
 			else if (data.error == "You are banned")
-				showPopup("You are ban of room " + data.id_public_room + " until " + data.ban_end);
+				showPopup("You are ban of room " + data.id_public_room + " until " + format_date(data.ban_end));
 		});
 		$client.socket.on("set_room_not_visible_res", (data: any) => {
-			chat.my_rooms.delete(data);
-			chat = chat;
-			if (data == roomSelected)
-				roomSelected = "";
-			$client.socket.emit("get_my_rooms");
+			if (data.username == $client.username)
+			{
+				if (data.id_public_room == roomSelected)
+					roomSelected = "";
+				$client.socket.emit("get_my_rooms");
+				chat.my_rooms.delete(data.id_public_room);
+				chat = chat;
+			}else{
+				$client.socket.emit("get_users_room", {id_public_room: data.id_public_room});
+			}
 		});
 		$client.socket.on("set_room_visible", (data: any) => { 
 			$client.socket.emit("get_my_rooms");
 		});
 		 $client.socket.on("success_append_user_to_room", (data : any) => {
+			console.log("Success_append:", data, $client.username);
 			if (data.username == $client.username)
 		 		$client.socket.emit("get_my_rooms", {data : "some_data"});
 			else
@@ -350,6 +356,7 @@
 			$client.socket.off("get_message_room_res");
 			$client.socket.off("get_users_room_res");
 			$client.socket.off("new_message_room_res");
+			$client.socket.off("success_append_user_to_room");
 		});
 	});
 </script>

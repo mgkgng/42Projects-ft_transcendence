@@ -86,6 +86,10 @@
 		$client.socket.on("success_append_user_to_room", (data: any) => {
 			console.log("success_append_user_to_room", data);
 			console.log("success_append_user_to_room", $client.username);
+			if (data.username == $client.username)
+		 		$client.socket.emit("get_my_rooms", {data : "some_data"});
+			else
+				$client.socket.emit("get_users_room", {id_public_room: data.id_public_room});
 			itself.close();
 		});
 

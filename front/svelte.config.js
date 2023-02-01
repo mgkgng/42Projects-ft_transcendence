@@ -14,7 +14,9 @@ const config = {
 
 	kit: {
 		adapter: adapter(),
-	}
+	},
+
+	logLevel: 'none'
 };
 
 export default config;
