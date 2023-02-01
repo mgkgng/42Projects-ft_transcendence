@@ -2,7 +2,7 @@
 	main {
 		padding: 0;
 		width: 100vw;
-		min-width: 800px;
+		min-width: 400px;
 		height: 100vh;
 		overflow: hidden;
 		display: flex;

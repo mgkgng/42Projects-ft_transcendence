@@ -290,7 +290,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 	}
 
-
 	@SubscribeMessage("isReady")
 	setReady(@MessageBody() data: any, @Request() req) {
 

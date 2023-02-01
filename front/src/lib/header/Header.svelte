@@ -4,7 +4,7 @@
 		width: 100%;
 		height: 95px;
 
-		z-index: 9999;
+		z-index: 50;
 
 		display: flex;
 		flex-direction: row;
@@ -47,6 +47,19 @@
 				object-fit: cover;
 				border-radius: .4em;
 			}
+
+			.notif-top {
+				position: absolute;
+				top: 0;
+				right: 0;
+				width: 15px;
+				height: 15px;
+				border-radius: 50%;
+				border: 2px solid $red-dark;
+				background-color: $red;
+				z-index: 999;
+			}
+
 		}
 
 		.menu {
@@ -58,7 +71,7 @@
 			width: 7rem;
 			border: 2px solid #fff;
 			border-radius: .3em;
-			z-index: 9999;
+			z-index: 99;
 			transform-origin: top;
 
 			&::before {
@@ -104,10 +117,7 @@
 				border-radius: 50%;
 				border: 2px solid $red-dark;
 				background-color: $red;
-			}
-
-			.img {
-				top: 0;
+				z-index: 999;
 			}
 		}
 	}
@@ -233,7 +243,7 @@
 				<img src="http://{location.hostname}:3000{(!userInfo.img) ? userInfo.img_url : userInfo.img}" alt="profile" />
 			{/if}
 			{#if newMessage.size || newFriendRequest.size}
-			<div class="notif img"></div>
+				<div class="notif-top"></div>
 			{/if}
 		</div>
 		<!-- <p>Hello {userInfo.username}!</p> -->
