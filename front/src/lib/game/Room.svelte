@@ -225,7 +225,7 @@
 	function convertPixelWithHeight(where: number) {
 		if (!gameSize)
 			return (initPos);
-		return (Math.floor((gameSize.height * where) / MapSize[gameInfo.mapSize][0]));
+		return (Math.floor((gameSize.height * where) / (MapSize[gameInfo.mapSize][0] + PongConfig.PuckSize / 2)));
 	}
 
 	function convertPixelWithWidth(where: number) {
@@ -246,9 +246,7 @@
 		paddleWidth = convertPixelWithHeight(PaddleSize[gameInfo.paddleSize]);
 		initPos = convertPixelWithHeight((MapSize[gameInfo?.mapSize][0] - PaddleSize[gameInfo?.paddleSize]) / 2);
 		zoneLimitWidth = convertPixelWithWidth(PongConfig.DeadZoneHeight);
-		let test = convertPixelWithWidth(PongConfig.DeadZoneHeight) - 12;
-		posHorizontal = [test, convertPixelWithWidth(MapSize[gameInfo.mapSize][1] - PongConfig.DeadZoneHeight)];
-		console.log(posHorizontal);
+		posHorizontal = [convertPixelWithWidth(PongConfig.DeadZoneHeight) - 12, convertPixelWithWidth(MapSize[gameInfo.mapSize][1] - PongConfig.DeadZoneHeight)];
 	}
 
 	function translatePucks(puck: any) {
@@ -411,7 +409,7 @@
 			{#if gameSize}
 				<div class="zone-limit left {(!switched) ? "player2" : "player1"}" style="--width: {zoneLimitWidth}px"></div>
 				<!-- Player 1 Paddle -->
-				<div class="paddle {(!player1) ? "absent" : ""}"
+				<div class="paddle {(!player1) ? "absent" : ""} user"
 					style="left: {posHorizontal[(!switched) ? 1 : 0]}px;
 					top: {(!player1) ? initPos : (!switched) ? convertPixelWithHeight(player1?.pos) : convertPixelWithHeight(MapSize[gameInfo?.mapSize][0] - player1?.pos - PaddleSize[gameInfo.paddleSize])}px;
 					height: {paddleWidth}px">

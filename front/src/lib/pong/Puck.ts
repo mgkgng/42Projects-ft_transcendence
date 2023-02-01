@@ -30,8 +30,8 @@ export class Puck {
 		if (this.pos[0][0] < 0) {
 			this.pos[0][0] *= -1;
 			this.vec[0] *= -1;
-		} else if (this.pos[0][0] > this.mapSize[0] - PongConfig.PuckSize / 2) {
-			this.pos[0][0] = this.mapSize[0] - PongConfig.PuckSize / 2 - (this.pos[0][0] - this.mapSize[0] + PongConfig.PuckSize / 2);
+		} else if (this.pos[0][0] > this.mapSize[0]) {
+			this.pos[0][0] = this.mapSize[0] - (this.pos[0][0] - this.mapSize[0]);
 			this.vec[0] *= -1;
 		}
 	}
