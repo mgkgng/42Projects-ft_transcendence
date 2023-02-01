@@ -163,10 +163,11 @@
 	export let itself: any;
 	export let profileUser: any;
 
-	console.log(profileUser);
 
 	let userInfo: any;
 	user.subscribe((user: any) => { userInfo = user; });
+
+	console.log(profileUser, userInfo);
 
 	let writeMessageModal: any;
 
@@ -214,11 +215,17 @@
 			//Username not exist in db
 		});
 
+		$client.socket.on("success_acceptFriend", (data: any) => {
+			profileUser.is_friend = true;
+			profileUser = profileUser;
+		});
+
 		return (() => {
 			$client.socket.off("resHistory");
 			$client.socket.off("error_askFriendG");
 			$client.socket.off("success_askFriendG");
 			$client.socket.off("success_unAskFriendG");
+			$client.socket.off("success_acceptFriend");
 			$client.socket.off("success_isUserBlocked");
 			$client.socket.off("success_unblockUser");
 			$client.socket.off("success_blockUser");
@@ -265,10 +272,14 @@
 		<button on:click={() => {
 			$client.socket.emit("askFriendG", { username_42: profileUser.username_42 });
 		}}>Add</button>
-		{:else if !profileUser.is_friend && profileUser.is_asked}
+		{:else if !profileUser.is_friend && profileUser.is_asked && profileUser.asked_by == userInfo.username_42}
 		<button on:click={() => {
 			$client.socket.emit("unAskFriendG", { username_42: profileUser.username_42 });
 		}}>Cancel</button>
+		{:else if !profileUser.is_friend && profileUser.is_asked && profileUser.asked_by != userInfo.username_42}
+		<button on:click={() => {
+			$client.socket.emit("acceptFriend", { username_42: profileUser.asked_by });
+		}}>Accept</button>
 		{/if}
 		{#if !profileUser.is_blocked}
 			<button on:click={toggleBlock}>Block</button>

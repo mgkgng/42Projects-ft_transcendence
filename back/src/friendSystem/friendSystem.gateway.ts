@@ -59,12 +59,19 @@ export class friendSystemGateway {
 
 	@SubscribeMessage('getUserProfile')
 	async getUserProfile(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
-		// const user = await this.userRepository.findOne({where: {username: this.mainServerService.getUserConnectedBySocketId(client.id).username}});
-		const id_user = await this.mainServerService.getIdUserByUsername(data.username);
-		const res = await this.dataSource.getRepository(UserEntity).createQueryBuilder("user")
-					.where("id_g = :id", {id : id_user})
-					.select(["user.email", "user.username", "user.img", "user.img_url", "user.displayname", "user.campus_name", "user.campus_country", "user.is_2fa", "user.otpauthUrl_2fa" ]).getOne();
-		client.emit("resUserProfile", res)
+		const user = await this.userRepository.findOne({where: {username_42: this.mainServerService.getUserConnectedBySocketId(client.id).username_42}});
+		const target = await this.userRepository.findOne({where: {username_42: data.username_42}});
+
+		let isUserFriendWithConnectedUser = await this.friendSystemService.isFriendWithByUsernameGetEnt(user.username, target.username);
+		let isUserAskedByConnectedUser = await (await this.friendSystemService.getAskList(user.username)).find((ask) => ask.username === target.username);
+		client.emit("resUserProfile", {username: target.username, username_42: target.username_42, displayname: target.displayname, img_url: target.img_url,
+			campus_name: target.campus_name, campus_country: target.campus_country,
+			last_connection: target.last_connection, created_at: target.created_at,
+			status: this.mainServerService.getUserConnectedByUsername42(target.username_42) ? "online" : "offline",
+			is_friend: isUserFriendWithConnectedUser ? true : false,
+			is_asked: isUserAskedByConnectedUser ? true : false,
+			asked_by: isUserAskedByConnectedUser ? isUserAskedByConnectedUser.username_42 : undefined
+		});
 	}
 
 	@SubscribeMessage('getAskList')
@@ -158,6 +165,7 @@ export class friendSystemGateway {
 	async acceptFriend(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
 		const user = await this.userRepository.findOne({where: {username_42: this.mainServerService.getUserConnectedBySocketId(client.id).username_42}});
 		const friend = await this.userRepository.findOne({where: {username_42: data.username_42}});
+		console.log("test?", user, friend, data);
 		if (!user || !friend)
 		{
 			this.server.to(client.id).emit('error_acceptFriend', {error: "User not found"});

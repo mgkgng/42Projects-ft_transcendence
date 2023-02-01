@@ -492,7 +492,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	async askFriend(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
 		const user = await this.userRep.findOne({where: {username_42: this.mainServerService.getUserConnectedBySocketId(client.id).username_42}});
 		const friend = await this.userRep.findOne({where: {username_42: data.username_42}});
-
+		
 		if (!user || !friend) {
 			this.server.to(client.id).emit('error_askFriendG', {error: "User not found"});
 			return;

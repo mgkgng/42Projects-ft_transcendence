@@ -90,7 +90,8 @@ export class MainServerGateway {
 					last_connection: user.last_connection, created_at: user.created_at,
 					status: this.mainServerService.getUserConnectedByUsername42(user.username_42) ? "online" : "offline",
 					is_friend: isUserFriendWithConnectedUser ? true : false,
-					is_asked: isUserAskedByConnectedUser ? true : false
+					is_asked: isUserAskedByConnectedUser ? true : false,
+					asked_by: isUserAskedByConnectedUser ? isUserAskedByConnectedUser.username_42 : undefined
 				}});
 			const parsedList = await Promise.all(promiseParsedList);
 			const index = parsedList.indexOf(this.mainServerService.getUserConnectedBySocketId(client.id).username);

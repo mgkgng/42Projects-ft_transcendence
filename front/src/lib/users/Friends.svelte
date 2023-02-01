@@ -97,7 +97,7 @@
 		.friends-list {
 			margin-top: 1em;
 			padding-left: .2em;
-			gap: .8em;
+			gap: .3em;
 			overflow-y: scroll;
 
 			width: 100%;
@@ -107,6 +107,7 @@
 			.line {
 				z-index: 1;
 				position: relative;
+				height: 3.5em;
 
 				.friend {
 					width: 60%;
@@ -117,7 +118,8 @@
 
 					&:hover {
 						background-color: transparentize($main-light, .3);
-						filter: saturate(50%);
+						border: $border-thin;
+						// filter: saturate(50%);
 					}
 				}
 				.tools {
@@ -130,6 +132,7 @@
 					justify-content: flex-end;
 					gap: 0;
 					align-items: center;
+					transition: .3s;
 
 					border-radius: 3em .2em .2em .2em;
 
@@ -137,17 +140,21 @@
 
 					&:hover {
 						background-color: transparentize($submain-lowshadeblue, .3);
-						filter: saturate(50%);
+						border: $border-thin;
+						// filter: saturate(50%);
 					}
 
 					button {
 						width: 2.5em;
 						height: 2.5em;
 						border-radius: 50%;
-						transition: .3s;
+						transition: .2s;
 						
+						&:last-child {
+							padding-bottom: .1em;
+						}
 						&:hover {
-							background-color: transparentize(#fff, .8	);
+							transform: scale(1.25);
 						}
 					}
 				}
@@ -179,7 +186,7 @@
 
 					p {
 						border-radius: .3em;
-						padding: 0 .1em;
+						padding: 0.5em .2em;
 						&:hover {
 							background-color: transparentize(#fff, .6);
 						}
@@ -258,6 +265,7 @@
 		});
 
 		$client.socket.on("success_getFriendList", (data: any) => {
+			console.log(data);
 			loadedFriends = false;
 			friends = new Map<string, any>();
 			for (let friend of data.friends)
@@ -267,21 +275,20 @@
 		});
 
 		$client.socket.on("success_getUserinDB", (data: any) => {
-			userSearchList = data.users; });
+			console.log("getUserinDB", data);
+			userSearchList = data.users;
+			// userProfileModal.open();
+		});
 		$client.socket.on("error_getUserinDB", (data: any) => { userSearchList = []; });
 
 		$client.socket.on("resUserProfile", (data: any) => {
-			// profileUser = data;
-			// userProfileModal.open();
+			console.log("resUser", data);
+			profileUser = data;
+			userProfileModal.open();
 		});
 
-		// TODO websocket to receive request while client is on the modal
-		// $client.socket.on("askFriendNotification", (data: any) => {
-		// 	// TODO turn off the notif <- notif should be a writable
-		// 	newFriendRequest = true;
-		// });
-
 		$client.socket.on("success_getAskList", (data: any) => {
+			console.log("AskList", data);
 			loadedRequests = false;
 			friendRequests = new Map<string, any>();
 			for (let request of data.friends)
@@ -390,8 +397,9 @@
 						<img src='http://{location.hostname}:3000{(request.img) ? request.img : request.img_url}' alt="user" />
 					{/if}
 				<div class="user" on:click={() => {
-					$client.socket.emit("getFriendList");
-					$client.socket.emit("getAskList");
+					// $client.socket.emit("getFriendList");
+					// $client.socket.emit("getAskList");
+					$client.socket.emit("getUserProfile", {username_42 : request.username_42});
 				}}>
 				<p>{request.username}</p>
 				</div>
@@ -411,7 +419,9 @@
 		<div class="vflex friends-list">
 			{#each [...friends.values()] as friend}
 			<div class="flex line">
-				<div class="friend">{friend.username}</div>
+				<div class="friend" on:click={() => {
+					$client.socket.emit("getUserProfile", {username_42 : friend.username_42});
+				}}>{friend.username}</div>
 				<div class="flex tools">
 					<button on:click={() => {
 						destMsg = [friend.username_42];
@@ -420,7 +430,7 @@
 					<button on:click={() => {
 						//TODO confirmMessage
 						$client.socket.emit("removeFriend", { username_42: friend.username_42 });
-					}}>-</button>
+					}}><img src="/remove.png" alt="remove"></button>
 				</div>
 			</div>
 			{/each}
