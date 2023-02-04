@@ -59,7 +59,7 @@ export class Puck {
 				this.pos[0] = deathPointX;
 				this.pos[1] = (this.vec[1] > 0) ? (this.mapSize[1] - PongConfig.DeadZoneHeight)
 					: PongConfig.DeadZoneHeight;
-				this.vec[1] += (this.vec[1] > 0) ? 1 : -1;
+				this.vec[1] += (this.vec[1] > 0) ? 2 : -2;
 				this.vec[1] *= -1;
 				room.broadcast("PuckHit");
 				this.setCheckPuck(room);

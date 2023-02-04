@@ -336,7 +336,7 @@
 		});
 
 		$client.socket.on("PuckHit", (data: any) => {
-			puck.vec[1] += (puck.vec[1] > 0) ? 1 : -1;
+			puck.vec[1] += (puck.vec[1] > 0) ? 2 : -2;
 			puck.vec[1] *= -1;
 			puck = puck;
 		});

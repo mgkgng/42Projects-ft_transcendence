@@ -14,12 +14,12 @@ export class Puck {
 	move() {
 		let newPos = [this.pos[0][0] + this.vec[0], this.pos[0][1] + this.vec[1]];
 		if (this.pos[0][1] < PongConfig.DeadZoneHeight + PongConfig.PaddleHeight) {
-			this.pos[0][1] = PongConfig.DeadZoneHeight + PongConfig.PaddleHeight;
-			return ;
+			let diff = PongConfig.DeadZoneHeight + PongConfig.PaddleHeight - this.pos[0][1];
+			this.pos[0][1] = PongConfig.DeadZoneHeight + PongConfig.PaddleHeight + diff;
 		}
 		else if (this.pos[0][1] > this.mapSize[1] - PongConfig.DeadZoneHeight - PongConfig.PaddleHeight) {
-			this.pos[0][1] = this.mapSize[1] - PongConfig.DeadZoneHeight - PongConfig.PaddleHeight;
-			return ;
+			let diff = this.pos[0][1] - PongConfig.DeadZoneHeight + PongConfig.PaddleHeight;
+			this.pos[0][1] = this.mapSize[1] - PongConfig.DeadZoneHeight - PongConfig.PaddleHeight - diff;
 		}
 		// If the puck has hit the wall, change the direction on X vector
 
