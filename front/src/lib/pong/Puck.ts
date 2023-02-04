@@ -5,12 +5,14 @@ export class Puck {
 	vec: Array<number>;
 	mapSize: Array<number>;
 	already: boolean;
+	hit: boolean;
 
 	constructor(vec: Array<number>, pos: Array<number>, mapSize: Array<number>) {
 		this.vec = vec;
 		this.pos = [pos];
 		this.mapSize = mapSize;
 		this.already = false;
+		this.hit = false;
 	}
 
 	// move() {
