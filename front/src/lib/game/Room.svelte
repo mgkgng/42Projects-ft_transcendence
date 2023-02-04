@@ -111,14 +111,10 @@
 			position: absolute;
 			margin: 0;
 			width: 12px;
-			background-color: #fff;
+			background-color: $main-bright;
 	
 			border-radius: .2em;
-	
 			z-index: 2;
-	
-			// border: 5px solid $red;
-			box-shadow: 0px 0px 5px 5px $main-bright;
 		}
 	
 		.absent {
@@ -128,7 +124,7 @@
 	
 		.user {
 			margin: 0;
-			box-shadow: 0px 0px 5px 5px $submain-blue;
+			background-color: $submain-blue;
 		}
 	}
 
@@ -235,7 +231,7 @@
 	function convertPixelWithHeight(where: number) {
 		if (!gameSize)
 			return (initPos);
-		return (Math.round(gameSize.height * (where / MapSize[gameInfo.mapSize][0])));
+		return (Math.round((gameSize.height - 12) * (where / MapSize[gameInfo.mapSize][0])));
 	}
 
 	function convertPixelWithWidth(where: number) {
@@ -336,8 +332,12 @@
 		});
 
 		$client.socket.on("PuckHit", (data: any) => {
-			puck.vec[1] += (puck.vec[1] > 0) ? 2 : -2;
-			puck.vec[1] *= -1;
+			if (Math.abs(puck.vec[1]) < 25)
+				puck.vec[1] += (puck.vec[1] > 0) ? 2 : -2;
+			if (puck.already === false)
+				puck.vec[1] *= -1;
+			else
+				puck.already = false;
 			puck = puck;
 		});
 
@@ -429,9 +429,9 @@
 				</div>
 				<div class="zone-limit right {(!switched) ? "player1" : "player2"}" style="--width: {zoneLimitWidth}px"></div>
 				
-				{#if puck && deathPointX}
-				<div class="death" style="left: {((puck.vec[1] > 0 && !switched) || (puck.vec[1] < 0 && switched)) ? posHorizontal[0] : posHorizontal[1]}px; top: {(!switched) ? convertPixelWithHeight(deathPointX) : convertPixelWithHeight(MapSize[gameInfo?.mapSize][0] - deathPointX)}px"></div>
-				{/if}
+				<!-- {#if puck && deathPointX}
+				<div class="death" style="left: {((puck.vec[1] > 0 && !switched && !puck.already) || (puck.vec[1] < 0 && switched && !puck.already)) ? posHorizontal[0] : posHorizontal[1]}px; top: {(!switched) ? convertPixelWithHeight(deathPointX) : convertPixelWithHeight(MapSize[gameInfo?.mapSize][0] - deathPointX)}px"></div>
+				{/if} -->
 				{#if puck && puckPos}
 					{#if puckPos.length > 4}
 					<div class="shadow" style="top: {puckPos[4][0]}px; left: {puckPos[4][1]}px; --opacity: 15%"></div>

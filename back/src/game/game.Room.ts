@@ -10,6 +10,7 @@ import { MapSize, PaddleSize, PuckSpeed } from "./game.utils";
 import { Client } from "./game.Client";
 import { Player } from "./game.Player";
 import { GameGateway } from "./game.gateway";
+import { Paddle } from "./game.Paddle";
 
 export class Room {
 	/* RoomInfo */
@@ -27,6 +28,7 @@ export class Room {
 
 	/* Game */
 	puck: Puck;
+	paddles: Array<Paddle>;
 
 	/* Users */
 	players: Map<string, Player>;
@@ -62,12 +64,13 @@ export class Room {
 		
 		/* Users */
 		this.players = new Map();
+		this.paddles = [new Paddle(MapSize[gameInfo.mapSize], PaddleSize[gameInfo.paddleSize]), new Paddle(MapSize[gameInfo.mapSize], PaddleSize[gameInfo.paddleSize])]
 		this.clients = new Map<string, Client>();
 		this.newWatchers = new Map<string, Client>();
 		this.playerIndex = [playersInfo[0].username_42, (playersInfo.length > 1) ? playersInfo[1].username_42 : undefined];
-		this.players.set(playersInfo[0].username_42, new Player(playersInfo[0], (hostname == playersInfo[0].usename_42), 0, MapSize[gameInfo.mapSize], PaddleSize[gameInfo.paddleSize]));
+		this.players.set(playersInfo[0].username_42, new Player(playersInfo[0], (hostname == playersInfo[0].usename_42), 0));
 		if (playersInfo.length > 1)
-			this.players.set(playersInfo[1].username_42, new Player(playersInfo[1], (hostname == playersInfo[1].usename_42), 1, MapSize[gameInfo.mapSize], PaddleSize[gameInfo.paddleSize]));
+			this.players.set(playersInfo[1].username_42, new Player(playersInfo[1], (hostname == playersInfo[1].usename_42), 1));
 		this.addClients(clients);
 
 		/* Server */
@@ -99,7 +102,7 @@ export class Room {
 
 	playerJoin(playerInfo: any, client: Client) {
 		let index = (this.playerIndex[0]) ? 1 : 0;
-		this.players.set(client.username_42, new Player(playerInfo, false, index, MapSize[this.gameInfo.mapSize], PaddleSize[this.gameInfo.paddleSize]));
+		this.players.set(client.username_42, new Player(playerInfo, false, index));
 		this.playerIndex[index] = client.username_42;
 		this.addClient(client);
 		this.isAvailable = false;

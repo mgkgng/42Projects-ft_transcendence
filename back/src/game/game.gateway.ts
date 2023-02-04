@@ -162,12 +162,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			player1: {
 				info: players[0].info,
 				score: players[0].score,
-				pos: players[0].paddle.pos
+				pos: room.paddles[0].pos
 			},
 			player2: (players.length > 1) ? {
 				info: players[1].info,
 				score: players[1].score,
-				pos: players[1].paddle.pos
+				pos: room.paddles[1].pos
 			} : undefined,
 			hostname: room.hostname,
 			invited: room.invited,
@@ -460,12 +460,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		// TODO protection switching between keyboard and mouse
 		// Paddle starts to move, Websocket Messages set with interval
 		let intervalID = setInterval(() => {
-			player.paddle.move(data.left);
+			room.paddles[player.index].move(data.left);
 			room.broadcast("PaddleUpdate", {
 				type: player.index,
-				pos: player.paddle.pos
+				pos: room.paddles[player.index].pos
 			});
-			if (player.paddle.pos == 0 || player.paddle.pos == player.paddle.moveLimit[1])
+			if (room.paddles[player.index].pos == 0 || room.paddles[player.index].pos == room.paddles[player.index].moveLimit[1])
 				clearInterval(intervalID);
 		}, 40);
 		player.control = intervalID;
@@ -485,7 +485,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		// clear the interval and delete it
 		clearInterval(player.control);
 		player.control = undefined
-		player.paddle.stop();
+		room.paddles[player.index].stop();
 	}
 
 	@SubscribeMessage('askFriendG')
