@@ -326,7 +326,37 @@
 		$client.socket.on("PongStart", () => {
 			clearInterval(puckMoving)
 			puckMoving = setInterval(() => {
-				puck.move();
+				let newPos = [puck.pos[0][0] + puck.vec[0], puck.pos[0][1] + puck.vec[1]];
+				
+				if ((puck.vec[1] > 0 && (!player2 || !(newPos[0] >= player2.pos - 4 && newPos[0] <= player2.pos + 4)))
+					|| (puck.vec[1] < 0 && (!player1 || !(newPos[0] >= player1.pos - 4 && newPos[0] <= player1.pos + 4))))
+					return ;
+
+				if (newPos[1] < PongConfig.DeadZoneHeight + PongConfig.PaddleHeight) {
+					let diff = PongConfig.DeadZoneHeight + PongConfig.PaddleHeight - newPos[1];
+					newPos[1] = PongConfig.DeadZoneHeight + PongConfig.PaddleHeight + diff;
+					puck.already = true;
+					puck.vec[1] *= -1;
+				}
+				else if (newPos[1] > puck.mapSize[1] - PongConfig.DeadZoneHeight - PongConfig.PaddleHeight) {
+					let diff = newPos[1] - puck.mapSize[1] + PongConfig.DeadZoneHeight + PongConfig.PaddleHeight;
+					newPos[1] = puck.mapSize[1] - PongConfig.DeadZoneHeight - PongConfig.PaddleHeight - diff;
+					puck.already = true;
+					puck.vec[1] *= -1;
+				}
+				// If the puck has hit the wall, change the direction on X vector
+
+				puck.pos.unshift(newPos);
+				if (puck.pos.length > 5)
+					puck.pos.splice(5, 1);
+
+				if (puck.pos[0][0] < 0) {
+					puck.pos[0][0] *= -1;
+					puck.vec[0] *= -1;
+				} else if (puck.pos[0][0] > puck.mapSize[0]) {
+					puck.pos[0][0] = puck.mapSize[0] - (puck.pos[0][0] - puck.mapSize[0]);
+					puck.vec[0] *= -1;
+				}
 				puck = puck;
 			}, 40);
 		});
