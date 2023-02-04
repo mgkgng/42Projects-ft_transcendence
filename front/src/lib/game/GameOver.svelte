@@ -33,7 +33,6 @@
 <script lang="ts">
 	export let winner: any;
 	export let gameModal: any;
-	export let itself: any;
 	export let scores: Array<number>;
 
 	if (scores[0] > scores[1]) { // my brain is paralysed for now...

@@ -37,15 +37,16 @@ export class Puck {
 	setCheckPuck(room: any) {
 		if (room.isOver)
 			return ;
-		let distToDeath = this.mapSize[1] - PongConfig.DeadZoneHeight * 2 - PongConfig.PuckSize;
+		let distToDeath = this.mapSize[1] - PongConfig.DeadZoneHeight * 2 - PongConfig.PaddleHeight * 2;
 		if (this.initialized) {
 			distToDeath /= 2;
 			this.initialized = false;
 		}
 
-		let frameNb = Math.floor(distToDeath / Math.abs(this.vec[1]));
+		let frameNb = Math.ceil(distToDeath / Math.abs(this.vec[1]));
 		let timeOut = frameNb * PongConfig.FrameDuration;
 		let deathPointX = this.calculPosX(frameNb);
+		room.broadcast("deathPointX", deathPointX);
 
 		setTimeout(() => {
 			let player = room.players.get(room.playerIndex[(this.vec[1] > 0) ? 1 : 0]);

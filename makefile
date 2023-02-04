@@ -1,5 +1,5 @@
 HOST_HOSTNAME=$(shell hostname)
-HOST_HOSTNAME=localhost
+# HOST_HOSTNAME=localhost
 
 all: update-env up
 

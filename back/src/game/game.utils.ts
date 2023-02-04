@@ -24,9 +24,9 @@ export function replacer() {
 export const PaddleSize = [40, 80, 120];
 
 export const MapSize = [
-	[200, 300],
-	[300, 500],
-	[400, 700]
+	[200, 400],
+	[300, 600],
+	[400, 800]
 ]
 
 export const PuckSpeed = [2, 4, 12]

@@ -79,7 +79,9 @@
 	.pong-game {
 		position: relative;
 		height: 100%;
+		max-height: 100%;
 		width: 100%;
+		max-width: 100%;
 		border: $border;
 
 		padding: 0;
@@ -148,6 +150,15 @@
 		opacity: var(--opacity);
 	}
 
+	.death {
+		position: absolute;
+		width: 10px;
+		height: 10px;
+		background-color: $red;
+		border-radius: 50%;
+		z-index: 9999;
+	}
+
 </style>
 
 <script lang="ts">
@@ -205,10 +216,9 @@
 	
 	let paddleWidth: number;
 	let posHorizontal: Array<number>;
-	let prevY: number = 0;
 	let zoneLimitWidth: number = 20;
 
-	let isMouseMoveDisabled = false;
+	let deathPointX: number;
 
 	$: puckPos = translatePucks(puck);
 	$: setGame(gameReady, game);
@@ -225,19 +235,13 @@
 	function convertPixelWithHeight(where: number) {
 		if (!gameSize)
 			return (initPos);
-		return (Math.floor((gameSize.height * where) / (MapSize[gameInfo.mapSize][0] + PongConfig.PuckSize / 2)));
+		return (Math.round(gameSize.height * (where / MapSize[gameInfo.mapSize][0])));
 	}
 
 	function convertPixelWithWidth(where: number) {
 		if (!gameSize)
 			return (initPos);
-		return (Math.floor((gameSize.width * where) / MapSize[gameInfo.mapSize][1]));
-	}
-
-	function convertFromPixelWithHeight(pixel: number) {
-		if (!gameSize)
-			return (initPos);
-		return (Math.floor((pixel * MapSize[gameInfo.mapSize][0]) / gameSize.height));
+		return (Math.round(gameSize.width * (where / MapSize[gameInfo.mapSize][1])));
 	}
 
 	function defineValues() {
@@ -256,7 +260,7 @@
 		for (let pos of puck.pos) {
 			res.push([
 				(!switched) ? convertPixelWithHeight(pos[0]) : convertPixelWithHeight(MapSize[gameInfo.mapSize][0] - pos[0]),
-				(!switched) ? convertPixelWithWidth(MapSize[gameInfo.mapSize][1] - pos[1]) : convertPixelWithWidth(pos[1])
+				(!switched) ? convertPixelWithWidth(MapSize[gameInfo.mapSize][1] - pos[1]): convertPixelWithWidth(pos[1])
 			]);
 		}
 		return (res);
@@ -332,11 +336,9 @@
 		});
 
 		$client.socket.on("PuckHit", (data: any) => {
-			console.log("Puck hit received");
 			puck.vec[1] += (puck.vec[1] > 0) ? 1 : -1;
 			puck.vec[1] *= -1;
 			puck = puck;
-			console.log("=================");
 		});
 
 		$client.socket.on("ScoreUpdate", (data: any) => {
@@ -375,6 +377,10 @@
 			readyToShow = true;
 		});
 
+		$client.socket.on("deathPointX", (data: any) => {
+			deathPointX = data;
+		})
+
 		$client.socket.emit("RoomCheck", roomID);
 
 		console.log("onMount is here");
@@ -393,6 +399,7 @@
 			$client.socket.off("GameFinished");
 			$client.socket.off("GameStartFail");
 			$client.socket.off("GameStart");
+			$client.socket.off("deathPointX");
 		});
 	});
 </script>
@@ -421,7 +428,10 @@
 					height: {paddleWidth}px">
 				</div>
 				<div class="zone-limit right {(!switched) ? "player1" : "player2"}" style="--width: {zoneLimitWidth}px"></div>
-
+				
+				{#if puck && deathPointX}
+				<div class="death" style="left: {((puck.vec[1] > 0 && !switched) || (puck.vec[1] < 0 && switched)) ? posHorizontal[0] : posHorizontal[1]}px; top: {(!switched) ? convertPixelWithHeight(deathPointX) : convertPixelWithHeight(MapSize[gameInfo?.mapSize][0] - deathPointX)}px"></div>
+				{/if}
 				{#if puck && puckPos}
 					{#if puckPos.length > 4}
 					<div class="shadow" style="top: {puckPos[4][0]}px; left: {puckPos[4][1]}px; --opacity: 15%"></div>
@@ -439,8 +449,6 @@
 					<div class="puck" style="top: {puckPos[0][0]}px; left: {puckPos[0][1]}px;"></div>
 					{/if}
 				{/if}
-
-
 			{/if}
 		</div>
 		<div class="vflex side right">
@@ -480,7 +488,7 @@
 {/if}
 
 <Modal bind:this={gameFinishedModal} closeOnBgClick={false}>
-	<GameOver winner={(winner == player1.info.username) ? player1 : player2} gameModal={itself} itself={gameFinishedModal} scores={[player1?.score, player2?.score]}/>
+	<GameOver winner={(winner == player1.info.username) ? player1 : player2} gameModal={itself} scores={[player1?.score, player2?.score]}/>
 </Modal>
 
 <Modal bind:this={quitConfirmMsgModal} closeOnBgClick={false}>
@@ -490,40 +498,6 @@
 <Modal bind:this={alertMessageModal}>
 	<AlertMessage msg={alertMessage} itself={alertMessageModal} />
 </Modal>
-
-<!-- <svelte:window
-	on:mousemove={(event) => {
-		if (isMouseMoveDisabled === true)
-			return ;
-		if (![player1?.info.username_42, player2?.info.username_42].includes(userInfo.username_42))
-			return ;
-		if (!gameSize)
-			return ;
-		let pos = Math.floor(event.clientY - gameSize?.y) - paddleWidth / 2;
-		if (pos < 0)
-			pos = 0;
-		if (pos > gameSize.height - paddleWidth)
-			pos = gameSize.height - paddleWidth;
-		
-		let posConverted = Math.floor(convertFromPixelWithHeight((!switched) ? pos : gameSize.height - pos - paddleWidth));
-		if (posConverted == prevY)
-			return ;
-		prevY = posConverted;
-		$client.socket.emit("PaddleMoveMouse", {
-			pos: posConverted,
-			roomID: roomID
-		});
-		if (player1.info.username_42 === userInfo.username_42)
-			player1.pos = posConverted;
-		else
-			player2.pos = posConverted;
-		isMouseMoveDisabled = true;
-        setTimeout(() => {
-            isMouseMoveDisabled = false;
-        }, 20);
-
-	}}
-/> -->
 
 <svelte:window
 on:keypress={(event) => {
