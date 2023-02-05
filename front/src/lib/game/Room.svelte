@@ -520,7 +520,7 @@
 {/if}
 
 <Modal bind:this={gameFinishedModal} closeOnBgClick={false}>
-	<GameOver winner={(winner == player1.info.username) ? player1 : player2} gameModal={itself} scores={[player1?.score, player2?.score]}/>
+	<GameOver winner={(winner == player1.info.username_42) ? player1 : player2} gameModal={itself} scores={[player1?.score, player2?.score]}/>
 </Modal>
 
 <Modal bind:this={quitConfirmMsgModal} closeOnBgClick={false}>
