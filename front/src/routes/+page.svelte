@@ -24,6 +24,8 @@
 	let messageModal: any;
 	let modalMessage: string = "";
 
+	let interrupted: boolean = false;
+
 	let joinGameModal: any;
 	let enterModal: any;
 	let enterGameModal: any;
@@ -44,6 +46,7 @@
 			console.log("RoomCreated", data);
 			createGameModal.close();
 			roomID = data;
+			interrupted = false;
 			roomModal.open();
 		});
 
@@ -51,6 +54,7 @@
 			console.log(data);
 			joinGameModal.close();
 			roomID = data.roomID;
+			interrupted = false;
 			roomModal.open();
 		});
 
@@ -68,6 +72,7 @@
 		$client.socket.on("MatchFound", (data: any) => {
 			roomID = data;
 			enterGameModal.close();
+			interrupted = false;
 			roomModal.open();
 		});
 
@@ -78,6 +83,7 @@
 			} else {
 				enterModal.close();
 				roomID = data;
+				interrupted = true;
 				roomModal.open();
 			}
 		});
@@ -119,7 +125,7 @@
 </Modal>
 
 <Modal bind:this={roomModal} closeOnBgClick={false}>
-	<Room itself={roomModal} roomID={roomID}/>
+	<Room itself={roomModal} roomID={roomID} interrupted={interrupted}/>
 </Modal>
 
 <Modal bind:this={messageModal}>

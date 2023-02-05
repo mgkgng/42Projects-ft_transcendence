@@ -170,7 +170,8 @@
 	import AlertMessage from '$lib/modals/AlertMessage.svelte';
 
 	export let roomID: string;
-	export let itself: any;	
+	export let itself: any;
+	export let interrupted: boolean;
 
 	let puck: any = undefined;
 	let moving: boolean = false;
@@ -321,7 +322,11 @@
 				player2.pos = data.pos;
 		});
 
-		$client.socket.on("LoadBall", (data: any) => { puck = new Puck(data.vec, data.pos, MapSize[gameInfo.mapSize]); });
+		$client.socket.on("LoadBall", (data: any) => {
+			readyToShow = true;
+			interrupted = false;
+			puck = new Puck(data.vec, data.pos, MapSize[gameInfo.mapSize]);
+		});
 
 		$client.socket.on("PongStart", () => {
 			clearInterval(puckMoving)
@@ -399,14 +404,14 @@
 
 		$client.socket.on("showGame", (data: any) => {
 			console.log("showGame", data);
-			puck = new Puck(data.vec, data.pos, MapSize[gameInfo.mapSize]);
-			if (data.isGoingOn) {
-				puckMoving = setInterval(() => {
-					puck.move();
-					puck = puck;
-				}, 40);
-			}
-			readyToShow = true;
+			// puck = new Puck(data.vec, data.pos, MapSize[gameInfo.mapSize]);
+			// if (data.isGoingOn) {
+			// 	puckMoving = setInterval(() => {
+			// 		puck.move();
+			// 		puck = puck;
+			// 	}, 40);
+			// }
+			// readyToShow = true;
 		});
 
 		$client.socket.on("deathPointX", (data: any) => {
@@ -432,11 +437,12 @@
 			$client.socket.off("GameStartFail");
 			$client.socket.off("GameStart");
 			$client.socket.off("deathPointX");
+			$client.socket.off("showGame");
 		});
 	});
 </script>
 
-{#if gameInfo && readyToShow}
+{#if gameInfo && readyToShow && !interrupted}
 <div class="container">
 	<!-- <div class="flex pong" style="width: {MapSize[gameInfo.mapSize][1] + 200}px; height: {MapSize[gameInfo.mapSize][0]}px;"> -->
 	<div class="flex pong">
