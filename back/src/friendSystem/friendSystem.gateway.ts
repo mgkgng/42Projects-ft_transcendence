@@ -74,6 +74,24 @@ export class friendSystemGateway {
 		});
 	}
 
+	@SubscribeMessage('getUserProfileByUsername')
+	async getUserProfileByUsername(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
+		const user = await this.userRepository.findOne({where: {username_42: this.mainServerService.getUserConnectedBySocketId(client.id).username_42}});
+		const target = await this.userRepository.findOne({where: {username: data.username}});
+
+		let isUserFriendWithConnectedUser = await this.friendSystemService.isFriendWithByUsernameGetEnt(user.username, target.username);
+		let isUserAskedByConnectedUser = await (await this.friendSystemService.getAskList(user.username)).find((ask) => ask.username === target.username);
+		client.emit("resUserProfileByUsername", {username: target.username, username_42: target.username_42, displayname: target.displayname, img_url: target.img_url,
+			campus_name: target.campus_name, campus_country: target.campus_country,
+			last_connection: target.last_connection, created_at: target.created_at,
+			status: this.mainServerService.getUserConnectedByUsername42(target.username_42) ? "online" : "offline",
+			is_friend: isUserFriendWithConnectedUser ? true : false,
+			is_asked: isUserAskedByConnectedUser ? true : false,
+			asked_by: isUserAskedByConnectedUser ? isUserAskedByConnectedUser.username_42 : undefined
+		});
+	}
+
+
 	@SubscribeMessage('getAskList')
 	async getAskedFriendList(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
 		const user = await this.userRepository.findOne({where: {username_42: this.mainServerService.getUserConnectedBySocketId(client.id).username_42}});

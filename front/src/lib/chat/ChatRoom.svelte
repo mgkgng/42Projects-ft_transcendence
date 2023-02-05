@@ -228,12 +228,17 @@
 	});	
 
 	onMount(() => {
-		$client.socket.on("success_getUserinDB", (data: any) => {
-			profileUser = data.users[0]; 
-			console.log("succes_getUserinDB: ", profileUser, data)
+		$client.socket.on("resUserProfileByUsername", (data: any) => {
+			console.log("resUser", data);
+			profileUser = data;
+			userProfileModal.open();
 		});
 		chat.my_rooms.get(roomID).actual_page = 0;
 		firstUpdate = false;
+
+		return (() => {
+			$client.socket.off("resUserProfileByUsername");
+		});
 	});
 	function scrollToBottom() {
 		let chatBox : any = document.querySelector('.read');
@@ -326,8 +331,7 @@
 							<u class="username" on:click={() => {
 								//TODO get profile User info
 								profileUser = {};
-								$client.socket.emit("getUserinDB", {username : message.username});
-								userProfileModal.open();
+								$client.socket.emit("getUserProfileByUsername", {username : message.username});
 								}}>{message.username}
 							</u>
 							<div class="date">{format_date_hours(message.date)}</div>
@@ -346,8 +350,7 @@
 							<p on:click={() => {
 							//TODO get profile User info
 							profileUser = {};
-							$client.socket.emit("getUserinDB", {username : message.username});
-							userProfileModal.open();
+							$client.socket.emit("getUserProfileByUsername", {username : message.username});
 						}}><u class="username">{message.username}:</u></p>
 							<div>{message.message}</div>
 							<div>{format_date_hours(message.date)}</div>
@@ -371,8 +374,7 @@
 			<div class="user" >
 			<p on:click={() => {
 				profileUser = {};
-				$client.socket.emit("getUserinDB", {username : user.username});
-				userProfileModal.open();
+				$client.socket.emit("getUserProfileByUsername", {username : user.username});
 			}}>{user.username}</p>
 			</div>
 			{/each}
