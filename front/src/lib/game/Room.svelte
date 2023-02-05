@@ -146,15 +146,14 @@
 		opacity: var(--opacity);
 	}
 
-	.death {
-		position: absolute;
-		width: 10px;
-		height: 10px;
-		background-color: $red;
-		border-radius: 50%;
-		z-index: 9999;
-	}
-
+	// .death {
+	// 	position: absolute;
+	// 	width: 10px;
+	// 	height: 10px;
+	// 	background-color: $red;
+	// 	border-radius: 50%;
+	// 	z-index: 9999;
+	// }
 </style>
 
 <script lang="ts">
