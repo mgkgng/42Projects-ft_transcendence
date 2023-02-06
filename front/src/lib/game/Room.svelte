@@ -546,7 +546,7 @@ on:keypress={(event) => {
 		// userType == UserType.Watcher ||
 		(event.code != 'KeyA' && event.code != 'KeyD'))
 	return ;
-	if (moving) //* TODO should make movement more fluent
+	if (moving)
 		return ;
 	moving = true;
 	$client.socket.emit("PaddleMoveKey", {
@@ -559,7 +559,6 @@ on:keyup={(event)=>{
 	if (event.code != 'KeyA' && event.code != 'KeyD')
 		return ;
 	
-	//* TODO some precision to make
 	$client.socket.emit("PaddleStopKey", roomID);
 	moving = false;
 }}

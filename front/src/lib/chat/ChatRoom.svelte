@@ -66,10 +66,6 @@
 						margin-right: .5em;
 						gap: 0;
 
-						&:last-of-type {
-							//TODO margin bottom for the last message
-						}
-
 						.info {
 							height: 1.5em;
 							position: relative;
@@ -329,7 +325,6 @@
 					<div class="vflex content {(act_user.username == message.username) ? "me" : ""}">
 						<div class="flex info">
 							<u class="username" on:click={() => {
-								//TODO get profile User info
 								profileUser = {};
 								$client.socket.emit("getUserProfileByUsername", {username : message.username});
 								}}>{message.username}
@@ -348,7 +343,6 @@
 					<div class="line">
 						<div class="vflex content {(act_user.username == message.username) ? "me" : ""}">
 							<p on:click={() => {
-							//TODO get profile User info
 							profileUser = {};
 							$client.socket.emit("getUserProfileByUsername", {username : message.username});
 						}}><u class="username">{message.username}:</u></p>

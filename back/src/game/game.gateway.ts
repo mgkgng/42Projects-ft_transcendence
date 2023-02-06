@@ -27,9 +27,6 @@ import { UserFriendEntity } from "src/entity/UserFriend.entity";
 import { ChatDirectMessageService } from "src/chatDirectMessage/chatDirectMessage.service";
 import { Player } from "./game.Player";
 
-//TODO Too many connections for a client
-//TODO if the client websocket contains request, handshake..
-//TODO put username_42 inside of client and replace everything with it
 
 @WebSocketGateway({
 	cors: {
@@ -512,7 +509,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			// Get the player
 			let player = room.players.get(target.username_42);
 	
-			// TODO protection switching between keyboard and mouse
 			// Paddle starts to move, Websocket Messages set with interval
 			let intervalID = setInterval(() => {
 				room.paddles[player.index].move(data.left);
