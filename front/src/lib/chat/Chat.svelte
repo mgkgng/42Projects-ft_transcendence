@@ -392,7 +392,11 @@
 					roomSelected = room.roomID;
 				}}>{room.title}</div>
 				<div class="button" on:click={() => {
+					if (room.roomID == roomSelected)
+						roomSelected = "";
 					$client.socket.emit("set_room_not_visible", { id_public_room: room.roomID });
+					chat.my_rooms.delete(room.roomID);
+					chat = chat;
 				}}><p>Quit</p></div>
 			</div>
 			{/each}

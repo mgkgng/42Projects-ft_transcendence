@@ -37,7 +37,7 @@ export class ChatRoomService {
 			for (let n of names) //ADD USER TO HIS ROOMS
 			{
 				const name : string = n.room.id_public_room;
-				// console.log("Join => ", n.room.id_public_roomublic_roomublic_roomublic_roomublic_roomublic_room);
+				//console.log("Join => ", n.room.id_public_room);
 				await client.join(n.room.id_public_room);
 			}
 		} catch (e) { console.log("error"); return (e); }
@@ -516,6 +516,7 @@ export class ChatRoomService {
 	//{id_public_roomng}
 	@SubscribeMessage("set_room_not_visible")
 	async setRoomNotVisible(@MessageBody() data, @ConnectedSocket() client: Socket, @Request() req) {
+		try{
 		// console.log("set_room_not_visible", data)
 		const user = await this.mainServer.getIdUser(req);
 		const user_jwt : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
@@ -527,6 +528,9 @@ export class ChatRoomService {
 				.set({is_visible: false}).execute();
 		//await client.emit("set_room_not_visible_res", data.id_public_room);
 		this.server.to(data.id_public_room).emit("set_room_not_visible_res", {id_public_room : data.id_public_room, username: client_username });;
+		}catch(e){
+			console.log("error data :", e);
+		}
 	}
 	//Put a room in state "visible" for a user
 	//{id_public_room:string}

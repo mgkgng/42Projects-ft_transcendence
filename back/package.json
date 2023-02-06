@@ -34,6 +34,7 @@
     "bcrypt": "^5.1.0",
     "bcryptjs": "^2.4.3",
     "express-jwt": "^7.7.7",
+    "express-rate-limit": "^6.7.0",
     "image-to-uri": "^1.0.0",
     "node-gyp": "^9.3.0",
     "otplib": "^12.0.1",

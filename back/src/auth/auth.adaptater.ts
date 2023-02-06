@@ -28,6 +28,7 @@ import { Socket } from 'socket.io';
 import { verify } from 'jsonwebtoken';
 import { HttpException, UnauthorizedException } from '@nestjs/common';
 import { throwError } from 'rxjs';
+import rateLimit from 'express-rate-limit';
 
 export class WsAdapter extends IoAdapter {
   createIOServer(port: number, options?: any) {
@@ -49,6 +50,7 @@ export class WsAdapter extends IoAdapter {
 		  }
 		  else
 		  {
+
 			socket.emit("errors", {message: "UnauthorizedJwt"});
 			return (null);
 		  }

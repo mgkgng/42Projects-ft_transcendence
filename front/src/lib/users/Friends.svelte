@@ -240,7 +240,7 @@
 	export let itself: any;
 
 	let writeMessageModal: any;
-	let destMsg: Array<string> = [];
+	let destMsg: Array<any> = [];
 
 	let loadedRequests: boolean = false;
 	let loadedFriends: boolean = false;
@@ -426,7 +426,7 @@
 				}}>{friend.username}</div>
 				<div class="flex tools">
 					<button on:click={() => {
-						destMsg = [friend.username_42];
+						destMsg = [{username_42 : friend.username_42, username : friend.username}];
 						writeMessageModal.open();
 					}}><img src="/icon-mail.png" alt="mail"></button>
 					<button on:click={() => {

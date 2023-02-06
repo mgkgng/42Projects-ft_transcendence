@@ -9,7 +9,7 @@ export class AppController {
 
   @Get("/")
   getHello(): string {
-    return ("Je te baise");
+    return ("Hello");``
   }
   @UseGuards(AuthGuard('jwt'))
   @Get("/hello")
