@@ -202,7 +202,7 @@
     import { user } from "$lib/stores/user";
 
 	export let itself: any;
-	export let sendTo: Array<string>;
+	export let sendTo: Array<any>;
 
 	let userInfo: any;
 	user.subscribe((user: any) => { userInfo = user; });
@@ -228,7 +228,7 @@
 	$: console.log(sendTo);
 
 	function createInvitationMessage(message: string) {
-		return (`/gameInvitation/${mapSize}/${puckSpeed}/${paddleSize}/${maxPoint}/${(message.length) ? message.replaceAll('/', '&sl') : "Let's play a game together!"}`);
+		return (`/gameInvitation/${mapSize}/${puckSpeed}/${paddleSize}/${maxPoint}/${(message.length) ? message.replaceAll('/', '&sl') : "Let's play together!"}`);
 	}
 
 	onMount(() => {
