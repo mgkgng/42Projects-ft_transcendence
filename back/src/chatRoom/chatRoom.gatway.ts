@@ -11,8 +11,8 @@ import { UseGuards, Request, HttpException } from '@nestjs/common';
 import { AuthGuard } from "@nestjs/passport";
 import { toDataURL } from "qrcode";
 import { authenticator } from "otplib";
-
-// import * as bcrypt from 'bcrypt';
+import { WsThrottlerGuard } from "src/auth/reate_limitter" 
+import * as bcrypt from 'bcrypt';
 
 @WebSocketGateway({
 	cors: {
@@ -48,6 +48,7 @@ export class ChatRoomService {
 	//OK
 	//Create new room with current socker user as admin
 	//{room_name: string, is_password_protected: bool, room_password: string}
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage('new_room')
 	async creat_room(@MessageBody() data: any, @Request() req, @ConnectedSocket() client : Socket)
 	{
@@ -55,8 +56,8 @@ export class ChatRoomService {
 		const id_user = await this.mainServer.getIdUser(req);
 		const is_password_protected : boolean = data.is_password_protected;
 		// const password  : string = is_password_protected ? data.room_password : "";
-		const password = (is_password_protected) ? data.room_password : "";
-		// const password : string = is_password_protected ? await bcrypt.hash(data.room_password, 10) : "";
+		//const password = (is_password_protected) ? data.room_password : "";
+		const password : string = is_password_protected ? await bcrypt.hash(data.room_password, 10) : "";
 		const name : string = data.room_name;
 		const date_creation : Date = new Date();
 		const  querry = this.dataSource.createQueryRunner(); 
@@ -104,6 +105,7 @@ export class ChatRoomService {
 	//<           \ /										     			 >	
 	//<            -											 			 >
 	//<---------------------------------------------------------------------->
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage('append_user_to_room')
 	async append_user_to_room(@MessageBody() data: any, @ConnectedSocket() client: Socket, @Request() req)
 	{
@@ -122,8 +124,8 @@ export class ChatRoomService {
 			let is_good_password = false;
 			if (room.is_password_protected)
 				is_good_password = (data.room_password === room.password);
-			// if (room.is_password_protected)
-			// 	is_good_password = await bcrypt.compare(data.room_password, room.password);
+			if (room.is_password_protected)
+			 	is_good_password = await bcrypt.compare(data.room_password, room.password);
 
 			const is_already_in = await this.dataSource.getRepository(UserChatRoomEntity).createQueryBuilder("userRoom").
 			where("userRoom.room = :id and userRoom.id_user = :id_u", {id: id_room, id_u : id_user}).getOne();
@@ -172,6 +174,7 @@ export class ChatRoomService {
 	//OK
 	//Get all user for a room
 	//{id_public_room: string}
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage('get_users_room')
 	async get_users_room(@MessageBody() data: any, @ConnectedSocket() client: Socket, @Request() req)
 	{
@@ -220,6 +223,7 @@ export class ChatRoomService {
 	//OK
 	//Get all messages in room (Error if current socket user is not in the room)
 	//{id_public_room: string }
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage('get_message_room')
 	async getMessageRoom(@MessageBody() data: any, @ConnectedSocket() client: Socket, @Request() req) 
 	{
@@ -259,6 +263,7 @@ export class ChatRoomService {
 	}
 	//Get a page of messages in room (Error if current socket user is not in the room)
 	//{id_public_room: string, page_number: number, size_page: number }
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage('get_message_room_page')
 	async getMessageRoomPage(@MessageBody() data: any, @ConnectedSocket() client: Socket, @Request() req) 
 	{
@@ -297,6 +302,7 @@ export class ChatRoomService {
 	}
 
 	//{id_message: number}
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage('get_message_by_id')
 	async getOneMessageRoom(@MessageBody() data: any, @ConnectedSocket() client: Socket, @Request() req){
 		const res : any = await this.dataSource.getRepository(MessageChatRoomEntity).createQueryBuilder("messageChatRoomEntity")
@@ -312,6 +318,7 @@ export class ChatRoomService {
 	//OK	
 	//Add message in a room (Error if current socket user is not in the room)
 	//{id_public_room: string, content_message: string}
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage('new_message_room')
 	async newMessageRoom(@MessageBody() data: any, @ConnectedSocket() client: Socket, @Request() req)
 	{
@@ -357,6 +364,7 @@ export class ChatRoomService {
 	//OK
 	//Get all rooms for the current socket user
 	//{}
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage('get_my_rooms')
 	async getMyRoom(@MessageBody() data, @ConnectedSocket() client: Socket)
 	{
@@ -367,6 +375,7 @@ export class ChatRoomService {
 	//OK
 	//Get all rooms in the databases
 	//{}
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage('get_all_rooms')
 	async getAllRooms(@MessageBody() data, @ConnectedSocket() client: Socket)
 	{
@@ -387,6 +396,7 @@ export class ChatRoomService {
 	//OK
 	//Get all rooms in the databases
 	//{research: string}
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage('get_all_rooms_begin_by')
 	async getAllRoomsBeginBy(@MessageBody() data, @ConnectedSocket() client: Socket, @Request() req)
 	{
@@ -422,6 +432,7 @@ export class ChatRoomService {
 
 	//Ban a user if current socket user is Admin on the room 
 	//{id_public_room:string, username_ban: string, ban_end: Date}
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage('ban_user')
 	async setBanUser(@MessageBody() data, @ConnectedSocket() client: Socket, @Request() req)
 	{
@@ -457,6 +468,7 @@ export class ChatRoomService {
 	//OK
 	//Mute a user if current socket user is Admin on the room 
 	//{id_public_room:string, username_ban: string, mute_end: Date}
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage('mute_user')
 	async setMuteUser(@MessageBody() data, @ConnectedSocket() client: Socket, @Request() req)
 	{
@@ -488,6 +500,7 @@ export class ChatRoomService {
 	//OK
 	//Set other user as admin if current socket user is Admin on the room 
 	//{id_public_room:string, username_new_admin: string}
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage('set_admin')
 	async setAdminUser(@MessageBody() data, @ConnectedSocket() client: Socket, @Request() req)
 	{
@@ -514,6 +527,7 @@ export class ChatRoomService {
 	}
 	//Put a room in state "note visible" for a user
 	//{id_public_roomng}
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage("set_room_not_visible")
 	async setRoomNotVisible(@MessageBody() data, @ConnectedSocket() client: Socket, @Request() req) {
 		try{
@@ -534,6 +548,7 @@ export class ChatRoomService {
 	}
 	//Put a room in state "visible" for a user
 	//{id_public_room:string}
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage("set_room_visible")
 	async setRoomVisible(@MessageBody() data, @ConnectedSocket() client: Socket, @Request() req) {
 		const client_username : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
@@ -547,6 +562,7 @@ export class ChatRoomService {
 	}
 	//Put a room private
 	//{id_public_room:string}
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage("set_room_private")
 	async setRoomPrivate(@MessageBody() data, @ConnectedSocket() client: Socket, @Request() req) {
 		const user : any = await this.mainServer.getIdUser(req);
@@ -566,6 +582,7 @@ export class ChatRoomService {
 	}
 	//Put a room private
 	//{id_public_room:string}
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage("unset_room_private")
 	async unsetRoomPrivate(@MessageBody() data, @ConnectedSocket() client: Socket, @Request() req) {
 		const client_username : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
@@ -585,6 +602,7 @@ export class ChatRoomService {
 		await client.emit("unset_room_private_res", {id_public_room : data.id_public_room});
 	}
 	//{id_public_room:string, password:string}
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage("set_password_room")
 	async setRoomPassword(@MessageBody() data, @ConnectedSocket() client: Socket, @Request() req) {
 		const user : any = await this.mainServer.getIdUser(req);
@@ -597,8 +615,8 @@ export class ChatRoomService {
 			await client.emit("error_set_password_room", {error: "You are not owner of the room."});
 			return ;
 		}
-		const password = data.password;
-		// const password = await bcrypt.hash(data.password, 10);
+		//const password = data.password;
+		const password = await bcrypt.hash(data.password, 10);
 		const res = await this.dataSource.createQueryBuilder().update(ChatRoomEntity)
 				.where("id_g = :r", {r: room})
 				.set({password: data.password, is_password_protected: true}).execute();
@@ -606,6 +624,7 @@ export class ChatRoomService {
 	}
 	//Unset password room
 	//{id_public_room:string}
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage("unset_password_room")
 	async unsetRoomPassword(@MessageBody() data, @ConnectedSocket() client: Socket, @Request() req) {
 		const client_username : any = (this.jwtServer.decode(req.handshake.headers.authorization.split(' ')[1]));
@@ -628,6 +647,7 @@ export class ChatRoomService {
 	//OK
 	//{}
 	//get email, username, img of current socket user
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage('get_user_info')
 	async get_user_infos(@MessageBody() data: any, @ConnectedSocket() client: Socket, @Request() req)
 	{
@@ -647,6 +667,7 @@ export class ChatRoomService {
 	}
 	//OK
 	//{username_search : string}
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage('get_other_user_info')
 	async get_other_user_infos(@MessageBody() data: any, @ConnectedSocket() client: Socket, @Request() req)
 	{
@@ -664,6 +685,7 @@ export class ChatRoomService {
 		}
 	}
 	//{research: string}
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage('get_all_username_begin_by')
 	async getAllUsernameBeginBy(@MessageBody() data, @ConnectedSocket() client: Socket)
 	{
@@ -674,6 +696,7 @@ export class ChatRoomService {
 		await client.emit("get_all_username_begin_by", res);
 	}
 	//{new_username: string}
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage('change_username')
 	async newUsername(@MessageBody() data, @ConnectedSocket() client: Socket, @Request() req)
 	{
@@ -704,6 +727,7 @@ export class ChatRoomService {
 		}
 	}
 
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage('try_active_double_auth')
 	async tryActiveDoubleAuth(@MessageBody() data, @ConnectedSocket() client: Socket, @Request() req)
 	{
@@ -720,6 +744,7 @@ export class ChatRoomService {
 		}
 	}
 
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage('active_double_auth')
 	async activeDoubleAuth(@MessageBody() data, @ConnectedSocket() client: Socket, @Request() req)
 	{
@@ -734,6 +759,7 @@ export class ChatRoomService {
 			await client.emit("error_active_double_auth", {});
 		}
 	}
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage('disable_double_auth')
 	async disableDoubleAuth(@MessageBody() data, @ConnectedSocket() client: Socket, @Request() req)
 	{
@@ -748,6 +774,7 @@ export class ChatRoomService {
 		}
 	}
 
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage('verify2FAKey')
 	async verify2FAKey(@MessageBody() data: any, @ConnectedSocket() client: Socket, @Request() req) {
 	  try {

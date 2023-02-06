@@ -1,4 +1,4 @@
-import { Inject } from "@nestjs/common";
+import { Inject, UseGuards } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway } from "@nestjs/websockets";
 import { MainServerService } from "src/mainServer/mainServer.service";
@@ -7,6 +7,7 @@ import { Repository } from "typeorm";
 import { UserEntity } from "src/entity/User.entity";
 import { WebSocketServer } from "@nestjs/websockets";
 import { friendSystemService } from "src/friendSystem/friendSystem.service";
+import { WsThrottlerGuard } from "src/auth/reate_limitter" 
 
 @WebSocketGateway({
 	cors: {
@@ -27,7 +28,8 @@ export class ChatDirectMessageGateway {
 
 	@WebSocketServer() server;
 
-	// @SubscribeMessage('sendDirectMessage')
+	// @UseGuards(WsThrottlerGuard)
+	//@SubscribeMessage('sendDirectMessage')
 	// async sendMessage(@MessageBody() data: any, @ConnectedSocket() client: any) {
 	// 	console.log("sendMessage")
 	// 	const user = await this.userRepository.findOne({
@@ -77,13 +79,13 @@ export class ChatDirectMessageGateway {
 	// }
 
 	// Get all the chatDirectMessage between 2 users
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage('getDirectMessage')
 	async getDirectMessage(@MessageBody() data: any, @ConnectedSocket() client: any) {
 		const user = await this.userRepository.findOne({
 			where: {username_42: data.username_42},
 			select: ["username", "username_42"]
 		});
-
 		const userSender = await this.userRepository.findOne({
 			where: {username_42: this.mainServerService.getUserConnectedBySocketId(client.id).username_42},
 			select: ["username", "username_42"]
@@ -118,6 +120,7 @@ export class ChatDirectMessageGateway {
 		}
 	}
 
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage('getMessageUserList')
 	async getMessageUserList(@MessageBody() data: any, @ConnectedSocket() client: any) {
 		let ret = await this.chatDirectMessageService.handleGetMessageUserList(this.mainServerService.getUserConnectedBySocketId(client.id).username_42);

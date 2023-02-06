@@ -6,7 +6,7 @@ import {
 	WebSocketServer,
 	WsException,
   } from '@nestjs/websockets';
-import { UseGuards, Request, HttpException } from '@nestjs/common';
+import { UseGuards, Request, Catch } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Repository, DataSource} from 'typeorm';
 import { UserEntity } from 'src/entity/User.entity';
@@ -17,6 +17,7 @@ import { Like } from 'typeorm';
 import { MainServerService } from "src/mainServer/mainServer.service";
 import { Inject } from '@nestjs/common';
 import { friendSystemService } from 'src/friendSystem/friendSystem.service';
+import { WsThrottlerGuard } from "src/auth/reate_limitter" 
 
 @WebSocketGateway({
 	cors: {
@@ -24,6 +25,7 @@ import { friendSystemService } from 'src/friendSystem/friendSystem.service';
 	},
 })
 //@WebSocketGateway(3001)
+@Catch()
 export class MainServerGateway {
 	constructor(
 		private dataSource : DataSource,
@@ -63,9 +65,10 @@ export class MainServerGateway {
 	after_init()
 	{
 	}
-
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage('getUserinDB')
 	async getUserinDB(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
+		try {
 		const qb = this.userRepository.createQueryBuilder('user');
 		if (data.username.length < 1)
 			return;
@@ -102,9 +105,13 @@ export class MainServerGateway {
 			this.server.to(client.id).emit('success_getUserinDB', {users: parsedList});
 			return;
 		}
+		}catch(e){
+			console.log("Bad data");
+		}
 	}
 
-	// @SubscribeMessage('notification')
+	//@UseGuards(WsThrottlerGuard)
+	//@SubscribeMessage('notification')
 	// async getNotification(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
 	// 	const userConnected = this.mainServerService.getUserConnectedBySocketId(client.id);
 	// 	const userSender = await this.userRepository.findOne({where: {username: userConnected.username}});

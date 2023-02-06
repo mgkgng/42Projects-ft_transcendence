@@ -12,12 +12,18 @@ import { Repository } from 'typeorm';
 import { MainServerService } from "src/mainServer/mainServer.service";
 import { friendSystemService } from 'src/friendSystem/friendSystem.service';
 import { UserFriendEntity } from 'src/entity/UserFriend.entity';
-
+import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
-	imports :	[TypeOrmModule.forFeature([UserEntity, UserChatRoomEntity, ChatRoomEntity, GameEntity, MessageChatRoomEntity, UserBlockEntity, UserFriendEntity]),
-	],				
-    providers: [MainServerService, JwtService, MainServerGateway, friendSystemService],
+	imports :	[TypeOrmModule.forFeature([UserEntity, UserChatRoomEntity, ChatRoomEntity, GameEntity, MessageChatRoomEntity, UserBlockEntity, UserFriendEntity,
+		
+	]), ThrottlerModule.forRoot({ limit: 50, ttl: 1 }) ],				
+    providers: [MainServerService, JwtService, MainServerGateway, friendSystemService ,    
+		{
+			provide: APP_GUARD,
+			useClass: ThrottlerGuard,
+		}, ],
 	exports : [MainServerService]
 })
 export class MainServerModule {}

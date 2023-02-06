@@ -45,6 +45,9 @@ services:
     networks:
       - net
     volumes:
-      - ./bd:/var/lib/postgresql/data 
+      #- ./bd:/var/lib/postgresql/data 
+      - volume_bd:/var/lib/postgresql/data 
     #ports:
       #- "5432:5432"
+volumes:
+  volume_bd:

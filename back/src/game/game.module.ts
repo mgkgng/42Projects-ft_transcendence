@@ -15,13 +15,15 @@ import { UserFriendEntity } from 'src/entity/UserFriend.entity';
 import { ChatDirectMessageService } from 'src/chatDirectMessage/chatDirectMessage.service';
 import { ChatDirectMessageEntity } from 'src/entity/ChatDirectMessage.entity';
 import { UserBlockEntity } from 'src/entity/UserBlock.entity';
+import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   controllers: [GameController],
-  providers: [GameGateway, JwtService, friendSystemService, ChatDirectMessageService],//{
-			//provide: APP_GUARD,
-			//useClass: JwtAuthGuard,
-		//  }],
+  providers: [GameGateway, JwtService, friendSystemService, ChatDirectMessageService ,{
+	provide: APP_GUARD,
+		useClass: ThrottlerGuard,
+	}, ],
 	imports :	[TypeOrmModule.forFeature([GameEntity, UserEntity, UserBlockEntity, UserFriendEntity, ChatDirectMessageEntity]), MainServerModule, UserModule]
 })
 export class GameModule {}

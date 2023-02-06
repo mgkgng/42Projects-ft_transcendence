@@ -15,6 +15,8 @@ import { ChatRoomEntity } from 'src/entity/ChatRoom.entity';
 import { GameEntity } from 'src/entity/Game.entity';
 import { MessageChatRoomEntity } from 'src/entity/MessageChatRoom.entity';
 import { UserBlockEntity } from 'src/entity/UserBlock.entity'
+import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
 	imports: [
@@ -25,7 +27,10 @@ import { UserBlockEntity } from 'src/entity/UserBlock.entity'
 	    	signOptions: { expiresIn: '1d' },      
 	    }), 
 	],
-	providers: [AuthService, OAuthStrategy, JwtStrategy],
+	providers: [AuthService, OAuthStrategy, JwtStrategy, {
+		provide: APP_GUARD,
+		useClass: ThrottlerGuard,
+	},],
 	exports: [AuthService]
 })
 export class AuthModule {}

@@ -34,7 +34,7 @@ export class WsAdapter extends IoAdapter {
   createIOServer(port: number, options?: any) {
     const server = super.createIOServer(port, options);
     server.use((socket: any, next: any) => {
-	  verify(socket.handshake.headers.authorization.split(' ')[1] as string, process.env.SECRET, (err, decoded : any) => { 
+	verify(socket.handshake.headers.authorization.split(' ')[1] as string, process.env.SECRET, (err, decoded : any) => { 
 		if (err)
 		{
 			console.log("ERROR", err);
@@ -43,17 +43,16 @@ export class WsAdapter extends IoAdapter {
 		}
 		else
 		{
-		  if(new Date((decoded.iat + 60 * 60 * 24) * 1000) > (new Date(Date.now())) && decoded.try_2fa == false)
-		  {
-			socket.emit("connection", {});
-		  	next();
-		  }
-		  else
-		  {
+			if(new Date((decoded.iat + 60 * 60 * 24) * 1000) > (new Date(Date.now())) && decoded.try_2fa == false)
+			{
+			next();
+			}
+			else
+			{
 
 			socket.emit("errors", {message: "UnauthorizedJwt"});
 			return (null);
-		  }
+			}
 		}
 	  });
     });

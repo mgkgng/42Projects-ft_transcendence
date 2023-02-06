@@ -26,7 +26,7 @@ import { friendSystemService } from "src/friendSystem/friendSystem.service";
 import { UserFriendEntity } from "src/entity/UserFriend.entity";
 import { ChatDirectMessageService } from "src/chatDirectMessage/chatDirectMessage.service";
 import { Player } from "./game.Player";
-
+import { WsThrottlerGuard } from "src/auth/reate_limitter" 
 
 @WebSocketGateway({
 	cors: {
@@ -82,6 +82,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		target.sockets.delete(client.id);
     }
 
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage("CheckOnGoing")
 	checkOnGoing(@ConnectedSocket() client: Socket, @Request() req) {
 		try {
@@ -92,6 +93,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 	}
 
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage("JoinQueue")
 	async joinQueue(@ConnectedSocket() client: Socket, @Request() req) {
 		try {
@@ -130,6 +132,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 	}
 
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage("LeaveQueue")
 	leaveQueue(@Request() req) {
 		try {
@@ -147,6 +150,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 	}
 
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage("RoomCheck")
 	roomCheck(@ConnectedSocket() client: Socket, @MessageBody() data: any, @Request() req) {
 		try {
@@ -193,6 +197,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 	}
 
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage("RoomListReq")
 	roomList(@ConnectedSocket() client: Socket) {
 		try {
@@ -213,6 +218,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 	}
 
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage("CreateRoom")
 	async createRoom(@ConnectedSocket() client: Socket, @MessageBody() data: any, @Request() req) {		
 		try {
@@ -239,6 +245,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 	}
 
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage("JoinRoom")
 	async joinRoom(@ConnectedSocket() client: Socket, @MessageBody() data: any, @Request() req) {
 		try {
@@ -297,6 +304,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 	}
 
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage("ExitRoom")
 	exitRoom(@ConnectedSocket() client: Socket, @MessageBody() data: any, @Request() req) {
 		try {
@@ -319,6 +327,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 	}
 
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage("isReady")
 	setReady(@MessageBody() data: any, @Request() req) {
 		try {
@@ -337,6 +346,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 	}
 
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage("StartGame")
 	startGame(@ConnectedSocket() client: Socket, @MessageBody() data: any, @Request() req) {
 		try {
@@ -371,6 +381,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			client.emit(event, data);
 	}
 
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage("getHistory")
 	async getHistGame(@MessageBody() data: any, @ConnectedSocket() client: Socket, @Request() req) {
 		try{
@@ -389,6 +400,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 	}
 
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage("RankingReq")
 	async getRankedUsers(@ConnectedSocket() client: Socket) {
 		try {
@@ -412,6 +424,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 	}
 
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage('CheckNewUsername')
 	async checkNewUsername(@ConnectedSocket() client: Socket, @MessageBody() data)
 	{
@@ -464,6 +477,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	/** From here, it is about friend system, direct messages and the notification */
 	/* I need to do this here in order to finish the project as soon as possible */
 
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage('reqFriendAndMessage')
 	async sendFriendAndMessage(@ConnectedSocket() client: Socket, @Request() req) {
 		try {
@@ -477,6 +491,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 	}
 
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage('requestsChecked')
 	requestChecked(@Request() req) {
 		try {
@@ -487,6 +502,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 	}
 
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage('messagesChekced')
 	messagesChecked(@Request() req) {
 		try {
@@ -497,6 +513,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 	}
 
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage("PaddleMoveKey")
 	paddleMoveKey(@MessageBody() data: any, @Request() req) {
 		try {
@@ -525,6 +542,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 	}
 
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage("PaddleStopKey")
 	paddleStopKey(@MessageBody() data: any, @Request() req) {
 		try {
@@ -545,6 +563,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 	}
 
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage('askFriendG')
 	async askFriend(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
 		try {
@@ -578,6 +597,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 	}
 
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage('unAskFriendG')
 	async unAskFriend(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
 		try {
@@ -615,6 +635,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 	}
 
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage('sendDirectMessageG')
 	async sendMessage(@MessageBody() data: any, @ConnectedSocket() client: any, @Request() req) {
 		try {

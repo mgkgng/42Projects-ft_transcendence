@@ -10,12 +10,16 @@ import { UserBlockEntity } from 'src/entity/UserBlock.entity';
 import { JwtService } from '@nestjs/jwt';
 import { Repository } from 'typeorm';
 import { ChatRoomService } from './chatRoom.gatway';
-
+import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
 	imports :	[TypeOrmModule.forFeature([UserEntity, UserChatRoomEntity, ChatRoomEntity, GameEntity, MessageChatRoomEntity, UserBlockEntity]),
 	],				
-    providers: [ChatRoomService, MainServerService, JwtService,]
+    providers: [ChatRoomService, MainServerService, JwtService,{
+		provide: APP_GUARD,
+		useClass: ThrottlerGuard,
+	},]
 })
 
 export class ChatRoomModule{}

@@ -257,6 +257,7 @@
 		});
 		// this will append when you send a message (sendDirectMessageG)
 		$client.socket.on("getDirectMessage", (lastMessage: any) => {
+	
 			let from = (lastMessage.recipient == userInfo.username_42) ? lastMessage.sender : lastMessage.recipient
 			let oldMessage = allMessages.get(from);
 			let found = false;
@@ -320,6 +321,7 @@
 	function getMessageAndChangeSelected(selected_username_42: string)
 	{
 		selected = selected_username_42;
+		console.log("sending", selected_username_42);
 		$client.socket.emit("getDirectMessage", { username_42: selected_username_42, page: allMessagePage, pageSize: allMessagePageSize});
 	}
 	function sendDirectMessageAndUpdate() {

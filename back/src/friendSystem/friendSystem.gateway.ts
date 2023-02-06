@@ -12,6 +12,8 @@ import { UserEntity } from "src/entity/User.entity";
 import { UserFriendEntity } from "src/entity/UserFriend.entity";
 import { Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
+import { WsThrottlerGuard } from "src/auth/reate_limitter" 
+
 
 @WebSocketGateway({
 	cors: {
@@ -35,6 +37,7 @@ export class friendSystemGateway {
 
 	@WebSocketServer() server;
 
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage('getFriendList')
 	async getFriendList(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
 		const user = await this.userRepository.findOne({where: {username_42: this.mainServerService.getUserConnectedBySocketId(client.id).username_42}});
@@ -57,6 +60,7 @@ export class friendSystemGateway {
 		return;
 	}
 
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage('getUserProfile')
 	async getUserProfile(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
 		const user = await this.userRepository.findOne({where: {username_42: this.mainServerService.getUserConnectedBySocketId(client.id).username_42}});
@@ -74,6 +78,7 @@ export class friendSystemGateway {
 		});
 	}
 
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage('getUserProfileByUsername')
 	async getUserProfileByUsername(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
 		const user = await this.userRepository.findOne({where: {username_42: this.mainServerService.getUserConnectedBySocketId(client.id).username_42}});
@@ -92,6 +97,7 @@ export class friendSystemGateway {
 	}
 
 
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage('getAskList')
 	async getAskedFriendList(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
 		const user = await this.userRepository.findOne({where: {username_42: this.mainServerService.getUserConnectedBySocketId(client.id).username_42}});
@@ -117,6 +123,7 @@ export class friendSystemGateway {
 		return;
 	}
 
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage('askFriend')
 	async askFriend(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
 		const user = await this.userRepository.findOne({where: {username_42: this.mainServerService.getUserConnectedBySocketId(client.id).username_42}});
@@ -150,6 +157,7 @@ export class friendSystemGateway {
 		}
 	}
 
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage('unAskFriend')
 	async unAskFriend(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
 		const user = await this.userRepository.findOne({where: {username_42: this.mainServerService.getUserConnectedBySocketId(client.id).username_42}});
@@ -179,6 +187,7 @@ export class friendSystemGateway {
 		}
 	}
 
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage('acceptFriend')
 	async acceptFriend(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
 		const user = await this.userRepository.findOne({where: {username_42: this.mainServerService.getUserConnectedBySocketId(client.id).username_42}});
@@ -209,6 +218,7 @@ export class friendSystemGateway {
 		}
 	}
 
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage('refuseFriend')
 	async refuseFriend(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
 		const user = await this.userRepository.findOne({where: {username_42: this.mainServerService.getUserConnectedBySocketId(client.id).username_42}});
@@ -243,6 +253,7 @@ export class friendSystemGateway {
 		}
 	}
 
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage('removeFriend')
 	async removeFriend(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
 		const user = await this.userRepository.findOne({where: {username_42: this.mainServerService.getUserConnectedBySocketId(client.id).username_42}});
@@ -271,6 +282,7 @@ export class friendSystemGateway {
 		}
 	}
 
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage('unblockUser')
 	async unblockUser(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
 		const user = await this.userRepository.findOne({where: {username_42: this.mainServerService.getUserConnectedBySocketId(client.id).username_42}});
@@ -288,6 +300,7 @@ export class friendSystemGateway {
 	  }
 	}
 
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage('blockUser')
 	async blockUser(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
 		const user = await this.userRepository.findOne({where: {username_42: this.mainServerService.getUserConnectedBySocketId(client.id).username_42}});
@@ -305,6 +318,7 @@ export class friendSystemGateway {
 	  }
 	}
 
+	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage('isUserBlocked')
 	async isUserBlocked(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
 		const user = await this.userRepository.findOne({where: {username_42: this.mainServerService.getUserConnectedBySocketId(client.id).username_42}});
