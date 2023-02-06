@@ -146,15 +146,14 @@
 		opacity: var(--opacity);
 	}
 
-	.death {
-		position: absolute;
-		width: 10px;
-		height: 10px;
-		background-color: $red;
-		border-radius: 50%;
-		z-index: 9999;
-	}
-
+	// .death {
+	// 	position: absolute;
+	// 	width: 10px;
+	// 	height: 10px;
+	// 	background-color: $red;
+	// 	border-radius: 50%;
+	// 	z-index: 9999;
+	// }
 </style>
 
 <script lang="ts">
@@ -170,7 +169,8 @@
 	import AlertMessage from '$lib/modals/AlertMessage.svelte';
 
 	export let roomID: string;
-	export let itself: any;	
+	export let itself: any;
+	export let interrupted: boolean;
 
 	let puck: any = undefined;
 	let moving: boolean = false;
@@ -321,16 +321,23 @@
 				player2.pos = data.pos;
 		});
 
-		$client.socket.on("LoadBall", (data: any) => { puck = new Puck(data.vec, data.pos, MapSize[gameInfo.mapSize]); });
+		$client.socket.on("LoadBall", (data: any) => {
+			readyToShow = true;
+			interrupted = false;
+			puck = new Puck(data.vec, data.pos, MapSize[gameInfo.mapSize]);
+		});
 
 		$client.socket.on("PongStart", () => {
 			clearInterval(puckMoving)
 			puckMoving = setInterval(() => {
 				let newPos = [puck.pos[0][0] + puck.vec[0], puck.pos[0][1] + puck.vec[1]];
+				console.log("moving");
 				
-				if (!puck.hit && ((puck.vec[1] > 0 && (!player2 || !(newPos[0] >= player2.pos - 4 && newPos[0] <= player2.pos + 4)))
-					|| (puck.vec[1] < 0 && (!player1 || !(newPos[0] >= player1.pos - 4 && newPos[0] <= player1.pos + 4)))))
-					return ;
+				// if (!puck.hit && ((puck.vec[1] > 0 && (!player2 || !(newPos[0] >= player2.pos - 4 && newPos[0] <= player2.pos + 4)))
+				// 	|| (puck.vec[1] < 0 && (!player1 || !(newPos[0] >= player1.pos - 4 && newPos[0] <= player1.pos + 4))))) {
+				// 		console.log("maybe");
+				// 		return ;
+				// 	}
 
 				if (newPos[1] < PongConfig.DeadZoneHeight + PongConfig.PaddleHeight) {
 					let diff = PongConfig.DeadZoneHeight + PongConfig.PaddleHeight - newPos[1];
@@ -359,6 +366,7 @@
 				}
 				puck.hit = false;
 				puck = puck;
+				console.log("here?");
 			}, 40);
 		});
 
@@ -399,14 +407,14 @@
 
 		$client.socket.on("showGame", (data: any) => {
 			console.log("showGame", data);
-			puck = new Puck(data.vec, data.pos, MapSize[gameInfo.mapSize]);
-			if (data.isGoingOn) {
-				puckMoving = setInterval(() => {
-					puck.move();
-					puck = puck;
-				}, 40);
-			}
-			readyToShow = true;
+			// puck = new Puck(data.vec, data.pos, MapSize[gameInfo.mapSize]);
+			// if (data.isGoingOn) {
+			// 	puckMoving = setInterval(() => {
+			// 		puck.move();
+			// 		puck = puck;
+			// 	}, 40);
+			// }
+			// readyToShow = true;
 		});
 
 		$client.socket.on("deathPointX", (data: any) => {
@@ -432,11 +440,12 @@
 			$client.socket.off("GameStartFail");
 			$client.socket.off("GameStart");
 			$client.socket.off("deathPointX");
+			$client.socket.off("showGame");
 		});
 	});
 </script>
 
-{#if gameInfo && readyToShow}
+{#if gameInfo && readyToShow && !interrupted}
 <div class="container">
 	<!-- <div class="flex pong" style="width: {MapSize[gameInfo.mapSize][1] + 200}px; height: {MapSize[gameInfo.mapSize][0]}px;"> -->
 	<div class="flex pong">
@@ -520,7 +529,7 @@
 {/if}
 
 <Modal bind:this={gameFinishedModal} closeOnBgClick={false}>
-	<GameOver winner={(winner == player1.info.username) ? player1 : player2} gameModal={itself} scores={[player1?.score, player2?.score]}/>
+	<GameOver winner={(winner == player1.info.username_42) ? player1 : player2} gameModal={itself} scores={[player1?.score, player2?.score]}/>
 </Modal>
 
 <Modal bind:this={quitConfirmMsgModal} closeOnBgClick={false}>
@@ -537,7 +546,7 @@ on:keypress={(event) => {
 		// userType == UserType.Watcher ||
 		(event.code != 'KeyA' && event.code != 'KeyD'))
 	return ;
-	if (moving) //* TODO should make movement more fluent
+	if (moving)
 		return ;
 	moving = true;
 	$client.socket.emit("PaddleMoveKey", {
@@ -550,7 +559,6 @@ on:keyup={(event)=>{
 	if (event.code != 'KeyA' && event.code != 'KeyD')
 		return ;
 	
-	//* TODO some precision to make
 	$client.socket.emit("PaddleStopKey", roomID);
 	moving = false;
 }}

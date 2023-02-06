@@ -22,12 +22,12 @@ export class Puck {
 		let winner = (this.vec[1] > 0) ? room.players.get(room.playerIndex[0]) : room.players.get(room.playerIndex[1]);
 		if (!winner || room.isOver)
 			return ;
-		room.broadcast("ScoreUpdate", winner?.info.username);
+		room.broadcast("ScoreUpdate", winner?.info.username_42);
 		winner.score++;
 
 		if (winner.score == room.gameInfo.maxPoint) {
-			room.broadcast("GameFinished",  winner.info.username);
-			room.endGame(winner.info.username);
+			room.broadcast("GameFinished",  winner.info.username_42);
+			room.endGame(winner.info.username_42);
 			return ;
 		}
 

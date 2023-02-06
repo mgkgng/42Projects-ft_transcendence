@@ -79,8 +79,6 @@
 	export let hostname: string;
 	export let invited: any;
 	export let ready: boolean;
-
-	//TODO precision username_42 & username
 </script>
 
 <div class="vflex player {(left) ? "left" : ""}">

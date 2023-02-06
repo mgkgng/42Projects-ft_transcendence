@@ -83,6 +83,14 @@ export class MainServerService {
 		return (id_user.id_g);
 	}
 
+	async getIdUserByUsername42(username_42 : string) //GET THE UNIQ ID OF A USER FIND WITH USER'S USERNAME
+	{
+		const client_username_42 : any = username_42;
+		const id_user = await this.dataSource.getRepository(UserEntity)
+		.createQueryBuilder().where("UserEntity.username_42 = :u", { u: client_username_42 }).getOneOrFail();
+		return (id_user.id_g);
+	}
+
 	async getIdRoom (@MessageBody() name) //GET THE UNIQ ID OF A ROOM FIND WITH THE ROOM'S NAME 
 	{
 		const id_user : any = await this.dataSource.getRepository(ChatRoomEntity)

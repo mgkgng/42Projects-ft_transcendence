@@ -133,7 +133,7 @@
 						roomID = room.id_public_room;
 						passwordModal.open();
 					} else
-						$client.socket.emit("append_user_to_room", {id_public_room: room.id_public_room, username: $client.username, room_password: ""}); // TODO
+						$client.socket.emit("append_user_to_room", {id_public_room: room.id_public_room, username: $client.username, room_password: ""});
 				}}>Join</button>
 			</div>
 		{/if}

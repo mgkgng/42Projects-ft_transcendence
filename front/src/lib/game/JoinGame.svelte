@@ -193,11 +193,6 @@
 <script lang="ts">
 	import { onMount } from "svelte";
 	import { client } from "$lib/stores/client";
-    import { user } from "$lib/stores/user";
-
-	// TODO automatic requests
-	// TODO grey button for host when the room is yet empty
-	// TODO different button options when it is a random game
 	
 	export let itself: any;
 	export let enterGameModal: any;

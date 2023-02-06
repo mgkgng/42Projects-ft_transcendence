@@ -297,7 +297,6 @@
 			{#each gameHistory as game}
 				<div class="flex result">
 					<div class="versus">
-						<!-- TODO: open other's profile when clicked -->
 						<div class="uname">{(game.player1_score > game.player2_score) ? game.player1.username : game.player2.username}</div>
 						<div class="mid">vs</div>
 						<div class="uname">{(game.player1_score > game.player2_score) ? game.player2.username : game.player1.username}</div>

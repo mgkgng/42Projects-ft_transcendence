@@ -430,7 +430,6 @@
 						writeMessageModal.open();
 					}}><img src="/icon-mail.png" alt="mail"></button>
 					<button on:click={() => {
-						//TODO confirmMessage
 						$client.socket.emit("removeFriend", { username_42: friend.username_42 });
 					}}><img src="/remove.png" alt="remove"></button>
 				</div>

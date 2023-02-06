@@ -41,7 +41,7 @@ export class Room {
 		
 	constructor(playersInfo: Array<any>, clients: Array<any>, gameInfo: any,
 		hostname: string = "", invited: any = undefined,
-		gameServer: GameGateway, // TODO is it the best way to use it?
+		gameServer: GameGateway,
 		@InjectRepository(GameEntity) private gameRep: Repository<GameEntity>, 
 				private mainServerService : MainServerService,
 				private dataSource : DataSource,
@@ -116,8 +116,7 @@ export class Room {
 	playerExit(client: Client) {
 		if (this.isStarted) { // If the game has begun, end the game
 			// console.log("test: ", this.players, this.players.keys());
-			this.endGame(this.players.keys()[0]); //TODO check if it works well tomorrow
-			// TODO tomorrow player 
+			this.endGame(this.players.keys()[0]);
 			return ;
 		} 
 
@@ -186,13 +185,13 @@ export class Room {
 		for (let client of this.clients.values())
 			client.isAvailable();
 
-		this.destroyRoom(); // TODO check
+		this.destroyRoom();
 	}
 
 	async storeGame() {
 		try{
-			const id_player1 : any = await this.mainServerService.getIdUserByUsername(this.players.get(this.playerIndex[0]).info.username);
-			const id_player2 : any = await this.mainServerService.getIdUserByUsername(this.players.get(this.playerIndex[1]).info.username);
+			const id_player1 : any = await this.mainServerService.getIdUserByUsername42(this.players.get(this.playerIndex[0]).info.username_42);
+			const id_player2 : any = await this.mainServerService.getIdUserByUsername42(this.players.get(this.playerIndex[1]).info.username_42);
 			const res_user_chat_room = await this.dataSource.createQueryBuilder().insert().into(GameEntity).values
 				([ 
 					{ player1: id_player1, player2: id_player2, is_finished: true, player1_score: this.players.get(this.playerIndex[0]).score, player2_score: this.players.get(this.playerIndex[1]).score, date_game: new Date() }

@@ -85,15 +85,15 @@
 			myPos = data.map((x: any) => x.username).indexOf(userInfo.username);
 		});
 
-		$client.socket.on("success_getUserinDB", (data: any) => {
-			profileUser.username_42 = data.users[0].username_42;
-			profileUser = profileUser;
+		$client.socket.on("resUserProfileByUsername", (data: any) => {
+			console.log("resUser", data);
+			profileUser = data;
 			userProfileModal.open();
 		});
 
 		return (() => {
 			$client.socket.off("RankingRes");
-			$client.socket.off("success_getUserinDB");
+			$client.socket.off("resUserProfileByUsername");
 		});
 	});
 </script>
@@ -127,7 +127,7 @@
 					}
 					else
 					{
-						$client.socket.emit("getUserinDB", {username: profileUser.username});
+						$client.socket.emit("getUserProfileByUsername", {username: profileUser.username});
 					}
 				}}>{rank.username}</p>
 				<p>{rank.campus_name}, {rank.campus_country}</p>

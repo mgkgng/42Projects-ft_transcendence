@@ -120,8 +120,6 @@
     import ChangeUsername from "$lib/settings/ChangeUsername.svelte";
     import ConfirmLeave from "$lib/modals/ConfirmLeave.svelte";
 	import QRCodeModal from "$lib/settings/QRCodeModal.svelte";
-
-	//TODO limit the image size
 	
 	export let itself: any;
 

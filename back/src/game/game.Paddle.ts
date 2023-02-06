@@ -15,8 +15,6 @@ export class Paddle {
 	}
 
 	move(left: boolean) {
-		//TODO put the accelerating speed on paddle
-
 		if ((this.pos == this.moveLimit[0] && left)
 			|| (this.pos == this.moveLimit[1] && !left))
 			return ;
