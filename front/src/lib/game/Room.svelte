@@ -331,10 +331,13 @@
 			clearInterval(puckMoving)
 			puckMoving = setInterval(() => {
 				let newPos = [puck.pos[0][0] + puck.vec[0], puck.pos[0][1] + puck.vec[1]];
+				console.log("moving");
 				
-				if (!puck.hit && ((puck.vec[1] > 0 && (!player2 || !(newPos[0] >= player2.pos - 4 && newPos[0] <= player2.pos + 4)))
-					|| (puck.vec[1] < 0 && (!player1 || !(newPos[0] >= player1.pos - 4 && newPos[0] <= player1.pos + 4)))))
-					return ;
+				// if (!puck.hit && ((puck.vec[1] > 0 && (!player2 || !(newPos[0] >= player2.pos - 4 && newPos[0] <= player2.pos + 4)))
+				// 	|| (puck.vec[1] < 0 && (!player1 || !(newPos[0] >= player1.pos - 4 && newPos[0] <= player1.pos + 4))))) {
+				// 		console.log("maybe");
+				// 		return ;
+				// 	}
 
 				if (newPos[1] < PongConfig.DeadZoneHeight + PongConfig.PaddleHeight) {
 					let diff = PongConfig.DeadZoneHeight + PongConfig.PaddleHeight - newPos[1];
@@ -363,6 +366,7 @@
 				}
 				puck.hit = false;
 				puck = puck;
+				console.log("here?");
 			}, 40);
 		});
 
