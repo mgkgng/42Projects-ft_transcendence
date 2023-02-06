@@ -633,7 +633,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				let invited = await this.getPlayerInfo(data.username_42);
 				let args = messageToSave.split("/");
 				console.log(args);
-				//TODO parsing + error
+				let set = ["0", "1", "2"];
+				if (args.length != 6
+					|| !set.includes(args[2]) || !set.includes(args[3]) || !set.includes(args[4]) || parseInt(args[5]) < 3 || parseInt(args[5]) > 20 || args[6].length > 50) {
+					client.emit('error_sendDirectMessageG', {error: 'This message format is not allowed.'});
+					return ;
+				}
+
 				let gameInfo = {
 					title: "", 
 					mapSize: parseInt(args[2]), 
