@@ -19,7 +19,7 @@ services:
     volumes:
       - ./front/src:/app/src
       - ./front/static:/app/static
-      - /app/node_modules
+      - node_modules_front:/app/node_modules
     depends_on:
       - back
   back:
@@ -27,7 +27,7 @@ services:
     build: ./back
     volumes:
       - ./back:/usr/src/app
-      - /usr/src/app/node_modules
+      - node_modules_back:/usr/src/app/node_modules
     ports:
       - 3000:3000
       - 3001:3001
@@ -51,3 +51,5 @@ services:
       #- "5432:5432"
 volumes:
   volume_bd:
+  node_modules_front:
+  node_modules_back:

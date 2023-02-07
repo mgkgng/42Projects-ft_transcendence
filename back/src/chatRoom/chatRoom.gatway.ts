@@ -539,7 +539,7 @@ export class ChatRoomService {
 		// console.log("set_room_not_visible", data, user, room);
 		const res = await this.dataSource.createQueryBuilder().update(UserChatRoomEntity)
 				.where("id_user = :u AND room = :r", {u: user, r: room})
-				.set({is_visible: false}).execute();
+				.set({is_visible: false, is_owner: false}).execute();
 		//await client.emit("set_room_not_visible_res", data.id_public_room);
 		this.server.to(data.id_public_room).emit("set_room_not_visible_res", {id_public_room : data.id_public_room, username: client_username });;
 		}catch(e){
