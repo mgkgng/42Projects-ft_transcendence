@@ -541,7 +541,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				// });
 				// if (room.paddles[player.index].pos == 0 || room.paddles[player.index].pos == room.paddles[player.index].moveLimit[1])
 				// 	clearInterval(intervalID);
-			}, 40);
+			}, 30);
 			player.control = intervalID;
 		} catch (e) {
 			console.log("Error PaddleMoveKey", e);

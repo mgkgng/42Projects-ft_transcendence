@@ -103,7 +103,7 @@
 			{/if}
 		{/if}
 	</div>
-	<div class="username {(player) ? "" : "invited"}">{(player) ? player.info.username_42 : invited.username}</div>
+	<div class="username {(player) ? "" : "invited"}">{(player) ? player.info.username : invited.username}</div>
 	{:else}
 	<div class="who">?</div>
 	{/if}

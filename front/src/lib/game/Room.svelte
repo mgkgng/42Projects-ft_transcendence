@@ -356,7 +356,7 @@
 					paddle1 = paddle1;
 					if (paddle1.limit)
 						clearInterval(paddle1Moving);
-				}, 40);
+				}, 30);
 			} else {
 				clearInterval(paddle2Moving)
 				paddle2Moving = setInterval(() => {
@@ -365,7 +365,7 @@
 					paddle2 = paddle2;
 					if (paddle2.limit)
 						clearInterval(paddle2Moving);
-				}, 40);
+				}, 30);
 			}
 		})
 
@@ -399,6 +399,11 @@
 		$client.socket.on("PongStart", () => {
 			clearInterval(puckMoving)
 			puckMoving = setInterval(() => {
+				if (!player1 || !player2) {
+					clearInterval(puckMoving);
+					return ;
+				}
+
 				let newPos = [puck.pos[0][0] + puck.vec[0], puck.pos[0][1] + puck.vec[1]];
 				console.log("moving");
 				
@@ -458,7 +463,7 @@
 			puck = undefined;
 
 			// Update Score
-			if (player1.info.username == data)
+			if (player1.info.username_42 == data)
 				player1.score++;
 			else
 				player2.score++;

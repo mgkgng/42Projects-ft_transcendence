@@ -11,7 +11,7 @@ export class Paddle {
 		this.width = width;
 		this.pos = (mapSize[0] - width) / 2;
 		this.moveLimit = [0, mapSize[0] - width];
-		this.vec = 6;
+		this.vec = 5;
 		this.acc = 0;
 	}
 
@@ -31,7 +31,7 @@ export class Paddle {
 	}
 
 	stop() {
-		this.vec = 6;
+		this.vec = 5;
 		this.acc = 0;
 	}
 
