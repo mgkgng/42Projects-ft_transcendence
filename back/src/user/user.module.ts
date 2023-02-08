@@ -1,6 +1,5 @@
 import { Controller, Module, Post } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserController } from './user.controller';
 import { UserEntity } from 'src/entity/User.entity';
 import { UserService } from './user.service';
 import { UserChatRoomEntity } from 'src/entity/UserChatRoom.entity';
@@ -14,7 +13,6 @@ import { JwtService } from '@nestjs/jwt';
 @Module({
 
 	imports :	[TypeOrmModule.forFeature([UserEntity, UserChatRoomEntity, ChatRoomEntity, GameEntity, MessageChatRoomEntity, UserBlockEntity, UserFriendEntity])],
-  controllers: [UserController],
   providers: [UserService, JwtService],
   exports : [UserService]
 })

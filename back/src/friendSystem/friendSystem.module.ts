@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { UserEntity } from 'src/entity/User.entity';
-import { friendSystemController } from './friendSystem.controller';
 import { friendSystemService } from './friendSystem.service';
 import { TypeOrmModule } from '@nestjs/typeorm'; 
 import { UserFriendEntity } from 'src/entity/UserFriend.entity';
@@ -14,7 +13,6 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 @Module({
     imports: [TypeOrmModule.forFeature([UserEntity, UserBlockEntity, UserFriendEntity])],
     exports: [friendSystemService],
-    controllers: [friendSystemController],
     providers: [friendSystemService, JwtService, MainServerService, friendSystemGateway,{
         provide: APP_GUARD,
         useClass: ThrottlerGuard,

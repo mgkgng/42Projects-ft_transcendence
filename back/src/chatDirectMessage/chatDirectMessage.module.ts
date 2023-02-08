@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { ChatDirectMessageController } from './chatDirectMessage.controller';
 import { ChatDirectMessageService } from './chatDirectMessage.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ChatDirectMessageEntity } from 'src/entity/ChatDirectMessage.entity';
@@ -16,7 +15,6 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 @Module({
     imports: [TypeOrmModule.forFeature([UserEntity, ChatDirectMessageEntity, UserFriendEntity, UserBlockEntity]),ThrottlerModule.forRoot({ limit: 50, ttl: 1 })],
     exports: [ChatDirectMessageService],
-    controllers: [ChatDirectMessageController],
     providers: [ChatDirectMessageService, friendSystemService, JwtService, MainServerService, ChatDirectMessageGateway,{
         provide: APP_GUARD,
         useClass: ThrottlerGuard,
