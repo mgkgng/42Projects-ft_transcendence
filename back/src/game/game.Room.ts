@@ -197,7 +197,7 @@ export class Room {
 					{ player1: id_player1, player2: id_player2, is_finished: true, player1_score: this.players.get(this.playerIndex[0]).score, player2_score: this.players.get(this.playerIndex[1]).score, date_game: new Date() }
 				]).execute();
 		}catch(e){
-			console.log(e);
+			// console.log(e);
 		}
 	}
 

@@ -110,7 +110,7 @@ export class MainServerGateway {
 			return;
 		}
 		}catch(e){
-			console.log("Bad data");
+			// console.log("Bad data");
 		}
 	}
 

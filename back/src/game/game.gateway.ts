@@ -89,7 +89,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			let target = this.getClient(req);
 			client.emit("OnGoingRes", target.room);
 		} catch (e) {
-			console.log("Error CheckOnGoing", e);
+			// console.log("Error CheckOnGoing", e);
 		}
 	}
 
@@ -128,7 +128,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				room.broadcast("MatchFound", room.id);
 			}
 		} catch (e) {
-			console.log("Error JoinQueue", e);
+			// console.log("Error JoinQueue", e);
 		}
 	}
 
@@ -146,7 +146,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			this.queue.splice(index, 1);
 			target.isAvailable();
 		} catch (e) {
-			console.log("Error LeaveQueue", e);
+			// console.log("Error LeaveQueue", e);
 		}
 	}
 
@@ -194,7 +194,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				started: room.isStarted
 			});
 		} catch (e) {
-			console.log("Error RoomCheck", e);
+			// console.log("Error RoomCheck", e);
 		}
 	}
 
@@ -215,7 +215,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			}
 			client.emit("RoomListRes", allRooms);
 		} catch (e) {
-			console.log("Error RoomListReq", e);
+			// console.log("Error RoomListReq", e);
 		}
 	}
 
@@ -242,7 +242,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			// Invite the user to the room
 			target.broadcast("CreateRoomRes", room.id);
 		} catch (e) {
-			console.log("Error CreateRoom", e);
+			// console.log("Error CreateRoom", e);
 		}
 	}
 
@@ -301,7 +301,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				});
 			}
 		} catch (e) {
-			console.log("Error JoinRoom", e);
+			// console.log("Error JoinRoom", e);
 		}
 	}
 
@@ -324,7 +324,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				target.room = "";
 			}
 		} catch (e) {
-			console.log("Error ExitRoom", e);
+			// console.log("Error ExitRoom", e);
 		}
 	}
 
@@ -343,7 +343,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			room.isReady = data.isReady;
 			room.broadcast("ReadyUpdate", room.isReady);
 		} catch (e) {
-			console.log("Error isReady", e);
+			// console.log("Error isReady", e);
 		}
 	}
 
@@ -368,7 +368,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			room.startPong();
 			room.broadcast("GameStart", undefined);
 		} catch (e) {
-			console.log("Error CheckOnGoing", e);
+			// console.log("Error CheckOnGoing", e);
 		}
 	}
 
@@ -396,7 +396,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			.select(["game.player1_score", "game.player2_score", "user1.username", "user2.username", "game.date_game"]).getMany();
 			client.emit("resHistory", res);
 		}catch (e){
-			console.log("error get_history", e);
+			// console.log("error get_history", e);
 			client.emit("error_resHistory", {error : "Bad data"});
 		}
 	}
@@ -421,7 +421,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					ORDER BY nb_victory DESC, win_rate DESC; ", []);
 			client.emit("RankingRes", res);
 		} catch (e) {
-			console.log("Error RankingReq", e);
+			// console.log("Error RankingReq", e);
 		}
 	}
 
@@ -488,7 +488,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				requests: Array.from(target.newRequests.keys())
 			})
 		} catch (e) {
-			console.log("Error reqFriendAndMessage", e);
+			// console.log("Error reqFriendAndMessage", e);
 		}
 	}
 
@@ -499,7 +499,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			let target = this.getClient(req);
 			target.newRequests.clear();
 		} catch (e) {
-			console.log("Error requestsChecked", e);
+			// console.log("Error requestsChecked", e);
 		}
 	}
 
@@ -510,7 +510,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			let target = this.getClient(req);
 			target.newMessages.clear();
 		} catch (e) {
-			console.log("Error messagesChecked", e);
+			// console.log("Error messagesChecked", e);
 		}
 	}
 
@@ -544,7 +544,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			}, 30);
 			player.control = intervalID;
 		} catch (e) {
-			console.log("Error PaddleMoveKey", e);
+			// console.log("Error PaddleMoveKey", e);
 		}
 	}
 
@@ -570,7 +570,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				pos: Math.floor(room.paddles[player.index].pos)
 			})
 		} catch (e) {
-			console.log("Error PaddleStopKey", e);
+			// console.log("Error PaddleStopKey", e);
 		}
 	}
 
@@ -604,7 +604,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				return;
 			}
 		} catch (e) {
-			console.log("Error askFriendG", e);
+			// console.log("Error askFriendG", e);
 		}
 	}
 
@@ -642,7 +642,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				return ;
 			}
 		} catch (e) {
-			console.log("Error unAskFriend", e);
+			// console.log("Error unAskFriend", e);
 		}
 	}
 
@@ -737,7 +737,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				}
 			}
 		} catch (e) {
-			console.log("Error sendDirectMessageG", e);
+			// console.log("Error sendDirectMessageG", e);
 		}
 	}
 }
