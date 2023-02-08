@@ -275,6 +275,8 @@
 				getDirectMessage = true;
 			}
 			console.log("getDirectMessage", lastMessage)
+			allMessages = allMessages;
+
 		});
 		$client.socket.on("error_getDirectMessage", (data: any) => {
 			console.log("error", data);
@@ -287,6 +289,7 @@
 				roomID = data.message.split('/')[2];
 				invitationModal.open();
 			}
+			$client.socket.emit("getDirectMessage", )
 		});
 		$client.socket.on("error_sendDirectMessageG", (data: any) => {
 			console.log("error_sendDirectMessageG", data);
