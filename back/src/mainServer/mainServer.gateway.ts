@@ -101,7 +101,11 @@ export class MainServerGateway {
 			if (index > -1) {
 				parsedList.splice(index, 1);
 			}
-			//console.log(parsedList);
+			// if parsedList contain the connected user, remove it
+			parsedList.forEach((user) => {
+				if (user.username_42 === this.mainServerService.getUserConnectedBySocketId(client.id).username_42)
+					parsedList.splice(parsedList.indexOf(user), 1);
+			});
 			this.server.to(client.id).emit('success_getUserinDB', {users: parsedList});
 			return;
 		}
