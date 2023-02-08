@@ -224,8 +224,7 @@
 	$: searchUser = "";
 	$: searchUser = searchUser.toLowerCase();
 	$: { $client.socket.emit("getUserinDB", {username: searchUser}); }
-	
-	$: console.log(sendTo);
+
 
 	function createInvitationMessage(message: string) {
 		return (`/gameInvitation/${mapSize}/${puckSpeed}/${paddleSize}/${maxPoint}/${(message.length) ? message.replaceAll('/', '&sl') : "Let's play together!"}`);
