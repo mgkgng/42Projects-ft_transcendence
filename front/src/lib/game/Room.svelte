@@ -541,22 +541,23 @@
 </Modal>
 
 <svelte:window
-on:keypress={(event) => {
+on:keydown={(event) => {
 	if (
 		// userType == UserType.Watcher ||
-		(event.code != 'KeyA' && event.code != 'KeyD'))
+		(event.code != 'ArrowDown' && event.code != 'ArrowUp'))
 	return ;
 	if (moving)
 		return ;
 	moving = true;
 	$client.socket.emit("PaddleMoveKey", {
 		room: roomID,
-		left: (userType == UserType.Player1 && event.code == 'KeyD'
-			|| userType == UserType.Player2 && event.code == 'KeyA')
+		left: (userType == UserType.Player1 && event.code == 'ArrowUp'
+			|| userType == UserType.Player2 && event.code == 'ArrowDown')
 	});
 }}
 on:keyup={(event)=>{
-	if (event.code != 'KeyA' && event.code != 'KeyD')
+	console.log("keyup", event.code)
+	if (event.code != 'ArrowDown' && event.code != 'ArrowUp')
 		return ;
 	
 	$client.socket.emit("PaddleStopKey", roomID);
