@@ -1,27 +1,24 @@
+import { PongConfig } from "$lib/stores/var";
+
 export class Paddle {
 	width: number;
 	pos: number;
 	vec: number;
 	acc: number;
 	moveLimit: Array<number>;
-	index: number;
-	limit: boolean;
 
-	constructor(mapSize: Array<number>, width: number) {
+    constructor(mapSize: Array<number>, width: number) {
 		this.width = width;
 		this.pos = (mapSize[0] - width) / 2;
 		this.moveLimit = [0, mapSize[0] - width];
 		this.vec = 6;
 		this.acc = 0;
-		this.limit = false;
 	}
 
 	move(left: boolean) {
 		if ((this.pos == this.moveLimit[0] && left)
-			|| (this.pos == this.moveLimit[1] && !left)) {
-				this.limit = true;
-				return ;
-			}
+			|| (this.pos == this.moveLimit[1] && !left))
+			return ;
 
 		// this.acc += 0.07;
 		// this.vec += this.acc;
@@ -36,6 +33,12 @@ export class Paddle {
 	stop() {
 		this.vec = 6;
 		this.acc = 0;
-		this.limit = false;
 	}
+
+    fixMove(dest: number) {
+        if (this.pos > dest)
+            this.pos -= 1;
+        else if (this.pos < dest)
+            this.pos += 1;
+    }
 }

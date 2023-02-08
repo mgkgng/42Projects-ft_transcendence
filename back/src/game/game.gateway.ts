@@ -190,7 +190,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					pos: room.puck.pos,
 					vec: room.puck.vec
 				} : undefined,
-				isNewWatcher: room.newWatchers.has(target.username_42)
+				isNewWatcher: room.newWatchers.has(target.username_42),
+				started: room.isStarted
 			});
 		} catch (e) {
 			console.log("Error RoomCheck", e);
@@ -520,21 +521,26 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			// Check if the request came from a proper player
 			let target = this.getClient(req);
 			let room = this.getRoom(data.room);
+
 			if (!room || !room.players.has(target.username_42))
 				return ;
 	
 			// Get the player
 			let player = room.players.get(target.username_42);
-	
+			
+			room.broadcast("PaddleStartMove", {
+				type: player.index,
+				left: data.left
+			});
 			// Paddle starts to move, Websocket Messages set with interval
 			let intervalID = setInterval(() => {
 				room.paddles[player.index].move(data.left);
-				room.broadcast("PaddleUpdate", {
-					type: player.index,
-					pos: room.paddles[player.index].pos
-				});
-				if (room.paddles[player.index].pos == 0 || room.paddles[player.index].pos == room.paddles[player.index].moveLimit[1])
-					clearInterval(intervalID);
+				// room.broadcast("PaddleUpdate", {
+				// 	type: player.index,
+				// 	pos: room.paddles[player.index].pos
+				// });
+				// if (room.paddles[player.index].pos == 0 || room.paddles[player.index].pos == room.paddles[player.index].moveLimit[1])
+				// 	clearInterval(intervalID);
 			}, 40);
 			player.control = intervalID;
 		} catch (e) {
@@ -558,6 +564,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			clearInterval(player.control);
 			player.control = undefined
 			room.paddles[player.index].stop();
+
+			room.broadcast("PaddleStopMove", {
+				type: player.index,
+				pos: Math.floor(room.paddles[player.index].pos)
+			})
 		} catch (e) {
 			console.log("Error PaddleStopKey", e);
 		}

@@ -161,6 +161,7 @@
 	import { client } from "$lib/stores/client";
 	import { UserType, MapSize, PaddleSize, PongConfig } from '$lib/stores/var';
 	import { Puck } from '$lib/pong/Puck';
+	import { Paddle } from '$lib/pong/Paddle';
     import Modal from '$lib/tools/Modal.svelte';
     import GameOver from '$lib/game/GameOver.svelte';
     import ConfirmMsg from '$lib/modals/ConfirmMsg.svelte';
@@ -202,6 +203,11 @@
 	let player1: any = undefined;
 	let player2: any = undefined;
 	let invited: any = undefined;
+
+	let paddle1: any = undefined;
+	let paddle2: any = undefined;
+	let paddle1Moving: any;
+	let paddle2Moving: any;
 
 	let switched: boolean = false;
 	let update: boolean = false;
@@ -286,6 +292,12 @@
 				started = true;
 			player1 = data.player1;
 			player2 = data.player2;
+
+			if (player1)
+				paddle1 = new Paddle(MapSize[gameInfo.mapSize], PaddleSize[gameInfo.paddleSize], player1.pos);
+			if (player2)
+				paddle2 = new Paddle(MapSize[gameInfo.mapSize], PaddleSize[gameInfo.paddleSize], player2.pos);
+			
 			invited = data.invited;
 			userType = (player1?.info.username_42 == userInfo.username_42) ? UserType.Player1 :
 				(player2?.info.username_42 == userInfo.username_42) ? UserType.Player2 :
@@ -293,33 +305,90 @@
 			// By default, player1 is on the right side unless user is the player2
 			switched = (userInfo.username_42 == player2?.info.username_42);
 			gameReady = true;
+			if (!started)
+				interrupted = false;
 			if (!data.isNewWatcher)
 				readyToShow = true;
+			
+			console.log(readyToShow, gameInfo, interrupted);
 		});
 
 		$client.socket.on("PlayerUpdate", (data: any) => {
 			console.log("PlayerUpdate", data);
 			if (data.join) {
-				player2 = data.player;
+				if (!player1) {
+					player1 = data.player;
+					paddle1 = new Paddle(MapSize[gameInfo.mapSize], PaddleSize[gameInfo.paddleSize], player1.pos);
+				} else {
+					player2 = data.player;
+					paddle2 = new Paddle(MapSize[gameInfo.mapSize], PaddleSize[gameInfo.paddleSize], player2.pos);
+				}
 			} else {
 				if (started) {
 					clearInterval(puckMoving);
 					return ;
 				}
-				if (data.username_42 == player1.info.username_42)
+				if (data.username_42 == player1.info.username_42) {
 					player1 = undefined;
-				else
+					paddle1 = undefined;
+				} else {
 					player2 = undefined;
+					paddle2 = undefined;
+				}
 				hostname = data.hostname;
 			}
 		});
 		
-		$client.socket.on("PaddleUpdate", (data: any) => {
-			if (data.type === 0)
-				player1.pos = data.pos;
-			else
-				player2.pos = data.pos;
-		});
+		// $client.socket.on("PaddleUpdate", (data: any) => {
+		// 	if (data.type === 0)
+		// 		player1.pos = data.pos;
+		// 	else
+		// 		player2.pos = data.pos;
+		// });
+
+		$client.socket.on("PaddleStartMove", (data: any) => {
+			console.log("start", data);
+			if (data.type === 0) {
+				clearInterval(paddle1Moving)
+				paddle1Moving = setInterval(() => {
+					console.log("paddle1 moving");
+					paddle1.move(data.left);
+					paddle1 = paddle1;
+					if (paddle1.limit)
+						clearInterval(paddle1Moving);
+				}, 40);
+			} else {
+				clearInterval(paddle2Moving)
+				paddle2Moving = setInterval(() => {
+					console.log("Paddle2 moving");
+					paddle2.move(data.left);
+					paddle2 = paddle2;
+					if (paddle2.limit)
+						clearInterval(paddle2Moving);
+				}, 40);
+			}
+		})
+
+		$client.socket.on("PaddleStopMove", (data: any) => {
+			console.log("stop", data);
+			if (data.type === 0) {
+				clearInterval(paddle1Moving);
+				paddle1Moving = setInterval(() => {
+					paddle1.fixMove(data.pos);
+					paddle1 = paddle1;
+					if (paddle1.pos == data.pos)
+						clearInterval(paddle1Moving);
+				}, 5);
+			} else {
+				clearInterval(paddle2Moving);
+				paddle2Moving = setInterval(() => {
+					paddle2.fixMove(data.pos);	
+					paddle2 = paddle2;
+					if (paddle2.pos == data.pos)
+						clearInterval(paddle2Moving);
+				}, 5);
+			}
+		})
 
 		$client.socket.on("LoadBall", (data: any) => {
 			readyToShow = true;
@@ -371,6 +440,8 @@
 		});
 
 		$client.socket.on("PuckHit", (data: any) => {
+			if (!puck)
+				return ;
 			if (Math.abs(puck.vec[1]) < 25)
 				puck.vec[1] += (puck.vec[1] > 0) ? 2 : -2;
 			if (puck.already === false)
@@ -441,6 +512,8 @@
 			$client.socket.off("GameStart");
 			$client.socket.off("deathPointX");
 			$client.socket.off("showGame");
+			$client.socket.off("PaddleStartMove");
+			$client.socket.off("PaddleStopMove");
 		});
 	});
 </script>
@@ -457,15 +530,15 @@
 			{#if gameSize}
 				<div class="zone-limit left {(!switched) ? "player2" : "player1"}" style="--width: {zoneLimitWidth}px"></div>
 				<!-- Player 1 Paddle -->
-				<div class="paddle {(!player1) ? "absent" : ""} user"
+				<div class="paddle {(!paddle1) ? "absent" : ""} user"
 					style="left: {posHorizontal[(!switched) ? 1 : 0]}px;
-					top: {(!player1) ? initPos : (!switched) ? convertPixelWithHeight(player1?.pos) : convertPixelWithHeight(MapSize[gameInfo?.mapSize][0] - player1?.pos - PaddleSize[gameInfo.paddleSize])}px;
+					top: {(!paddle1) ? initPos : (!switched) ? convertPixelWithHeight(paddle1?.pos) : convertPixelWithHeight(MapSize[gameInfo?.mapSize][0] - paddle1?.pos - PaddleSize[gameInfo.paddleSize])}px;
 					height: {paddleWidth}px">
 				</div>
 				<!-- Player 2 Paddle -->
-				<div class="paddle {(!player2) ? "absent" : ""}"
+				<div class="paddle {(!paddle2) ? "absent" : ""}"
 					style="left: {posHorizontal[(!switched) ? 0 : 1]}px;
-					top: {(!player2) ? initPos : (!switched) ? convertPixelWithHeight(player2?.pos) : convertPixelWithHeight(MapSize[gameInfo?.mapSize][0] - player2?.pos - PaddleSize[gameInfo?.paddleSize])}px;
+					top: {(!paddle2) ? initPos : (!switched) ? convertPixelWithHeight(paddle2?.pos) : convertPixelWithHeight(MapSize[gameInfo?.mapSize][0] - paddle2?.pos - PaddleSize[gameInfo?.paddleSize])}px;
 					height: {paddleWidth}px">
 				</div>
 				<div class="zone-limit right {(!switched) ? "player1" : "player2"}" style="--width: {zoneLimitWidth}px"></div>
@@ -542,22 +615,23 @@
 
 <svelte:window
 on:keydown={(event) => {
+	console.log(event);
 	if (
-		// userType == UserType.Watcher ||
-		(event.code != 'ArrowDown' && event.code != 'ArrowUp'))
+		userType == UserType.Watcher ||
+		(event.code != 'KeyD' && event.code != 'KeyA'))
 	return ;
 	if (moving)
 		return ;
 	moving = true;
 	$client.socket.emit("PaddleMoveKey", {
 		room: roomID,
-		left: (userType == UserType.Player1 && event.code == 'ArrowUp'
-			|| userType == UserType.Player2 && event.code == 'ArrowDown')
+		left: (userType == UserType.Player1 && event.code == 'KeyD'
+			|| userType == UserType.Player2 && event.code == 'KeyA')
 	});
 }}
 on:keyup={(event)=>{
 	console.log("keyup", event.code)
-	if (event.code != 'ArrowDown' && event.code != 'ArrowUp')
+	if (event.code != 'KeyA' && event.code != 'KeyD')
 		return ;
 	
 	$client.socket.emit("PaddleStopKey", roomID);
