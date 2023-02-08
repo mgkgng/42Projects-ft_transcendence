@@ -82,51 +82,55 @@ export class ChatDirectMessageGateway {
 	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage('getDirectMessage')
 	async getDirectMessage(@MessageBody() data: any, @ConnectedSocket() client: any) {
-		const user = await this.userRepository.findOne({
-			where: {username_42: data.username_42},
-			select: ["username", "username_42"]
-		});
-		const userSender = await this.userRepository.findOne({
-			where: {username_42: this.mainServerService.getUserConnectedBySocketId(client.id).username_42},
-			select: ["username", "username_42"]
-		});
-		if (!user || !userSender)
-		{
-			this.server.to(client.id).emit('error_getDirectMessage', {error: 'User not found'});
-			return;
-		}
-		if (await this.friendSystemService.isUserBlocked(userSender.username, user.username))
-		{
-			this.server.to(client.id).emit('error_getDirectMessage', {error: 'User blocked'});
-			return;
-		}
-		if (await this.friendSystemService.isUserBlocked(user.username, userSender.username))
-		{
-			this.server.to(client.id).emit('error_getDirectMessage', {error: 'You\'ve been blocked by this user'});
-			return;
-		}
+		try {
+			const user = await this.userRepository.findOne({
+				where: {username_42: data.username_42},
+				select: ["username", "username_42"]
+			});
+			const userSender = await this.userRepository.findOne({
+				where: {username_42: this.mainServerService.getUserConnectedBySocketId(client.id).username_42},
+				select: ["username", "username_42"]
+			});
+			if (!user || !userSender)
+			{
+				this.server.to(client.id).emit('error_getDirectMessage', {error: 'User not found'});
+				return;
+			}
+			if (await this.friendSystemService.isUserBlocked(userSender.username, user.username))
+			{
+				this.server.to(client.id).emit('error_getDirectMessage', {error: 'User blocked'});
+				return;
+			}
+			if (await this.friendSystemService.isUserBlocked(user.username, userSender.username))
+			{
+				this.server.to(client.id).emit('error_getDirectMessage', {error: 'You\'ve been blocked by this user'});
+				return;
+			}
 
-		// const messages = await this.chatDirectMessageService.handleGetDirectMessageHistory(userSender.username, user.username, data.limit, data.offset);
-		if (Number(data.page) < 0 || Number(data.pageSize) < 0 || Number(data.page) == NaN || Number(data.pageSize) == NaN)
-		{
-			this.server.to(client.id).emit('error_getDirectMessage', {error: 'Invalid page or pageSize'});
-			return;
-		}
-		const messages = await this.chatDirectMessageService.handleGetDirectMessageHistory(userSender.username, user.username, data.page, data.pageSize);
-		if (messages) {
-			this.server.to(client.id).emit('success_getDirectMessage', { messageHistory: messages });
-		} else {
-			this.server.to(client.id).emit('error_getDirectMessage', { error: 'An error occured' });
-		}
+			// const messages = await this.chatDirectMessageService.handleGetDirectMessageHistory(userSender.username, user.username, data.limit, data.offset);
+			if (Number(data.page) < 0 || Number(data.pageSize) < 0 || Number(data.page) == NaN || Number(data.pageSize) == NaN)
+			{
+				this.server.to(client.id).emit('error_getDirectMessage', {error: 'Invalid page or pageSize'});
+				return;
+			}
+			const messages = await this.chatDirectMessageService.handleGetDirectMessageHistory(userSender.username, user.username, data.page, data.pageSize);
+			if (messages) {
+				this.server.to(client.id).emit('success_getDirectMessage', { messageHistory: messages });
+			} else {
+				this.server.to(client.id).emit('error_getDirectMessage', { error: 'An error occured' });
+			}
+		}catch(e){}
 	}
 
 	@UseGuards(WsThrottlerGuard)
 	@SubscribeMessage('getMessageUserList')
 	async getMessageUserList(@MessageBody() data: any, @ConnectedSocket() client: any) {
-		let ret = await this.chatDirectMessageService.handleGetMessageUserList(this.mainServerService.getUserConnectedBySocketId(client.id).username_42);
-		if (ret)
-			this.server.to(client.id).emit('success_getMessageUserList', {messageUserList: ret});
-		else
-			this.server.to(client.id).emit('error_getMessageUserList', {error: 'An error occured'});
+		try {
+			let ret = await this.chatDirectMessageService.handleGetMessageUserList(this.mainServerService.getUserConnectedBySocketId(client.id).username_42);
+			if (ret)
+				this.server.to(client.id).emit('success_getMessageUserList', {messageUserList: ret});
+			else
+				this.server.to(client.id).emit('error_getMessageUserList', {error: 'An error occured'});
+		}catch(e){}
 	}
 }
