@@ -79,7 +79,7 @@ export class MainServerGateway {
 		if (!users || users.length < 1)
 		{
 			this.server.to(client.id).emit('error_getUserinDB', {error: "No user found"});
-			console.log("error");
+			// console.log("error");
 			return;
 		}
 		else

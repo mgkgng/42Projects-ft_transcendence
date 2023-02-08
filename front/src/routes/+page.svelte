@@ -43,7 +43,7 @@
 		});
 
 		$client.socket.on("CreateRoomRes", (data: any) => {
-			console.log("RoomCreated", data);
+			// console.log("RoomCreated", data);
 			createGameModal.close();
 			roomID = data;
 			interrupted = false;
@@ -51,7 +51,7 @@
 		});
 
 		$client.socket.on("JoinRoomRes", (data: any) => {
-			console.log(data);
+			// console.log(data);
 			joinGameModal.close();
 			roomID = data.roomID;
 			interrupted = false;

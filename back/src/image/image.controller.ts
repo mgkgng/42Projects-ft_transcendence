@@ -46,14 +46,14 @@ export class ImageController {
             const imageChanged = await this.imageService.changeUserImage(user.username_42, imageSaved);
             if (!imageChanged)
             {
-                console.log(imageSaved, imageChanged);
+                // console.log(imageSaved, imageChanged);
                 return { error: "Error changing image" };
             }
             else
                 return { success: "Image changed" };
         }
         else {
-            console.log("File is not an image", file);
+            // console.log("File is not an image", file);
             return "File is not an image";
         }
     }

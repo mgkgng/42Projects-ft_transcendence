@@ -48,7 +48,7 @@
 	let loading = false;
 
 	onMount(() => {
-		console.log(client);
+		// console.log(client);
 		
 		$client.socket.on("JoinQueueError", (data: any) => {
 			loading = false;

@@ -274,16 +274,16 @@
 				allMessages = allMessages;
 				getDirectMessage = true;
 			}
-			console.log("getDirectMessage", lastMessage)
+			// console.log("getDirectMessage", lastMessage)
 			allMessages = allMessages;
 
 		});
 		$client.socket.on("error_getDirectMessage", (data: any) => {
-			console.log("error", data);
+			// console.log("error", data);
 			selectMessageOrBlocked = data.error;
 		});
 		$client.socket.on("success_sendDirectMessageG", (data: any) => {
-			console.log("success_sendDirectMessageG", data);
+			// console.log("success_sendDirectMessageG", data);
 			writeMessageModal.close();
 			if (data.message.startsWith('/gameInvitation/')) {
 				roomID = data.message.split('/')[2];
@@ -292,7 +292,7 @@
 			$client.socket.emit("getDirectMessage", )
 		});
 		$client.socket.on("error_sendDirectMessageG", (data: any) => {
-			console.log("error_sendDirectMessageG", data);
+			// console.log("error_sendDirectMessageG", data);
 		});
 		$client.socket.on("newMessageArrived", async (senderUsername: string) => {
 			if (selected == senderUsername) {
@@ -324,13 +324,13 @@
 	function getMessageAndChangeSelected(selected_username_42: string)
 	{
 		selected = selected_username_42;
-		console.log("sending", selected_username_42);
+		// console.log("sending", selected_username_42);
 		$client.socket.emit("getDirectMessage", { username_42: selected_username_42, page: allMessagePage, pageSize: allMessagePageSize});
 	}
 	function sendDirectMessageAndUpdate() {
 		if (!message.length)
 			return ;
-		console.log("sendDirectMessageG", {username_42: selected, message: message})
+		// console.log("sendDirectMessageG", {username_42: selected, message: message})
 		$client.socket.emit('sendDirectMessageG', {username_42: selected, message: message});
 		message = '';
 	}

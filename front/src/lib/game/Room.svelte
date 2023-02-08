@@ -282,10 +282,10 @@
 			return ;
 		
 		$client.socket.on("RoomFound", (data: any) => {
-			console.log("RoomFound", data);
+			// console.log("RoomFound", data);
 
-			// Get room information
-			console.log(userInfo);
+			// // Get room information
+			// console.log(userInfo);
 			gameInfo = data.gameInfo;
 			hostname = data.hostname;
 			if (!hostname.length)
@@ -305,16 +305,20 @@
 			// By default, player1 is on the right side unless user is the player2
 			switched = (userInfo.username_42 == player2?.info.username_42);
 			gameReady = true;
-			if (!started)
+			if (!data.started)
 				interrupted = false;
+			else {
+				ready = true;
+				started = true;
+			}
 			if (!data.isNewWatcher)
 				readyToShow = true;
 			
-			console.log(readyToShow, gameInfo, interrupted);
+			// console.log(readyToShow, gameInfo, interrupted);
 		});
 
 		$client.socket.on("PlayerUpdate", (data: any) => {
-			console.log("PlayerUpdate", data);
+			// console.log("PlayerUpdate", data);
 			if (data.join) {
 				if (!player1) {
 					player1 = data.player;
@@ -347,11 +351,11 @@
 		// });
 
 		$client.socket.on("PaddleStartMove", (data: any) => {
-			console.log("start", data);
+			// console.log("start", data);
 			if (data.type === 0) {
 				clearInterval(paddle1Moving)
 				paddle1Moving = setInterval(() => {
-					console.log("paddle1 moving");
+					// console.log("paddle1 moving");
 					paddle1.move(data.left);
 					paddle1 = paddle1;
 					if (paddle1.limit)
@@ -360,7 +364,7 @@
 			} else {
 				clearInterval(paddle2Moving)
 				paddle2Moving = setInterval(() => {
-					console.log("Paddle2 moving");
+					// console.log("Paddle2 moving");
 					paddle2.move(data.left);
 					paddle2 = paddle2;
 					if (paddle2.limit)
@@ -370,7 +374,7 @@
 		})
 
 		$client.socket.on("PaddleStopMove", (data: any) => {
-			console.log("stop", data);
+			// console.log("stop", data);
 			if (data.type === 0) {
 				clearInterval(paddle1Moving);
 				paddle1Moving = setInterval(() => {
@@ -405,7 +409,7 @@
 				}
 
 				let newPos = [puck.pos[0][0] + puck.vec[0], puck.pos[0][1] + puck.vec[1]];
-				console.log("moving");
+				// console.log("moving");
 				
 				// if (!puck.hit && ((puck.vec[1] > 0 && (!player2 || !(newPos[0] >= player2.pos - 4 && newPos[0] <= player2.pos + 4)))
 				// 	|| (puck.vec[1] < 0 && (!player1 || !(newPos[0] >= player1.pos - 4 && newPos[0] <= player1.pos + 4))))) {
@@ -440,7 +444,7 @@
 				}
 				puck.hit = false;
 				puck = puck;
-				console.log("here?");
+				// console.log("here?");
 			}, 40);
 		});
 
@@ -472,7 +476,10 @@
 		$client.socket.on("ReadyUpdate", (data: any) => { ready = data; });
 
 		$client.socket.on("GameFinished", (data: any) => {
+			// console.log("game finished", data);
 			clearInterval(puckMoving);
+			clearInterval(paddle1Moving);
+			clearInterval(paddle2Moving);
 			puck = undefined;
 			winner = data;
 			gameFinishedModal.open();
@@ -482,7 +489,7 @@
 		$client.socket.on("GameStart", () => { started = true });
 
 		$client.socket.on("showGame", (data: any) => {
-			console.log("showGame", data);
+			// console.log("showGame", data);
 			// puck = new Puck(data.vec, data.pos, MapSize[gameInfo.mapSize]);
 			// if (data.isGoingOn) {
 			// 	puckMoving = setInterval(() => {
@@ -499,11 +506,13 @@
 
 		$client.socket.emit("RoomCheck", roomID);
 
-		console.log("onMount is here");
+		// console.log("onMount is here");
 
 		return (() => {
-			if (puckMoving)
+			if (puckMoving) 
 				clearInterval(puckMoving);
+			clearInterval(paddle1Moving);
+			clearInterval(paddle2Moving);
 			$client.socket.off("RoomFound");
 			$client.socket.off("PlayerUpdate");
 			$client.socket.off("PaddleUpdate");
@@ -620,7 +629,7 @@
 
 <svelte:window
 on:keydown={(event) => {
-	console.log(event);
+	// console.log(event);
 	if (
 		userType == UserType.Watcher ||
 		(event.code != 'KeyD' && event.code != 'KeyA'))
@@ -635,7 +644,7 @@ on:keydown={(event) => {
 	});
 }}
 on:keyup={(event)=>{
-	console.log("keyup", event.code)
+	// console.log("keyup", event.code)
 	if (event.code != 'KeyA' && event.code != 'KeyD')
 		return ;
 	

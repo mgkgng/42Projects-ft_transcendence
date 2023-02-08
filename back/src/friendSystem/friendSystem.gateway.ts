@@ -205,7 +205,7 @@ export class friendSystemGateway {
 		try {
 			const user = await this.userRepository.findOne({where: {username_42: this.mainServerService.getUserConnectedBySocketId(client.id).username_42}});
 			const friend = await this.userRepository.findOne({where: {username_42: data.username_42}});
-			console.log("test?", user, friend, data);
+			// console.log("test?", user, friend, data);
 			if (!user || !friend)
 			{
 				this.server.to(client.id).emit('error_acceptFriend', {error: "User not found"});

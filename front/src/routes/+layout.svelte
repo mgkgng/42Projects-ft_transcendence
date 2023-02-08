@@ -60,7 +60,7 @@
 				verifCodeModal.open();
 			}
 		else {
-				console.log("Oupsi");
+				// console.log("Oupsi");
 				// while (tok.get_code != null)
 				// {
 				//  	let ufa_code : any = prompt("Your code is : ");
@@ -86,7 +86,7 @@
 				goto('/');
 			}
 		} catch(e){
-			console.log("NOT CONNECTED");
+			// console.log("NOT CONNECTED");
 			localStorage.removeItem('transcendence-jwt');
 		}
 	}
@@ -116,7 +116,7 @@
 
 			if ($client.socket) {
 				$client.socket.on("get_user_info_res", (data: any) => {
-					console.log("get_user_info_res: ", data);
+					// console.log("get_user_info_res: ", data);
 					$client.username = data.username;
 					user.set(data);
 					login.set(true);
@@ -132,9 +132,9 @@
 			});
 		}
 		else if ($client.socket) {
-			console.log("hey");
+			// console.log("hey");
 			$client.socket.on("get_user_info_res", (data: any) => {
-				console.log("get_user_info_res: ", data);
+				// console.log("get_user_info_res: ", data);
 				$client.username = data.username;
 				user.set(data);
 				login.set(true);

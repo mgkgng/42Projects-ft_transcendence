@@ -43,7 +43,7 @@
 	});
 	async function try_code(ufa_code : String)
 	{
-		console.log(tok);
+		// console.log(tok);
 		const res_ufa : any = await fetch(`http://${location.hostname}:3000/auth42`,{
 			method: 'POST',
 			headers: {

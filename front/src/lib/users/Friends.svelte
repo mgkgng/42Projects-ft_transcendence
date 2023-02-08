@@ -262,11 +262,11 @@
 
 	onMount(() => {
 		$client.socket.on("error_getFriendList", (data: any) => {
-			console.log("Error!");
+			// console.log("Error!");
 		});
 
 		$client.socket.on("success_getFriendList", (data: any) => {
-			console.log(data);
+			// console.log(data);
 			loadedFriends = false;
 			friends = new Map<string, any>();
 			for (let friend of data.friends)
@@ -276,20 +276,20 @@
 		});
 
 		$client.socket.on("success_getUserinDB", (data: any) => {
-			console.log("getUserinDB", data);
+			// console.log("getUserinDB", data);
 			userSearchList = data.users;
 			// userProfileModal.open();
 		});
 		$client.socket.on("error_getUserinDB", (data: any) => { userSearchList = []; });
 
 		$client.socket.on("resUserProfile", (data: any) => {
-			console.log("resUser", data);
+			// console.log("resUser", data);
 			profileUser = data;
 			userProfileModal.open();
 		});
 
 		$client.socket.on("success_getAskList", (data: any) => {
-			console.log("AskList", data);
+			// console.log("AskList", data);
 			loadedRequests = false;
 			friendRequests = new Map<string, any>();
 			for (let request of data.friends)
@@ -318,7 +318,7 @@
 		});
 
 		$client.socket.on("error_getAskList", (data: any) => {
-			console.log("error_getAskList: ", data);
+			// console.log("error_getAskList: ", data);
 		});
 
 		$client.socket.emit("getFriendList");

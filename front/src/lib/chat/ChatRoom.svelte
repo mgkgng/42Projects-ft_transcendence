@@ -225,7 +225,7 @@
 
 	onMount(() => {
 		$client.socket.on("resUserProfileByUsername", (data: any) => {
-			console.log("resUser", data);
+			// console.log("resUser", data);
 			profileUser = data;
 			userProfileModal.open();
 		});
@@ -270,7 +270,7 @@
 	}
 	function handleScroll(event) {
 		if (event.target.scrollTop === 0) {
-			console.log("emit");
+			// console.log("emit");
 			$client.socket.emit("get_message_room_page", { id_public_room: roomID, page_number: ++chat.my_rooms.get(roomID).actual_page , size_page: 100});
 		}
 		else if(event.target.scrollTop >= event.target.scrollHeight - event.target.clientHeight - 1 && chat.my_rooms.get(roomID).actual_page > 0)

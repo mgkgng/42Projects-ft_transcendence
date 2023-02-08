@@ -192,7 +192,7 @@
 	onMount (() => {
 		/* Chat Updates*/
 		$client.socket.on("ban_user", (data: any) => {
-			console.log("ban");
+			// console.log("ban");
 			if (data.username_ban == $client.username)
 			{
 				chat.my_rooms.delete(data.id_chat_room);
@@ -235,32 +235,32 @@
 			$client.socket.emit("get_my_rooms");
 		});
 		 $client.socket.on("success_append_user_to_room", (data : any) => {
-			console.log("Success_append:", data, $client.username);
+			// console.log("Success_append:", data, $client.username);
 			if (data.username == $client.username)
 		 		$client.socket.emit("get_my_rooms", {data : "some_data"});
 			else
 				$client.socket.emit("get_users_room", {id_public_room: data.id_public_room});
 		 });
 		$client.socket.on("set_room_private_res", (data: any) => {
-			console.log("check private");
+			// console.log("check private");
 			chat.my_rooms.get(data.id_public_room).is_private = true;
 			chat = chat
 		});
 
 		$client.socket.on("unset_room_private_res", (data: any) => {
-			console.log("check public");
+			// console.log("check public");
 			chat.my_rooms.get(data.id_public_room).is_private = false;
 			chat = chat;
 		});
 
 		$client.socket.on("set_password_room_res", (data: any) => {
-			console.log("check with");
+			// console.log("check with");
 			chat.my_rooms.get(data.id_public_room).is_password_protected = true;
 			chat = chat;
 		});
 
 		$client.socket.on("unset_password_room_res", (data: any) => {
-			console.log("check without");
+			// console.log("check without");
 			chat.my_rooms.get(data.id_public_room).is_password_protected = false;
 			chat = chat;
 		});
@@ -272,7 +272,7 @@
 		});
 
 		$client.socket.on("get_my_rooms_res", (data: any) => {
-			console.log("get_my_rooms_res", data);
+			// console.log("get_my_rooms_res", data);
 			for (let x of data) {
 				if (chat.my_rooms.get(x.id_public_room) == undefined) {
 					chat.my_rooms.set(x.room.id_public_room, new ChattRoom(x.room.id_public_room, x.room.name, x.room.is_password_protected, x.room.is_private, x.is_admin, x.is_owner));
@@ -299,7 +299,7 @@
 		//});
 
 		$client.socket.on("get_message_room_res", (data: any) => {
-			console.log("Get Messages:", data);
+			// console.log("Get Messages:", data);
 			let chatRoom = chat.my_rooms.get(data.id_public_room);
 			for (let message of data.messages)
 				chatRoom.messages.push(new Message(message.id_chat_room.id_public_room, message.id_user.username, message.content_message, message.date_message))
@@ -307,7 +307,7 @@
 			scrollToBottom();
 		});
 		$client.socket.on("get_message_room_page_res", (data: any) => {
-			console.log("Get Messages page :", data);
+			// console.log("Get Messages page :", data);
 			let chatRoom = chat.my_rooms.get(data.id_public_room);
 			let new_page : Array<Message> = [];
 			for (let message of data.messages)
@@ -322,7 +322,7 @@
 			chat = chat;
 		});
 		$client.socket.on("get_users_room_res", (data: any) => {
-			console.log("Get User:", data);
+			// console.log("Get User:", data);
 			let chatRoom = chat.my_rooms.get(data.id_public_room);
 			chatRoom.users = [];
 			for (let user of data.users)
@@ -336,7 +336,7 @@
 			chat.my_rooms.get(data.id_public_room).messages.push(new Message(data.id_public_room, data.username, data.content_message, data.date_message));
 			chat.my_rooms.get(data.id_public_room).pages_messages[0].push(new Message(data.id_public_room, data.username, data.content_message, data.date_message));
 			chat.my_rooms.get(data.id_public_room).is_new_message = true;
-			console.log("new_message_room: ",chat.my_rooms);
+			// console.log("new_message_room: ",chat.my_rooms);
 			chat = chat;
 		});
 

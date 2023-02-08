@@ -116,7 +116,7 @@ export class Room {
 	playerExit(client: Client) {
 		if (this.isStarted) { // If the game has begun, end the game
 			// console.log("test: ", this.players, this.players.keys());
-			this.endGame(this.players.keys()[0]);
+			this.endGame([...this.players.keys()][0]);
 			return ;
 		} 
 

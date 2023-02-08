@@ -167,7 +167,7 @@
 	let userInfo: any;
 	user.subscribe((user: any) => { userInfo = user; });
 
-	console.log(profileUser, userInfo);
+	// console.log(profileUser, userInfo);
 
 	let writeMessageModal: any;
 
@@ -180,7 +180,7 @@
 			lunch_update();
 			update = true;
 		}
-	} 	
+	}
 
 	function lunch_update() {
 		$client.socket.emit("getHistory", { username: profileUser.username });
@@ -189,7 +189,7 @@
 
 	onMount(() => {
 		$client.socket.on("error_askFriendG", (data: any) => {
-			console.log("error", data)
+			// console.log("error", data)
 		});
 		$client.socket.on("success_askFriendG", (data: any) => {
 			profileUser.is_asked = true;
@@ -209,7 +209,7 @@
 
 		$client.socket.on("resHistory", (data: any) => {
 			gameHistory = data;
-			console.log(gameHistory);
+			// console.log(gameHistory);
 		});
 
 		$client.socket.on("error_resHistory", (data: any) => {
@@ -246,7 +246,7 @@
 </script>
 
 <Modal bind:this={writeMessageModal}>
-	<WriteMessage itself={writeMessageModal} sendTo={[profileUser.username_42]}/>
+	<WriteMessage itself={writeMessageModal} sendTo={[profileUser]}/>
 </Modal>
 
 

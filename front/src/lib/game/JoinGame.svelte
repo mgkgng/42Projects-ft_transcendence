@@ -209,9 +209,9 @@
 	$: roomArray = (showAvailable) ? rooms?.filter(room => room.players.length < 2) : rooms;
 	$: roomsOnPage = roomArray?.slice(roomPage * perPage, roomPage * perPage + perPage);
 	$: roomPageNb = Math.ceil(roomArray?.length / perPage);
-	$: console.log("rooms", rooms)
-	$: console.log("Array: ", roomArray)
-	$: console.log("onpage:", roomsOnPage);
+	// $: console.log("rooms", rooms)
+	// $: console.log("Array: ", roomArray)
+	// $: console.log("onpage:", roomsOnPage);
 
 	function movePage(left: boolean){
 		if (left && (roomPage - 1) * perPage >= 0)

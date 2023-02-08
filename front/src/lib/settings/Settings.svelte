@@ -191,7 +191,7 @@
 		});
 
 		let result = await response.json();
-		console.log("uploadImage",result);
+		// console.log("uploadImage",result);
 		if (result.success == "Image changed")
 		{
 			$client.socket.emit("get_user_info");
@@ -208,7 +208,7 @@
 		qrCodeUrl = data;
 	}
 	onMount(() => {
-		console.log(image);
+		// console.log(image);
 		$client.socket.on("change_username_res", (data: any) => {
 			user.update((u: any) => {
 				u.username = data.new_username;
@@ -218,7 +218,7 @@
 		});
 
 		$client.socket.on("try_active_double_auth_res", (data: any) => {
-			console.log("QrCode:", data);
+			// console.log("QrCode:", data);
 			lunchVerif(data);
 		});
 

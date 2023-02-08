@@ -664,7 +664,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				let player = await this.getPlayerInfo(target.username_42);
 				let invited = await this.getPlayerInfo(data.username_42);
 				let args = messageToSave.split("/");
-				console.log(args);
+				// console.log(args);
 				let set = ["0", "1", "2"];
 				if (args.length != 6
 					|| !set.includes(args[2]) || !set.includes(args[3]) || !set.includes(args[4]) || parseInt(args[5]) < 3 || parseInt(args[5]) > 20 || args[6].length > 50) {

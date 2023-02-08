@@ -382,7 +382,7 @@
 					alertMessageModal.open();
 					return ;
 				}
-				console.log(createInvitationMessage(message));
+				// console.log(createInvitationMessage(message));
 				$client.socket.emit("sendDirectMessageG", {
 					username_42: sendTo[0].username_42,
 					message: createInvitationMessage(message)

@@ -170,7 +170,7 @@
 			return ;
 
 		$client.socket.on("updateFriendAndMessage", (data: any) => {
-			console.log("got update", data);
+			// console.log("got update", data);
 
 			for (let req of data.requests)
 				newFriendRequest.set(req, true);
@@ -178,7 +178,7 @@
 		});
 
 		$client.socket.on("newMessageArrived", (data: any) => {
-			console.log("message arrived", data); 
+			// console.log("message arrived", data); 
 			newMessage.set(data, true);
 			newMessage = newMessage;
 		});
@@ -194,7 +194,7 @@
 		});
 
 		$client.socket.on("JoinRoomRes", (data: any) => {
-			console.log(data);
+			// console.log(data);
 			privateMessagesModal.close();
 		});
 

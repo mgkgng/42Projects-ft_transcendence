@@ -40,7 +40,10 @@ export class ChatRoomService {
 				//console.log("Join => ", n.room.id_public_room);
 				await client.join(n.room.id_public_room);
 			}
-		} catch (e) { console.log("error"); return (e); }
+		} catch (e) {
+			// console.log("error");
+			return (e); 
+		}
 		return ("connect");
 	}
 
@@ -121,7 +124,7 @@ export class ChatRoomService {
 			{
 				if (is_already_in && is_already_in.is_admin) //Test if user is admin
 				{
-					console.log("Error");
+					// console.log("Error");
 					await client.emit("error_append_user_to_room", {error: "Bad password"});
 					return;
 				}
@@ -130,7 +133,7 @@ export class ChatRoomService {
 			{
 				if (is_already_in.is_banned && is_already_in.ban_end > new Date())
 				{
-					console.log("Error");
+					// console.log("Error");
 					await client.emit("error_append_user_to_room", {error : "You are ban of this room"});
 					return ;
 				}
@@ -150,11 +153,11 @@ export class ChatRoomService {
 			await client.join(data.id_public_room); 		//JOIN ROOM (socket.io rooms)
 			this.server.to(data.id_public_room).emit("success_append_user_to_room", {id_public_room: room.id_public_room, room_name: room.name, username: client_username_42});
 			//this.server.to(data.id_public_room).emit("append_user_to_room_res", {id_public_room: room.id_public_room, is_admin: false, username: user.username});
-			console.log("Append user to room finish");
+			// console.log("Append user to room finish");
 			return;
 		}
 		catch(e){
-			console.log("Append message Error: bad data", data);
+			// console.log("Append message Error: bad data", data);
 			throw new WsException("Bad data");
 		}
 	}
@@ -223,7 +226,7 @@ export class ChatRoomService {
 				.andWhere("userChat.room = :r", {r: id_room}).getMany();
 				if (!res_is_in_room.length)
 				{
-					console.log("Not in room Error");
+					// console.log("Not in room Error");
 					await client.emit("error_get_message_room", {error: "You are not in this room"});
 					throw new WsException("Not in the room");
 				}
@@ -240,11 +243,11 @@ export class ChatRoomService {
 				await client.emit('get_message_room_res', {messages : res, id_public_room: data.id_public_room} )
 				return;
 			} catch (e) {
-				console.log("getMessage Error", e);
+				// console.log("getMessage Error", e);
 				throw new WsException("No message in this room");
 			}
 		} catch(e){
-			console.log("getMessage Error: bad data");
+			// console.log("getMessage Error: bad data");
 			throw new WsException("Bad data");
 		}
 	}
@@ -279,11 +282,11 @@ export class ChatRoomService {
 				await client.emit('get_message_room_page_res', {messages : res.reverse(), id_public_room: data.id_public_room, page_number: data.page_number});
 				//console.log("Page send", res);
 			} catch (e) {
-				console.log("getMessage Error", e);
+				// console.log("getMessage Error", e);
 				throw new WsException("No message in this room");
 			}
 		}catch(e){
-			console.log("getMessage Error: bad data",e, data);
+			// console.log("getMessage Error: bad data",e, data);
 			throw new WsException("Bad data");
 		}
 	}
@@ -349,7 +352,7 @@ export class ChatRoomService {
 				//await querry.rollbackTransaction();
 				await client.emit("error_new_message_room", {error: "Can't create message"});
 				throw new WsException("Can't send message");
-				console.log("Error Create message:", e)
+				// console.log("Error Create message:", e)
 			}
 		}catch(e){}
 	}
@@ -549,7 +552,7 @@ export class ChatRoomService {
 		//await client.emit("set_room_not_visible_res", data.id_public_room);
 		this.server.to(data.id_public_room).emit("set_room_not_visible_res", {id_public_room : data.id_public_room, username: client_username });;
 		}catch(e){
-			console.log("error data :", e);
+			// console.log("error data :", e);
 		}
 	}
 	//Put a room in state "visible" for a user

@@ -86,7 +86,7 @@
 		});
 
 		$client.socket.on("resUserProfileByUsername", (data: any) => {
-			console.log("resUser", data);
+			// console.log("resUser", data);
 			profileUser = data;
 			userProfileModal.open();
 		});
