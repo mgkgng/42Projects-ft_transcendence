@@ -139,7 +139,7 @@ export class Room {
 		// Broadcast
 		this.broadcast("PlayerUpdate", {
 			join: false,
-			username: client.username_42,
+			username_42: client.username_42,
 			hostname: this.hostname
 		});
 		return (true);
