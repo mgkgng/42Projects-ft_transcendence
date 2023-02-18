@@ -345,6 +345,7 @@
 			getDirectMessage = false;
 		}
 	}
+	$: allMessages = allMessages;
 </script>
 <Modal bind:this={writeMessageModal}>
 	<WriteMessage itself={writeMessageModal} sendTo={[]}/>
